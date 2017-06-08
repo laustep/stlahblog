@@ -7,8 +7,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>My Hakyll Blog - The `owen` library for Haskell</title>
   <link rel="stylesheet" href="../css/post.css" />
-  <link rel="stylesheet" href="../css/misc.css" /> 
-  <link rel="stylesheet" href="../css/hscolour.css" />  
+  <link rel="stylesheet" href="../css/misc.css" />
+  <link rel="stylesheet" href="../css/hscolour.css" />
   <link href="http://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="http://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="http://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
@@ -48,9 +48,9 @@
     <div class="content">
       <h1>The `owen` library for Haskell</h1> <div class="info">
     Posted on June  1, 2017
-    
+
         by Stéphane Laurent
-    
+
 </div>
 
 <p>The <code>owen</code> library is available <a href="https://github.com/stla/owen">on Github</a>. The functions it provides are described and illustrated in this post.</p>
@@ -79,7 +79,7 @@ T(h,a) = \frac{1}{2\pi}\int_0^a \frac{e^{-\frac12 h^2(1+x^2)}}{1+x^2}\mathrm{d}x
 <p>The <code>owenT</code> function allows infinite values of <span class="math inline">\(h\)</span> and <span class="math inline">\(a\)</span>:</p>
 <div class="sourceCode">
 <pre class="scriptHaskell"><code class="scriptHaskell"><span class="prompt">></span> <span class="hs-keyword">import</span> <span class="hs-conid">OwenT</span>
-<span class="prompt">></span> <span class="hs-keyword">import</span> <span class="hs-conid">Data</span><span class="hs-varop">.</span><span class="hs-conid">Number</span><span class="hs-varop">.</span><span class="hs-conid">Erf</span> 
+<span class="prompt">></span> <span class="hs-keyword">import</span> <span class="hs-conid">Data</span><span class="hs-varop">.</span><span class="hs-conid">Number</span><span class="hs-varop">.</span><span class="hs-conid">Erf</span>
 <span class="prompt">></span> <span class="hs-comment">-- zero: </span>
 <span class="prompt">></span> <span class="hs-definition">owenT</span> <span class="hs-layout">(</span><span class="hs-num">1</span><span class="hs-varop">/</span><span class="hs-num">0</span><span class="hs-layout">)</span> <span class="hs-num">3</span>
 <span class="output">0.0</span>
@@ -134,9 +134,9 @@ x^{\nu-1} e^{-\frac{x^2}{2}} \mathrm{d}x
 <pre class="scriptHaskell"><code class="scriptHaskell"><span class="prompt">></span> <span class="hs-keyword">import</span> <span class="hs-conid">OwenQ</span>
 <span class="prompt">></span> <span class="hs-keyword">import</span> <span class="hs-conid">Math</span><span class="hs-varop">.</span><span class="hs-conid">Gamma</span> <span class="hs-keyword">as</span> <span class="hs-conid">G</span>
 <span class="prompt">></span> <span class="hs-comment">-- zero:</span>
-<span class="prompt">></span> <span class="hs-definition">owenQ1</span> <span class="hs-num">3</span> <span class="hs-layout">(</span><span class="hs-varop">-</span><span class="hs-num">1</span><span class="hs-varop">/</span><span class="hs-num">0</span><span class="hs-layout">)</span> <span class="hs-num">2</span> <span class="hs-num">2</span> 
+<span class="prompt">></span> <span class="hs-definition">owenQ1</span> <span class="hs-num">3</span> <span class="hs-layout">(</span><span class="hs-varop">-</span><span class="hs-num">1</span><span class="hs-varop">/</span><span class="hs-num">0</span><span class="hs-layout">)</span> <span class="hs-num">2</span> <span class="hs-num">2</span>
 <span class="output">0.0</span>
-<span class="prompt">></span> <span class="hs-definition">owenQ1</span> <span class="hs-num">3</span> <span class="hs-num">2</span> <span class="hs-layout">(</span><span class="hs-num">1</span><span class="hs-varop">/</span><span class="hs-num">0</span><span class="hs-layout">)</span> <span class="hs-num">2</span>  
+<span class="prompt">></span> <span class="hs-definition">owenQ1</span> <span class="hs-num">3</span> <span class="hs-num">2</span> <span class="hs-layout">(</span><span class="hs-num">1</span><span class="hs-varop">/</span><span class="hs-num">0</span><span class="hs-layout">)</span> <span class="hs-num">2</span>
 <span class="output">0.0</span>
 <span class="prompt">></span> <span class="hs-comment">-- equalities:</span>
 <span class="prompt">></span> <span class="hs-definition">owenQ1</span> <span class="hs-num">5</span> <span class="hs-layout">(</span><span class="hs-num">1</span><span class="hs-varop">/</span><span class="hs-num">0</span><span class="hs-layout">)</span> <span class="hs-num">9</span> <span class="hs-num">3</span>
@@ -170,7 +170,7 @@ x^{\nu-1} e^{-\frac{x^2}{2}} \mathrm{d}x
   <div id="disqus_thread"></div>
   <div class="pagination">
     <ul>
-      <li><a href="https://laustep.github.io/">« Back Home</a></li>
+      <li><a href="http://laustep.github.io/">« Back Home</a></li>
     </ul>
   </div>
 </body>
