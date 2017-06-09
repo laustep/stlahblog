@@ -7,15 +7,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>My Hakyll Blog - The `owen` library for Haskell</title>
   <link rel="stylesheet" href="../css/post.css" />
-  <link rel="stylesheet" href="../css/misc.css" />
-  <link rel="stylesheet" href="../css/hscolour.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/hscolour.css" />  
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script type="text/javascript" async
-    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
-  </script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
 </head>
 
 <body>
@@ -26,10 +25,10 @@
         <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
       </a>
       <br />
-      <a href="https://t-redactyl.io/">
+      <a href="http://t-redactyl.io/">
         <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
       </a>
-      <a href="https://timelyportfolio.blogspot.be/">
+      <a href="http://timelyportfolio.blogspot.be/">
         <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
       </a>
     </div>
@@ -51,9 +50,9 @@
     <div class="content">
       <h1>The `owen` library for Haskell</h1> <div class="info">
     Posted on June  1, 2017
-
+    
         by Stéphane Laurent
-
+    
 </div>
 
 <p>The <code>owen</code> library is available <a href="https://github.com/stla/owen">on Github</a>. The functions it provides are described and illustrated in this post.</p>
@@ -82,7 +81,7 @@ T(h,a) = \frac{1}{2\pi}\int_0^a \frac{e^{-\frac12 h^2(1+x^2)}}{1+x^2}\mathrm{d}x
 <p>The <code>owenT</code> function allows infinite values of <span class="math inline">\(h\)</span> and <span class="math inline">\(a\)</span>:</p>
 <div class="sourceCode">
 <pre class="scriptHaskell"><code class="scriptHaskell"><span class="prompt">></span> <span class="hs-keyword">import</span> <span class="hs-conid">OwenT</span>
-<span class="prompt">></span> <span class="hs-keyword">import</span> <span class="hs-conid">Data</span><span class="hs-varop">.</span><span class="hs-conid">Number</span><span class="hs-varop">.</span><span class="hs-conid">Erf</span>
+<span class="prompt">></span> <span class="hs-keyword">import</span> <span class="hs-conid">Data</span><span class="hs-varop">.</span><span class="hs-conid">Number</span><span class="hs-varop">.</span><span class="hs-conid">Erf</span> 
 <span class="prompt">></span> <span class="hs-comment">-- zero: </span>
 <span class="prompt">></span> <span class="hs-definition">owenT</span> <span class="hs-layout">(</span><span class="hs-num">1</span><span class="hs-varop">/</span><span class="hs-num">0</span><span class="hs-layout">)</span> <span class="hs-num">3</span>
 <span class="output">0.0</span>
@@ -137,9 +136,9 @@ x^{\nu-1} e^{-\frac{x^2}{2}} \mathrm{d}x
 <pre class="scriptHaskell"><code class="scriptHaskell"><span class="prompt">></span> <span class="hs-keyword">import</span> <span class="hs-conid">OwenQ</span>
 <span class="prompt">></span> <span class="hs-keyword">import</span> <span class="hs-conid">Math</span><span class="hs-varop">.</span><span class="hs-conid">Gamma</span> <span class="hs-keyword">as</span> <span class="hs-conid">G</span>
 <span class="prompt">></span> <span class="hs-comment">-- zero:</span>
-<span class="prompt">></span> <span class="hs-definition">owenQ1</span> <span class="hs-num">3</span> <span class="hs-layout">(</span><span class="hs-varop">-</span><span class="hs-num">1</span><span class="hs-varop">/</span><span class="hs-num">0</span><span class="hs-layout">)</span> <span class="hs-num">2</span> <span class="hs-num">2</span>
+<span class="prompt">></span> <span class="hs-definition">owenQ1</span> <span class="hs-num">3</span> <span class="hs-layout">(</span><span class="hs-varop">-</span><span class="hs-num">1</span><span class="hs-varop">/</span><span class="hs-num">0</span><span class="hs-layout">)</span> <span class="hs-num">2</span> <span class="hs-num">2</span> 
 <span class="output">0.0</span>
-<span class="prompt">></span> <span class="hs-definition">owenQ1</span> <span class="hs-num">3</span> <span class="hs-num">2</span> <span class="hs-layout">(</span><span class="hs-num">1</span><span class="hs-varop">/</span><span class="hs-num">0</span><span class="hs-layout">)</span> <span class="hs-num">2</span>
+<span class="prompt">></span> <span class="hs-definition">owenQ1</span> <span class="hs-num">3</span> <span class="hs-num">2</span> <span class="hs-layout">(</span><span class="hs-num">1</span><span class="hs-varop">/</span><span class="hs-num">0</span><span class="hs-layout">)</span> <span class="hs-num">2</span>  
 <span class="output">0.0</span>
 <span class="prompt">></span> <span class="hs-comment">-- equalities:</span>
 <span class="prompt">></span> <span class="hs-definition">owenQ1</span> <span class="hs-num">5</span> <span class="hs-layout">(</span><span class="hs-num">1</span><span class="hs-varop">/</span><span class="hs-num">0</span><span class="hs-layout">)</span> <span class="hs-num">9</span> <span class="hs-num">3</span>
@@ -165,7 +164,7 @@ x^{\nu-1} e^{-\frac{x^2}{2}} \mathrm{d}x
 
     <div id="footer">
       Site proudly generated by
-      <a href="https://jaspervdj.be/hakyll">Hakyll</a>
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
     </div>
 
   </div>
@@ -173,7 +172,7 @@ x^{\nu-1} e^{-\frac{x^2}{2}} \mathrm{d}x
   <div id="disqus_thread"></div>
   <div class="pagination">
     <ul>
-      <li><a href="https://laustep.github.io/">« Back Home</a></li>
+      <li><a href="http://laustep.github.io/stlahblog/">« Back Home</a></li>
     </ul>
   </div>
 </body>
@@ -187,12 +186,12 @@ x^{\nu-1} e^{-\frac{x^2}{2}} \mathrm{d}x
     var dsq = document.createElement('script');
     dsq.type = 'text/javascript';
     dsq.async = true;
-    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
     (document.getElementsByTagName('head')[0] ||
       document.getElementsByTagName('body')[0]).appendChild(dsq);
   })();
 </script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
 <script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
 <!-- <script>

@@ -1,0 +1,209 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Hakyll Blog - Dyadic expansion with R</title>
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/kate.css" />  
+  <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+</head>
+
+<body>
+  <!-- Sidebar. -->
+  <div class="sidebar">
+    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+      <a href="https://www.r-bloggers.com/">
+        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+      </a>
+      <br />
+      <a href="http://t-redactyl.io/">
+        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
+      </a>
+      <a href="http://timelyportfolio.blogspot.be/">
+        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="header">
+      <div id="logo" style="position:absolute;">
+        <a href="../"><img src="../images/stla.jpg" alt="stla" width="100px" /></a>
+      </div>
+      <div id="navigation" style="margin-top:50px;">
+        <a href="../">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../archive.html">Archive</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Dyadic expansion with R</h1> <div class="info">
+    Posted on June  2, 2017
+    
+        by Stéphane Laurent
+    
+</div>
+
+<ul>
+<li><a href="#dyadic-expansion">Dyadic expansion</a></li>
+<li><a href="#the-dyadic-odometer">The dyadic odometer</a></li>
+<li><a href="#the-pascal-transformation">The Pascal transformation</a></li>
+</ul>
+<p>We provide a function that computes the dyadic representation of a real number in the interval <span class="math inline">\([0,1]\)</span>. Then we give an implementation of two transformations of the set <span class="math inline">\({\{0,1\}}^\mathbb{N}\)</span> which are well-known in ergodic theory: the dyadic odometer and the Pascal transformation. For each of these transformations, we plot the graph of the conjugate transformation of <span class="math inline">\([0,1]\)</span> obtained by the dyadic representation.</p>
+<h2 id="dyadic-expansion">Dyadic expansion</h2>
+<p>Every real number <span class="math inline">\(u \in [0,1]\)</span> has a <em>dyadic expansion</em> (or <em>binary expansion</em>): <span class="math display">\[
+u = \frac{\epsilon_1}{2} + \frac{\epsilon_2}{2^2} + \frac{\epsilon_3}{2^3} + \ldots
+\]</span> where <span class="math inline">\(\epsilon_i=0\)</span> or <span class="math inline">\(1\)</span>. We say that the sequence <span class="math inline">\((\epsilon_1, \epsilon_2, \ldots)\)</span> is the <em>dyadic representation</em> of <span class="math inline">\(u\)</span>.</p>
+<p>The <code>num2dyadic</code> function below returns the dyadic representation of <span class="math inline">\(u \in [0,1]\)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">num2dyadic &lt;-<span class="st"> </span><span class="cf">function</span>(u, <span class="dt">nmax=</span>1024L){ 
+  out &lt;-<span class="st"> </span><span class="kw">integer</span>(nmax)
+  i &lt;-<span class="st"> </span>j &lt;-<span class="st"> </span>0L
+  <span class="cf">while</span>(u<span class="op">&gt;</span><span class="dv">0</span> <span class="op">&amp;&amp;</span><span class="st"> </span>i<span class="op">&lt;</span>nmax){
+    j &lt;-<span class="st"> </span>1L <span class="op">+</span><span class="st"> </span><span class="kw">max</span>(0L,<span class="kw">floor</span>(<span class="op">-</span><span class="kw">log2</span>(u<span class="op">*</span>(<span class="dv">1</span><span class="op">+</span>.Machine<span class="op">$</span>double.eps<span class="op">^</span>.<span class="dv">5</span>)))) 
+    <span class="cf">if</span>(i<span class="op">+</span>j <span class="op">&lt;=</span><span class="st"> </span>nmax){
+      i &lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span>j
+      out[i] &lt;-<span class="st"> </span>1L
+      u &lt;-<span class="st"> </span>2L<span class="op">^</span>j<span class="op">*</span>u <span class="op">-</span><span class="st"> </span>1L
+    }<span class="cf">else</span>{
+      i &lt;-<span class="st"> </span>nmax
+    }
+  }
+  <span class="kw">return</span>(out[<span class="dv">1</span><span class="op">:</span>i])
+}</code></pre></div>
+<p>The <code>dyadic2num</code> function below does the reverse action:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dyadic2num &lt;-<span class="st"> </span><span class="cf">function</span>(d) <span class="kw">sum</span>(d<span class="op">/</span>2L<span class="op">^</span>(<span class="kw">seq_along</span>(d))) </code></pre></div>
+<p>Let us check that the dyadic representation of <span class="math inline">\(0.75 = \frac{1}{2}+\frac{1}{4}\)</span> is <span class="math inline">\((1,1)\)</span>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">num2dyadic</span>(<span class="dv">1</span><span class="op">/</span><span class="dv">2</span><span class="op">+</span><span class="dv">1</span><span class="op">/</span><span class="dv">4</span>)
+## [1] 1 1</code></pre></div>
+<p>The real number <span class="math inline">\(u=0.2\)</span> has the infinite periodic dyadic representation <span class="math inline">\((0, 0, 1, 1, 0, 0, 1, 1, \ldots)\)</span>. The <code>num2dyadic</code> function applied to <span class="math inline">\(0.2\)</span> returns only the first <span class="math inline">\(54\)</span> digits of its dyadic representation:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">( d &lt;-<span class="st"> </span><span class="kw">num2dyadic</span>(<span class="fl">0.2</span>) )
+##  [1] 0 0 1 1 0 0 1 1 0 0 1 1 0 0 1 1 0 0 1 1 0 0 1 1 0 0 1 1 0 0 1 1 0 0 1
+## [36] 1 0 0 1 1 0 0 1 1 0 0 1 1 0 0 1 1 0 1
+<span class="kw">length</span>(d)
+## [1] 54</code></pre></div>
+<p>But it makes no difference for R:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dyadic2num</span>(d) <span class="op">==</span><span class="st"> </span><span class="fl">0.2</span>
+## [1] TRUE</code></pre></div>
+<h2 id="the-dyadic-odometer">The dyadic odometer</h2>
+<p>The dyadic odometer is the transformation <span class="math inline">\(O\)</span> of the set <span class="math inline">\({\{0,1\}}^{\mathbb{N}}\)</span> defined by <span class="math inline">\(O(d) = d + (1, 0, 0, \ldots)\)</span>, where “<span class="math inline">\(+\)</span>” is the addition <span class="math inline">\(\bmod\, 2\)</span> with carry to the right.</p>
+<p>The <code>odometer</code> function below is an implementation of the dyadic odometer and its inverse (option <code>image=&quot;backward&quot;</code>).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">odometer &lt;-<span class="st"> </span><span class="cf">function</span>(d, <span class="dt">image=</span><span class="kw">c</span>(<span class="st">&quot;forward&quot;</span>, <span class="st">&quot;backward&quot;</span>)){
+  image &lt;-<span class="st"> </span><span class="kw">match.arg</span>(image)
+  <span class="cf">if</span>(image<span class="op">==</span><span class="st">&quot;forward&quot;</span>){
+    <span class="cf">if</span>(<span class="kw">all</span>(d<span class="op">==</span>1L)){
+      d &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">rep</span>(0L, <span class="kw">length</span>(d)), 1L)
+    }<span class="cf">else</span>{
+      k &lt;-<span class="st"> </span><span class="kw">which.min</span>(d)
+      d[<span class="dv">1</span><span class="op">:</span>k] &lt;-<span class="st"> </span>1L<span class="op">-</span>d[<span class="dv">1</span><span class="op">:</span>k]
+    }
+  }
+  <span class="cf">if</span>(image<span class="op">==</span><span class="st">&quot;backward&quot;</span>){
+    <span class="cf">if</span>(<span class="kw">all</span>(d<span class="op">==</span>0L)){
+      d &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">rep</span>(1L, <span class="kw">length</span>(d)), 0L)
+    }<span class="cf">else</span>{
+      k &lt;-<span class="st"> </span><span class="kw">which.max</span>(d)
+      d[<span class="dv">1</span><span class="op">:</span>k] &lt;-<span class="st"> </span>1L<span class="op">-</span>d[<span class="dv">1</span><span class="op">:</span>k]
+    }
+  }
+  <span class="kw">return</span>(d)
+}</code></pre></div>
+<p>Using the dyadic representation, the odometer also defines a map from the interval <span class="math inline">\([0,1]\)</span> to itself. We plot its graph below:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">4</span>,<span class="dv">4</span>,<span class="dv">2</span>,<span class="dv">2</span>))
+u &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="fl">0.995</span>, <span class="dt">by=</span><span class="fl">0.001</span>)
+Ou &lt;-<span class="st"> </span><span class="kw">sapply</span>(u, <span class="cf">function</span>(u) <span class="kw">dyadic2num</span>(<span class="kw">odometer</span>(<span class="kw">num2dyadic</span>(u))))
+<span class="kw">plot</span>(u, Ou, <span class="dt">xlab=</span><span class="st">&quot;u&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;O(u)&quot;</span>, 
+     <span class="dt">xlim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),
+     <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">cex=</span>.<span class="dv">25</span>, 
+     <span class="dt">pty=</span><span class="st">&quot;s&quot;</span>, <span class="dt">xaxs=</span><span class="st">&quot;i&quot;</span>, <span class="dt">yaxs=</span><span class="st">&quot;i&quot;</span>)
+<span class="kw">grid</span>(<span class="dt">nx=</span><span class="dv">10</span>)</code></pre></div>
+<p><img src="./figures/dyadic-plot_odometer-1.png" style="display: block; margin: auto;" /></p>
+<h2 id="the-pascal-transformation">The Pascal transformation</h2>
+<p>The Pascal transformation <span class="math inline">\(P\)</span> is defined for every <span class="math inline">\(d \in {\{0,1\}}^{\mathbb{N}}\)</span> except when <span class="math inline">\(d=000\ldots\)</span> or when <span class="math inline">\(d\)</span> has the form <span class="math inline">\(d=0^i111\ldots\)</span> (<span class="math inline">\(i\geq 0\)</span>). Such a <span class="math inline">\(d\)</span> has the form <span class="math inline">\(d= 0^m1^k10x\)</span> where <span class="math inline">\(m,k \geq 0\)</span> and <span class="math inline">\(x \in {\{0,1\}}^{\mathbb{N}}\)</span>, and then the image of <span class="math inline">\(d\)</span> by the Pascal transformation is defined by <span class="math display">\[
+P(0^m1^k10x) = 1^k0^m01x.
+\]</span> The case when <span class="math inline">\(d=0^i111\ldots\)</span> does not occur for us since we deal with finite sequences only. One naturally extends the Pascal transformation to include the case <span class="math inline">\(d=000\ldots\)</span> by setting <span class="math inline">\(P(000\ldots) = 000\ldots\)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pascal &lt;-<span class="st"> </span><span class="cf">function</span>(d){
+  <span class="cf">if</span>(<span class="kw">all</span>(d<span class="op">==</span>0L)) <span class="kw">return</span>(0L)
+  i &lt;-<span class="st"> </span><span class="kw">which.max</span>(d)
+  m1 &lt;-<span class="st"> </span>i<span class="op">-</span>1L
+  d0 &lt;-<span class="st"> </span><span class="kw">c</span>(d, 0L)
+  k1 &lt;-<span class="st"> </span><span class="kw">which.min</span>(d0[<span class="op">-</span>(<span class="dv">1</span><span class="op">:</span>i)])<span class="op">-</span>1L
+  begin &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">rep</span>(1L, k1), <span class="kw">rep</span>(0L, m1<span class="op">+</span>1L), 1L)
+  <span class="cf">if</span>(<span class="kw">length</span>(d)<span class="op">==</span>m1<span class="op">+</span>k1<span class="op">+</span>1L) d &lt;-<span class="st"> </span>begin <span class="cf">else</span> d[1L<span class="op">:</span>(m1<span class="op">+</span>k1<span class="op">+</span>2L)] &lt;-<span class="st"> </span>begin
+  <span class="kw">return</span>(d)
+}</code></pre></div>
+<p>By the dyadic representation, the Pascal transformation also defines a map from the interval <span class="math inline">\([0,1)\)</span> to itself, whose graph is plotted below:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">4</span>,<span class="dv">4</span>,<span class="dv">2</span>,<span class="dv">2</span>))
+u &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">1</span><span class="op">-</span><span class="dv">1</span><span class="op">/</span><span class="dv">2</span><span class="op">^</span><span class="dv">10</span>, <span class="dt">by=</span><span class="dv">1</span><span class="op">/</span><span class="dv">2</span><span class="op">^</span><span class="dv">10</span>)
+Pu &lt;-<span class="st"> </span><span class="kw">sapply</span>(u, <span class="cf">function</span>(u) <span class="kw">dyadic2num</span>(<span class="kw">pascal</span>(<span class="kw">num2dyadic</span>(u))))
+<span class="kw">plot</span>(u, Pu, <span class="dt">xlab=</span><span class="st">&quot;u&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;P(u)&quot;</span>, 
+     <span class="dt">xlim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),
+     <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">cex=</span>.<span class="dv">25</span>, 
+     <span class="dt">pty=</span><span class="st">&quot;s&quot;</span>, <span class="dt">xaxs=</span><span class="st">&quot;i&quot;</span>, <span class="dt">yaxs=</span><span class="st">&quot;i&quot;</span>)
+<span class="kw">grid</span>(<span class="dt">nx=</span><span class="dv">10</span>)</code></pre></div>
+<p><img src="./figures/dyadic-plot_pascal-1.png" style="display: block; margin: auto;" /></p>
+
+    </div>
+
+
+    <div id="footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </div>
+
+  </div>
+
+  <div id="disqus_thread"></div>
+  <div class="pagination">
+    <ul>
+      <li><a href="http://laustep.github.io/stlahblog/">« Back Home</a></li>
+    </ul>
+  </div>
+</body>
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+<!-- Google Prettify -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+<script>
+  var pres = document.getElementsByTagName("pre");
+  for (var i = 0; i < pres.length; ++i) {
+    pres[i].className = pres[i].className + " prettyprint linenums";
+  }
+  prettyPrint();
+</script>
+
+
+</html>

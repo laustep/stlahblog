@@ -1,0 +1,7 @@
+jax/
+localization/
+test/
+!config/
+config/*
+!config/TeX-MML-AM_CHTML.js
+fonts/
