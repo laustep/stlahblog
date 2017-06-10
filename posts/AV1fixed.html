@@ -1,0 +1,177 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Hakyll Blog - The geometry of the balanced ANOVA model (with fixed effects)</title>
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/kate.css" />  
+  <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+</head>
+
+<body>
+  <!-- Sidebar. -->
+  <div class="sidebar">
+    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+      <a href="https://www.r-bloggers.com/">
+        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+      </a>
+      <br />
+      <a href="http://t-redactyl.io/">
+        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
+      </a>
+      <a href="http://timelyportfolio.blogspot.be/">
+        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="header">
+      <div id="logo" style="position:absolute;">
+        <a href="../"><img src="../images/stla.jpg" alt="stla" width="100px" /></a>
+      </div>
+      <div id="navigation" style="margin-top:50px;">
+        <a href="../">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../archive.html">Archive</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>The geometry of the balanced ANOVA model (with fixed effects)</h1> <div class="info">
+    Posted on June  6, 2017
+    
+        by Stéphane Laurent
+    
+</div>
+
+<ul>
+<li><a href="#standard-normal-distribution-on-a-vector-space">Standard normal distribution on a vector space</a></li>
+<li><a href="#the-balanced-anova-model">The balanced ANOVA model</a></li>
+<li><a href="#tensor-product">Tensor product</a></li>
+<li><a href="#least-squares-estimates">Least-squares estimates</a></li>
+</ul>
+<p>Most usually, the mathematical treatment of Gaussian linear models starts with the matricial writing <span class="math inline">\(Y=X\beta+\sigma G\)</span>, where <span class="math inline">\(Y\)</span> is a random vector modelling the <span class="math inline">\(n\)</span> response values, <span class="math inline">\(X\)</span> is a known matrix, <span class="math inline">\(\beta\)</span> is the vector of unknown parameters, and <span class="math inline">\(G\)</span> has the standard normal distribution on <span class="math inline">\(\mathbb{R}^n\)</span>.</p>
+<p>There are good reasons to use this matricial writing. However it is cleaner to treat the theory with the equivalent vector space notation <span class="math inline">\(Y = \mu + \sigma G\)</span>, where <span class="math inline">\(\mu\)</span> is assumed to lie in a linear subspace <span class="math inline">\(W\)</span> of <span class="math inline">\(\mathbb{R}^n\)</span>, corresponding to <span class="math inline">\(\text{Im}(X)\)</span> in the matricial notation. For example, denoting by <span class="math inline">\(P_W\)</span> the orthogonal projection on <span class="math inline">\(W\)</span>, the least-squares estimate <span class="math inline">\(\hat\mu\)</span> of <span class="math inline">\(\mu\)</span> is simply given by <span class="math inline">\(\hat\mu=P_Wy\)</span>, and <span class="math inline">\(P_W^\perp y\)</span> is the vector of residuals, denoting by <span class="math inline">\(P^\perp_W\)</span> the projection on the orthogonal complement of <span class="math inline">\(W\)</span>. Thus there is no need to consider <span class="math inline">\(W=\text{Im}(X)\)</span> to derive the general principles of the theory. The balanced one-way ANOVA model, which is the topic of this article, illustrates this approach.</p>
+<h2 id="standard-normal-distribution-on-a-vector-space">Standard normal distribution on a vector space</h2>
+<p>The main tool used to treat the theory of Gaussian linear models is the standard normal distribution on a linear space.</p>
+<div class="title_box">
+<span id="boxtitle" style="color:blue;font-size:30px;">Theorem and definition</span>
+<p id="boxcontent">
+Let <span class="math inline">\(X\)</span> be a <span class="math inline">\(\mathbb{R}^n\)</span>-valued random vector, and <span class="math inline">\(W \subset \mathbb{R}^n\)</span> be a linear space. Say that <span class="math inline">\(X\)</span> has the standard normal distribution on the vector space <span class="math inline">\(W\)</span>, and then note <span class="math inline">\(X \sim SN(W)\)</span>, if it takes its values in <span class="math inline">\(W\)</span> and its characteristic function is given by <span class="math display">\[\mathbb{E} \textrm{e}^{i\langle w, X \rangle} = \textrm{e}^{-\frac12{\Vert w \Vert}^2} \quad \text{for all } w \in W.\]</span> The three following assertions are equivalent (and this is easy to prove): <br /> 1. <span class="math inline">\(X \sim SN(W)\)</span>; <br /> 2. the coordinates of <span class="math inline">\(X\)</span> in some orthonormal basis of <span class="math inline">\(W\)</span> are i.i.d. standard normal random variables; <br /> 3. the coordinates of <span class="math inline">\(X\)</span> in any orthonormal basis of <span class="math inline">\(W\)</span> are i.i.d. standard normal random variables.
+</p>
+</div>
+<p>Of course we retrieve the standard normal distribution on <span class="math inline">\(\mathbb{R}^n\)</span> when taking <span class="math inline">\(W=\mathbb{R}^n\)</span>.</p>
+<p>From this definition-theorem, the so-called <em>Cochran’s theorem</em> is an obvious statement. More precisely, if <span class="math inline">\(U \subset W\)</span> is a linear space, and <span class="math inline">\(Z=U^\perp \cap W\)</span> is the orthogonal complement of <span class="math inline">\(U\)</span> in <span class="math inline">\(W\)</span>, then the projection <span class="math inline">\(P_UX\)</span> of <span class="math inline">\(X\)</span> on <span class="math inline">\(U\)</span> has the standard normal distribution on <span class="math inline">\(U\)</span>, similarly the projection <span class="math inline">\(P_ZX\)</span> of <span class="math inline">\(X\)</span> on <span class="math inline">\(Z\)</span> has the standard normal distribution on <span class="math inline">\(Z\)</span>, and moreover <span class="math inline">\(P_UX\)</span> and <span class="math inline">\(P_ZX\)</span> are independent. This is straightforward to see from the definition-theorem of <span class="math inline">\(SN(W)\)</span>, and it is also easy to see that <span class="math inline">\({\Vert P_UX\Vert}^2 \sim \chi^2_{\dim(U)}\)</span>.</p>
+<h2 id="the-balanced-anova-model">The balanced ANOVA model</h2>
+<p>The balanced ANOVA model is used to model a sample <span class="math inline">\(y=(y_{ij})\)</span> with a tabular structure: <span class="math display">\[
+y=\begin{pmatrix}
+y_{11} &amp; \ldots &amp; y_{1J} \\
+\vdots &amp; y_{ij} &amp; \vdots \\
+y_{I1} &amp; \ldots &amp; y_{IJ}
+\end{pmatrix},
+\]</span> <span class="math inline">\(y_{ij}\)</span> denoting the <span class="math inline">\(j\)</span>-th measurement in group <span class="math inline">\(i\)</span>. It is assumed that the <span class="math inline">\(y_{ij}\)</span> are independent and the population mean depends on the group index <span class="math inline">\(i\)</span>. More precisely, the <span class="math inline">\(y_{ij}\)</span> are modelled by random variables <span class="math inline">\(Y_{ij} \sim_{\text{iid}} {\cal N}(\mu_i, \sigma^2)\)</span>.</p>
+<p>So, how to write this model as <span class="math inline">\(Y=\mu + \sigma G\)</span> where <span class="math inline">\(G \sim SN(\mathbb{R}^n)\)</span> and <span class="math inline">\(\mu\)</span> lies in a linear space <span class="math inline">\(W \subset \mathbb{R}^n\)</span> ?</p>
+<h2 id="tensor-product">Tensor product</h2>
+<p>Here <span class="math inline">\(n=IJ\)</span> and one could consider <span class="math inline">\(Y\)</span> as the vector obtained by stacking the <span class="math inline">\(Y_{ij}\)</span>. For example if <span class="math inline">\(I=2\)</span> and <span class="math inline">\(J=3\)</span>, we should write <span class="math display">\[Y={(Y_{11}, Y_{12}, Y_{13}, Y_{21}, Y_{22}, Y_{23})}'.\]</span></p>
+<p>Actually this is not a good idea to loose the tabular structure. The appropriate approach for writing the balanced ANOVA model involves the <em>tensor product</em>. We keep the tabular structure of the data: <span class="math display">\[Y = \begin{pmatrix} 
+Y_{11} &amp; Y_{12} &amp; Y_{13} \\
+Y_{21} &amp; Y_{22} &amp; Y_{23}
+\end{pmatrix}\]</span> and we take <span class="math display">\[G \sim SN(\mathbb{R}^I\otimes\mathbb{R}^J)\]</span> where the <em>tensor poduct</em> <span class="math inline">\(\mathbb{R}^I\otimes\mathbb{R}^J\)</span> of <span class="math inline">\(\mathbb{R}^I\)</span> and <span class="math inline">\(\mathbb{R}^J\)</span> is nothing but the space of matrices with <span class="math inline">\(I\)</span> rows and <span class="math inline">\(J\)</span> columns. Here <span class="math display">\[
+\mu = \begin{pmatrix} 
+\mu_1 &amp; \mu_1 &amp; \mu_1 \\
+\mu_2 &amp; \mu_2 &amp; \mu_2 
+\end{pmatrix},
+\]</span> lies, as we will see, in a linear space <span class="math inline">\(W \subset \mathbb{R}^I\otimes\mathbb{R}^J\)</span> which is convenient to define with the help of the <em>tensor product</em> <span class="math inline">\(x \otimes y\)</span> of two vectors <span class="math inline">\(x \in \mathbb{R}^I\)</span> and <span class="math inline">\(y \in \mathbb{R}^J\)</span>, defined as the element of <span class="math inline">\(\mathbb{R}^I\otimes\mathbb{R}^J\)</span> given by <span class="math display">\[
+{(x \otimes y)}_{ij}=x_iy_j.
+\]</span> Not all vectors of <span class="math inline">\(\mathbb{R}^I\otimes\mathbb{R}^J\)</span> can be written <span class="math inline">\(x \otimes y\)</span>, but the vectors <span class="math inline">\(x \otimes y\)</span> span <span class="math inline">\(\mathbb{R}^I\otimes\mathbb{R}^J\)</span>. In consistence with this notation, the tensor product <span class="math inline">\(U \otimes V\)</span> of two vector spaces <span class="math inline">\(U \subset \mathbb{R}^I\)</span> and <span class="math inline">\(V \subset \mathbb{R}^J\)</span> is defined as the vector space spanned by the vectors of the form <span class="math inline">\(x \otimes y\)</span>, <span class="math inline">\(x \in U\)</span>, <span class="math inline">\(y \in V\)</span>.</p>
+<p>Then<br />
+<span class="math display">\[
+\mu = (\mu_1, \mu_2) \otimes (1,1,1),
+\]</span> and <span class="math inline">\(\mu\)</span> is assumed to lie in the linear space <span class="math display">\[
+W = \mathbb{R}^I \otimes [{\bf 1}_J].
+\]</span></p>
+<p>Moreover, there is a nice orthogonal decomposition of <span class="math inline">\(W\)</span> corresponding to the usual other parameterization of the model: <span class="math display">\[\boxed{\mu_i = m + \alpha_i} \quad \text{with } \sum_{i=1}^I\alpha_i=0.\]</span> Indeed, writing <span class="math inline">\(\mathbb{R}^I=[{\bf 1}_I] \oplus {[{\bf 1}_I]}^\perp\)</span> yields the following decomposition of <span class="math inline">\(\mu\)</span>: <span class="math display">\[
+\begin{align*}
+\mu = (\mu_1, \ldots, \mu_I) \otimes {\bf 1}_J &amp; = 
+\begin{pmatrix} 
+m &amp; m &amp; m \\
+m &amp; m &amp; m 
+\end{pmatrix} + 
+\begin{pmatrix} 
+\alpha_1 &amp; \alpha_1 &amp; \alpha_1 \\
+\alpha_2 &amp; \alpha_2 &amp; \alpha_2 
+\end{pmatrix} \\ 
+&amp; = \underset{\in \bigl([{\bf 1}_I]\otimes[{\bf 1}_J]\bigr)}{\underbrace{m({\bf 1}_I\otimes{\bf 1}_J)}} + \underset{\in \bigl([{\bf 1}_I]^{\perp}\otimes[{\bf 1}_J] \bigr)}{\underbrace{(\alpha_1,\ldots,\alpha_I)\otimes{\bf 1}_J}} 
+\end{align*}
+\]</span></p>
+<h2 id="least-squares-estimates">Least-squares estimates</h2>
+<p>With the theory introduced above, the least-squares estimates of <span class="math inline">\(m\)</span> and the <span class="math inline">\(\alpha_i\)</span> are given by <span class="math inline">\(\hat m({\bf 1}_I\otimes{\bf 1}_J) = P_U y\)</span> and <span class="math inline">\(\hat\alpha\otimes{\bf 1}_J = P_Zy\)</span> where <span class="math inline">\(U = [{\bf 1}_I]\otimes[{\bf 1}_J]\)</span> and <span class="math inline">\(Z = {[{\bf 1}_I]}^{\perp}\otimes[{\bf 1}_J] = U^\perp \cap W\)</span>, and we also know that <span class="math inline">\(\hat m\)</span> and the <span class="math inline">\(\hat\alpha_i\)</span> are independent. The least-squares estimates of the <span class="math inline">\(\mu_i\)</span> are given by <span class="math inline">\(\hat\mu_i=\hat m +\hat\alpha_i\)</span>. Deriving the expression of these estimates and their distribution is left as an exercise to the reader. As another exercise, check that <span class="math display">\[
+{\Vert P_Z \mu \Vert}^2 =  J \sum_{i=1}^I {(\mu_i - \bar\mu_\bullet)}^2 =
+J \sum_{i=1}^I \alpha_i^2.
+\]</span></p>
+
+    </div>
+
+
+    <div id="footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </div>
+
+  </div>
+
+  <div id="disqus_thread"></div>
+  <div class="pagination">
+    <ul>
+      <li><a href="http://laustep.github.io/stlahblog/">« Back Home</a></li>
+    </ul>
+  </div>
+</body>
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+<!-- Google Prettify -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+<script>
+  var pres = document.getElementsByTagName("pre");
+  for (var i = 0; i < pres.length; ++i) {
+    pres[i].className = pres[i].className + " prettyprint linenums";
+  }
+  prettyPrint();
+</script>
+
+
+</html>
