@@ -1,0 +1,195 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Hakyll Blog - Two-sided tolerance factor for linear regression</title>
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/kate.css" />  
+  <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+</head>
+
+<body>
+  <!-- Sidebar. -->
+  <div class="sidebar">
+    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+      <a href="https://www.r-bloggers.com/">
+        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+      </a>
+      <br />
+      <a href="http://t-redactyl.io/">
+        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
+      </a>
+      <a href="http://timelyportfolio.blogspot.be/">
+        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="header">
+      <div id="logo" style="position:absolute;">
+        <a href="../"><img src="../images/stla.jpg" alt="stla" width="100px" /></a>
+      </div>
+      <div id="navigation" style="margin-top:50px;">
+        <a href="../">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../archive.html">Archive</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Two-sided tolerance factor for linear regression</h1> <div class="info">
+    Posted on July 23, 2017
+    
+        by Stéphane Laurent
+    
+</div>
+
+<p>We denote by <span class="math inline">\(\chi^2_{\nu, \lambda}(p)\)</span> the <span class="math inline">\(100p\%\)</span>-quantile of the non-central Chi-squared distribution <span class="math inline">\(\chi^2_{\nu, \lambda}\)</span> with degrees of freedom number <span class="math inline">\(\nu\)</span> and non-centrality parameter <span class="math inline">\(\lambda\)</span>.</p>
+<p>As shown in Krishnamoorthy &amp; Mathew’s book, the two-sided <span class="math inline">\((p, 1-\alpha)\)</span>-tolerance factor for a linear regression model is the solution <span class="math inline">\(k\)</span> of the equation</p>
+<p><span class="math display">\[
+2\int_0^\infty \Pr\left(\chi^2_\ell &gt; \frac{\ell\chi^2_{1,x^2}(p)}{k^2} \right) \phi\left(\frac{x}{d}\right) \mathrm{d}x
+= 1-\alpha
+\]</span> where <span class="math inline">\(\ell\)</span> is the corank of the <span class="math inline">\(X\)</span> matrix, and <span class="math inline">\(d\)</span> is a number calculated from the desired values of the predictors (as we will see on the example).</p>
+<p>Below we provide a <code>Rcpp</code> implementation of the integral. We use the <code>boost</code> library (offered by the <code>BH</code> package) to evaluate the integrand, and the package <a href="https://github.com/yixuan/RcppNumerical"><code>RcppNumerical</code></a> to evaluate the integral, after transforming this integral to an integral on <span class="math inline">\((0,1)\)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="co">// [[Rcpp::depends(BH)]]</span>
+<span class="co">// [[Rcpp::depends(RcppEigen)]]</span>
+<span class="co">// [[Rcpp::depends(RcppNumerical)]]</span>
+<span class="pp">#include </span><span class="im">&lt;RcppNumerical.h&gt;</span>
+<span class="kw">using</span> <span class="kw">namespace</span> Numer;
+<span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span>
+<span class="kw">using</span> <span class="kw">namespace</span> Rcpp;
+<span class="pp">#include </span><span class="im">&lt;boost/math/distributions/non_central_chi_squared.hpp&gt;</span>
+<span class="pp">#include </span><span class="im">&lt;boost/math/distributions/complement.hpp&gt;</span>
+<span class="pp">#include </span><span class="im">&lt;boost/math/distributions/normal.hpp&gt;</span>
+<span class="pp">#include </span><span class="im">&lt;boost/math/distributions/chi_squared.hpp&gt;</span>
+
+<span class="co">// [[Rcpp::export]]</span>
+<span class="dt">double</span> integrand(<span class="dt">double</span> u, <span class="dt">double</span> l, <span class="dt">double</span> p, <span class="dt">double</span> k, <span class="dt">double</span> d){
+  <span class="dt">double</span> x = u/(<span class="dv">1</span>-u);
+  <span class="dt">double</span> q = <span class="ex">boost::</span>math<span class="ex">::</span>quantile(<span class="ex">boost::</span>math<span class="ex">::</span>non_central_chi_squared(<span class="dv">1</span>, x*x), p);
+  <span class="dt">double</span> pchisq = <span class="ex">boost::</span>math<span class="ex">::</span>cdf(<span class="ex">boost::</span>math<span class="ex">::</span>complement(<span class="ex">boost::</span>math<span class="ex">::</span>chi_squared(l), l*q/k/k));
+  <span class="dt">double</span> w = <span class="dv">2</span>*<span class="ex">boost::</span>math<span class="ex">::</span>pdf(<span class="ex">boost::</span>math<span class="ex">::</span>normal(<span class="dv">0</span>, d), x);
+  <span class="cf">return</span> w * pchisq / ((<span class="dv">1</span>-u)*(<span class="dv">1</span>-u));
+}
+
+<span class="kw">class</span> Integrand: <span class="kw">public</span> Func
+{
+<span class="kw">private</span>:
+  <span class="dt">double</span> l;
+  <span class="dt">double</span> p;
+  <span class="dt">double</span> k;
+  <span class="dt">double</span> d;
+<span class="kw">public</span>:
+  Integrand(<span class="dt">double</span> <span class="va">l_</span>, <span class="dt">double</span> <span class="va">p_</span>, <span class="dt">double</span> <span class="va">k_</span>, <span class="dt">double</span> <span class="va">d_</span>) : l(<span class="va">l_</span>), p(<span class="va">p_</span>), k(<span class="va">k_</span>), d(<span class="va">d_</span>) {}
+  
+  <span class="dt">double</span> <span class="kw">operator</span>()(<span class="at">const</span> <span class="dt">double</span>&amp; u) <span class="at">const</span>
+  {
+    <span class="cf">return</span> integrand(u, l, p, k, d);
+  }
+};
+
+<span class="co">// [[Rcpp::export]]</span>
+Rcpp::NumericVector integral(<span class="dt">double</span> l, <span class="dt">double</span> p, <span class="dt">double</span> k, <span class="dt">double</span> d){
+  Integrand f(l, p, k, d);
+  <span class="dt">double</span> err_est;
+  <span class="dt">int</span> err_code;
+  <span class="at">const</span> <span class="dt">double</span> res = integrate(f, <span class="dv">0</span>, <span class="dv">1</span>, err_est, err_code);
+  Rcpp::NumericVector out = Rcpp::NumericVector::create(res);
+  out.attr(<span class="st">&quot;err_est&quot;</span>) = err_est;
+  out.attr(<span class="st">&quot;err_code&quot;</span>) = err_code;
+  <span class="cf">return</span> out;
+}</code></pre></div>
+<h2 id="example">Example</h2>
+<p>We test our function on Example 3.1 of Krishnamoorthy &amp; Mathew’s book. We firstly calculate the value of <span class="math inline">\(d\)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat &lt;-<span class="st"> </span><span class="kw">data.frame</span>(
+  <span class="dt">x1 =</span> <span class="kw">c</span>(<span class="dv">80</span>, <span class="dv">93</span>, <span class="dv">100</span>, <span class="dv">82</span>, <span class="dv">90</span>, <span class="dv">99</span>, <span class="dv">81</span>, <span class="dv">96</span>, <span class="dv">94</span>, <span class="dv">93</span>, <span class="dv">97</span>, <span class="dv">95</span>, <span class="dv">100</span>, <span class="dv">85</span>, <span class="dv">86</span>, <span class="dv">87</span>), 
+  <span class="dt">x2 =</span> <span class="kw">c</span>(<span class="dv">8</span>, <span class="dv">9</span>, <span class="dv">10</span>, <span class="dv">12</span>, <span class="dv">11</span>, <span class="dv">8</span>, <span class="dv">8</span>, <span class="dv">10</span>, <span class="dv">12</span>, <span class="dv">11</span>, <span class="dv">13</span>, <span class="dv">11</span>, <span class="dv">8</span>, <span class="dv">12</span>, <span class="dv">9</span>, <span class="dv">12</span>), 
+  <span class="dt">y =</span> <span class="kw">c</span>(<span class="dv">2256</span>, <span class="dv">2340</span>, <span class="dv">2426</span>, <span class="dv">2293</span>, <span class="dv">2330</span>, <span class="dv">2368</span>, <span class="dv">2250</span>, <span class="dv">2409</span>, <span class="dv">2364</span>, <span class="dv">2379</span>, <span class="dv">2440</span>, <span class="dv">2364</span>, <span class="dv">2404</span>, <span class="dv">2317</span>, <span class="dv">2309</span>, <span class="dv">2328</span>)
+)
+fit &lt;-<span class="st"> </span><span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span>x1<span class="op">+</span>x2, <span class="dt">data=</span>dat)
+X &lt;-<span class="st"> </span><span class="kw">model.matrix</span>(fit)
+H &lt;-<span class="st"> </span><span class="kw">chol2inv</span>(<span class="kw">chol</span>(<span class="kw">t</span>(X)<span class="op">%*%</span>X)) <span class="co"># inverse of X'X</span>
+## we want the tolerance interval at x1=88 and x2=9
+xnew &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">88</span>, <span class="dv">9</span>)
+d &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">t</span>(xnew) <span class="op">%*%</span><span class="st"> </span>H <span class="op">%*%</span><span class="st"> </span><span class="kw">matrix</span>(xnew)))</code></pre></div>
+<p>No we solve the equation. The <code>Rcpp</code> function <code>integral</code> is available in a package I called <code>RcppNC</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(RcppNC)
+f &lt;-<span class="st"> </span><span class="cf">function</span>(k, l, p, d, alpha){
+  <span class="kw">integral</span>(l, p, k, d) <span class="op">-</span><span class="st"> </span>(<span class="dv">1</span><span class="op">-</span>alpha)
+}
+## Calculation of the (0.9, 0.95)-tolerance factor
+( k &lt;-<span class="st"> </span><span class="kw">uniroot</span>(f, <span class="dt">l=</span><span class="kw">nrow</span>(dat)<span class="op">-</span><span class="dv">3</span>, <span class="dt">p=</span><span class="fl">0.9</span>, <span class="dt">d=</span>d, <span class="dt">alpha=</span><span class="fl">0.05</span>, <span class="dt">lower=</span><span class="dv">2</span>, <span class="dt">upper=</span><span class="dv">3</span>)<span class="op">$</span>root )
+## [1] 2.602851</code></pre></div>
+<p>Now we get the tolerance interval as follows:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">estimates &lt;-<span class="st"> </span>fit<span class="op">$</span>coefficients
+yhat &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">t</span>(xnew) <span class="op">%*%</span><span class="st"> </span><span class="kw">matrix</span>(estimates))
+yhat <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>)<span class="op">*</span>k<span class="op">*</span><span class="kw">sigma</span>(fit)
+## [1] 2271.436 2356.594</code></pre></div>
+<h1 id="references">References</h1>
+<p>Krishnamoorthy &amp; Mathew (2009). <em>Statistical Tolerance Regions</em>. Wiley.</p>
+
+    </div>
+
+
+    <div id="footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </div>
+
+  </div>
+
+  <div id="disqus_thread"></div>
+  <div class="pagination">
+    <ul>
+      <li><a href="http://laustep.github.io/stlahblog/">« Back Home</a></li>
+    </ul>
+  </div>
+</body>
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+<!-- Google Prettify -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+<script>
+  var pres = document.getElementsByTagName("pre");
+  for (var i = 0; i < pres.length; ++i) {
+    pres[i].className = pres[i].className + " prettyprint linenums";
+  }
+  prettyPrint();
+</script>
+
+
+</html>
