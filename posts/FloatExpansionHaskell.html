@@ -55,6 +55,11 @@
         by Stéphane Laurent
     
 </div>
+<div class="info">
+    
+    Tags: <a href="../tags/haskell.html">haskell</a>, <a href="../tags/R.html">R</a>
+    
+</div>
 
 <ul>
 <li><a href="#binary-and-more-expansion-in-haskell">Binary (and more) expansion in Haskell</a></li>
@@ -216,9 +221,9 @@ floatExpansion' base u <span class="fu">=</span> replicate (<span class="fu">-</
   <span class="dt">times =</span> <span class="dv">5000</span>
 )
 ## Unit: microseconds
-##         expr    min     lq     mean median      uq      max neval cld
-##  floatExpand 12.048 14.280 19.46149 15.619  16.511 1871.522  5000  a 
-##   num2dyadic 45.516 80.323 97.29269 91.033 102.189 1550.677  5000   b</code></pre></div>
+##         expr    min      lq      mean  median      uq      max neval cld
+##  floatExpand 12.049 16.9580  43.44155  23.205  35.253 8006.062  5000  a 
+##   num2dyadic 43.286 98.8435 150.81104 128.964 167.788 3451.697  5000   b</code></pre></div>
 <p>It is faster. And I have checked that the two functions always return the same results.</p>
 <p>Moreover the “RHaskell” function allows more than the binary expansion, for example the ternary expansion:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">floatExpand</span>(<span class="dv">1</span><span class="op">/</span><span class="dv">3</span><span class="op">+</span><span class="dv">1</span><span class="op">/</span><span class="dv">27</span>, <span class="dt">base=</span><span class="dv">3</span>)
