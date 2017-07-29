@@ -1,0 +1,196 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Hakyll Blog - The balanced ANOVA model with random effects</title>
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/kate.css" />  
+  <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+</head>
+
+<body>
+  <!-- Sidebar. -->
+  <div class="sidebar">
+    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+      <a href="https://www.r-bloggers.com/">
+        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+      </a>
+      <br />
+      <a href="http://t-redactyl.io/">
+        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
+      </a>
+      <a href="http://timelyportfolio.blogspot.be/">
+        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="header">
+      <div id="logo" style="position:absolute;">
+        <a href="../"><img src="../images/stla.jpg" alt="stla" width="100px" /></a>
+      </div>
+      <div id="navigation" style="margin-top:50px;">
+        <a href="../">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../archive.html">Archive</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>The balanced ANOVA model with random effects</h1> <div class="info">
+    Posted on July 29, 2017
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="../tags/maths.html">maths</a>, <a href="../tags/statistics.html">statistics</a>
+    
+</div>
+
+<ul>
+<li><a href="#the-balanced-anova-model-with-random-effects">The balanced ANOVA model with random effects</a></li>
+<li><a href="#the-three-summary-statistics-bary_bulletbullet-ss_by-ss_wy">The three summary statistics <span class="math inline">\(\bar{Y}_{\bullet\bullet}\)</span>, <span class="math inline">\(SS_b(Y)\)</span>, <span class="math inline">\(SS_w(Y)\)</span></a></li>
+<li><a href="#confidence-interval-for-the-overall-mean">Confidence interval for the overall mean</a></li>
+</ul>
+<p><span class="math inline">\(\newcommand{\indic}{\mathbf{1}}\)</span> <span class="math inline">\(\newcommand{\perpoplus}{\overset{\perp}{\oplus}}\)</span> <span class="math inline">\(\newcommand{\RR}{\mathbb{R}}\)</span></p>
+<h2 id="the-balanced-anova-model-with-random-effects">The balanced ANOVA model with random effects</h2>
+<p>The balanced ANOVA model is used to model a sample <span class="math inline">\(y=(y_{ij})\)</span> with a tabular structure: <span class="math display">\[y=\begin{pmatrix}
+y_{11} &amp; \ldots &amp; y_{1J} \\
+\vdots &amp; y_{ij} &amp; \vdots \\
+y_{I1} &amp; \ldots &amp; y_{IJ}
+\end{pmatrix},
+\]</span> <span class="math inline">\(y_{ij}\)</span> denoting the <span class="math inline">\(j\)</span>-th response in group <span class="math inline">\(i\)</span>.</p>
+<p>In the model with <em>random effects</em>, it is assumed that the observations <span class="math inline">\(y_{ij}\)</span> are generated in two steps. First, the group means <span class="math inline">\(\mu_i\)</span> are independently generated according to a Gaussian distribution <span class="math inline">\({\cal N}(\mu, \sigma^2_b)\)</span> where <span class="math inline">\(\mu\)</span> is the overall mean and <span class="math inline">\(\sigma^2_b\)</span> is the so-called <em>between variance</em>. Second, the responses <span class="math inline">\(y_{ij}\)</span>, <span class="math inline">\(j =1,\ldots,J\)</span>, for each group <span class="math inline">\(i\)</span>, are independently distributed according to a Gaussian distribution <span class="math inline">\({\cal N}(\mu_i, \sigma^2_w)\)</span> with <em>within variance</em> <span class="math inline">\(\sigma^2_w\)</span> and mean <span class="math inline">\(\mu_i\)</span>. Shortly, the model can be written: <span class="math display">\[
+\begin{cases}
+\mu_i \sim_{\text{iid}} {\cal N}(\mu, \sigma^2_b) &amp; i=1, \ldots, I \\
+ (y_{ij} \mid \mu_i) \sim_{\text{iid}} {\cal N}(\mu_i, \sigma^2_w) 
+ &amp; j = 1, \ldots, J 
+\end{cases}.
+\]</span></p>
+<div class="figure">
+<img src="./figures/AV1random-anovarandommodel-1.png" />
+
+</div>
+<p>An equivalent writing of this model, and from now on using capital letters for random variables, is <span class="math display">\[Y_{ij} = \mu + \sigma_bA_{i} + \sigma_wG_{ij},\]</span> where all random variables <span class="math inline">\(A_i\)</span> and <span class="math inline">\(G_{ij}\)</span> are independent and <span class="math inline">\(\sim {\cal N}(0,1)\)</span>.</p>
+<h2 id="the-three-summary-statistics-bary_bulletbullet-ss_by-ss_wy">The three summary statistics <span class="math inline">\(\bar{Y}_{\bullet\bullet}\)</span>, <span class="math inline">\(SS_b(Y)\)</span>, <span class="math inline">\(SS_w(Y)\)</span></h2>
+<p>Using the tensor product language introduced in <a href="http://stla.github.io/stlapblog/posts/Anova1fixed.html">this article</a>, the model can be written <span class="math display">\[Y = \mu({\bf 1}_I\otimes{\bf 1}_J) + \sigma_b A\otimes\indic_J +\sigma_wG, 
+\qquad A \sim SN(\RR^I), \quad G \sim SN(\RR^I\otimes\RR^J).\]</span></p>
+<p>The overall mean <span class="math inline">\(\bar{Y}_{\bullet\bullet}\)</span> is given by the projection of <span class="math inline">\(Y\)</span> on the subspace <span class="math inline">\([{\bf 1}_I]\otimes[{\bf 1}_J]\)</span>:<br />
+<span class="math display">\[P_{[{\bf 1}_I]\otimes[{\bf 1}_J]} Y = \bar{Y}_{\bullet\bullet}({\bf 1}_I\otimes{\bf 1}_J).\]</span></p>
+<p>Then the variations <span class="math inline">\(Y_{ij}-\bar{Y}_{\bullet\bullet}\)</span> around the overall mean are given by the projection on the orthogonal complement <span class="math inline">\({\Bigl([\indic_I]\otimes[\indic_J]\Bigr)}^\perp\)</span>. Knowing that <span class="math display">\[
+\RR^I \otimes \RR^J  = 
+\Bigl([\indic_I]\otimes[\indic_J]\Bigr) 
+\perpoplus \Bigl([\indic_I]^\perp\otimes[\indic_J]\Bigr) 
+\perpoplus \Bigl([\indic_I]\otimes[\indic_J]^\perp\Bigr) 
+\perpoplus \Bigl([\indic_I]^\perp\otimes[\indic_J]^\perp\Bigr),
+\]</span> one gets <span class="math display">\[
+\begin{align}
+\underset{\text{'total'}}{\underbrace{ {\Bigl([\indic_I]\otimes[\indic_J]\Bigr)}^\perp} }  &amp; = 
+\Bigl([\indic_I]^\perp\otimes[\indic_J]\Bigr) 
+\perpoplus \Bigl([\indic_I]\otimes[\indic_J]^\perp\Bigr) 
+\perpoplus \Bigl([\indic_I]^\perp\otimes[\indic_J]^\perp\Bigr) \\
+&amp; =  \underset{\text{'between'}}{\underbrace{\Bigl([\indic_I]^\perp\otimes[\indic_J]\Bigr)}} 
+\perpoplus 
+\underset{\text{'within'}}{\underbrace{\Bigl(\RR^I\otimes[\indic_J]^\perp\Bigr)}},
+\end{align}
+\]</span> thereby yielding the decomposition of the variations: <span class="math display">\[
+P^\perp_{[\indic_I]\otimes[\indic_J]}Y = 
+P_{[\indic_I]^\perp\otimes[\indic_J]}Y + P_{\RR^I\otimes[\indic_J]^\perp}Y,
+\]</span> whose component formulae are:</p>
+<ul>
+<li><p><span class="math inline">\({\bigl(P^\perp_{[\indic_I]\otimes[\indic_J]}Y\bigr)}_{ij}=Y_{ij}-\bar{Y}_{\bullet\bullet}\)</span></p></li>
+<li><p><span class="math inline">\({\bigl(P_{[\indic_I]^\perp\otimes[\indic_J]}Y \bigr)}_{ij} = \bar{Y}_{i\bullet}-\bar{Y}_{\bullet\bullet}\)</span></p></li>
+<li><p><span class="math inline">\({\bigl(P_{\RR^I\otimes[\indic_J]^\perp}Y\bigr)}_{ij} = Y_{ij}-\bar{Y}_{i\bullet}\)</span></p></li>
+</ul>
+<p>Now we can see that the three summary statistics (<em>overall mean</em>, <em>between sum of squares</em>, <em>within sum of squares</em>) <span class="math display">\[\bar{Y}_{\bullet\bullet}, \quad 
+SS_b(Y):={\Vert P_{[\indic_I]^\perp\otimes[\indic_J]}Y  \Vert}^2, \quad 
+SS_w(Y):={\Vert P_{\RR^I\otimes[\indic_J]^\perp}Y \Vert}^2,\]</span> are independent random variables. Indeed, the overall mean <span class="math inline">\(\bar{Y}_{\bullet\bullet}\)</span> is given by <span class="math display">\[\begin{align}
+P_{[{\bf 1}_I]\otimes[{\bf 1}_J]} Y &amp;= \bar{Y}_{\bullet\bullet}({\bf 1}_I\otimes{\bf 1}_J) \\
+&amp; =  
+\mu({\bf 1}_I\otimes{\bf 1}_J) + \sigma_b(P_{[{\bf 1}_I]}A)\otimes\indic_J+\sigma_wP_{[{\bf 1}_I]\otimes[{\bf 1}_J]}G,
+\end{align}\]</span> the between variations are <span class="math display">\[P_{[\indic_I]^\perp\otimes[\indic_J]}Y 
+= \sigma_b(P^\perp_{[\indic_I]} A)\otimes\indic_J + \sigma_w P_{[\indic_I]^\perp\otimes[\indic_J]} G,\]</span> and the within variations are <span class="math display">\[P_{\RR^I\otimes[\indic_J]^\perp}Y 
+= \sigma_wP_{\RR^I\otimes[\indic_J]^\perp} G.\]</span> Independence follows from the independence between <span class="math inline">\(G\)</span> and <span class="math inline">\(A\)</span> and from the orthogonality between the ranges of the different projections.</p>
+<p>It is easy to derive <span class="math inline">\(\bar{Y}_{\bullet\bullet} \sim {\cal N}\left(\mu, \frac{\sigma^2}{IJ}\right)\)</span> where <span class="math inline">\(\sigma^2=J\sigma^2_b+\sigma^2_w\)</span>. It is also easy to get <span class="math inline">\(SS_w(Y) \sim \sigma^2_w\chi^2_{I(J-1)}\)</span> because of <span class="math display">\[P_{\RR^I\otimes[\indic_J]^\perp}Y = \sigma_wP_{\RR^I\otimes[\indic_J]^\perp}G.\]</span> To derive the law of <span class="math inline">\(SS_b(Y)\)</span>, note that <span class="math display">\[
+\begin{align}
+P_{[\indic_I]^\perp\otimes[\indic_J]} G 
+&amp; = \begin{pmatrix} 
+\bar{G}_{1\bullet} - \bar{G}_{\bullet\bullet} &amp; \ldots &amp; \bar{G}_{1\bullet} - \bar{G}_{\bullet\bullet} \\
+\vdots &amp; \vdots &amp; \vdots \\
+\bar{G}_{I\bullet} - \bar{G}_{\bullet\bullet} &amp; \ldots &amp; \bar{G}_{I\bullet} - \bar{G}_{\bullet\bullet} 
+\end{pmatrix} \\
+&amp; = (P^\perp_{[\indic_I]}G_{\text{row}}) \otimes \indic_J
+\end{align}\]</span> where <span class="math inline">\(G_{\text{row}} = (\bar{G}_{i\bullet})\)</span> is the vector of row means of <span class="math inline">\(G\)</span>, and then one can write<br />
+<span class="math display">\[P_{[\indic_I]^\perp\otimes[\indic_J]} Y 
+= \bigl(P^\perp_{[\indic_I]}(\sigma_b A + \sigma_w G_{\text{row}})\bigr) \otimes \indic_J.\]</span> Now it is easy to see that the components of <span class="math inline">\(\sigma_b A + \sigma_w G_{\text{row}}\)</span> are <span class="math inline">\(\sim_{\text{iid}} {\cal N}(0, \sigma^2)\)</span>, and consequently <span class="math inline">\(SS_b(Y) \sim \sigma^2\chi^2_{J-1}\)</span>.</p>
+<h2 id="confidence-interval-for-the-overall-mean">Confidence interval for the overall mean</h2>
+<p>By our previous derivations, the statistic <span class="math display">\[ \frac{\bar Y_{\bullet\bullet}  - \mu}{\frac{1}{\sqrt{I}}\sqrt{\frac{SS_b(Y)}{I(J-1)}}}\]</span> has a Student <span class="math inline">\(t\)</span> distribution with <span class="math inline">\(I-1\)</span> degrees of freedom, wherefrom it is easy to get an exact confidence interval about the overall mean <span class="math inline">\(\mu\)</span>.</p>
+<p>Note that we would get exactly the same confidence interval if we were told only the group means <span class="math inline">\(\bar{Y}_{i\bullet}\)</span>. This is the topic of <a href="http://stla.github.io/stlapblog/posts/ModelReduction.html">another article</a>.</p>
+
+    </div>
+
+
+    <div id="footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </div>
+
+  </div>
+
+  <div id="disqus_thread"></div>
+  <div class="pagination">
+    <ul>
+      <li><a href="http://laustep.github.io/stlahblog/">« Back Home</a></li>
+    </ul>
+  </div>
+</body>
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+<!-- Google Prettify -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+<script>
+  var pres = document.getElementsByTagName("pre");
+  for (var i = 0; i < pres.length; ++i) {
+    pres[i].className = pres[i].className + " prettyprint linenums";
+  }
+  prettyPrint();
+</script>
+
+
+</html>
