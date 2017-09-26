@@ -1,0 +1,241 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Passing a R function to Haskell</title>
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/pandoc-solarized.css" />  
+  <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+</head>
+
+<body>
+  <!-- Sidebar. -->
+  <div class="sidebar">
+    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+      <a href="https://www.r-bloggers.com/">
+        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+      </a>
+      <br />
+      <a href="http://t-redactyl.io/">
+        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
+      </a>
+      <a href="http://timelyportfolio.blogspot.be/">
+        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
+      </a>
+      <br />
+      <a href="https://antoineguillot.wordpress.com/blog/">
+        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="header">
+      <div id="logo" style="position:absolute;">
+        <a href="../"><img src="../images/stla.jpg" alt="stla" width="100px" /></a>
+      </div>
+      <div id="navigation" style="margin-top:50px;">
+        <a href="../">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../archive.html">Archive</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Passing a R function to Haskell</h1> <div class="info">
+    Posted on September 26, 2017
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="../tags/haskell.html">haskell</a>, <a href="../tags/R.html">R</a>
+    
+</div>
+
+<h2 id="passing-r-objects-to-haskell">Passing R objects to Haskell</h2>
+<p>In two previous posts I have shown some examples of calling Haskell from R. More precisely, the procedure consists in building a DLL with Haskell and using this DLL in R, with the help of the <code>.C</code> function.</p>
+<p>We can obviously pass an integer, a double or a character string in the <code>.C</code> function. Thanks to the <code>inline-r</code> Haskell library, we can do more: namely, it is possible to pass any R object, since this library implements the type <code>SEXP</code>.</p>
+<p>Let’s give an example. In this example we pass a R vector of doubles to Haskell, we calculate the square of each component in Haskell and we send the result to R.</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE DataKinds                #-}</span>
+<span class="ot">{-# LANGUAGE ForeignFunctionInterface #-}</span>
+<span class="kw">module</span> <span class="dt">Lib</span> <span class="kw">where</span>
+<span class="kw">import qualified</span> <span class="dt">Data.Vector.SEXP</span> <span class="kw">as</span> <span class="dt">VS</span>
+<span class="kw">import           </span><span class="dt">Foreign</span>
+<span class="kw">import           </span><span class="dt">Foreign.C</span>
+<span class="kw">import qualified</span> <span class="dt">Foreign.R.Type</span>   <span class="kw">as</span> <span class="dt">R</span>
+
+foreign export ccall<span class="ot"> squaredDoubles1 ::</span> <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="ch">'R.Real) -&gt; Ptr (SEXP s '</span><span class="dt">R.Real</span>) <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
+<span class="ot">squaredDoubles1 ::</span> <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="ch">'R.Real) -&gt; Ptr (SEXP s '</span><span class="dt">R.Real</span>) <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
+squaredDoubles1 input result <span class="fu">=</span> <span class="kw">do</span>
+  input <span class="ot">&lt;-</span> peek input
+  <span class="kw">let</span> inputAsList <span class="fu">=</span> (VS.toList <span class="fu">.</span> VS.fromSEXP) input
+  <span class="kw">let</span> outputAsList <span class="fu">=</span> map (\x <span class="ot">-&gt;</span> x<span class="fu">*</span>x) inputAsList
+  <span class="kw">let</span> output <span class="fu">=</span> (VS.toSEXP <span class="fu">.</span> VS.fromList)<span class="ot"> outputAsList ::</span> <span class="dt">SEXP</span> s <span class="ch">'R.Real</span>
+  poke result output</code></pre></div>
+<p>To call in R with the <code>.C</code> function, the R objects must be encapsulated in <code>list()</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span><span class="kw">.C</span>(<span class="st">&quot;squaredDoubles1&quot;</span>, <span class="dt">input =</span> <span class="kw">list</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>)), <span class="dt">result=</span><span class="kw">list</span>(<span class="dv">0</span>))<span class="op">$</span>result[[<span class="dv">1</span>]]
+[<span class="dv">1</span>] <span class="dv">1</span> <span class="dv">4</span> <span class="dv">9</span></code></pre></div>
+<p>Instead of using <code>VS.toList . VS.fromSEXP</code> to convert the R vector to a Haskell list, we could use the <code>real</code> function of the <code>Foreign.R</code> module (this is a port of the <code>C</code> function <code>REAL</code>):</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="fu">...</span>
+<span class="kw">import qualified</span> <span class="dt">Foreign.R</span> <span class="kw">as</span> <span class="dt">FR</span>
+
+foreign export ccall<span class="ot"> squaredDoubles2 ::</span> <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="ch">'R.Real) -&gt; Ptr (SEXP s '</span><span class="dt">R.Real</span>) <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
+<span class="ot">squaredDoubles2 ::</span> <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="ch">'R.Real) -&gt; Ptr (SEXP s '</span><span class="dt">R.Real</span>) <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
+squaredDoubles2 input result <span class="fu">=</span> <span class="kw">do</span>
+  input <span class="ot">&lt;-</span> peek input
+  inputAsListPtr <span class="ot">&lt;-</span> FR.real input
+  l <span class="ot">&lt;-</span> FR.length input
+  inputAsList <span class="ot">&lt;-</span> peekArray l inputAsListPtr
+  <span class="kw">let</span> outputAsList <span class="fu">=</span> map (\x <span class="ot">-&gt;</span> x<span class="fu">*</span>x) inputAsList
+  <span class="kw">let</span> output <span class="fu">=</span> (VS.toSEXP <span class="fu">.</span> VS.fromList)<span class="ot"> outputAsList ::</span> <span class="dt">SEXP</span> s <span class="ch">'R.Real</span>
+  poke result output</code></pre></div>
+<p>The performance is a bit better:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span><span class="kw">library</span>(microbenchmark)
+<span class="op">&gt;</span><span class="st"> </span>x &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">100000</span>)
+<span class="op">&gt;</span><span class="st"> </span><span class="kw">microbenchmark</span>(
+<span class="op">+</span><span class="st">   </span><span class="dt">H1 =</span> <span class="kw">.C</span>(<span class="st">&quot;squaredDoubles1&quot;</span>, <span class="dt">input =</span> <span class="kw">list</span>(x), <span class="dt">result=</span><span class="kw">list</span>(<span class="dv">0</span>))<span class="op">$</span>result[[<span class="dv">1</span>]],
+<span class="op">+</span><span class="st">   </span><span class="dt">H2 =</span> <span class="kw">.C</span>(<span class="st">&quot;squaredDoubles2&quot;</span>, <span class="dt">input =</span> <span class="kw">list</span>(x), <span class="dt">result=</span><span class="kw">list</span>(<span class="dv">0</span>))<span class="op">$</span>result[[<span class="dv">1</span>]]
+<span class="op">+</span><span class="st"> </span>)
+Unit<span class="op">:</span><span class="st"> </span>milliseconds
+ expr      min       lq     mean   median       uq      max neval cld
+   H1 <span class="fl">26.96348</span> <span class="fl">34.70504</span> <span class="fl">44.02896</span> <span class="fl">38.77741</span> <span class="fl">42.31139</span> <span class="fl">205.2244</span>   <span class="dv">100</span>   b
+   H2 <span class="fl">24.33826</span> <span class="fl">30.25337</span> <span class="fl">34.39467</span> <span class="fl">32.80317</span> <span class="fl">35.54754</span> <span class="fl">160.4622</span>   <span class="dv">100</span>  a </code></pre></div>
+<p>Alternatively, we can avoid the pointers and use the <code>.Call</code> function instead of the <code>.C</code> function:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">foreign export ccall<span class="ot"> squaredDoubles3 ::</span> <span class="dt">SEXP</span> s <span class="ch">'R.Real -&gt; SEXP s '</span><span class="dt">R.Real</span>
+<span class="ot">squaredDoubles3 ::</span> <span class="dt">SEXP</span> s <span class="ch">'R.Real -&gt; SEXP s '</span><span class="dt">R.Real</span>
+squaredDoubles3 input <span class="fu">=</span>
+  (VS.toSEXP <span class="fu">.</span> VS.fromList)
+    (map (\x <span class="ot">-&gt;</span> x<span class="fu">*</span>x) ((VS.toList <span class="fu">.</span> VS.fromSEXP) input))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span><span class="kw">.Call</span>(<span class="st">&quot;squaredDoubles3&quot;</span>, <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>))
+[<span class="dv">1</span>] <span class="dv">1</span> <span class="dv">4</span> <span class="dv">9</span></code></pre></div>
+<h2 id="more-advanced-usage-resorting-to-the-ffi">More advanced usage: resorting to the FFI</h2>
+<p>Now we will show how to evaluate a R function.</p>
+<p>The function below is written in C. It takes as arguments a R function <code>f</code> (that is, a <code>SEXP</code> object of class <code>CLOSXP</code>), a double <code>x</code>, and it evaluates <code>f(x)</code>.</p>
+<p>I’m using the C language and not <code>inline-r</code> for two reasons:</p>
+<ul>
+<li><p>there’s no port of the C functions <code>allocSExp</code> and <code>defineVar</code> in <code>inline-r</code>;</p></li>
+<li><p>even if these two functions were available in Haskell (we could import them with the FFI), the Haskell code would be similar to the C code.</p></li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode c"><code class="sourceCode c"><span class="pp">#include </span><span class="im">&lt;R.h&gt;</span>
+<span class="pp">#include </span><span class="im">&lt;Rinternals.h&gt;</span>
+
+<span class="dt">double</span> myeval(SEXP f, <span class="dt">double</span> x) {
+    <span class="co">// convert x to SEXP</span>
+    SEXP xR;
+    PROTECT(xR = allocVector(REALSXP, <span class="dv">1</span>));
+    REAL(xR)[<span class="dv">0</span>] = x;
+    UNPROTECT(<span class="dv">1</span>);
+    <span class="co">// put f in an environment</span>
+    SEXP envir = allocSExp(ENVSXP);
+    SEXP f_symbol = install(<span class="st">&quot;f&quot;</span>);
+    defineVar(f_symbol, f, envir);
+    <span class="co">// evaluate f(x) - like eval(call(&quot;f&quot;, x), envir) in R</span>
+    SEXP call = Rf_lang2(f_symbol, xR);
+    <span class="cf">return</span>(REAL(eval(call, envir))[<span class="dv">0</span>]);
+}</code></pre></div>
+<p>Now we need to import this function:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE DataKinds                #-}</span>
+<span class="ot">{-# LANGUAGE ForeignFunctionInterface #-}</span>
+<span class="kw">module</span> <span class="dt">Lib</span> <span class="kw">where</span>
+<span class="kw">import           </span><span class="dt">Foreign.C.Types</span>
+<span class="kw">import           </span><span class="dt">Foreign.R</span>          (<span class="dt">SEXP</span>, <span class="dt">SEXP0</span>, unsexp)
+<span class="kw">import qualified</span> <span class="dt">Foreign.R</span>          <span class="kw">as</span> <span class="dt">R</span>
+<span class="kw">import qualified</span> <span class="dt">Foreign.R.Type</span>     <span class="kw">as</span> <span class="dt">R</span>
+
+foreign <span class="kw">import </span>ccall unsafe &quot;myeval&quot; c_myeval :: <span class="dt">SEXP0</span> -&gt; <span class="dt">CDouble</span> -&gt; <span class="dt">CDouble</span>
+<span class="ot">myeval ::</span> <span class="dt">SEXP</span> s <span class="ch">'R.Closure -&gt; Double -&gt; Double</span>
+myeval f x <span class="fu">=</span> realToFrac (c_myeval (unsexp f) (realToFrac x))</code></pre></div>
+<p>Let us try it. The numerous <code>realToFrac</code>’s could seem silly but for a more serious application we prefer the signature <code>SEXP s 'R.Closure -&gt; Double -&gt; Double</code> rather than <code>SEXP s 'R.Closure -&gt; CDouble -&gt; CDouble</code>.</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">foreign export ccall<span class="ot"> myevalR ::</span> <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="ch">'R.Closure) -&gt; Ptr CDouble -&gt; Ptr CDouble -&gt; IO ()</span>
+<span class="ot">myevalR ::</span> <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="ch">'R.Closure) -&gt; Ptr CDouble -&gt; Ptr CDouble -&gt; IO ()</span>
+myevalR f x result <span class="fu">=</span> <span class="kw">do</span>
+  f <span class="ot">&lt;-</span> peek f
+  x <span class="ot">&lt;-</span> peek x
+  poke result <span class="fu">$</span> realToFrac <span class="fu">$</span> myeval f (realToFrac<span class="ot"> x ::</span> <span class="dt">Double</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span><span class="kw">.C</span>(<span class="st">&quot;myevalR&quot;</span>, <span class="dt">f=</span><span class="kw">list</span>(<span class="cf">function</span>(x) x<span class="op">+</span><span class="dv">1</span>), <span class="dt">x=</span><span class="dv">3</span>, <span class="dt">result=</span><span class="dv">0</span>)<span class="op">$</span>result
+[<span class="dv">1</span>] <span class="dv">4</span></code></pre></div>
+<p>Thus, <code>myeval f</code> is a Haskell function of signature <code>Double -&gt; Double</code>, though the evaluation is not performed by Haskell.</p>
+<p>Let us see an example of application. Form R, we will call the function</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">chebyshevFit ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>) <span class="ot">-&gt;</span> [<span class="dt">Double</span>]</code></pre></div>
+<p>of the <code>polynomial</code> library.</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="fu">...</span>
+<span class="kw">import </span><span class="dt">Math.Polynomial.Chebyshev</span>
+
+foreign export ccall<span class="ot"> chebyshevFitR ::</span> <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="ch">'R.Closure) -&gt; Ptr CInt -&gt; Ptr (SEXP V '</span><span class="dt">R.Real</span>) <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
+<span class="ot">chebyshevFitR ::</span> <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="ch">'R.Closure) -&gt; Ptr CInt -&gt; Ptr (SEXP V '</span><span class="dt">R.Real</span>) <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
+chebyshevFitR f n result <span class="fu">=</span> <span class="kw">do</span>
+  n <span class="ot">&lt;-</span> peek n
+  f <span class="ot">&lt;-</span> peek f
+  <span class="kw">let</span> fit <span class="fu">=</span> chebyshevFit (fromIntegral<span class="ot"> n ::</span> <span class="dt">Int</span>) (myeval f)
+  poke result <span class="fu">$</span> (VS.toSEXP <span class="fu">.</span> VS.fromList) fit</code></pre></div>
+<p>We will apply it to the function <span class="math inline">\(x \mapsto \cos(4\arccos(x))\)</span>, which is the Chebyshev polynomial of order <span class="math inline">\(4\)</span> for <span class="math inline">\(|x| \leq 1\)</span>. Therefore, for any <span class="math inline">\(n \geq 5\)</span>, the result must theoretically be <span class="math inline">\(0, 0, 0, 0, 1, 0, \ldots, 0\)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span>f &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="kw">cos</span>(<span class="dv">4</span><span class="op">*</span><span class="kw">acos</span>(x))
+<span class="op">&gt;</span><span class="st"> </span><span class="kw">.C</span>(<span class="st">&quot;chebyshevFitR&quot;</span>, <span class="dt">f=</span><span class="kw">list</span>(f), <span class="dt">n=</span>6L, <span class="dt">result=</span><span class="kw">list</span>(<span class="dv">0</span>))<span class="op">$</span>result[[<span class="dv">1</span>]]
+[<span class="dv">1</span>] <span class="op">-</span><span class="fl">1.110223e-16</span>  <span class="fl">3.145632e-16</span> <span class="op">-</span><span class="fl">1.480297e-16</span>  <span class="fl">4.255855e-16</span>  <span class="fl">1.000000e+00</span>  <span class="fl">2.775558e-16</span></code></pre></div>
+
+    </div>
+
+
+    <div id="footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </div>
+
+  </div>
+
+  <div id="disqus_thread"></div>
+  <div class="pagination">
+    <ul>
+      <li><a href="http://laustep.github.io/stlahblog/">« Back Home</a></li>
+    </ul>
+  </div>
+</body>
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+<!-- Google Prettify -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+<script>
+  var pres = document.getElementsByTagName("pre");
+  for (var i = 0; i < pres.length; ++i) {
+    pres[i].className = pres[i].className + " prettyprint linenums";
+  }
+  prettyPrint();
+</script>
+
+
+</html>
