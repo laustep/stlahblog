@@ -1,0 +1,179 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Drawing spherical wedges with rgl</title>
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/kate.css" />  
+  <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+</head>
+
+<body>
+  <!-- Sidebar. -->
+  <div class="sidebar">
+    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+      <a href="https://www.r-bloggers.com/">
+        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+      </a>
+      <br />
+      <a href="http://t-redactyl.io/">
+        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
+      </a>
+      <a href="http://timelyportfolio.blogspot.be/">
+        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
+      </a>
+      <br />
+      <a href="https://antoineguillot.wordpress.com/blog/">
+        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="header">
+      <div id="logo" style="position:absolute;">
+        <a href="../"><img src="../images/stla.jpg" alt="stla" width="100px" /></a>
+      </div>
+      <div id="navigation" style="margin-top:50px;">
+        <a href="../">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../archive.html">Archive</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Drawing spherical wedges with rgl</h1> <div class="info">
+    Posted on February 22, 2017
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="../tags/R.html">R</a>
+    
+</div>
+
+<p>This post provides some code to draw a sphere wedge with the R library <code>rgl</code>.</p>
+<p>As an helper function, I use <code>spherical2cartesian</code> to convert from spherical coordinates to Cartesian coordinates:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">spherical2cartesian &lt;-<span class="st"> </span><span class="cf">function</span>(rthetaphi){
+  r &lt;-<span class="st"> </span>rthetaphi[<span class="dv">1</span>]
+  theta &lt;-<span class="st"> </span>rthetaphi[<span class="dv">2</span>]
+  phi &lt;-<span class="st"> </span>rthetaphi[<span class="dv">3</span>]
+  <span class="kw">c</span>(<span class="dt">x=</span>r<span class="op">*</span><span class="kw">cos</span>(theta)<span class="op">*</span><span class="kw">sin</span>(phi), <span class="dt">y=</span>r<span class="op">*</span><span class="kw">sin</span>(theta)<span class="op">*</span><span class="kw">sin</span>(phi), <span class="dt">z=</span>r<span class="op">*</span><span class="kw">cos</span>(phi))
+}</code></pre></div>
+<p>Now, here is the main function:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sphereWedge &lt;-<span class="st"> </span><span class="cf">function</span>(theta1, theta2, <span class="dt">radius=</span><span class="dv">1</span>, <span class="dt">nm=</span><span class="dv">30</span>, <span class="dt">np=</span><span class="dv">30</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>){
+  thetas &lt;-<span class="st"> </span><span class="kw">seq</span>(theta1, theta2, <span class="dt">length.out=</span>nm)
+  phis &lt;-<span class="st"> </span>pi <span class="op">*</span><span class="st"> </span><span class="dv">1</span><span class="op">:</span>(np<span class="op">-</span><span class="dv">1</span>)<span class="op">/</span>np
+  meridians &lt;-<span class="st"> </span><span class="kw">sapply</span>(phis, 
+                      <span class="cf">function</span>(phi) <span class="kw">sapply</span>(thetas, 
+                                           <span class="cf">function</span>(theta) <span class="kw">c</span>(radius,theta,phi)), 
+                      <span class="dt">simplify=</span><span class="ot">FALSE</span>)
+  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>(np<span class="op">-</span><span class="dv">2</span>)){
+    x1 &lt;-<span class="st"> </span>plyr<span class="op">::</span><span class="kw">aaply</span>(meridians[[i]], <span class="dv">2</span>, spherical2cartesian)
+    x2 &lt;-<span class="st"> </span>plyr<span class="op">::</span><span class="kw">aaply</span>(meridians[[i<span class="op">+</span><span class="dv">1</span>]], <span class="dv">2</span>, spherical2cartesian)
+    <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>(nm<span class="op">-</span><span class="dv">1</span>)){
+      <span class="kw">quads3d</span>(<span class="kw">rbind</span>(x1[j<span class="op">:</span>(j<span class="op">+</span><span class="dv">1</span>),],x2[(j<span class="op">+</span><span class="dv">1</span>)<span class="op">:</span>j,]), <span class="dt">color=</span>col)
+      <span class="kw">triangles3d</span>(<span class="kw">rbind</span>(<span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,radius), <span class="kw">spherical2cartesian</span>(meridians[[<span class="dv">1</span>]][,j]), 
+                        <span class="kw">spherical2cartesian</span>(meridians[[<span class="dv">1</span>]][,j<span class="op">+</span><span class="dv">1</span>])), <span class="dt">color=</span>col)
+      <span class="kw">triangles3d</span>(<span class="kw">rbind</span>(<span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="op">-</span>radius), <span class="kw">spherical2cartesian</span>(meridians[[np<span class="op">-</span><span class="dv">1</span>]][,j]), 
+                        <span class="kw">spherical2cartesian</span>(meridians[[np<span class="op">-</span><span class="dv">1</span>]][,j<span class="op">+</span><span class="dv">1</span>])), <span class="dt">color=</span>col)
+    }
+  }
+}</code></pre></div>
+<p>A simple example:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sphereWedge</span>(<span class="dv">0</span>, pi<span class="op">/</span><span class="dv">3</span>, <span class="dt">col=</span><span class="st">&quot;purple&quot;</span>)</code></pre></div>
+<div class="figure">
+<img src="figures/wedge1.png" />
+
+</div>
+<p>Now let’s draw a tricolor sphere:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sphereWedge</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>)
+<span class="kw">sphereWedge</span>(<span class="dv">2</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>, <span class="dv">4</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>, <span class="dt">col=</span><span class="st">&quot;green&quot;</span>)
+<span class="kw">sphereWedge</span>(<span class="dv">4</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>)</code></pre></div>
+<div class="figure">
+<img src="figures/wedge2.png" />
+
+</div>
+<p>As you can see, I use <code>2*pi</code> and not <code>0</code> for the blue wedge. That should be equivalent. However, and I don’t know why, using <code>0</code> instead of <code>2*pi</code> colors the interior of the two other wedges:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sphereWedge</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>)
+<span class="kw">sphereWedge</span>(<span class="dv">2</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>, <span class="dv">4</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>, <span class="dt">col=</span><span class="st">&quot;green&quot;</span>)
+<span class="kw">sphereWedge</span>(<span class="dv">4</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>, <span class="dv">0</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>)</code></pre></div>
+<div class="figure">
+<img src="figures/wedge3.png" />
+
+</div>
+<h2 id="spherical-triangles-with-rgl">Spherical triangles with rgl</h2>
+<p>I also did a code which draws spherical triangles for rgl. I won’t reproduce it here. If you are interested, it is available in <a href="https://gist.github.com/stla/1cd2c0b3c4db4898f7132003e2ed2766">this gist</a>.</p>
+<div class="figure">
+<img src="figures/triangulatedSphere.png" />
+
+</div>
+
+    </div>
+
+
+    <div id="footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </div>
+
+  </div>
+
+  <div id="disqus_thread"></div>
+  <div class="pagination">
+    <ul>
+      <li><a href="http://laustep.github.io/stlahblog/">« Back Home</a></li>
+    </ul>
+  </div>
+</body>
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+<!-- Google Prettify -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+<script>
+  var pres = document.getElementsByTagName("pre");
+  for (var i = 0; i < pres.length; ++i) {
+    
+    pres[i].className = pres[i].className + " prettyprint";
+    
+  }
+  prettyPrint();
+</script>
+
+
+</html>
