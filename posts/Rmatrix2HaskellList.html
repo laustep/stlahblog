@@ -1,0 +1,160 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - A R matrix to a Haskell list, with the `clipr` package</title>
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/kate.css" />  
+  <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+</head>
+
+<body>
+  <!-- Sidebar. -->
+  <div class="sidebar">
+    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+      <a href="https://www.r-bloggers.com/">
+        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+      </a>
+      <br />
+      <a href="http://t-redactyl.io/">
+        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
+      </a>
+      <a href="http://timelyportfolio.blogspot.be/">
+        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
+      </a>
+      <br />
+      <a href="https://antoineguillot.wordpress.com/blog/">
+        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="header">
+      <div id="logo" style="position:absolute;">
+        <a href="../"><img src="../images/stla.jpg" alt="stla" width="100px" /></a>
+      </div>
+      <div id="navigation" style="margin-top:50px;">
+        <a href="../">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../archive.html">Archive</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>A R matrix to a Haskell list, with the `clipr` package</h1> <div class="info">
+    Posted on March 13, 2018
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="../tags/R.html">R</a>, <a href="../tags/haskell.html">haskell</a>
+    
+</div>
+
+<p>Assume you have a matrix in R, and you want to use it in Haskell as a list. Here is a way to go.</p>
+<p>I will take a small matrix for the illustration.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">M &lt;-<span class="st"> </span><span class="kw">rbind</span>(
+  <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="fl">1.5</span>),
+  <span class="kw">c</span>(<span class="fl">0.5</span>,<span class="dv">2</span>,<span class="dv">3</span>),
+  <span class="kw">c</span>(<span class="dv">5</span>,<span class="fl">4.3</span>,<span class="dv">7</span>)
+)
+M
+##      [,1] [,2] [,3]
+## [1,]  1.0  2.0  1.5
+## [2,]  0.5  2.0  3.0
+## [3,]  5.0  4.3  7.0</code></pre></div>
+<p>So, for Haskell, you want:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">[ [<span class="fl">1.0</span>,  <span class="fl">2.0</span>,  <span class="fl">1.5</span>]
+ ,[<span class="fl">0.5</span>,  <span class="fl">2.0</span>,  <span class="fl">3.0</span>]
+ ,[<span class="fl">5.0</span>,  <span class="fl">4.3</span>,  <span class="fl">7.0</span>] ]</code></pre></div>
+<p>It would be very painful to do it by hands. But the <code>clipr</code> package is your friend. First, write the matrix in the clipboard, like this:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(clipr)
+<span class="kw">write_clip</span>(M, <span class="dt">breaks=</span><span class="st">&quot;],</span><span class="ch">\n</span><span class="st">&quot;</span>, <span class="dt">sep=</span><span class="st">&quot;, &quot;</span>)</code></pre></div>
+<p>No we will use <code>cat</code> to write the output to a file.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(magrittr)
+myfile &lt;-<span class="st"> &quot;matrix.txt&quot;</span>
+<span class="kw">paste0</span>(<span class="st">&quot;[&quot;</span>, <span class="kw">read_clip</span>()) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">cat</span>(<span class="dt">sep=</span><span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>, <span class="dt">file=</span>myfile) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">cat</span>(<span class="st">&quot;]&quot;</span>, <span class="dt">sep=</span><span class="st">&quot;&quot;</span>, <span class="dt">file=</span>myfile, <span class="dt">append=</span><span class="ot">TRUE</span>)</code></pre></div>
+<p>And then, here is the content of <code>matrix.txt</code>:</p>
+<pre class="txt"><code>[1, 2, 1.5],
+[0.5, 2, 3],
+[5, 4.3, 7
+
+]</code></pre>
+<p>Well, not totally perfect. But now it’s a child game to complete the output before copying it to Haskell:</p>
+<pre class="txt"><code>[
+[1, 2, 1.5],
+[0.5, 2, 3],
+[5, 4.3, 7]
+]</code></pre>
+
+    </div>
+
+
+    <div id="footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </div>
+
+  </div>
+
+  <div id="disqus_thread"></div>
+  <div class="pagination">
+    <ul>
+      <li><a href="http://laustep.github.io/stlahblog/">« Back Home</a></li>
+    </ul>
+  </div>
+</body>
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+<!-- Google Prettify -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+<script>
+  var pres = document.getElementsByTagName("pre");
+  for (var i = 0; i < pres.length; ++i) {
+    
+    pres[i].className = pres[i].className + " prettyprint linenums";
+    
+  }
+  prettyPrint();
+</script>
+
+
+</html>
