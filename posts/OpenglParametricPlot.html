@@ -1,0 +1,344 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Parametric surface with OpenGL in Haskell</title>
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/kate.css" />  
+  <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+</head>
+
+<body>
+  <!-- Sidebar. -->
+  <div class="sidebar">
+    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+      <a href="https://www.r-bloggers.com/">
+        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+      </a>
+      <br />
+      <a href="http://t-redactyl.io/">
+        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
+      </a>
+      <a href="http://timelyportfolio.blogspot.be/">
+        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
+      </a>
+      <br />
+      <a href="https://antoineguillot.wordpress.com/blog/">
+        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="header">
+      <div id="logo" style="position:absolute;">
+        <a href="../"><img src="../images/stla.jpg" alt="stla" width="100px" /></a>
+      </div>
+      <div id="navigation" style="margin-top:50px;">
+        <a href="../">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../archive.html">Archive</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Parametric surface with OpenGL in Haskell</h1> <div class="info">
+    Posted on March 27, 2018
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="../tags/haskell.html">haskell</a>, <a href="../tags/graphics.html">graphics</a>
+    
+</div>
+
+<p>In this blog post, I will show how to draw a parametric surface with the Haskell OpenGL library.</p>
+<p>We will take as example the following function with two variables <span class="math inline">\(u\)</span> and <span class="math inline">\(v\)</span> and depending on a parameter <span class="math inline">\(n\)</span>:</p>
+<p><span class="math display">\[
+f_n(u,v) = \begin{pmatrix}
+\sin\Bigl(n v + \dfrac{\pi}{2}\Bigr) \left(\Bigl(1-\dfrac{v}{2\pi}\Bigr)(1 - \cos u) -0.2 \right) \\
+\dfrac{4v}{\pi} \Bigl(1-\dfrac{v}{2\pi}\Bigr) \sin u \\
+\cos\Bigl(n v + \dfrac{\pi}{2}\Bigr) \left(\Bigl(1-\dfrac{v}{2\pi}\Bigr)(1 - \cos u) +0.2 \right)
+\end{pmatrix}
+\]</span> for <span class="math inline">\(0 \leq u \leq 2\pi\)</span> and <span class="math inline">\(0 \leq v \leq 2\pi\)</span>. It draws a conical spiral (see the images below).</p>
+<p>Firslty, we define this function in Haskell:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">function ::</span> <span class="dt">Double</span>           <span class="co">-- parameter n</span>
+         <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="co">-- variables u and v</span>
+         <span class="ot">-&gt;</span> [<span class="dt">Double</span>]         <span class="co">-- result vector</span>
+function n u v <span class="fu">=</span> [x, y, z]
+  <span class="kw">where</span>
+    x <span class="fu">=</span> sin(n<span class="fu">*</span>v<span class="fu">+</span><span class="fl">0.5</span><span class="fu">*</span>pi) <span class="fu">*</span> ((<span class="dv">1</span><span class="fu">-</span><span class="fl">0.5</span><span class="fu">*</span>v<span class="fu">/</span>pi) <span class="fu">*</span> (<span class="dv">1</span><span class="fu">-</span>cos u) <span class="fu">-</span> <span class="fl">0.2</span>)
+    y <span class="fu">=</span> <span class="dv">4</span><span class="fu">*</span>v<span class="fu">/</span>pi <span class="fu">+</span> (<span class="dv">1</span><span class="fu">-</span><span class="fl">0.5</span><span class="fu">*</span>v<span class="fu">/</span>pi) <span class="fu">*</span> sin u
+    z <span class="fu">=</span> cos(n<span class="fu">*</span>v<span class="fu">+</span><span class="fl">0.5</span><span class="fu">*</span>pi) <span class="fu">*</span> ((<span class="dv">1</span><span class="fu">-</span><span class="fl">0.5</span><span class="fu">*</span>v<span class="fu">/</span>pi) <span class="fu">*</span> (<span class="dv">1</span><span class="fu">-</span>cos u) <span class="fu">+</span> <span class="fl">0.2</span>)</code></pre></div>
+<p>We will evaluate the function <span class="math inline">\(f_n\)</span> at the corners of each square of a grid like the one show below:</p>
+<div class="figure">
+<img src="./figures/OpenglParametric-grid-1.png" />
+
+</div>
+<p>This is done by the Haskell function <code>quad</code> below, which returns a pair made of a four-tuple of <code>Vertex3</code> and the normal. To get the normal, we use the helper function <code>triangleNormal</code> which computes the cross product.</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Graphics.Rendering.OpenGL.GL</span> (<span class="dt">Normal3</span> (..), <span class="dt">Vertex3</span> (..))
+
+<span class="ot">triangleNormal ::</span> <span class="dt">Floating</span> a <span class="ot">=&gt;</span> (<span class="dt">Vertex3</span> a, <span class="dt">Vertex3</span> a, <span class="dt">Vertex3</span> a) <span class="ot">-&gt;</span> <span class="dt">Normal3</span> a
+triangleNormal (<span class="dt">Vertex3</span> x1 x2 x3, <span class="dt">Vertex3</span> y1 y2 y3, <span class="dt">Vertex3</span> z1 z2 z3) <span class="fu">=</span>
+  <span class="dt">Normal3</span> (a<span class="fu">/</span>norm) (b<span class="fu">/</span>norm) (c<span class="fu">/</span>norm)
+  <span class="kw">where</span>
+    (a, b, c) <span class="fu">=</span> crossProd (y1<span class="fu">-</span>x1, y2<span class="fu">-</span>x2, y3<span class="fu">-</span>x3) (z1<span class="fu">-</span>x1, z2<span class="fu">-</span>x2, z3<span class="fu">-</span>x3)
+    crossProd (a1,a2,a3) (b1,b2,b3) <span class="fu">=</span> (a2<span class="fu">*</span>b3<span class="fu">-</span>a3<span class="fu">*</span>b2, a3<span class="fu">*</span>b1<span class="fu">-</span>a1<span class="fu">*</span>b3, a1<span class="fu">*</span>b2<span class="fu">-</span>a2<span class="fu">*</span>b1)
+    norm <span class="fu">=</span> sqrt (a<span class="fu">*</span>a <span class="fu">+</span> b<span class="fu">*</span>b <span class="fu">+</span> c<span class="fu">*</span>c)
+
+
+<span class="ot">quad ::</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> [<span class="dt">Double</span>]) <span class="co">-- the function</span>
+     <span class="ot">-&gt;</span> <span class="dt">Double</span>                                   <span class="co">-- parameter n</span>
+     <span class="ot">-&gt;</span> [<span class="dt">Double</span>] <span class="ot">-&gt;</span> [<span class="dt">Double</span>]                     <span class="co">-- sequences of u and v</span>
+     <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span>                               <span class="co">-- indices</span>
+     <span class="ot">-&gt;</span> ((<span class="dt">Vertex3</span> <span class="dt">Double</span>, <span class="dt">Vertex3</span> <span class="dt">Double</span>, <span class="dt">Vertex3</span> <span class="dt">Double</span>, <span class="dt">Vertex3</span> <span class="dt">Double</span>),
+          <span class="dt">Normal3</span> <span class="dt">Double</span>)
+quad f n u_ v_ i j <span class="fu">=</span> ((a, b, c, d), norm)
+  <span class="kw">where</span>
+  (a,b,c,d) <span class="fu">=</span> ( toVx3 <span class="fu">$</span> f n (u_<span class="fu">!!</span>i) (v_<span class="fu">!!</span>j)
+              , toVx3 <span class="fu">$</span> f n (u_<span class="fu">!!</span>i) (v_<span class="fu">!!</span>(j<span class="fu">+</span><span class="dv">1</span>))
+              , toVx3 <span class="fu">$</span> f n (u_<span class="fu">!!</span>(i<span class="fu">+</span><span class="dv">1</span>)) (v_<span class="fu">!!</span>(j<span class="fu">+</span><span class="dv">1</span>))
+              , toVx3 <span class="fu">$</span> f n (u_<span class="fu">!!</span>(i<span class="fu">+</span><span class="dv">1</span>)) (v_<span class="fu">!!</span>j)    )
+  norm <span class="fu">=</span> triangleNormal (a, b, c)
+  toVx3 x <span class="fu">=</span> <span class="dt">Vertex3</span> (x<span class="fu">!!</span><span class="dv">0</span>) (x<span class="fu">!!</span><span class="dv">1</span>) (x<span class="fu">!!</span><span class="dv">2</span>)</code></pre></div>
+<p>Now we compute all the <code>quad</code>’s for two given integers defining the grid:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">allQuads ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="co">-- numbers of subdivisions for u and v</span>
+         <span class="ot">-&gt;</span> <span class="dt">Double</span>     <span class="co">-- parameter n</span>
+         <span class="ot">-&gt;</span> [((<span class="dt">Vertex3</span> <span class="dt">Double</span>, <span class="dt">Vertex3</span> <span class="dt">Double</span>, <span class="dt">Vertex3</span> <span class="dt">Double</span>, <span class="dt">Vertex3</span> <span class="dt">Double</span>),
+               <span class="dt">Normal3</span> <span class="dt">Double</span>)]
+allQuads n_u n_v n <span class="fu">=</span>
+    map (uncurry (quad function n seq_u seq_v))
+        [(i,j) <span class="fu">|</span> i <span class="ot">&lt;-</span> [<span class="dv">0</span> <span class="fu">..</span> n_u<span class="fu">-</span><span class="dv">1</span>], j <span class="ot">&lt;-</span> [<span class="dv">0</span> <span class="fu">..</span> n_v<span class="fu">-</span><span class="dv">1</span>]]
+    <span class="kw">where</span>
+      seq_u,<span class="ot">seq_v ::</span> [<span class="dt">Double</span>]
+      seq_u <span class="fu">=</span> [<span class="dv">2</span><span class="fu">*</span>pi <span class="fu">*</span> frac i n_u <span class="fu">|</span> i <span class="ot">&lt;-</span> [<span class="dv">0</span> <span class="fu">..</span> n_u]]
+      seq_v <span class="fu">=</span> [<span class="dv">2</span><span class="fu">*</span>pi <span class="fu">*</span> frac i n_v <span class="fu">|</span> i <span class="ot">&lt;-</span> [<span class="dv">0</span> <span class="fu">..</span> n_v]]
+<span class="ot">      frac ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>
+      frac p q <span class="fu">=</span> realToFrac p <span class="fu">/</span> realToFrac q</code></pre></div>
+<p>Now we make a standard OpenGL program. We allow the user to use the keyboard for some controls: rotating the scene and increasing/decreasing the parameter <span class="math inline">\(n\)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">module</span> <span class="dt">ConicalSpiral.ConicalSpiral2</span> <span class="kw">where</span>
+<span class="kw">import           </span><span class="dt">ConicalSpiral.Data2</span>
+<span class="kw">import           </span><span class="dt">Data.IORef</span>
+<span class="kw">import           </span><span class="dt">Graphics.Rendering.OpenGL.GL</span>
+<span class="kw">import           </span><span class="dt">Graphics.UI.GLUT</span>
+
+white,black,<span class="ot">red ::</span> <span class="dt">Color4</span> <span class="dt">GLfloat</span>
+white      <span class="fu">=</span> <span class="dt">Color4</span>    <span class="dv">1</span>    <span class="dv">1</span>    <span class="dv">1</span>    <span class="dv">1</span>
+black      <span class="fu">=</span> <span class="dt">Color4</span>    <span class="dv">0</span>    <span class="dv">0</span>    <span class="dv">0</span>    <span class="dv">1</span>
+red        <span class="fu">=</span> <span class="dt">Color4</span>    <span class="dv">1</span>    <span class="dv">0</span>    <span class="dv">0</span>    <span class="dv">1</span>
+
+<span class="ot">display ::</span> <span class="dt">IORef</span> <span class="dt">GLfloat</span> <span class="ot">-&gt;</span> <span class="dt">IORef</span> <span class="dt">GLfloat</span> <span class="ot">-&gt;</span> <span class="dt">IORef</span> <span class="dt">GLfloat</span> <span class="co">-- rotations</span>
+        <span class="ot">-&gt;</span> <span class="dt">IORef</span> <span class="dt">GLdouble</span>  <span class="co">-- parameter n</span>
+        <span class="ot">-&gt;</span> <span class="dt">IORef</span> <span class="dt">GLdouble</span>  <span class="co">-- zoom</span>
+        <span class="ot">-&gt;</span> <span class="dt">DisplayCallback</span>
+display rot1 rot2 rot3 n zoom <span class="fu">=</span> <span class="kw">do</span>
+  clear [<span class="dt">ColorBuffer</span>, <span class="dt">DepthBuffer</span>]
+  n' <span class="ot">&lt;-</span> get n
+  r1 <span class="ot">&lt;-</span> get rot1
+  r2 <span class="ot">&lt;-</span> get rot2
+  r3 <span class="ot">&lt;-</span> get rot3
+  z <span class="ot">&lt;-</span> get zoom
+  (_, size) <span class="ot">&lt;-</span> get viewport
+  <span class="kw">let</span> surface <span class="fu">=</span> allQuads <span class="dv">200</span> <span class="dv">200</span> n'
+  loadIdentity
+  resize z size
+  rotate r1 <span class="fu">$</span> <span class="dt">Vector3</span> <span class="dv">1</span> <span class="dv">0</span> <span class="dv">0</span>
+  rotate r2 <span class="fu">$</span> <span class="dt">Vector3</span> <span class="dv">0</span> <span class="dv">1</span> <span class="dv">0</span>
+  rotate r3 <span class="fu">$</span> <span class="dt">Vector3</span> <span class="dv">0</span> <span class="dv">0</span> <span class="dv">1</span>
+  renderPrimitive <span class="dt">Quads</span> <span class="fu">$</span> <span class="kw">do</span>
+    materialDiffuse <span class="dt">FrontAndBack</span> <span class="fu">$=</span> red
+    mapM_ drawQuad surface
+  swapBuffers
+  <span class="kw">where</span>
+    drawQuad ((v1,v2,v3,v4),norm) <span class="fu">=</span> <span class="kw">do</span>
+      normal norm
+      vertex v1
+      vertex v2
+      vertex v3
+      vertex v4
+
+<span class="ot">resize ::</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Size</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
+resize zoom s<span class="fu">@</span>(<span class="dt">Size</span> w h) <span class="fu">=</span> <span class="kw">do</span>
+  viewport <span class="fu">$=</span> (<span class="dt">Position</span> <span class="dv">0</span> <span class="dv">0</span>, s)
+  matrixMode <span class="fu">$=</span> <span class="dt">Projection</span>
+  loadIdentity
+  perspective <span class="fl">45.0</span> (w'<span class="fu">/</span>h') <span class="fl">1.0</span> <span class="fl">100.0</span>
+  lookAt (<span class="dt">Vertex3</span> <span class="dv">0</span> <span class="dv">0</span> (<span class="fu">-</span><span class="dv">15</span><span class="fu">+</span>zoom)) (<span class="dt">Vertex3</span> <span class="dv">0</span> <span class="dv">2</span> <span class="dv">0</span>) (<span class="dt">Vector3</span> <span class="dv">0</span> <span class="dv">1</span> <span class="dv">0</span>)
+  matrixMode <span class="fu">$=</span> <span class="dt">Modelview</span> <span class="dv">0</span>
+  <span class="kw">where</span>
+    w' <span class="fu">=</span> realToFrac w
+    h' <span class="fu">=</span> realToFrac h
+
+<span class="ot">keyboard ::</span> <span class="dt">IORef</span> <span class="dt">GLfloat</span> <span class="ot">-&gt;</span> <span class="dt">IORef</span> <span class="dt">GLfloat</span> <span class="ot">-&gt;</span> <span class="dt">IORef</span> <span class="dt">GLfloat</span> <span class="co">-- rotations</span>
+         <span class="ot">-&gt;</span> <span class="dt">IORef</span> <span class="dt">GLdouble</span> <span class="co">-- parameter n</span>
+         <span class="ot">-&gt;</span> <span class="dt">IORef</span> <span class="dt">GLdouble</span> <span class="co">-- zoom</span>
+         <span class="ot">-&gt;</span> <span class="dt">KeyboardCallback</span>
+keyboard rot1 rot2 rot3 n zoom c _ <span class="fu">=</span>
+  <span class="kw">case</span> c <span class="kw">of</span>
+    <span class="ch">'b'</span> <span class="ot">-&gt;</span> n <span class="fu">$~!</span> subtract <span class="fl">0.1</span>
+    <span class="ch">'n'</span> <span class="ot">-&gt;</span> n <span class="fu">$~!</span> (<span class="fu">+</span> <span class="fl">0.1</span>)
+    <span class="ch">'e'</span> <span class="ot">-&gt;</span> rot1 <span class="fu">$~!</span> subtract <span class="dv">1</span>
+    <span class="ch">'r'</span> <span class="ot">-&gt;</span> rot1 <span class="fu">$~!</span> (<span class="fu">+</span><span class="dv">1</span>)
+    <span class="ch">'t'</span> <span class="ot">-&gt;</span> rot2 <span class="fu">$~!</span> subtract <span class="dv">1</span>
+    <span class="ch">'y'</span> <span class="ot">-&gt;</span> rot2 <span class="fu">$~!</span> (<span class="fu">+</span><span class="dv">1</span>)
+    <span class="ch">'u'</span> <span class="ot">-&gt;</span> rot3 <span class="fu">$~!</span> subtract <span class="dv">1</span>
+    <span class="ch">'i'</span> <span class="ot">-&gt;</span> rot3 <span class="fu">$~!</span> (<span class="fu">+</span><span class="dv">1</span>)
+    <span class="ch">'m'</span> <span class="ot">-&gt;</span> zoom <span class="fu">$~!</span> (<span class="fu">+</span><span class="dv">1</span>)
+    <span class="ch">'l'</span> <span class="ot">-&gt;</span> zoom <span class="fu">$~!</span> subtract <span class="dv">1</span>
+    <span class="ch">'q'</span> <span class="ot">-&gt;</span> leaveMainLoop
+    _   <span class="ot">-&gt;</span> return ()
+
+<span class="ot">idle ::</span> <span class="dt">IdleCallback</span>
+idle <span class="fu">=</span> postRedisplay <span class="dt">Nothing</span>
+
+<span class="ot">main ::</span> <span class="dt">IO</span> ()
+main <span class="fu">=</span> <span class="kw">do</span>
+  _ <span class="ot">&lt;-</span> getArgsAndInitialize
+  _ <span class="ot">&lt;-</span> createWindow <span class="st">&quot;Conical Surface&quot;</span>
+  windowSize <span class="fu">$=</span> <span class="dt">Size</span> <span class="dv">500</span> <span class="dv">500</span>
+  initialDisplayMode <span class="fu">$=</span> [<span class="dt">RGBAMode</span>, <span class="dt">DoubleBuffered</span>, <span class="dt">WithDepthBuffer</span>]
+  clearColor <span class="fu">$=</span> white
+  materialAmbient <span class="dt">FrontAndBack</span> <span class="fu">$=</span> black
+  materialShininess <span class="dt">FrontAndBack</span> <span class="fu">$=</span> <span class="dv">95</span>
+  materialSpecular <span class="dt">FrontAndBack</span> <span class="fu">$=</span> white
+  lighting <span class="fu">$=</span> <span class="dt">Enabled</span>
+  lightModelTwoSide <span class="fu">$=</span> <span class="dt">Enabled</span>
+  light (<span class="dt">Light</span> <span class="dv">0</span>) <span class="fu">$=</span> <span class="dt">Enabled</span>
+  position (<span class="dt">Light</span> <span class="dv">0</span>) <span class="fu">$=</span> <span class="dt">Vertex4</span> <span class="dv">0</span> <span class="dv">0</span> (<span class="fu">-</span><span class="dv">100</span>) <span class="dv">1</span>
+  ambient (<span class="dt">Light</span> <span class="dv">0</span>) <span class="fu">$=</span> black
+  diffuse (<span class="dt">Light</span> <span class="dv">0</span>) <span class="fu">$=</span> white
+  specular (<span class="dt">Light</span> <span class="dv">0</span>) <span class="fu">$=</span> white
+  depthFunc <span class="fu">$=</span> <span class="dt">Just</span> <span class="dt">Less</span>
+  shadeModel <span class="fu">$=</span> <span class="dt">Smooth</span>
+  n <span class="ot">&lt;-</span> newIORef <span class="fl">5.0</span>
+  rot1 <span class="ot">&lt;-</span> newIORef <span class="fl">0.0</span>
+  rot2 <span class="ot">&lt;-</span> newIORef <span class="fl">0.0</span>
+  rot3 <span class="ot">&lt;-</span> newIORef <span class="fl">0.0</span>
+  zoom <span class="ot">&lt;-</span> newIORef <span class="fl">0.0</span>
+  displayCallback <span class="fu">$=</span> display rot1 rot2 rot3 n zoom
+  reshapeCallback <span class="fu">$=</span> <span class="dt">Just</span> (resize <span class="dv">0</span>)
+  keyboardCallback <span class="fu">$=</span> <span class="dt">Just</span> (keyboard rot1 rot2 rot3 n zoom)
+  idleCallback <span class="fu">$=</span> <span class="dt">Just</span> idle
+  putStrLn <span class="st">&quot;*** Haskell OpenGL Conical Spiral ***\n\</span>
+<span class="st">        \    To quit, press q.\n\</span>
+<span class="st">        \    Scene rotation:\n\</span>
+<span class="st">        \        e, r, t, y, u, i\n\</span>
+<span class="st">        \    Zoom: l, m\n\</span>
+<span class="st">        \    Increase/decrease parameter: n, b \n\</span>
+<span class="st">        \&quot;</span>
+<span class="st">  mainLoop</span></code></pre></div>
+<p>And this is the result:</p>
+<div class="figure">
+<img src="figures/OpenGLredCone.png" />
+
+</div>
+<p>We have chosen to render the conical spiral in red. We can include colors. A possible way to do so is to compute the average value of the <code>quad</code>, normalize it and consider the result as a RGB code:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Graphics.Rendering.OpenGL.GL</span> (<span class="dt">Color4</span> (..), <span class="dt">GLfloat</span>, <span class="dt">Vertex3</span> (..))
+
+<span class="kw">type</span> <span class="dt">Quad</span> <span class="fu">=</span> (<span class="dt">Vertex3</span> <span class="dt">Double</span>, <span class="dt">Vertex3</span> <span class="dt">Double</span>, <span class="dt">Vertex3</span> <span class="dt">Double</span>, <span class="dt">Vertex3</span> <span class="dt">Double</span>)
+
+<span class="ot">colMeans ::</span> <span class="dt">Quad</span> <span class="ot">-&gt;</span> (<span class="dt">Double</span>, <span class="dt">Double</span>, <span class="dt">Double</span>)
+colMeans quad <span class="fu">=</span> (x<span class="fu">/</span>m , y<span class="fu">/</span>m, z<span class="fu">/</span>m)
+  <span class="kw">where</span>
+    (a, b, c, d) <span class="fu">=</span> quad
+    <span class="dt">Vertex3</span> a1 a2 a3 <span class="fu">=</span> a
+    <span class="dt">Vertex3</span> b1 b2 b3 <span class="fu">=</span> b
+    <span class="dt">Vertex3</span> c1 c2 c3 <span class="fu">=</span> c
+    <span class="dt">Vertex3</span> d1 d2 d3 <span class="fu">=</span> d
+    x <span class="fu">=</span> abs (a1 <span class="fu">+</span> b1 <span class="fu">+</span> c1 <span class="fu">+</span> d1)
+    y <span class="fu">=</span> abs (a2 <span class="fu">+</span> b2 <span class="fu">+</span> c2 <span class="fu">+</span> d2)
+    z <span class="fu">=</span> abs (a3 <span class="fu">+</span> b3 <span class="fu">+</span> c3 <span class="fu">+</span> d3)
+    m <span class="fu">=</span> x <span class="fu">+</span> y <span class="fu">+</span> z
+
+<span class="ot">quadColor ::</span> <span class="dt">Quad</span> <span class="ot">-&gt;</span> <span class="dt">Color4</span> <span class="dt">GLfloat</span>
+quadColor quad <span class="fu">=</span>
+  <span class="dt">Color4</span> (realToFrac x) (realToFrac y) (realToFrac z) <span class="dv">1</span>
+  <span class="kw">where</span>
+    (x,y,z) <span class="fu">=</span> colMeans quad</code></pre></div>
+<p>Then, in our <code>display</code> function:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">  <span class="fu">......</span>
+  renderPrimitive <span class="dt">Quads</span> <span class="fu">$</span> mapM_ drawQuad surface
+  swapBuffers
+  <span class="kw">where</span>
+    drawQuad ((v1,v2,v3,v4),norm) <span class="fu">=</span> <span class="kw">do</span>
+      materialDiffuse <span class="dt">FrontAndBack</span> <span class="fu">$=</span> quadColor (v1,v2,v3,v4) 
+      normal norm
+      vertex v1
+      vertex v2
+      vertex v3
+      vertex v4</code></pre></div>
+<p>And this is the result:</p>
+<div class="figure">
+<img src="figures/OpenGLcoloredCone.png" />
+
+</div>
+<p>The full code is available in <a href="https://github.com/stla/openglParametricPlot">this Github repo</a>.</p>
+
+    </div>
+
+
+    <div id="footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </div>
+
+  </div>
+
+  <div id="disqus_thread"></div>
+  <div class="pagination">
+    <ul>
+      <li><a href="http://laustep.github.io/stlahblog/">« Back Home</a></li>
+    </ul>
+  </div>
+</body>
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+<!-- Google Prettify -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+<script>
+  var pres = document.getElementsByTagName("pre");
+  for (var i = 0; i < pres.length; ++i) {
+    
+    pres[i].className = pres[i].className + " prettyprint linenums";
+    
+  }
+  prettyPrint();
+</script>
+
+
+</html>
