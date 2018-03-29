@@ -102,6 +102,25 @@ myfile &lt;-<span class="st"> &quot;matrix.txt&quot;</span>
 [0.5, 2, 3],
 [5, 4.3, 7]
 ]</code></pre>
+<h3 id="update-2018-03-29">Update 2018-03-29</h3>
+<p>I’ve written a function which gives a better result:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(clipr)
+<span class="kw">library</span>(magrittr)
+matrix2list &lt;-<span class="st"> </span><span class="cf">function</span>(M, <span class="dt">outfile=</span><span class="st">&quot;haskell.txt&quot;</span>){
+  <span class="kw">write_clip</span>(M, <span class="dt">sep=</span><span class="st">&quot;, &quot;</span>) 
+  clipboard &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">sprintf</span>(<span class="st">&quot;%s],&quot;</span>, <span class="kw">head</span>(<span class="kw">read_clip</span>(),<span class="op">-</span><span class="dv">1</span>)), 
+                 <span class="kw">sprintf</span>(<span class="st">&quot;%s]&quot;</span>, <span class="kw">tail</span>(<span class="kw">read_clip</span>(),<span class="dv">1</span>)))
+  <span class="kw">paste0</span>(<span class="kw">c</span>(<span class="st">&quot;[&quot;</span>, <span class="kw">paste0</span>(<span class="st">&quot; [&quot;</span>, clipboard))) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">cat</span>(<span class="dt">sep=</span><span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>, <span class="dt">file=</span>outfile) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">cat</span>(<span class="st">&quot;]&quot;</span>, <span class="dt">sep=</span><span class="st">&quot;&quot;</span>, <span class="dt">file=</span>outfile, <span class="dt">append=</span><span class="ot">TRUE</span>)
+}</code></pre></div>
+<p>For example, <code>matrix2list(M)</code> generates the text file</p>
+<pre class="txt"><code>[
+ [1, 2, 1.5],
+ [0.5, 2, 3],
+ [5, 4.3, 7]
+]</code></pre>
+<p>Nothing to change manually now. Just copy-paste.</p>
 
     </div>
 
