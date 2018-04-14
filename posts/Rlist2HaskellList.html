@@ -98,6 +98,29 @@ L
 [1, 2]
 ]</code></pre>
 <p>Now copy-paste to Haskell, it is ready.</p>
+<h3 id="update-2018-04-18">Update 2018-04-18</h3>
+<p>I’ve realized there is an issue in the case when some elements of the list are vectors of length one. It is fixed in the following function:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">list2list &lt;-<span class="st"> </span><span class="cf">function</span>(L, <span class="dt">outfile=</span><span class="st">&quot;list.txt&quot;</span>){
+  singletons_idxs &lt;-<span class="st"> </span><span class="kw">which</span>(<span class="kw">lapply</span>(L,length)<span class="op">==</span><span class="dv">1</span>)
+  singletons &lt;-<span class="st"> </span>L[singletons_idxs]
+  L &lt;-<span class="st"> </span><span class="kw">replace</span>(L, singletons_idxs, <span class="kw">sprintf</span>(<span class="st">&quot;c(%s)&quot;</span>, singletons))
+  <span class="kw">write_clip</span>(L, <span class="dt">breaks=</span><span class="st">&quot;],</span><span class="ch">\n</span><span class="st">&quot;</span>, <span class="dt">sep=</span><span class="st">&quot;, &quot;</span>)
+  <span class="kw">cat</span>(<span class="st">&quot;[&quot;</span>,
+      <span class="kw">sub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">)&quot;</span>, <span class="st">&quot;]</span><span class="ch">\n</span><span class="st">]&quot;</span>, <span class="kw">gsub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">)]&quot;</span>, <span class="st">&quot;]&quot;</span>, <span class="kw">gsub</span>(<span class="st">&quot;c</span><span class="ch">\\</span><span class="st">(&quot;</span>, <span class="st">&quot;[&quot;</span> ,<span class="kw">read_clip</span>()))), 
+      <span class="dt">sep=</span><span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>, <span class="dt">file=</span>outfile)
+}</code></pre></div>
+<p>Let’s test it.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">L &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>), <span class="dv">0</span>, <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>), <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))
+<span class="kw">list2list</span>(L)
+## Warning in flat_str(content, breaks): Coercing content to character</code></pre></div>
+<p>Here is the content of <code>list.txt</code>:</p>
+<pre class="txt"><code>[
+[1, 2, 3],
+[0],
+[1, 2, 3, 4],
+[1, 2]
+]</code></pre>
+<p>Fine.</p>
 
     </div>
 
