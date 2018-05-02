@@ -1,0 +1,185 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Hopf Torus (1/3): the equatorial case</title>
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/kate.css" />  
+  <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+</head>
+
+<body>
+  <!-- Sidebar. -->
+  <div class="sidebar">
+    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+      <a href="https://www.r-bloggers.com/">
+        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+      </a>
+      <br />
+      <a href="http://t-redactyl.io/">
+        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
+      </a>
+      <a href="http://timelyportfolio.blogspot.be/">
+        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
+      </a>
+      <br />
+      <a href="https://antoineguillot.wordpress.com/blog/">
+        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="header">
+      <div id="logo" style="position:absolute;">
+        <a href="../"><img src="../images/stla.jpg" alt="stla" width="100px" /></a>
+      </div>
+      <div id="navigation" style="margin-top:50px;">
+        <a href="../">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../archive.html">Archive</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Hopf Torus (1/3): the equatorial case</h1> <div class="info">
+    Posted on May  1, 2018
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="../tags/R.html">R</a>, <a href="../tags/graphics.html">graphics</a>, <a href="../tags/rgl.html">rgl</a>
+    
+</div>
+
+<p>In this series of three articles, we will show how to construct <em>Hopf tori</em>.</p>
+<p>Hopf tori takes their origins in the Hopf map <span class="math inline">\(S^3 \to S^2\)</span> defined by <span class="math display">\[
+H(p) = \begin{pmatrix}
+2(p_2 p_4 - p_1 p_3) \\
+2(p_1 p_4 + p_2 p_3) \\
+p_1^2 + p_2^2 - p_3^2 - p_4^2 \\
+\end{pmatrix}.
+\]</span></p>
+<p>Obviously, this map is not bijective. Its main property is that it sends each great circle of <span class="math inline">\(S^3\)</span> to a same point of <span class="math inline">\(S^2\)</span>. Thus, it has, say a “pseudo-inverse” <span class="math inline">\(H^{-1} \colon S^2 \times S^1 \to S^3\)</span> defined by <span class="math display">\[
+H^{-1}(q,t) = \frac{1}{\sqrt{2(1+q_3)}} 
+\begin{pmatrix} 
+q_1 \cos t + q_2 \sin t \\
+\sin t (1+q_3)  \\
+\cos t (1+q_3)  \\
+q_1 \sin t  - q_2 \cos t \\
+\end{pmatrix}.
+\]</span></p>
+<p>Now let’s introduce the stereographic projection: <span class="math display">\[
+Stereo \colon S^3 -&gt; \mathbb{R}^3 \\
+Stereo \, x = \frac{1}{1-x_4}(x_1, x_2, x_3).
+\]</span></p>
+<p>Then, we can draw a circle in <span class="math inline">\(\mathbb{R}^3\)</span> as follows:</p>
+<ul>
+<li><p>take a point <span class="math inline">\(q\)</span> on <span class="math inline">\(S^2\)</span>;</p></li>
+<li><p>calculate the great circle on <span class="math inline">\(S^3\)</span> by applying <span class="math inline">\(H^{-1}(q, S^1)\)</span>;</p></li>
+<li><p>maps this great cirlce to <span class="math inline">\(\mathbb{R}^3\)</span> with the stereographic projection.</p></li>
+</ul>
+<p>In this article, we will show what happens when we take for <span class="math inline">\(q\)</span> a point on the equator on <span class="math inline">\(S^2\)</span>. Below are the necessary R functions.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">hopfinverse &lt;-<span class="st"> </span><span class="cf">function</span>(q, t){ 
+  <span class="dv">1</span><span class="op">/</span><span class="kw">sqrt</span>(<span class="dv">2</span><span class="op">*</span>(<span class="dv">1</span><span class="op">+</span>q[<span class="dv">3</span>])) <span class="op">*</span><span class="st"> </span><span class="kw">c</span>(q[<span class="dv">1</span>]<span class="op">*</span><span class="kw">cos</span>(t)<span class="op">+</span>q[<span class="dv">2</span>]<span class="op">*</span><span class="kw">sin</span>(t),
+                         <span class="kw">sin</span>(t)<span class="op">*</span>(<span class="dv">1</span><span class="op">+</span>q[<span class="dv">3</span>]),
+                         <span class="kw">cos</span>(t)<span class="op">*</span>(<span class="dv">1</span><span class="op">+</span>q[<span class="dv">3</span>]),
+                         q[<span class="dv">1</span>]<span class="op">*</span><span class="kw">sin</span>(t)<span class="op">-</span>q[<span class="dv">2</span>]<span class="op">*</span><span class="kw">cos</span>(t)) 
+}
+stereog &lt;-<span class="st"> </span><span class="cf">function</span>(x){
+  <span class="kw">c</span>(x[<span class="dv">1</span>], x[<span class="dv">2</span>], x[<span class="dv">3</span>])<span class="op">/</span>(<span class="dv">1</span><span class="op">-</span>x[<span class="dv">4</span>])
+}</code></pre></div>
+<p>This is the sphere with the equator:</p>
+<div class="figure">
+<img src="figures/SphereWithEquator.png" />
+
+</div>
+<p>Each point of the equator is mapped to a circle, and the circles form a torus:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(rgl)
+<span class="kw">view3d</span>(<span class="dv">45</span>,<span class="dv">45</span>)
+t_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">len=</span><span class="dv">200</span>)
+phi &lt;-<span class="st"> </span><span class="dv">0</span>
+theta_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">len=</span><span class="dv">300</span>)
+<span class="cf">for</span>(theta <span class="cf">in</span> theta_){
+  circle4d &lt;-<span class="st"> </span><span class="kw">sapply</span>(t_, <span class="cf">function</span>(t){
+    <span class="kw">hopfinverse</span>(<span class="kw">c</span>(<span class="kw">cos</span>(theta)<span class="op">*</span><span class="kw">cos</span>(phi), <span class="kw">sin</span>(theta)<span class="op">*</span><span class="kw">cos</span>(phi), <span class="kw">sin</span>(phi)), t)
+  })
+  circle3d &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">apply</span>(circle4d, <span class="dv">2</span>, stereog))
+  <span class="kw">shade3d</span>(<span class="kw">cylinder3d</span>(circle3d, <span class="dt">radius=</span><span class="fl">0.1</span>), <span class="dt">color=</span><span class="st">&quot;purple&quot;</span>)
+}</code></pre></div>
+<p>Indeed, we get a torus, made of circles:</p>
+<!-- ![](figures/hopftorus1.gif) -->
+<!-- ![](figures/hopftorus1_anim.gif) -->
+<div style="text-align:center">
+<img src="./figures/hopftorus1.gif" style="float: left; width: 45%; margin-right: 1%; margin-bottom: 0.5em; border:3px solid pink"> <img src="figures/hopftorus1_anim.gif" style="float: left; width: 45%; margin-right: 1%; margin-bottom: 0.5em; border:3px solid pink">
+<p style="clear: both;">
+</div>
+
+    </div>
+
+
+    <div id="footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </div>
+
+  </div>
+
+  <div id="disqus_thread"></div>
+  <div class="pagination">
+    <ul>
+      <li><a href="http://laustep.github.io/stlahblog/">« Back Home</a></li>
+    </ul>
+  </div>
+</body>
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+<!-- Google Prettify -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+<script>
+  var pres = document.getElementsByTagName("pre");
+  for (var i = 0; i < pres.length; ++i) {
+    
+    pres[i].className = pres[i].className + " prettyprint linenums";
+    
+  }
+  prettyPrint();
+</script>
+
+
+</html>
