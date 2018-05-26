@@ -78,9 +78,9 @@ stereog &lt;-<span class="st"> </span><span class="cf">function</span>(x){
 <p>In order to draw a sinusoidal curve on the sphere, I used this equation, that I found on <a href="https://www.mathcurve.com/courbes3d/sinusoidespherique/sinusoidespherique.shtml">mathcurve.com</a>:</p>
 <p><span class="math display">\[
 \begin{equation}
-x = \frac{\cos u}{1+k^2\cos^2(nu)} \\
-y = \frac{\sin u}{1+k^2\cos^2(nu)} \\
-z = \frac{k \cos(nu)}{1+k^2\cos^2(nu)}
+x = \frac{\cos u}{\sqrt{1+k^2\cos^2(nu)}} \\
+y = \frac{\sin u}{\sqrt{1+k^2\cos^2(nu)}} \\
+z = \frac{k \cos(nu)}{\sqrt{1+k^2\cos^2(nu)}}
 \end{equation}
 \]</span></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">plotSphereWithSinusCurve &lt;-<span class="st"> </span><span class="cf">function</span>(){

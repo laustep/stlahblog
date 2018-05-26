@@ -1,0 +1,264 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Drawing a torus with Haskell</title>
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/pandoc-solarized.css" />  
+  <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+</head>
+
+<body>
+  <!-- Sidebar. -->
+  <div class="sidebar">
+    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+      <a href="https://www.r-bloggers.com/">
+        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+      </a>
+      <br />
+      <a href="http://t-redactyl.io/">
+        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
+      </a>
+      <a href="http://timelyportfolio.blogspot.be/">
+        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
+      </a>
+      <br />
+      <a href="https://antoineguillot.wordpress.com/blog/">
+        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="header">
+      <div id="logo" style="position:absolute;">
+        <a href="../"><img src="../images/stla.jpg" alt="stla" width="100px" /></a>
+      </div>
+      <div id="navigation" style="margin-top:50px;">
+        <a href="../">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../archive.html">Archive</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Drawing a torus with Haskell</h1> <div class="info">
+    Posted on May 26, 2018
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="../tags/haskell.html">haskell</a>, <a href="../tags/graphics.html">graphics</a>, <a href="../tags/opengl.html">opengl</a>
+    
+</div>
+
+<p><strong><em>Problem:</em></strong> <em>With the Haskell <code>OpenGL</code> library, how to draw a torus passing by three given points?</em></p>
+<hr />
+<p>Firstly, we write a function to get the circle passing by three given points, with the help of the <code>linear</code> library. The imported <code>toList</code> function will be used later.</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">module</span> <span class="dt">TransformationMatrix</span>
+  <span class="kw">where</span>
+<span class="kw">import           </span><span class="dt">Data.Foldable</span> (toList)
+<span class="kw">import           </span><span class="dt">Linear</span>
+
+<span class="co">-- | the plane passing by three points</span>
+<span class="ot">plane3pts ::</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> <span class="dt">V3</span> a <span class="ot">-&gt;</span> <span class="dt">V3</span> a <span class="ot">-&gt;</span> <span class="dt">V3</span> a <span class="ot">-&gt;</span> (<span class="dt">V3</span> a, a)
+plane3pts p1 p2 p3 <span class="fu">=</span> (<span class="dt">V3</span> xcoef ycoef zcoef, offset)
+  <span class="kw">where</span>
+    <span class="dt">V3</span> p1x p1y p1z <span class="fu">=</span> p1
+    <span class="dt">V3</span> p2x p2y p2z <span class="fu">=</span> p2
+    <span class="dt">V3</span> p3x p3y p3z <span class="fu">=</span> p3
+    xcoef <span class="fu">=</span> (p1y<span class="fu">-</span>p2y)<span class="fu">*</span>(p2z<span class="fu">-</span>p3z)<span class="fu">-</span>(p1z<span class="fu">-</span>p2z)<span class="fu">*</span>(p2y<span class="fu">-</span>p3y)
+    ycoef <span class="fu">=</span> (p1z<span class="fu">-</span>p2z)<span class="fu">*</span>(p2x<span class="fu">-</span>p3x)<span class="fu">-</span>(p1x<span class="fu">-</span>p2x)<span class="fu">*</span>(p2z<span class="fu">-</span>p3z)
+    zcoef <span class="fu">=</span> (p1x<span class="fu">-</span>p2x)<span class="fu">*</span>(p2y<span class="fu">-</span>p3y)<span class="fu">-</span>(p1y<span class="fu">-</span>p2y)<span class="fu">*</span>(p2x<span class="fu">-</span>p3x)
+    offset <span class="fu">=</span> p1x<span class="fu">*</span>xcoef <span class="fu">+</span> p1y<span class="fu">*</span>ycoef <span class="fu">+</span> p1z<span class="fu">*</span>zcoef
+
+<span class="co">-- | plane given a point and a normal</span>
+<span class="ot">plane1ptnormal ::</span> <span class="dt">Num</span> a <span class="ot">=&gt;</span> <span class="dt">V3</span> a <span class="ot">-&gt;</span> <span class="dt">V3</span> a <span class="ot">-&gt;</span> (<span class="dt">V3</span> a, a)
+plane1ptnormal p normal <span class="fu">=</span> (normal, p <span class="ot">`dot`</span> normal)
+
+<span class="co">-- | circumcenter and circumradius given three points</span>
+<span class="ot">circleCenterRadius ::</span> (<span class="dt">Num</span> a, <span class="dt">Fractional</span> a, <span class="dt">Floating</span> a) <span class="ot">=&gt;</span> <span class="dt">V3</span> a <span class="ot">-&gt;</span> <span class="dt">V3</span> a <span class="ot">-&gt;</span> <span class="dt">V3</span> a
+                   <span class="ot">-&gt;</span> ((<span class="dt">V3</span> a, a), <span class="dt">V3</span> a)
+circleCenterRadius p1 p2 p3 <span class="fu">=</span> ((center, radius), coefs1)
+  <span class="kw">where</span>
+    p12 <span class="fu">=</span> (p1 <span class="fu">^+^</span> p2) <span class="fu">^/</span> <span class="dv">2</span>
+    p23 <span class="fu">=</span> (p2 <span class="fu">^+^</span> p3) <span class="fu">^/</span> <span class="dv">2</span>
+    v12 <span class="fu">=</span> p2 <span class="fu">^-^</span> p1
+    v23 <span class="fu">=</span> p3 <span class="fu">^-^</span> p2
+    (coefs1, offset1) <span class="fu">=</span> plane3pts p1 p2 p3
+    (coefs2, offset2) <span class="fu">=</span> plane1ptnormal p12 v12
+    (coefs3, offset3) <span class="fu">=</span> plane1ptnormal p23 v23
+    a <span class="fu">=</span> <span class="dt">V3</span> coefs1 coefs2 coefs3
+    b <span class="fu">=</span> <span class="dt">V3</span> offset1 offset2 offset3
+    center <span class="fu">=</span> inv33 a <span class="fu">!*</span> b
+    op1 <span class="fu">=</span> p1 <span class="fu">^-^</span> center
+    radius <span class="fu">=</span> norm op1</code></pre></div>
+<p>The <code>circleCenterRadius</code> function returns the center of the circle passing by the points <code>p1</code>, <code>p2</code>, <code>p3</code>, its radius <span class="math inline">\(R\)</span>, as well as a vector perpendicular to the plane passing by these points.</p>
+<p>Now we write a function which returns an appropriate <em>transformation matrix</em>. The torus drawn by <code>Torus</code> in the <code>GLUT</code> library is always centered at <span class="math inline">\((0,0,0)\)</span> and it is in the <span class="math inline">\(xy\)</span>-plane (the plane <span class="math inline">\(z=0\)</span>). Setting its outer radius to <span class="math inline">\(R\)</span>, we are looking for the transformation matrix which maps this torus to the desired torus.</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- | the transformation matrix for a torus passing by three points </span>
+<span class="ot">transformationMatrix ::</span> (<span class="dt">Real</span> a, <span class="dt">Floating</span> a) <span class="ot">=&gt;</span> <span class="dt">V3</span> a <span class="ot">-&gt;</span> <span class="dt">V3</span> a <span class="ot">-&gt;</span> <span class="dt">V3</span> a <span class="ot">-&gt;</span> ([a], a)
+transformationMatrix p1 p2 p3 <span class="fu">=</span>
+  (concatMap toList (toList (mkTransformationMat m center)), radius)
+  <span class="kw">where</span>
+    ((center, radius), plane) <span class="fu">=</span> circleCenterRadius p1 p2 p3
+    <span class="dt">V3</span> a b c <span class="fu">=</span> plane
+    measure <span class="fu">=</span> sqrt (a<span class="fu">*</span>a <span class="fu">+</span> b<span class="fu">*</span>b <span class="fu">+</span> c<span class="fu">*</span>c)
+    a' <span class="fu">=</span> a <span class="fu">/</span> measure
+    b' <span class="fu">=</span> b <span class="fu">/</span> measure
+    c' <span class="fu">=</span> c <span class="fu">/</span> measure
+    n <span class="fu">=</span> <span class="dt">V3</span> a' b' c'
+    s <span class="fu">=</span> sqrt (a'<span class="fu">*</span>a' <span class="fu">+</span> b'<span class="fu">*</span>b') <span class="co">-- TODO: case a=b=0</span>
+    a'' <span class="fu">=</span> a' <span class="fu">/</span> s
+    b'' <span class="fu">=</span> b' <span class="fu">/</span> s
+    u <span class="fu">=</span> <span class="dt">V3</span> b'' (<span class="fu">-</span>a'') <span class="dv">0</span>
+    v <span class="fu">=</span> cross n u
+    m <span class="fu">=</span> transpose <span class="fu">$</span> <span class="dt">V3</span> u v n</code></pre></div>
+<p>The function <code>transformationMatrix</code> also returns the radius <span class="math inline">\(R\)</span>. The matrix it returns is given by a list, thanks to the <code>toList</code> function. We return this list instead of a matrix of the <code>linear</code> library in order to use it in <code>OpenGL</code>. The transformation matrix is applied with the <code>multMatrix</code> function of <code>OpenGL</code>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">module</span> <span class="dt">TestTransformationMatrix</span>
+  <span class="kw">where</span>
+<span class="kw">import           </span><span class="dt">Data.Tuple.Extra</span>             (fst3, snd3, thd3, second)
+<span class="kw">import           </span><span class="dt">Graphics.Rendering.OpenGL.GL</span>
+<span class="kw">import           </span><span class="dt">Graphics.UI.GLUT</span>
+<span class="kw">import           </span><span class="dt">Linear</span>                       (<span class="dt">V3</span> (..))
+<span class="kw">import           </span><span class="dt">TransformationMatrix</span>
+
+<span class="kw">type</span> <span class="dt">Point</span> <span class="fu">=</span> (<span class="dt">GLfloat</span>,<span class="dt">GLfloat</span>,<span class="dt">GLfloat</span>)
+
+<span class="ot">pointToV3 ::</span> <span class="dt">Point</span> <span class="ot">-&gt;</span> <span class="dt">V3</span> <span class="dt">GLfloat</span>
+pointToV3 (x,y,z) <span class="fu">=</span> <span class="dt">V3</span> x y z
+
+<span class="ot">myTriplet ::</span> (<span class="dt">Point</span>, <span class="dt">Point</span>, <span class="dt">Point</span>) <span class="co">-- the three points for our test</span>
+myTriplet <span class="fu">=</span> ((<span class="fu">-</span><span class="dv">1</span>,<span class="dv">5</span>,<span class="dv">1</span>),(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">8</span>),(<span class="fu">-</span><span class="dv">5</span>,<span class="dv">0</span>,<span class="dv">3</span>))
+
+white,black,<span class="ot">blue ::</span> <span class="dt">Color4</span> <span class="dt">GLfloat</span>
+white      <span class="fu">=</span> <span class="dt">Color4</span>    <span class="dv">1</span>    <span class="dv">1</span>    <span class="dv">1</span>    <span class="dv">1</span>
+black      <span class="fu">=</span> <span class="dt">Color4</span>    <span class="dv">0</span>    <span class="dv">0</span>    <span class="dv">0</span>    <span class="dv">1</span>
+blue       <span class="fu">=</span> <span class="dt">Color4</span>    <span class="dv">0</span>    <span class="dv">0</span>    <span class="dv">1</span>    <span class="dv">1</span>
+
+<span class="ot">tmatAndRadius ::</span> ([<span class="dt">GLfloat</span>], <span class="dt">GLdouble</span>)
+tmatAndRadius <span class="fu">=</span> second realToFrac (transformationMatrix
+                                   (pointToV3 <span class="fu">$</span> fst3 myTriplet)
+                                   (pointToV3 <span class="fu">$</span> snd3 myTriplet)
+                                   (pointToV3 <span class="fu">$</span> thd3 myTriplet))
+
+<span class="ot">display ::</span> <span class="dt">DisplayCallback</span>
+display <span class="fu">=</span> <span class="kw">do</span>
+  clear [<span class="dt">ColorBuffer</span>, <span class="dt">DepthBuffer</span>]
+  loadIdentity
+  preservingMatrix <span class="fu">$</span> <span class="kw">do</span>
+    m <span class="ot">&lt;-</span> newMatrix <span class="dt">RowMajor</span> (fst tmatAndRadius)<span class="ot"> ::</span> <span class="dt">IO</span> (<span class="dt">GLmatrix</span> <span class="dt">GLfloat</span>)
+    multMatrix m
+    materialDiffuse <span class="dt">Front</span> <span class="fu">$=</span> blue
+    renderObject <span class="dt">Solid</span> <span class="fu">$</span> <span class="dt">Torus</span> <span class="fl">0.2</span> (snd tmatAndRadius) <span class="dv">30</span> <span class="dv">30</span>
+  renderPrimitive <span class="dt">Triangles</span> <span class="fu">$</span>
+    mapM_ (\(x, y, z) <span class="ot">-&gt;</span> vertex <span class="fu">$</span> <span class="dt">Vertex3</span> x y z)
+          [fst3 myTriplet, snd3 myTriplet, thd3 myTriplet]
+  swapBuffers
+
+<span class="ot">resize ::</span> <span class="dt">Size</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
+resize s<span class="fu">@</span>(<span class="dt">Size</span> w h) <span class="fu">=</span> <span class="kw">do</span>
+  viewport <span class="fu">$=</span> (<span class="dt">Position</span> <span class="dv">0</span> <span class="dv">0</span>, s)
+  matrixMode <span class="fu">$=</span> <span class="dt">Projection</span>
+  loadIdentity
+  perspective <span class="fl">45.0</span> (w'<span class="fu">/</span>h') <span class="fl">1.0</span> <span class="fl">100.0</span>
+  lookAt (<span class="dt">Vertex3</span> <span class="dv">0</span> <span class="dv">0</span> (<span class="fu">-</span><span class="dv">20</span>)) (<span class="dt">Vertex3</span> <span class="dv">0</span> <span class="dv">0</span> <span class="dv">0</span>) (<span class="dt">Vector3</span> <span class="dv">0</span> <span class="dv">1</span> <span class="dv">0</span>)
+  matrixMode <span class="fu">$=</span> <span class="dt">Modelview</span> <span class="dv">0</span>
+  <span class="kw">where</span>
+    w' <span class="fu">=</span> realToFrac w
+    h' <span class="fu">=</span> realToFrac h
+
+<span class="ot">main ::</span> <span class="dt">IO</span> ()
+main <span class="fu">=</span> <span class="kw">do</span>
+  _ <span class="ot">&lt;-</span> getArgsAndInitialize
+  _ <span class="ot">&lt;-</span> createWindow <span class="st">&quot;Torus passing by three points&quot;</span>
+  windowSize <span class="fu">$=</span> <span class="dt">Size</span> <span class="dv">500</span> <span class="dv">500</span>
+  initialDisplayMode <span class="fu">$=</span> [<span class="dt">RGBAMode</span>, <span class="dt">DoubleBuffered</span>, <span class="dt">WithDepthBuffer</span>]
+  clearColor <span class="fu">$=</span> white
+  materialAmbient <span class="dt">Front</span> <span class="fu">$=</span> black
+  lighting <span class="fu">$=</span> <span class="dt">Enabled</span>
+  light (<span class="dt">Light</span> <span class="dv">0</span>) <span class="fu">$=</span> <span class="dt">Enabled</span>
+  position (<span class="dt">Light</span> <span class="dv">0</span>) <span class="fu">$=</span> <span class="dt">Vertex4</span> <span class="dv">0</span> <span class="dv">0</span> (<span class="fu">-</span><span class="dv">100</span>) <span class="dv">1</span>
+  ambient (<span class="dt">Light</span> <span class="dv">0</span>) <span class="fu">$=</span> black
+  diffuse (<span class="dt">Light</span> <span class="dv">0</span>) <span class="fu">$=</span> white
+  specular (<span class="dt">Light</span> <span class="dv">0</span>) <span class="fu">$=</span> black
+  depthFunc <span class="fu">$=</span> <span class="dt">Just</span> <span class="dt">Less</span>
+  shadeModel <span class="fu">$=</span> <span class="dt">Smooth</span>
+  displayCallback <span class="fu">$=</span> display
+  reshapeCallback <span class="fu">$=</span> <span class="dt">Just</span> resize
+  idleCallback <span class="fu">$=</span> <span class="dt">Nothing</span>
+  mainLoop</code></pre></div>
+<p>And here is the result:</p>
+<div class="figure">
+<img src="figures/torusPassingByThreePoints.png" />
+
+</div>
+<p>Thanks to this technique, I made a Haskell library to draw <em>Hopf tori</em> with <code>OpenGL</code>. This library is <a href="https://github.com/stla/villarceau">available here</a>.</p>
+
+    </div>
+
+
+    <div id="footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </div>
+
+  </div>
+
+  <div id="disqus_thread"></div>
+  <div class="pagination">
+    <ul>
+      <li><a href="http://laustep.github.io/stlahblog/">« Back Home</a></li>
+    </ul>
+  </div>
+</body>
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+<!-- Google Prettify -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+<script>
+  var pres = document.getElementsByTagName("pre");
+  for (var i = 0; i < pres.length; ++i) {
+    
+    pres[i].className = pres[i].className + " prettyprint linenums";
+    
+  }
+  prettyPrint();
+</script>
+
+
+</html>
