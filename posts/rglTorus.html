@@ -140,7 +140,7 @@ circleCenterAndRadius &lt;-<span class="st"> </span><span class="cf">function</s
   s &lt;-<span class="st"> </span><span class="kw">sqrt</span>(normal[<span class="dv">1</span>]<span class="op">^</span><span class="dv">2</span><span class="op">+</span>normal[<span class="dv">2</span>]<span class="op">^</span><span class="dv">2</span>) <span class="co"># </span><span class="al">TODO</span><span class="co">: case s=0</span>
   u &lt;-<span class="st"> </span><span class="kw">c</span>(normal[<span class="dv">2</span>]<span class="op">/</span>s, <span class="op">-</span>normal[<span class="dv">1</span>]<span class="op">/</span>s, <span class="dv">0</span>)
   v &lt;-<span class="st"> </span>geometry<span class="op">::</span><span class="kw">extprod3d</span>(normal, u)
-  m &lt;-<span class="st"> </span><span class="kw">rbind</span>(<span class="kw">cbind</span>(u, v, normal, center), <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>)) <span class="co"># p-e transposer le cbind</span>
+  m &lt;-<span class="st"> </span><span class="kw">rbind</span>(<span class="kw">cbind</span>(u, v, normal, center), <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>)) 
   <span class="kw">list</span>(<span class="dt">matrix=</span><span class="kw">t</span>(m), <span class="dt">radius=</span>radius)
 }</code></pre></div>
 <p>Our function <code>transfoMatrix</code> also returns a radius, the major radius of the desired torus.</p>
