@@ -1,0 +1,283 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Drawing a torus with POV-Ray</title>
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/pandoc-solarized.css" />  
+  <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+</head>
+
+<body>
+  <!-- Sidebar. -->
+  <div class="sidebar">
+    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+      <a href="https://www.r-bloggers.com/">
+        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+      </a>
+      <br />
+      <a href="http://t-redactyl.io/">
+        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
+      </a>
+      <a href="http://timelyportfolio.blogspot.be/">
+        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
+      </a>
+      <br />
+      <a href="https://antoineguillot.wordpress.com/blog/">
+        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="header">
+      <div id="logo" style="position:absolute;">
+        <a href="../"><img src="../images/stla.jpg" alt="stla" width="100px" /></a>
+      </div>
+      <div id="navigation" style="margin-top:50px;">
+        <a href="../">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../archive.html">Archive</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Drawing a torus with POV-Ray</h1> <div class="info">
+    Posted on June  2, 2018
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="../tags/povray.html">povray</a>, <a href="../tags/graphics.html">graphics</a>, <a href="../tags/geometry.html">geometry</a>
+    
+</div>
+
+<p>It is easy to draw a torus with POV-Ray. What we propose here, is to draw a torus such that its equator passes by three given points.</p>
+<p>The include file <a href="http://www.f-lohmueller.de/pov_tut/a_geo/a_geo70e.htm">analytical_g.inc</a> made by Friedrich A. Lohmueller provides a macro which does this task, namely the macro <code>Circle_Line_out</code>. However I tested it and I noticed that the rendering is very slow. With the macro I wrote, provided below, the rendering is not slow.</p>
+<div class="sourceCode"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">// -------------------------- the Torus macro ------------------------------- //</span>
+    <span class="co">// 3x3 matrix Functions ----------------------------------------------------</span>
+#macro <span class="at">det</span>(A)
+    <span class="op">-</span> A[<span class="dv">0</span>].<span class="at">z</span><span class="op">*</span>A[<span class="dv">1</span>].<span class="at">y</span><span class="op">*</span>A[<span class="dv">2</span>].<span class="at">x</span>
+    <span class="op">+</span> A[<span class="dv">0</span>].<span class="at">y</span><span class="op">*</span>A[<span class="dv">1</span>].<span class="at">z</span><span class="op">*</span>A[<span class="dv">2</span>].<span class="at">x</span>
+    <span class="op">+</span> A[<span class="dv">0</span>].<span class="at">z</span><span class="op">*</span>A[<span class="dv">1</span>].<span class="at">x</span><span class="op">*</span>A[<span class="dv">2</span>].<span class="at">y</span>
+    <span class="op">-</span> A[<span class="dv">0</span>].<span class="at">x</span><span class="op">*</span>A[<span class="dv">1</span>].<span class="at">z</span><span class="op">*</span>A[<span class="dv">2</span>].<span class="at">y</span>
+    <span class="op">-</span> A[<span class="dv">0</span>].<span class="at">y</span><span class="op">*</span>A[<span class="dv">1</span>].<span class="at">x</span><span class="op">*</span>A[<span class="dv">2</span>].<span class="at">z</span>
+    <span class="op">+</span> A[<span class="dv">0</span>].<span class="at">x</span><span class="op">*</span>A[<span class="dv">1</span>].<span class="at">y</span><span class="op">*</span>A[<span class="dv">2</span>].<span class="at">z</span>
+#end
+#macro <span class="at">transpose</span>(A)
+    array[<span class="dv">3</span>] <span class="op">{</span> <span class="op">&lt;</span> A[<span class="dv">0</span>].<span class="at">x</span><span class="op">,</span>A[<span class="dv">1</span>].<span class="at">x</span><span class="op">,</span>A[<span class="dv">2</span>].<span class="at">x</span> <span class="op">&gt;,</span>
+               <span class="op">&lt;</span> A[<span class="dv">0</span>].<span class="at">y</span><span class="op">,</span>A[<span class="dv">1</span>].<span class="at">y</span><span class="op">,</span>A[<span class="dv">2</span>].<span class="at">y</span> <span class="op">&gt;,</span>
+               <span class="op">&lt;</span> A[<span class="dv">0</span>].<span class="at">z</span><span class="op">,</span>A[<span class="dv">1</span>].<span class="at">z</span><span class="op">,</span>A[<span class="dv">2</span>].<span class="at">z</span> <span class="op">&gt;</span> <span class="op">}</span>
+#end
+#macro <span class="at">Inverse</span>(A)
+    #local d<span class="op">=</span><span class="at">det</span>(A)<span class="op">;</span>
+    array[<span class="dv">3</span>] <span class="op">{</span>
+     <span class="op">&lt;</span> <span class="op">-</span>A[<span class="dv">1</span>].<span class="at">z</span><span class="op">*</span>A[<span class="dv">2</span>].<span class="at">y</span><span class="op">+</span>A[<span class="dv">1</span>].<span class="at">y</span><span class="op">*</span>A[<span class="dv">2</span>].<span class="at">z</span><span class="op">,</span>
+       A[<span class="dv">0</span>].<span class="at">z</span><span class="op">*</span>A[<span class="dv">2</span>].<span class="at">y</span><span class="op">-</span>A[<span class="dv">0</span>].<span class="at">y</span><span class="op">*</span>A[<span class="dv">2</span>].<span class="at">z</span><span class="op">,</span>
+       <span class="op">-</span>A[<span class="dv">0</span>].<span class="at">z</span><span class="op">*</span>A[<span class="dv">1</span>].<span class="at">y</span><span class="op">+</span>A[<span class="dv">0</span>].<span class="at">y</span><span class="op">*</span>A[<span class="dv">1</span>].<span class="at">z</span> <span class="op">&gt;</span> <span class="ss">/ d,</span>
+<span class="ss">     &lt; A</span><span class="sc">[1]</span><span class="ss">.z</span><span class="sc">*</span><span class="ss">A</span><span class="sc">[2]</span><span class="ss">.x-A</span><span class="sc">[1]</span><span class="ss">.x</span><span class="sc">*</span><span class="ss">A</span><span class="sc">[2]</span><span class="ss">.z,</span>
+<span class="ss">       -A</span><span class="sc">[0]</span><span class="ss">.z</span><span class="sc">*</span><span class="ss">A</span><span class="sc">[2]</span><span class="ss">.x</span><span class="sc">+</span><span class="ss">A</span><span class="sc">[0]</span><span class="ss">.x</span><span class="sc">*</span><span class="ss">A</span><span class="sc">[2]</span><span class="ss">.z,</span>
+<span class="ss">       A</span><span class="sc">[0]</span><span class="ss">.z</span><span class="sc">*</span><span class="ss">A</span><span class="sc">[1]</span><span class="ss">.x-A</span><span class="sc">[0]</span><span class="ss">.x</span><span class="sc">*</span><span class="ss">A</span><span class="sc">[1]</span><span class="ss">.z &gt; /</span> d<span class="op">,</span>
+     <span class="op">&lt;</span> <span class="op">-</span>A[<span class="dv">1</span>].<span class="at">y</span><span class="op">*</span>A[<span class="dv">2</span>].<span class="at">x</span><span class="op">+</span>A[<span class="dv">1</span>].<span class="at">x</span><span class="op">*</span>A[<span class="dv">2</span>].<span class="at">y</span><span class="op">,</span>
+       A[<span class="dv">0</span>].<span class="at">y</span><span class="op">*</span>A[<span class="dv">2</span>].<span class="at">x</span><span class="op">-</span>A[<span class="dv">0</span>].<span class="at">x</span><span class="op">*</span>A[<span class="dv">2</span>].<span class="at">y</span><span class="op">,</span>
+       <span class="op">-</span>A[<span class="dv">0</span>].<span class="at">y</span><span class="op">*</span>A[<span class="dv">1</span>].<span class="at">x</span><span class="op">+</span>A[<span class="dv">0</span>].<span class="at">x</span><span class="op">*</span>A[<span class="dv">1</span>].<span class="at">y</span> <span class="op">&gt;</span> <span class="ss">/ d</span>
+<span class="ss">    }</span>
+<span class="ss">#end</span>
+<span class="ss">#macro mult</span><span class="sc">(</span><span class="ss">A,p</span><span class="sc">)</span>
+<span class="ss">    &lt; A</span><span class="sc">[0]</span><span class="ss">.x</span><span class="sc">*</span><span class="ss">p.x</span><span class="sc">+</span><span class="ss">A</span><span class="sc">[0]</span><span class="ss">.y</span><span class="sc">*</span><span class="ss">p.y</span><span class="sc">+</span><span class="ss">A</span><span class="sc">[0]</span><span class="ss">.z</span><span class="sc">*</span><span class="ss">p.z,</span>
+<span class="ss">      A</span><span class="sc">[1]</span><span class="ss">.x</span><span class="sc">*</span><span class="ss">p.x</span><span class="sc">+</span><span class="ss">A</span><span class="sc">[1]</span><span class="ss">.y</span><span class="sc">*</span><span class="ss">p.y</span><span class="sc">+</span><span class="ss">A</span><span class="sc">[1]</span><span class="ss">.z</span><span class="sc">*</span><span class="ss">p.z,</span>
+<span class="ss">      A</span><span class="sc">[2]</span><span class="ss">.x</span><span class="sc">*</span><span class="ss">p.x</span><span class="sc">+</span><span class="ss">A</span><span class="sc">[2]</span><span class="ss">.y</span><span class="sc">*</span><span class="ss">p.y</span><span class="sc">+</span><span class="ss">A</span><span class="sc">[2]</span><span class="ss">.z</span><span class="sc">*</span><span class="ss">p.z &gt;</span>
+<span class="ss">#end</span>
+<span class="ss">    // Transformation matrix ---------------------------------------------------</span>
+<span class="ss">#macro Matrix</span><span class="sc">(</span><span class="ss">p</span><span class="sc">)</span>
+<span class="ss">    #local a = p.x;</span>
+<span class="ss">    #local b = p.y;</span>
+<span class="ss">    #local c = p.z;</span>
+<span class="ss">    #if</span><span class="sc">(</span><span class="ss">a=0 &amp; c =0</span><span class="sc">)</span>
+<span class="ss">        matrix &lt; 1, 0, 0,</span>
+<span class="ss">                 0, 1, 0,</span>
+<span class="ss">                 0, 0, 1,</span>
+<span class="ss">                 0, 0, 0 &gt;</span>
+<span class="ss">    #else</span>
+<span class="ss">        #local length = vlength</span><span class="sc">(</span><span class="ss">p</span><span class="sc">)</span><span class="ss">;</span>
+<span class="ss">        #local aa = a/length</span><span class="op">;</span>
+        #local bb <span class="op">=</span> b/length<span class="op">;</span>
+        #local cc <span class="op">=</span> c/length<span class="op">;</span>
+        #local n <span class="op">=</span> <span class="op">&lt;</span>aa<span class="op">,</span> bb<span class="op">,</span> cc<span class="op">&gt;;</span>
+        #local s <span class="op">=</span> <span class="at">sqrt</span>(aa<span class="op">*</span>aa<span class="op">+</span>cc<span class="op">*</span>cc)<span class="op">;</span>
+        #local aaa <span class="op">=</span> aa/s<span class="op">;</span>
+        #local ccc <span class="op">=</span> cc/s<span class="op">;</span>
+        #local uu <span class="op">=</span> <span class="op">&lt;</span> <span class="op">-</span>ccc<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> aaa<span class="op">&gt;;</span>
+        #local vv <span class="op">=</span> <span class="at">vcross</span>(n<span class="op">,</span>uu)<span class="op">;</span>
+        matrix <span class="op">&lt;</span> <span class="op">-</span>ccc<span class="op">,</span> <span class="dv">0</span><span class="op">,</span>    aaa<span class="op">,</span>
+                 aa<span class="op">,</span>   bb<span class="op">,</span>   cc<span class="op">,</span>
+                 <span class="va">vv</span>.<span class="at">x</span><span class="op">,</span> <span class="va">vv</span>.<span class="at">y</span><span class="op">,</span> <span class="va">vv</span>.<span class="at">z</span><span class="op">,</span>
+                 <span class="dv">0</span><span class="op">,</span>    <span class="dv">0</span><span class="op">,</span>    <span class="dv">0</span> <span class="op">&gt;</span>
+    #end
+#end
+    <span class="co">// plane passing by points p1, p2, p3 --------------------------------------</span>
+#macro <span class="at">Plane1</span>(p1<span class="op">,</span>p2<span class="op">,</span>p3)
+    #local xcoef <span class="op">=</span> (<span class="va">p1</span>.<span class="at">y</span><span class="op">-</span><span class="va">p2</span>.<span class="at">y</span>)<span class="op">*</span>(<span class="va">p2</span>.<span class="at">z</span><span class="op">-</span><span class="va">p3</span>.<span class="at">z</span>)<span class="op">-</span>(<span class="va">p1</span>.<span class="at">z</span><span class="op">-</span><span class="va">p2</span>.<span class="at">z</span>)<span class="op">*</span>(<span class="va">p2</span>.<span class="at">y</span><span class="op">-</span><span class="va">p3</span>.<span class="at">y</span>)<span class="op">;</span>
+    #local ycoef <span class="op">=</span> (<span class="va">p1</span>.<span class="at">z</span><span class="op">-</span><span class="va">p2</span>.<span class="at">z</span>)<span class="op">*</span>(<span class="va">p2</span>.<span class="at">x</span><span class="op">-</span><span class="va">p3</span>.<span class="at">x</span>)<span class="op">-</span>(<span class="va">p1</span>.<span class="at">x</span><span class="op">-</span><span class="va">p2</span>.<span class="at">x</span>)<span class="op">*</span>(<span class="va">p2</span>.<span class="at">z</span><span class="op">-</span><span class="va">p3</span>.<span class="at">z</span>)<span class="op">;</span>
+    #local zcoef <span class="op">=</span> (<span class="va">p1</span>.<span class="at">x</span><span class="op">-</span><span class="va">p2</span>.<span class="at">x</span>)<span class="op">*</span>(<span class="va">p2</span>.<span class="at">y</span><span class="op">-</span><span class="va">p3</span>.<span class="at">y</span>)<span class="op">-</span>(<span class="va">p1</span>.<span class="at">y</span><span class="op">-</span><span class="va">p2</span>.<span class="at">y</span>)<span class="op">*</span>(<span class="va">p2</span>.<span class="at">x</span><span class="op">-</span><span class="va">p3</span>.<span class="at">x</span>)<span class="op">;</span>
+    #local Offset <span class="op">=</span> <span class="va">p1</span>.<span class="at">x</span><span class="op">*</span>xcoef <span class="op">+</span> <span class="va">p1</span>.<span class="at">y</span><span class="op">*</span>ycoef <span class="op">+</span> <span class="va">p1</span>.<span class="at">z</span><span class="op">*</span>zcoef<span class="op">;</span>
+    <span class="op">&lt;</span>xcoef<span class="op">,</span> ycoef<span class="op">,</span> zcoef<span class="op">,</span> Offset<span class="op">&gt;</span>
+#end
+    <span class="co">// plane passing by p &amp; perpendicular to norm ------------------------------</span>
+#macro <span class="at">Plane2</span>(p<span class="op">,</span>norm)
+  #local Offset <span class="op">=</span> <span class="va">p</span>.<span class="at">x</span><span class="op">*</span><span class="va">norm</span>.<span class="at">x</span><span class="op">+</span><span class="va">p</span>.<span class="at">y</span><span class="op">*</span><span class="va">norm</span>.<span class="at">y</span><span class="op">+</span><span class="va">p</span>.<span class="at">z</span><span class="op">*</span><span class="va">norm</span>.<span class="at">z</span><span class="op">;</span>
+  <span class="op">&lt;</span><span class="va">norm</span>.<span class="at">x</span><span class="op">,</span> <span class="va">norm</span>.<span class="at">y</span><span class="op">,</span> <span class="va">norm</span>.<span class="at">z</span><span class="op">,</span> Offset<span class="op">&gt;</span>
+#end
+    <span class="co">// Circumcenter and circumradius of the circle passing by p1,p2,p3 ---------</span>
+#macro <span class="at">CircleCenter</span>(p1<span class="op">,</span>p2<span class="op">,</span>p3)
+    #local p12 <span class="op">=</span> (p1<span class="op">+</span>p2)/<span class="dv">2</span><span class="op">;</span>
+    #local p23 <span class="op">=</span> (p2<span class="op">+</span>p3)/<span class="dv">2</span><span class="op">;</span>
+    #local v12 <span class="op">=</span> p2<span class="op">-</span>p1<span class="op">;</span>
+    #local v23 <span class="op">=</span> p3<span class="op">-</span>p2<span class="op">;</span>
+    #local plane1 <span class="op">=</span> <span class="at">Plane1</span>(p1<span class="op">,</span>p2<span class="op">,</span>p3)<span class="op">;</span>
+    #local plane2 <span class="op">=</span> <span class="at">Plane2</span>(p12<span class="op">,</span>v12)<span class="op">;</span>
+    #local plane3 <span class="op">=</span> <span class="at">Plane2</span>(p23<span class="op">,</span>v23)<span class="op">;</span>
+    #local A <span class="op">=</span> array[<span class="dv">3</span>] <span class="op">{</span> <span class="op">&lt;</span><span class="va">plane1</span>.<span class="at">x</span><span class="op">,</span> <span class="va">plane2</span>.<span class="at">x</span><span class="op">,</span> <span class="va">plane3</span>.<span class="at">x</span><span class="op">&gt;,</span>
+                          <span class="op">&lt;</span><span class="va">plane1</span>.<span class="at">y</span><span class="op">,</span> <span class="va">plane2</span>.<span class="at">y</span><span class="op">,</span> <span class="va">plane3</span>.<span class="at">y</span><span class="op">&gt;,</span>
+                          <span class="op">&lt;</span><span class="va">plane1</span>.<span class="at">z</span><span class="op">,</span> <span class="va">plane2</span>.<span class="at">z</span><span class="op">,</span> <span class="va">plane3</span>.<span class="at">z</span><span class="op">&gt;</span> <span class="op">};</span>
+    #local b <span class="op">=</span> <span class="op">&lt;</span><span class="va">plane1</span>.<span class="at">t</span><span class="op">,</span> <span class="va">plane2</span>.<span class="at">t</span><span class="op">,</span> <span class="va">plane3</span>.<span class="at">t</span><span class="op">&gt;;</span>
+    #local center <span class="op">=</span> <span class="at">mult</span>(<span class="at">Inverse</span>(<span class="at">transpose</span>(A))<span class="op">,</span>b)<span class="op">;</span>
+    #local op1 <span class="op">=</span> p1<span class="op">-</span>center<span class="op">;</span>
+    #local r <span class="op">=</span> <span class="at">vlength</span>(op1)<span class="op">;</span>
+    <span class="op">&lt;</span><span class="va">center</span>.<span class="at">x</span><span class="op">,</span> <span class="va">center</span>.<span class="at">y</span><span class="op">,</span> <span class="va">center</span>.<span class="at">z</span><span class="op">,</span> r<span class="op">&gt;</span>
+#end
+    <span class="co">// Torus passing by three points -------------------------------------------</span>
+#macro <span class="at">Torus</span>(p1<span class="op">,</span>p2<span class="op">,</span>p3<span class="op">,</span>r<span class="op">,</span>Texture)
+    #local centre <span class="op">=</span> <span class="at">CircleCenter</span>(p1<span class="op">,</span>p2<span class="op">,</span>p3)<span class="op">;</span>
+    #local center <span class="op">=</span> <span class="op">&lt;</span><span class="va">centre</span>.<span class="at">x</span><span class="op">,</span><span class="va">centre</span>.<span class="at">y</span><span class="op">,</span><span class="va">centre</span>.<span class="at">z</span><span class="op">&gt;;</span>
+    #local R <span class="op">=</span> <span class="va">centre</span>.<span class="at">t</span><span class="op">;</span>
+    #local plane1 <span class="op">=</span> <span class="at">Plane1</span>(p1<span class="op">,</span>p2<span class="op">,</span>p3)<span class="op">;</span>
+    torus <span class="op">{</span>
+      R<span class="op">,</span> r
+      texture <span class="op">{</span> Texture <span class="op">}</span>
+      <span class="at">Matrix</span>(<span class="op">&lt;</span><span class="va">plane1</span>.<span class="at">x</span><span class="op">,</span> <span class="va">plane1</span>.<span class="at">y</span><span class="op">,</span> <span class="va">plane1</span>.<span class="at">z</span><span class="op">&gt;</span>)
+      translate center
+    <span class="op">}</span>
+#end
+<span class="co">// end of Torus macro ------------------------------------------------------- //</span></code></pre></div>
+<p>Let me give an example now. I take a tetrahedron and I draw the torus passing by the three vertices of a face, for each of the four faces.</p>
+<div class="sourceCode"><pre class="sourceCode javascript"><code class="sourceCode javascript">#version <span class="fl">3.7</span><span class="op">;</span>
+global_settings <span class="op">{</span> assumed_gamma <span class="dv">1</span> <span class="op">}</span>
+#default<span class="op">{</span> finish<span class="op">{</span> ambient <span class="fl">0.1</span> diffuse <span class="fl">0.9</span> <span class="op">}}</span>
+#include <span class="st">&quot;colors.inc&quot;</span>
+#include <span class="st">&quot;textures.inc&quot;</span>
+
+<span class="co">// Camera ----------------------------------------------------------------------</span>
+camera <span class="op">{</span>
+    location <span class="op">&lt;</span><span class="dv">7</span><span class="op">,</span><span class="dv">7</span><span class="op">,-</span><span class="dv">7</span><span class="op">&gt;</span> scale <span class="fl">0.4</span>
+    look_at <span class="dv">0</span>
+    angle <span class="dv">45</span>
+<span class="op">}</span>
+<span class="co">// Background ------------------------------------------------------------------</span>
+background <span class="op">{</span> color Gray95 <span class="op">}</span>
+<span class="co">// Light source ----------------------------------------------------------------</span>
+light_source <span class="op">{</span> <span class="op">&lt;</span><span class="dv">300</span><span class="op">,</span> <span class="dv">300</span><span class="op">,</span> <span class="op">-</span><span class="dv">1000</span><span class="op">&gt;</span> White <span class="op">}</span>
+
+<span class="co">// tetrahedron vertices --------------------------------------------------------</span>
+#declare phi <span class="op">=</span> (<span class="dv">1</span><span class="op">+</span><span class="at">sqrt</span>(<span class="dv">5</span>))/<span class="dv">2</span><span class="op">;</span>
+#declare a <span class="op">=</span> <span class="dv">1</span>/<span class="at">sqrt</span>(<span class="dv">3</span>)<span class="op">;</span>
+#declare b <span class="op">=</span> a/phi<span class="op">;</span>
+#declare c <span class="op">=</span> a<span class="op">*</span>phi<span class="op">;</span>
+#declare vertices <span class="op">=</span> array[<span class="dv">4</span>]
+  <span class="op">{</span> <span class="op">&lt;</span> a<span class="op">,</span>  a<span class="op">,</span> <span class="op">-</span>a<span class="op">&gt;,</span>
+    <span class="op">&lt;-</span>c<span class="op">,</span>  <span class="dv">0</span><span class="op">,</span> <span class="op">-</span>b<span class="op">&gt;,</span>
+    <span class="op">&lt;</span> b<span class="op">,</span> <span class="op">-</span>c<span class="op">,</span>  <span class="dv">0</span><span class="op">&gt;,</span>
+    <span class="op">&lt;</span> <span class="dv">0</span><span class="op">,</span>  b<span class="op">,</span>  c<span class="op">&gt;</span> <span class="op">};</span>
+
+<span class="co">// tetrahedron faces -----------------------------------------------------------</span>
+#declare tetra <span class="op">=</span> array[<span class="dv">4</span>]
+ <span class="op">{</span> <span class="op">&lt;</span><span class="dv">3</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">0</span><span class="op">&gt;,</span>
+   <span class="op">&lt;</span><span class="dv">3</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">&gt;,</span>
+   <span class="op">&lt;</span><span class="dv">1</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">2</span><span class="op">&gt;,</span>
+   <span class="op">&lt;</span><span class="dv">1</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">0</span><span class="op">&gt;</span> <span class="op">};</span>
+
+<span class="co">// draw tori -------------------------------------------------------------------</span>
+#declare Radius <span class="op">=</span> <span class="fl">0.15</span><span class="op">;</span>
+union<span class="op">{</span>
+    <span class="at">Torus</span>(vertices[tetra[<span class="dv">0</span>].<span class="at">x</span>]<span class="op">,</span>vertices[tetra[<span class="dv">0</span>].<span class="at">y</span>]<span class="op">,</span>vertices[tetra[<span class="dv">0</span>].<span class="at">z</span>]<span class="op">,</span>
+          Radius<span class="op">,</span> texture <span class="op">{</span> pigment <span class="op">{</span> color Red <span class="op">}</span> <span class="op">}</span>)
+    <span class="at">Torus</span>(vertices[tetra[<span class="dv">1</span>].<span class="at">x</span>]<span class="op">,</span>vertices[tetra[<span class="dv">1</span>].<span class="at">y</span>]<span class="op">,</span>vertices[tetra[<span class="dv">1</span>].<span class="at">z</span>]<span class="op">,</span>
+          Radius<span class="op">,</span> texture <span class="op">{</span> pigment <span class="op">{</span> color Blue <span class="op">}</span> <span class="op">}</span>)
+    <span class="at">Torus</span>(vertices[tetra[<span class="dv">2</span>].<span class="at">x</span>]<span class="op">,</span>vertices[tetra[<span class="dv">2</span>].<span class="at">y</span>]<span class="op">,</span>vertices[tetra[<span class="dv">2</span>].<span class="at">z</span>]<span class="op">,</span>
+          Radius<span class="op">,</span> texture <span class="op">{</span> pigment <span class="op">{</span> color Green <span class="op">}</span> <span class="op">}</span>)
+    <span class="at">Torus</span>(vertices[tetra[<span class="dv">3</span>].<span class="at">x</span>]<span class="op">,</span>vertices[tetra[<span class="dv">3</span>].<span class="at">y</span>]<span class="op">,</span>vertices[tetra[<span class="dv">3</span>].<span class="at">z</span>]<span class="op">,</span>
+          Radius<span class="op">,</span> texture <span class="op">{</span> pigment <span class="op">{</span> color Yellow <span class="op">}</span> <span class="op">}</span>)
+<span class="op">}</span></code></pre></div>
+<div class="figure">
+<img src="figures/POVRay_TorusMacro.png" />
+
+</div>
+
+    </div>
+
+
+    <div id="footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </div>
+
+  </div>
+
+  <div id="disqus_thread"></div>
+  <div class="pagination">
+    <ul>
+      <li><a href="http://laustep.github.io/stlahblog/">« Back Home</a></li>
+    </ul>
+  </div>
+</body>
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+<!-- Google Prettify -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+<script>
+  var pres = document.getElementsByTagName("pre");
+  for (var i = 0; i < pres.length; ++i) {
+    
+    pres[i].className = pres[i].className + " prettyprint linenums";
+    
+  }
+  prettyPrint();
+</script>
+
+
+</html>
