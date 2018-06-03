@@ -1,0 +1,213 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Linked cyclides</title>
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/pandoc-solarized.css" />  
+  <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+</head>
+
+<body>
+  <!-- Sidebar. -->
+  <div class="sidebar">
+    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+      <a href="https://www.r-bloggers.com/">
+        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+      </a>
+      <br />
+      <a href="http://t-redactyl.io/">
+        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
+      </a>
+      <a href="http://timelyportfolio.blogspot.be/">
+        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
+      </a>
+      <br />
+      <a href="https://antoineguillot.wordpress.com/blog/">
+        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="header">
+      <div id="logo" style="position:absolute;">
+        <a href="../"><img src="../images/stla.jpg" alt="stla" width="100px" /></a>
+      </div>
+      <div id="navigation" style="margin-top:50px;">
+        <a href="../">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../archive.html">Archive</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Linked cyclides</h1> <div class="info">
+    Posted on June  3, 2018
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="../tags/R.html">R</a>, <a href="../tags/graphics.html">graphics</a>, <a href="../tags/rgl.html">rgl</a>, <a href="../tags/geometry.html">geometry</a>, <a href="../tags/maths.html">maths</a>
+    
+</div>
+
+<p>In this post, I will show how to construct some linked <a href="https://en.wikipedia.org/wiki/Dupin_cyclide">cyclides</a> and draw them in R with <code>rgl</code>. The construction is based on the <a href="https://www.youtube.com/watch?v=UlZ7KDm3iCc">Hopf</a> <a href="https://www.youtube.com/watch?v=L3w_0y8VYAE">fibration</a>. To draw a cyclide, the method is the following one: for a given <span class="math inline">\(\phi \in [-\pi/2, \pi/2)\)</span> and for every <span class="math inline">\(\theta \in [0, 2\pi)\)</span>,</p>
+<ul>
+<li><p>take the Hopf fiber corresponding to the point on the two-dimensional sphere <span class="math inline">\(S^2\)</span> with spherical coordinates <span class="math inline">\((\theta, \phi)\)</span>, which is a great circle of the three-dimensional sphere <span class="math inline">\(S^3\)</span>;</p></li>
+<li><p>rotate it in the four-dimensional space;</p></li>
+<li><p>apply the stereographic projection to the rotated fiber.</p></li>
+</ul>
+<p>This gives a circle in the three-dimensional space, and the union of the circles over <span class="math inline">\(\theta \in [0, 2\pi)\)</span> forms a cyclide.</p>
+<p>Now, if you repeat the construction with another rotation, the two cyclides you get are linked (see the pictures below).</p>
+<p>To draw a circle with <code>rgl</code>, we will actually draw the torus whose equator is this circle, with a small minor radius. To do so, we will use the functions <code>createTorusMesh</code> and <code>transfoMatrix</code> that I introduced in <a href="https://laustep.github.io/stlahblog/posts/rglTorus.html">a previous post</a>. The code is also available in <a href="https://gist.github.com/stla/c9ad4e9e5518a5a60c06c840ce85531d">this gist</a>.</p>
+<p>Now, here is the promised code.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># load the functions createTorusMesh and transfoMatrix</span>
+<span class="kw">source</span>(<span class="st">&quot;TorusPassingByThreePoints.R&quot;</span>)
+
+<span class="co"># &quot;inverse&quot; Hopf map</span>
+hopfinverse &lt;-<span class="st"> </span><span class="cf">function</span>(q, t){ 
+  <span class="dv">1</span><span class="op">/</span><span class="kw">sqrt</span>(<span class="dv">2</span><span class="op">*</span>(<span class="dv">1</span><span class="op">+</span>q[<span class="dv">3</span>])) <span class="op">*</span><span class="st"> </span><span class="kw">c</span>(q[<span class="dv">1</span>]<span class="op">*</span><span class="kw">cos</span>(t)<span class="op">+</span>q[<span class="dv">2</span>]<span class="op">*</span><span class="kw">sin</span>(t),
+                         <span class="kw">sin</span>(t)<span class="op">*</span>(<span class="dv">1</span><span class="op">+</span>q[<span class="dv">3</span>]),
+                         <span class="kw">cos</span>(t)<span class="op">*</span>(<span class="dv">1</span><span class="op">+</span>q[<span class="dv">3</span>]),
+                         q[<span class="dv">1</span>]<span class="op">*</span><span class="kw">sin</span>(t)<span class="op">-</span>q[<span class="dv">2</span>]<span class="op">*</span><span class="kw">cos</span>(t)) 
+}
+<span class="co"># stereographic projection</span>
+stereog &lt;-<span class="st"> </span><span class="cf">function</span>(x){
+  <span class="kw">c</span>(x[<span class="dv">1</span>], x[<span class="dv">2</span>], x[<span class="dv">3</span>])<span class="op">/</span>(<span class="dv">1</span><span class="op">-</span>x[<span class="dv">4</span>])
+}
+<span class="co"># rotation in 4D space (right-isoclinic)</span>
+rotate4d &lt;-<span class="st"> </span><span class="cf">function</span>(alpha, beta, xi, vec){
+  a =<span class="st"> </span><span class="kw">cos</span>(xi)
+  b =<span class="st"> </span><span class="kw">sin</span>(alpha)<span class="op">*</span><span class="kw">cos</span>(beta)<span class="op">*</span><span class="kw">sin</span>(xi)
+  c =<span class="st"> </span><span class="kw">sin</span>(alpha)<span class="op">*</span><span class="kw">sin</span>(beta)<span class="op">*</span><span class="kw">sin</span>(xi)
+  d =<span class="st"> </span><span class="kw">cos</span>(alpha)<span class="op">*</span><span class="kw">sin</span>(xi)
+  p =<span class="st"> </span>vec[<span class="dv">1</span>]; q =<span class="st"> </span>vec[<span class="dv">2</span>]; r =<span class="st"> </span>vec[<span class="dv">3</span>]; s =<span class="st"> </span>vec[<span class="dv">4</span>]
+  <span class="kw">c</span>(a<span class="op">*</span>p <span class="op">-</span><span class="st"> </span>b<span class="op">*</span>q <span class="op">-</span><span class="st"> </span>c<span class="op">*</span>r <span class="op">-</span><span class="st"> </span>d<span class="op">*</span>s,
+    a<span class="op">*</span>q <span class="op">+</span><span class="st"> </span>b<span class="op">*</span>p <span class="op">+</span><span class="st"> </span>c<span class="op">*</span>s <span class="op">-</span><span class="st"> </span>d<span class="op">*</span>r,
+    a<span class="op">*</span>r <span class="op">-</span><span class="st"> </span>b<span class="op">*</span>s <span class="op">+</span><span class="st"> </span>c<span class="op">*</span>p <span class="op">+</span><span class="st"> </span>d<span class="op">*</span>q,
+    a<span class="op">*</span>s <span class="op">+</span><span class="st"> </span>b<span class="op">*</span>r <span class="op">-</span><span class="st"> </span>c<span class="op">*</span>q <span class="op">+</span><span class="st"> </span>d<span class="op">*</span>p)
+}
+
+nCirclesByCyclide &lt;-<span class="st"> </span><span class="dv">100</span>
+theta_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">len=</span>nCirclesByCyclide<span class="op">+</span><span class="dv">1</span>)[<span class="op">-</span><span class="dv">1</span>]
+nCyclides &lt;-<span class="st"> </span><span class="dv">3</span>
+beta0_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">2</span><span class="op">*</span>pi,<span class="dt">length.out=</span>nCyclides<span class="op">+</span><span class="dv">1</span>)[<span class="op">-</span><span class="dv">1</span>]
+colors &lt;-<span class="st"> </span><span class="kw">rainbow</span>(nCyclides)
+phi &lt;-<span class="st"> </span><span class="dv">1</span> <span class="co"># -pi/2 &lt; phi &lt; pi/2; close to pi/2 &lt;=&gt; big hole</span>
+
+<span class="kw">library</span>(rgl)
+<span class="kw">open3d</span>(<span class="dt">windowRect=</span><span class="kw">c</span>(<span class="dv">50</span>,<span class="dv">50</span>,<span class="dv">450</span>,<span class="dv">450</span>))
+<span class="kw">view3d</span>(<span class="dv">90</span>,<span class="dv">0</span>)
+<span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>nCyclides){
+  beta0 &lt;-<span class="st"> </span>beta0_[i]
+  <span class="cf">for</span>(theta <span class="cf">in</span> theta_){
+    <span class="co"># take 3 points on the Hopf fiber of the point with </span>
+    <span class="co"># spherical coordinates (theta,phi), and rotate them</span>
+    circle4d3pts &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">4</span>), <span class="cf">function</span>(t){
+      <span class="kw">rotate4d</span>(pi<span class="op">/</span><span class="dv">2</span>, beta0, <span class="dv">1</span>, 
+               <span class="kw">hopfinverse</span>(<span class="kw">c</span>(<span class="kw">cos</span>(theta)<span class="op">*</span><span class="kw">cos</span>(phi), 
+                             <span class="kw">sin</span>(theta)<span class="op">*</span><span class="kw">cos</span>(phi), 
+                             <span class="kw">sin</span>(phi)), t))
+    })
+    <span class="co"># apply the stereographic projection</span>
+    <span class="co"># this gives 3 points on a circle in the 3D space</span>
+    circle3d3pts &lt;-<span class="st"> </span><span class="kw">apply</span>(circle4d3pts, <span class="dv">2</span>, stereog)
+    <span class="co"># draw the torus passing by these three points</span>
+    mr &lt;-<span class="st"> </span><span class="kw">transfoMatrix</span>(circle3d3pts[,<span class="dv">1</span>], circle3d3pts[,<span class="dv">2</span>], circle3d3pts[,<span class="dv">3</span>])
+    tmesh &lt;-<span class="st"> </span><span class="kw">transform3d</span>(<span class="kw">createTorusMesh</span>(<span class="dt">R=</span>mr<span class="op">$</span>radius, <span class="dt">r=</span><span class="fl">0.2</span>), mr<span class="op">$</span>matrix)
+    <span class="kw">shade3d</span>(tmesh, <span class="dt">color=</span>colors[i])
+  }
+}</code></pre></div>
+<p>This code generates the following picture:</p>
+<div class="figure">
+<img src="figures/linkedCyclides1.png" />
+
+</div>
+<p>If you increase <span class="math inline">\(\phi\)</span>, this gives cyclides with a biggest hole, with a shape closer to the one of an ordinary torus. For example, here is the result for <span class="math inline">\(\phi=1.4\)</span>:</p>
+<div class="figure">
+<img src="figures/linkedCyclides2.png" />
+
+</div>
+<p>I used the same technique to do these animations with POV-Ray:</p>
+<div class="figure">
+<img src="https://thumbs.gfycat.com/BreakableRectangularHarlequinbug-size_restricted.gif" />
+
+</div>
+<div class="figure">
+<img src="https://thumbs.gfycat.com/EcstaticMintyHarrierhawk-size_restricted.gif" />
+
+</div>
+<div class="figure">
+<img src="https://thumbs.gfycat.com/ElaborateMedicalGroundbeetle-size_restricted.gif" />
+
+</div>
+
+    </div>
+
+
+    <div id="footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </div>
+
+  </div>
+
+  <div id="disqus_thread"></div>
+  <div class="pagination">
+    <ul>
+      <li><a href="http://laustep.github.io/stlahblog/">« Back Home</a></li>
+    </ul>
+  </div>
+</body>
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+<!-- Google Prettify -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+<script>
+  var pres = document.getElementsByTagName("pre");
+  for (var i = 0; i < pres.length; ++i) {
+    
+    pres[i].className = pres[i].className + " prettyprint linenums";
+    
+  }
+  prettyPrint();
+</script>
+
+
+</html>
