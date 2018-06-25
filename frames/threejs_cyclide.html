@@ -1,0 +1,140 @@
+<html>
+
+<head>
+  <title>Dupin cyclide</title>
+  <style>
+    canvas {
+      width: 100%;
+      height: 100%
+    }
+  </style>
+</head>
+
+<body>
+
+  <script src="../libraries/three.min.js"></script>
+  <script src="../libraries/jquery.min.js"></script>
+  <script src="../js/marchingCubes.js"></script>
+
+  <script>
+    // marching cubes ---------------------------------------------------------
+    var f = function (x, y, z) {
+      var a = 0.94;
+      var c = 0.34;
+      var mu = 0.56;
+      var b = Math.sqrt(a * a - c * c);
+      return (x * x + y * y + z * z - mu * mu + b * b) ** 2
+        - 4 * (a * x - c * mu) ** 2
+        - 4 * b * b * y * y;
+    }
+    var tris = marchingCubes(f, 0, -2, 1.3, -1.6, 1.6, -1, 1, 150, 150, 100);
+
+    // three js rendering -----------------------------------------------------
+    var scene = new THREE.Scene();
+
+    var aspect = window.innerWidth / window.innerHeight;
+    var camera = new THREE.PerspectiveCamera(50, aspect, 1, 10000);
+    camera.position.z = 3.8;
+    scene.add(camera);
+
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    var geom = new THREE.Geometry();
+    for (var i = 0; i < tris.length / 3; i++) {
+      var v1 = new THREE.Vector3(
+        tris[3 * i][0],
+        tris[3 * i][1],
+        tris[3 * i][2]);
+      var v2 = new THREE.Vector3(
+        tris[3 * i + 1][0],
+        tris[3 * i + 1][1],
+        tris[3 * i + 1][2]);
+      var v3 = new THREE.Vector3(
+        tris[3 * i + 2][0],
+        tris[3 * i + 2][1],
+        tris[3 * i + 2][2]);
+      geom.vertices.push(v1);
+      geom.vertices.push(v2);
+      geom.vertices.push(v3);
+      geom.faces.push(new THREE.Face3(3 * i, 3 * i + 2, 3 * i + 1));
+    }
+    geom.computeFaceNormals();
+
+    var mesh = new THREE.Mesh(geom, new THREE.MeshNormalMaterial());
+
+    var bretzel = new THREE.Object3D();
+    bretzel.add(mesh);
+    scene.add(bretzel);
+
+    // ------------------------------------------------------------------------
+    var isDragging = false;
+    var previousMousePosition = {
+      x: 0,
+      y: 0
+    };
+    $(renderer.domElement).on('mousedown', function (e) {
+      isDragging = true;
+    }).on('mousemove', function (e) {
+      var deltaMove = {
+        x: e.offsetX - previousMousePosition.x,
+        y: e.offsetY - previousMousePosition.y
+      };
+      if (isDragging) {
+        var deltaRotationQuaternion = new THREE.Quaternion()
+          .setFromEuler(new THREE.Euler(
+            Math.PI / 180 * (deltaMove.y * 1),
+            Math.PI / 180 * (deltaMove.x * 1),
+            0,
+            'XYZ'
+          ));
+        bretzel.quaternion.multiplyQuaternions(deltaRotationQuaternion,
+          bretzel.quaternion);
+      }
+      previousMousePosition = {
+        x: e.offsetX,
+        y: e.offsetY
+      };
+    });
+
+    $(document).on('mouseup', function (e) {
+      isDragging = false;
+    });
+
+    // shim layer with setTimeout fallback ------------------------------------
+    window.requestAnimFrame = (function () {
+      return window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        function (callback) {
+          window.setTimeout(callback, 1000 / 60);
+        };
+    })();
+
+    var lastFrameTime = new Date().getTime() / 1000;
+    var totalGameTime = 0;
+
+    function update(dt, t) {
+      setTimeout(function () {
+        var currTime = new Date().getTime() / 1000;
+        var dt = currTime - (lastFrameTime || currTime);
+        totalGameTime += dt;
+        update(dt, totalGameTime);
+        lastFrameTime = currTime;
+      }, 0);
+    }
+
+    function render() {
+      renderer.render(scene, camera);
+      requestAnimFrame(render);
+    }
+
+    render();
+    update(0, totalGameTime);
+
+  </script>
+
+</body>
+
+</html>
