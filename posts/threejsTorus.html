@@ -1,0 +1,192 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Drawing a torus with three.js</title>
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/pandoc-solarized.css" />  
+  <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+</head>
+
+<body>
+  <!-- Sidebar. -->
+  <div class="sidebar">
+    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+      <a href="https://www.r-bloggers.com/">
+        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+      </a>
+      <br />
+      <a href="http://t-redactyl.io/">
+        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
+      </a>
+      <a href="http://timelyportfolio.blogspot.be/">
+        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
+      </a>
+      <br />
+      <a href="https://antoineguillot.wordpress.com/blog/">
+        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="header">
+      <div id="logo" style="position:absolute;">
+        <a href="../"><img src="../images/stla.jpg" alt="stla" width="100px" /></a>
+      </div>
+      <div id="navigation" style="margin-top:50px;">
+        <a href="../">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../archive.html">Archive</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Drawing a torus with three.js</h1> <div class="info">
+    Posted on June 26, 2018
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="../tags/javascript.html">javascript</a>, <a href="../tags/graphics.html">graphics</a>, <a href="../tags/geometry.html">geometry</a>
+    
+</div>
+
+<p>In previous posts, I have shown how to draw a torus whose equator passes by three given points with Haskell, R and POV-Ray. In <a href="https://gist.github.com/stla/f461877b9426df53d2db2d18db93a2e6">this gist</a> I provide the code for Asymptote. Here I’m going to provide the code for <code>three.js</code>.</p>
+<p>Firstly, below is the Javascript function which returns the transformation matrix and the radius of the torus. The function takes as inputs the three points, each given as a <code>Vector3</code>, and returns an object containing the matrix as a <code>Matrix4</code> and a number, the radius.</p>
+<div class="sourceCode"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">function</span> <span class="at">TorusTransfo</span>(p1<span class="op">,</span> p2<span class="op">,</span> p3) <span class="op">{</span>
+  <span class="kw">var</span> p12 <span class="op">=</span> <span class="kw">new</span> <span class="va">THREE</span>.<span class="at">Vector3</span>()<span class="op">;</span>
+  <span class="va">p12</span>.<span class="at">addVectors</span>(p1<span class="op">,</span> p2).<span class="at">divideScalar</span>(<span class="dv">2</span>)<span class="op">;</span>
+  <span class="kw">var</span> p23 <span class="op">=</span> <span class="kw">new</span> <span class="va">THREE</span>.<span class="at">Vector3</span>()<span class="op">;</span>
+  <span class="va">p23</span>.<span class="at">addVectors</span>(p2<span class="op">,</span> p3).<span class="at">divideScalar</span>(<span class="dv">2</span>)<span class="op">;</span>
+  <span class="kw">var</span> xcoef <span class="op">=</span> (<span class="va">p1</span>.<span class="at">y</span> <span class="op">-</span> <span class="va">p2</span>.<span class="at">y</span>) <span class="op">*</span> (<span class="va">p2</span>.<span class="at">z</span> <span class="op">-</span> <span class="va">p3</span>.<span class="at">z</span>) <span class="op">-</span> (<span class="va">p1</span>.<span class="at">z</span> <span class="op">-</span> <span class="va">p2</span>.<span class="at">z</span>) <span class="op">*</span> (<span class="va">p2</span>.<span class="at">y</span> <span class="op">-</span> <span class="va">p3</span>.<span class="at">y</span>)<span class="op">;</span>
+  <span class="kw">var</span> ycoef <span class="op">=</span> (<span class="va">p1</span>.<span class="at">z</span> <span class="op">-</span> <span class="va">p2</span>.<span class="at">z</span>) <span class="op">*</span> (<span class="va">p2</span>.<span class="at">x</span> <span class="op">-</span> <span class="va">p3</span>.<span class="at">x</span>) <span class="op">-</span> (<span class="va">p1</span>.<span class="at">x</span> <span class="op">-</span> <span class="va">p2</span>.<span class="at">x</span>) <span class="op">*</span> (<span class="va">p2</span>.<span class="at">z</span> <span class="op">-</span> <span class="va">p3</span>.<span class="at">z</span>)<span class="op">;</span>
+  <span class="kw">var</span> zcoef <span class="op">=</span> (<span class="va">p1</span>.<span class="at">x</span> <span class="op">-</span> <span class="va">p2</span>.<span class="at">x</span>) <span class="op">*</span> (<span class="va">p2</span>.<span class="at">y</span> <span class="op">-</span> <span class="va">p3</span>.<span class="at">y</span>) <span class="op">-</span> (<span class="va">p1</span>.<span class="at">y</span> <span class="op">-</span> <span class="va">p2</span>.<span class="at">y</span>) <span class="op">*</span> (<span class="va">p2</span>.<span class="at">x</span> <span class="op">-</span> <span class="va">p3</span>.<span class="at">x</span>)<span class="op">;</span>
+  <span class="kw">var</span> offset1 <span class="op">=</span> <span class="va">p1</span>.<span class="at">x</span> <span class="op">*</span> xcoef <span class="op">+</span> <span class="va">p1</span>.<span class="at">y</span> <span class="op">*</span> ycoef <span class="op">+</span> <span class="va">p1</span>.<span class="at">z</span> <span class="op">*</span> zcoef<span class="op">;</span>
+  <span class="kw">var</span> v12 <span class="op">=</span> <span class="va">p2</span>.<span class="at">clone</span>()<span class="op">;</span> <span class="va">v12</span>.<span class="at">sub</span>(p1)<span class="op">;</span>
+  <span class="kw">var</span> v23 <span class="op">=</span> <span class="va">p3</span>.<span class="at">clone</span>()<span class="op">;</span> <span class="va">v23</span>.<span class="at">sub</span>(p2)<span class="op">;</span>
+  <span class="kw">var</span> offset21 <span class="op">=</span> <span class="va">p12</span>.<span class="at">dot</span>(v12)<span class="op">;</span> <span class="kw">var</span> offset22 <span class="op">=</span> <span class="va">p23</span>.<span class="at">dot</span>(v23)<span class="op">;</span>
+  <span class="kw">var</span> M <span class="op">=</span> <span class="kw">new</span> <span class="va">THREE</span>.<span class="at">Matrix3</span>()<span class="op">;</span>
+  <span class="va">M</span>.<span class="at">set</span>(xcoef<span class="op">,</span> <span class="va">v12</span>.<span class="at">x</span><span class="op">,</span> <span class="va">v23</span>.<span class="at">x</span><span class="op">,</span> ycoef<span class="op">,</span> <span class="va">v12</span>.<span class="at">y</span><span class="op">,</span> <span class="va">v23</span>.<span class="at">y</span><span class="op">,</span> zcoef<span class="op">,</span> <span class="va">v12</span>.<span class="at">z</span><span class="op">,</span> <span class="va">v23</span>.<span class="at">z</span>)<span class="op">;</span>
+  invM <span class="op">=</span> <span class="kw">new</span> <span class="va">THREE</span>.<span class="at">Matrix3</span>()<span class="op">;</span>
+  <span class="va">invM</span>.<span class="at">getInverse</span>(M)<span class="op">;</span>
+  <span class="co">// center = invM * (offset1, offset21, offset22)</span>
+  <span class="kw">var</span> A <span class="op">=</span> <span class="va">invM</span>.<span class="at">toArray</span>()<span class="op">;</span>
+  <span class="kw">var</span> center <span class="op">=</span> <span class="kw">new</span> <span class="va">THREE</span>.<span class="at">Vector3</span>(
+    A[<span class="dv">0</span>] <span class="op">*</span> offset1 <span class="op">+</span> A[<span class="dv">1</span>] <span class="op">*</span> offset21 <span class="op">+</span> A[<span class="dv">2</span>] <span class="op">*</span> offset22<span class="op">,</span>
+    A[<span class="dv">3</span>] <span class="op">*</span> offset1 <span class="op">+</span> A[<span class="dv">4</span>] <span class="op">*</span> offset21 <span class="op">+</span> A[<span class="dv">5</span>] <span class="op">*</span> offset22<span class="op">,</span>
+    A[<span class="dv">6</span>] <span class="op">*</span> offset1 <span class="op">+</span> A[<span class="dv">7</span>] <span class="op">*</span> offset21 <span class="op">+</span> A[<span class="dv">8</span>] <span class="op">*</span> offset22
+  )<span class="op">;</span>
+  <span class="kw">var</span> v <span class="op">=</span> <span class="va">p1</span>.<span class="at">clone</span>()<span class="op">;</span> <span class="va">v</span>.<span class="at">sub</span>(center)<span class="op">;</span>
+  <span class="kw">var</span> radius <span class="op">=</span> <span class="va">v</span>.<span class="at">length</span>()<span class="op">;</span>
+  <span class="kw">var</span> T <span class="op">=</span> <span class="kw">new</span> <span class="va">THREE</span>.<span class="at">Matrix4</span>()<span class="op">;</span>
+  <span class="cf">if</span> (xcoef <span class="op">==</span> <span class="dv">0</span> <span class="op">&amp;&amp;</span> ycoef <span class="op">==</span> <span class="dv">0</span>) <span class="op">{</span>
+    <span class="va">T</span>.<span class="at">identity</span>()<span class="op">;</span>
+    <span class="va">T</span>.<span class="at">setPosition</span>(center)<span class="op">;</span>
+    <span class="cf">return</span> <span class="op">{</span> <span class="dt">matrix</span><span class="op">:</span> T<span class="op">,</span> <span class="dt">radius</span><span class="op">:</span> radius <span class="op">};</span>
+  <span class="op">}</span>
+  <span class="kw">var</span> n <span class="op">=</span> <span class="kw">new</span> <span class="va">THREE</span>.<span class="at">Vector3</span>(xcoef<span class="op">,</span> ycoef<span class="op">,</span> zcoef)<span class="op">;</span>
+  <span class="va">n</span>.<span class="at">normalize</span>()<span class="op">;</span>
+  <span class="kw">var</span> s <span class="op">=</span> <span class="va">Math</span>.<span class="at">sqrt</span>(<span class="va">n</span>.<span class="at">x</span> <span class="op">*</span> <span class="va">n</span>.<span class="at">x</span> <span class="op">+</span> <span class="va">n</span>.<span class="at">y</span> <span class="op">*</span> <span class="va">n</span>.<span class="at">y</span>)<span class="op">;</span>
+  <span class="kw">var</span> a <span class="op">=</span> <span class="va">n</span>.<span class="at">x</span> / s<span class="op">;</span> <span class="kw">var</span> b <span class="op">=</span> <span class="va">n</span>.<span class="at">y</span> / s<span class="op">;</span>
+  <span class="kw">var</span> u <span class="op">=</span> <span class="kw">new</span> <span class="va">THREE</span>.<span class="at">Vector3</span>(b<span class="op">,</span> <span class="op">-</span>a<span class="op">,</span> <span class="dv">0</span>)<span class="op">;</span>
+  <span class="kw">var</span> v <span class="op">=</span> <span class="kw">new</span> <span class="va">THREE</span>.<span class="at">Vector3</span>()<span class="op">;</span> <span class="va">v</span>.<span class="at">crossVectors</span>(n<span class="op">,</span> u)<span class="op">;</span>
+  <span class="va">T</span>.<span class="at">set</span>(
+    <span class="va">u</span>.<span class="at">x</span><span class="op">,</span> <span class="va">v</span>.<span class="at">x</span><span class="op">,</span> <span class="va">n</span>.<span class="at">x</span><span class="op">,</span> <span class="va">center</span>.<span class="at">x</span><span class="op">,</span>
+    <span class="va">u</span>.<span class="at">y</span><span class="op">,</span> <span class="va">v</span>.<span class="at">y</span><span class="op">,</span> <span class="va">n</span>.<span class="at">y</span><span class="op">,</span> <span class="va">center</span>.<span class="at">y</span><span class="op">,</span>
+    <span class="va">u</span>.<span class="at">z</span><span class="op">,</span> <span class="va">v</span>.<span class="at">z</span><span class="op">,</span> <span class="va">n</span>.<span class="at">z</span><span class="op">,</span> <span class="va">center</span>.<span class="at">z</span><span class="op">,</span>
+    <span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">1</span>
+  )<span class="op">;</span>
+  <span class="cf">return</span> <span class="op">{</span> <span class="dt">matrix</span><span class="op">:</span> T<span class="op">,</span> <span class="dt">radius</span><span class="op">:</span> radius <span class="op">};</span>
+<span class="op">}</span></code></pre></div>
+<p>The <code>addTorus</code> function below conveniently adds the torus to a <code>three.js</code> object. The last argument <code>r</code> is the desired minor radius of the torus.</p>
+<div class="sourceCode"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">function</span> <span class="at">addTorus</span>(object<span class="op">,</span> p1<span class="op">,</span> p2<span class="op">,</span> p3<span class="op">,</span> r) <span class="op">{</span>
+  <span class="kw">var</span> TR <span class="op">=</span> <span class="at">TorusTransfo</span>(p1<span class="op">,</span> p2<span class="op">,</span> p3)<span class="op">;</span>
+  <span class="kw">var</span> geom <span class="op">=</span> <span class="kw">new</span> <span class="va">THREE</span>.<span class="at">TorusGeometry</span>(<span class="va">TR</span>.<span class="at">radius</span><span class="op">,</span> r<span class="op">,</span> <span class="dv">32</span><span class="op">,</span> <span class="dv">100</span>)<span class="op">;</span>
+  <span class="kw">var</span> mesh <span class="op">=</span> <span class="kw">new</span> <span class="va">THREE</span>.<span class="at">Mesh</span>(geom<span class="op">,</span> <span class="kw">new</span> <span class="va">THREE</span>.<span class="at">MeshNormalMaterial</span>())<span class="op">;</span>
+  <span class="va">mesh</span>.<span class="at">matrix</span> <span class="op">=</span> <span class="va">TR</span>.<span class="at">matrix</span><span class="op">;</span>
+  <span class="va">mesh</span>.<span class="at">matrixAutoUpdate</span> <span class="op">=</span> <span class="kw">false</span><span class="op">;</span>
+  <span class="va">object</span>.<span class="at">add</span>(mesh)<span class="op">;</span>
+<span class="op">}</span></code></pre></div>
+<p>Then we apply the <code>addTorus</code> function as follows. First, define three points and the desired minor radius:</p>
+<div class="sourceCode"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> A <span class="op">=</span> <span class="kw">new</span> <span class="va">THREE</span>.<span class="at">Vector3</span>(<span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">0</span>)<span class="op">;</span>
+<span class="kw">var</span> B <span class="op">=</span> <span class="kw">new</span> <span class="va">THREE</span>.<span class="at">Vector3</span>(<span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">0</span>)<span class="op">;</span>
+<span class="kw">var</span> C <span class="op">=</span> <span class="kw">new</span> <span class="va">THREE</span>.<span class="at">Vector3</span>(<span class="dv">1</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">1</span>)<span class="op">;</span>
+<span class="kw">var</span> r <span class="op">=</span> <span class="fl">0.3</span><span class="op">;</span></code></pre></div>
+<p>Then add the torus to an object in this way:</p>
+<div class="sourceCode"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> scene <span class="op">=</span> <span class="kw">new</span> <span class="va">THREE</span>.<span class="at">Scene</span>()<span class="op">;</span>
+<span class="kw">var</span> object <span class="op">=</span> <span class="kw">new</span> <span class="va">THREE</span>.<span class="at">Object3D</span>()<span class="op">;</span>
+<span class="at">addTorus</span>(object<span class="op">,</span> A<span class="op">,</span> B<span class="op">,</span> C<span class="op">,</span> r)<span class="op">;</span>
+<span class="va">scene</span>.<span class="at">add</span>(object)<span class="op">;</span></code></pre></div>
+<p>As an illustration, below are the <a href="https://laustep.github.io/stlahblog/posts/linkedCyclides.html">linked cyclides</a> plotted with <code>three.js</code>. Click on the object and drag the mouse to play with it. You can get the full code by looking at the source, or by going to <a href="https://gist.github.com/stla/9a9cf6d986ac60d53167912f3eb0074b">this gist</a>.</p>
+<iframe src="../frames/threejs_linkedCyclides.html" width="100%" height="500px" scrolling="no" frameborder="0">
+</iframe>
+
+    </div>
+
+
+    <div id="footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </div>
+
+  </div>
+
+  <div id="disqus_thread"></div>
+  <div class="pagination">
+    <ul>
+      <li><a href="http://laustep.github.io/stlahblog/">« Back Home</a></li>
+    </ul>
+  </div>
+</body>
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+<!-- Google Prettify -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+<script>
+  var pres = document.getElementsByTagName("pre");
+  for (var i = 0; i < pres.length; ++i) {
+    
+    pres[i].className = pres[i].className + " prettyprint linenums";
+    
+  }
+  prettyPrint();
+</script>
+
+
+</html>

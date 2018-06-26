@@ -70,10 +70,10 @@
 f(x,y,z) = \ell.
 \]</span></p>
 <p>The triangulation is returned by</p>
-<div class="sourceCode"><pre class="sourceCode js"><code class="sourceCode javascript"><span class="at">marchingCubes</span>(f<span class="op">,</span> l<span class="op">,</span> xmin<span class="op">,</span> xmax<span class="op">,</span> ymin<span class="op">,</span> ymax<span class="op">,</span> zmin<span class="op">,</span> zmax<span class="op">,</span> nx<span class="op">,</span> ny<span class="op">,</span> nz)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="at">marchingCubes</span>(f<span class="op">,</span> l<span class="op">,</span> xmin<span class="op">,</span> xmax<span class="op">,</span> ymin<span class="op">,</span> ymax<span class="op">,</span> zmin<span class="op">,</span> zmax<span class="op">,</span> nx<span class="op">,</span> ny<span class="op">,</span> nz)</code></pre></div>
 <p>where <code>xmin</code> and <code>xmax</code> are the bounds of the <span class="math inline">\(x\)</span> variable and <code>nx</code> is the number of subdivisions between <code>xmin</code> and <code>xmax</code>, and similarly for the <span class="math inline">\(y\)</span> and <span class="math inline">\(z\)</span> variables.</p>
 <p>The output is a <span class="math inline">\((n \times 3)\)</span>-array of vertices. Grouping the rows by chunks of three provides the triangles.</p>
-<p>As an illustration, below is a Dupin cyclide triangulated by the marching cubes algorithm and rendered with <code>three.js</code>.</p>
+<p>As an illustration, below is a Dupin cyclide triangulated by the marching cubes algorithm and rendered with <code>three.js</code>. The full code is available in the source. Go <a href="https://laustep.github.io/stlahblog/frames/threejs_cyclide.html">here</a> for a full-page rendering.</p>
 <iframe src="../frames/threejs_cyclide.html" width="100%" height="500px" scrolling="no" frameborder="0">
 </iframe>
 
