@@ -1,0 +1,347 @@
+<html>
+
+<head>
+  <title>3D Steiner Chain</title>
+  <style>
+    canvas {
+      width: 100%;
+      height: 100%
+    }
+  </style>
+</head>
+
+<body>
+
+  <script src="../libraries/three.min.js"></script>
+  <script src="../libraries/jquery.min.js"></script>
+
+  <label for="set_n">Number of spheres</label>
+  <input id="set_n" type="number" value="5" min="2" style="width: 3em; margin-right:10px" />
+  <script>
+    $("#set_n").on("change", function () {
+      Rendering(this.value, phi, $("#cyclide").prop("checked"));
+    })
+  </script>
+
+  <label for="cyclide">Villarceau circles</label>
+  <input id="cyclide" type="checkbox" />
+  <script>
+    $("#cyclide").on("click", function () {
+      Rendering($("#set_n").val(), phi, $(this).prop("checked"));
+    })
+  </script>
+
+  <script> // circle passing by three points -----------------------------------
+    function CircleTransfo(p1, p2, p3, shift) {
+      var p12 = new THREE.Vector3();
+      p12.addVectors(p1, p2).divideScalar(2);
+      var p23 = new THREE.Vector3();
+      p23.addVectors(p2, p3).divideScalar(2);
+      var xcoef = (p1.y - p2.y) * (p2.z - p3.z) - (p1.z - p2.z) * (p2.y - p3.y);
+      var ycoef = (p1.z - p2.z) * (p2.x - p3.x) - (p1.x - p2.x) * (p2.z - p3.z);
+      var zcoef = (p1.x - p2.x) * (p2.y - p3.y) - (p1.y - p2.y) * (p2.x - p3.x);
+      var offset1 = p1.x * xcoef + p1.y * ycoef + p1.z * zcoef;
+      var v12 = p2.clone(); v12.sub(p1);
+      var v23 = p3.clone(); v23.sub(p2);
+      var offset21 = p12.dot(v12); var offset22 = p23.dot(v23);
+      var M = new THREE.Matrix3();
+      M.set(xcoef, v12.x, v23.x, ycoef, v12.y, v23.y, zcoef, v12.z, v23.z);
+      invM = new THREE.Matrix3();
+      invM.getInverse(M);
+      // center = invM * (offset1, offset21, offset22)
+      var A = invM.toArray();
+      var center = new THREE.Vector3(
+        A[0] * offset1 + A[1] * offset21 + A[2] * offset22,
+        A[3] * offset1 + A[4] * offset21 + A[5] * offset22,
+        A[6] * offset1 + A[7] * offset21 + A[8] * offset22
+      );
+      var v = p1.clone(); v.sub(center);
+      var radius = v.length();
+      var T = new THREE.Matrix4();
+      if (xcoef == 0 && ycoef == 0) {
+        T.identity();
+        T.setPosition(center);
+        return { matrix: T, radius: radius };
+      }
+      var n = new THREE.Vector3(xcoef, ycoef, zcoef);
+      n.normalize();
+      var s = Math.sqrt(n.x * n.x + n.y * n.y);
+      var a = n.x / s; var b = n.y / s;
+      var u = new THREE.Vector3(b, -a, 0);
+      var v = new THREE.Vector3(); v.crossVectors(n, u);
+      T.set(
+        u.x, v.x, n.x, center.x + shift.x,
+        u.y, v.y, n.y, center.y + shift.y,
+        u.z, v.z, n.z, center.z + shift.z,
+        0, 0, 0, 1
+      );
+      return { matrix: T, radius: radius };
+    }
+  </script>
+
+  <script> // Villarceau circle parametrization --------------------------------
+    function Villarceau(mu, a, c, theta, psi, epsilon) {
+      var b = Math.sqrt(a * a - c * c);
+      var bb = b * Math.sqrt(mu * mu - c * c);
+      var bb2 = b * b * (mu * mu - c * c);
+      var denb1 = c * (a * c - mu * c + c * c - a * mu - bb);
+      var b1 = (a * mu * (c - mu) * (a + c) - bb2 + c * c +
+        bb * (c * (a - mu + c) - 2 * a * mu)) / denb1;
+      var denb2 = c * (a * c - mu * c - c * c + a * mu + bb);
+      var b2 = (a * mu * (c + mu) * (a - c) + bb2 - c * c +
+        bb * (c * (a - mu - c) + 2 * a * mu)) / denb2;
+      var omegaT = (b1 + b2) / 2;
+      var d = (a - c) * (mu - c) + bb;
+      var r = c * c * (mu - c) / ((a + c) * (mu - c) + bb) / d;
+      var R = c * c * (a - c) / ((a - c) * (mu + c) + bb) / d;
+      var sign = (epsilon > 0 ? 1 : -1);
+      var f1 = -Math.sqrt(R * R - r * r) * Math.sin(theta);
+      var f2 = sign * (r + R * Math.cos(theta));
+      var x1 = f1 * Math.cos(psi) + f2 * Math.sin(psi) + omegaT;
+      var y1 = f1 * Math.sin(psi) - f2 * Math.cos(psi);
+      var z1 = r * Math.sin(theta);
+      var omega = (a * mu + bb) / c;
+      var den = (x1 - omega) ** 2 + y1 * y1 + z1 * z1;
+      return new THREE.Vector3(omega + (x1 - omega) / den, y1 / den, z1 / den);
+    }
+  </script>
+
+  <script> // ------------------------------------------------------------------
+    function addCircle(object, mu, a, c, shift, psi, eps) {
+      var A = Villarceau(mu, a, c, 0, psi, eps);
+      var B = Villarceau(mu, a, c, 2, psi, eps);
+      var C = Villarceau(mu, a, c, 4, psi, eps);
+      var TR = CircleTransfo(A, B, C, shift);
+      material = new THREE.LineBasicMaterial({ color: 0xa50000 }),
+        geometry = new THREE.CircleGeometry(TR.radius, 64);
+      geometry.vertices.shift(); // Remove center vertex
+      var circle = new THREE.LineLoop(geometry, material);
+      var Xaxis = new THREE.Vector3(1, 0, 0);
+      circle.matrix = TR.matrix;
+      circle.matrixAutoUpdate = false;
+      object.add(circle);
+    }
+  </script>
+
+  <script> // ------------------------------------------------------------------
+    function cyclideParameters(n, phi) {
+      var cs;
+      if (n > 2) {
+        var sr = (1 - Math.sin(Math.PI / n)) / (1 + Math.sin(Math.PI / n));
+        var p1 = inversion(phi, [sr, 0, 0], 1, [0, 0, 0]);
+        var p2 = inversion(phi, [0, sr, 0], 1, [0, 0, 0]);
+        var p3 = inversion(phi, [-sr, 0, 0], 1, [0, 0, 0]);
+        var p4 = inversion(phi, [0, 0, sr], 1, [0, 0, 0]);
+        cs = circumsphere(p1, p2, p3, p4);
+      } else {
+        cs = {
+          center: inversion(phi, [0, 0, 0], 1, [0, 0, 0]),
+          radius: 0
+        };
+      }
+      var a = (cs.radius + 1) / 2;
+      var mu = 1 - a;
+      var c = -(2 / phi - cs.center[0]) / 2;
+      var shift = {
+        x: (cs.center[0] - 2 / phi) / 2,
+        y: cs.center[1] / 2,
+        z: cs.center[2] / 2
+      };
+      return {
+        a: a,
+        c: c,
+        mu: mu,
+        shift: shift
+      };
+    }
+  </script>
+
+  <script> // ------------------------------------------------------------------
+    function det3x3(A) {
+      return A[0][0] * A[1][1] * A[2][2]
+        + A[0][1] * A[1][2] * A[2][0]
+        + A[0][2] * A[1][0] * A[2][1]
+        - A[2][0] * A[1][1] * A[0][2]
+        - A[2][1] * A[1][2] * A[0][0]
+        - A[2][2] * A[1][0] * A[0][1];
+    }
+
+    function orient(p1, p2, p3, p4) {
+      var A1 = [p2, p3, p4];
+      var A2 = [p1, p3, p4];
+      var A3 = [p1, p2, p4];
+      var A4 = [p1, p2, p3];
+      return -det3x3(A1) + det3x3(A2) - det3x3(A3) + det3x3(A4);
+    }
+
+    function circumsphere(p1, p2, p3, p4) {
+      var a = orient(p1, p2, p3, p4);
+      var q1 = p1[0] * p1[0] + p1[1] * p1[1] + p1[2] * p1[2];
+      var q2 = p2[0] * p2[0] + p2[1] * p2[1] + p2[2] * p2[2];
+      var q3 = p3[0] * p3[0] + p3[1] * p3[1] + p3[2] * p3[2];
+      var q4 = p4[0] * p4[0] + p4[1] * p4[1] + p4[2] * p4[2];
+      var Dx = orient([q1, p1[1], p1[2]], [q2, p2[1], p2[2]],
+        [q3, p3[1], p3[2]], [q4, p4[1], p4[2]]);
+      var Dy = orient([q1, p1[0], p1[2]], [q2, p2[0], p2[2]],
+        [q3, p3[0], p3[2]], [q4, p4[0], p4[2]]);
+      var Dz = orient([q1, p1[0], p1[1]], [q2, p2[0], p2[1]],
+        [q3, p3[0], p3[1]], [q4, p4[0], p4[1]]);
+      var center = [0.5 / a * Dx, -0.5 / a * Dy, 0.5 / a * Dz];
+      var radius = Math.sqrt(
+        (p1[0] - center[0]) ** 2 +
+        (p1[1] - center[1]) ** 2 +
+        (p1[2] - center[2]) ** 2);
+      return { center: center, radius: radius };
+    }
+
+    function inversion(phi, pnt, r, center) {
+      var invphi = 1 / phi;
+      var k = r * r * (invphi * invphi - 1);
+      var Ix = invphi * r;
+      var vx = pnt[0] - Ix - center[0];
+      var vy = pnt[1] - center[1];
+      var vz = pnt[2] - center[2];
+      var c = k / (vx * vx + vy * vy + vz * vz);
+      var outx = Ix + center[0] - c * vx;
+      var outy = center[1] - c * vy;
+      var outz = center[2] - c * vz;
+      return [outx, outy, outz];
+    }
+
+    function oneSphere(n, phi, center, r, beta) {
+      var sine = Math.sin(Math.PI / n);
+      var coef = 1 / (1 + sine);
+      var cHalfside = coef * r * sine;
+      var cRadius = coef * r;
+      var O1x = 2 / phi * r;
+      var cosbeta = Math.cos(beta); var sinbeta = Math.sin(beta);
+      var pntx = center[0] + cRadius * cosbeta;
+      var pnty = center[1] + cRadius * sinbeta;
+      var pntz = center[2];
+      var p1 = [pntx + cHalfside, pnty, pntz];
+      var p2 = [pntx, pnty + cHalfside, pntz];
+      var p3 = [pntx - cHalfside, pnty, pntz];
+      var p4 = [pntx, pnty, pntz + cHalfside];
+      var q1 = inversion(phi, p1, r, center);
+      var q2 = inversion(phi, p2, r, center);
+      var q3 = inversion(phi, p3, r, center);
+      var q4 = inversion(phi, p4, r, center);
+      var cs = circumsphere(q1, q2, q3, q4);
+      var center2 = [cs.center[0] - O1x, cs.center[1], cs.center[2]];
+      return { center: center2, radius: cs.radius };
+    }
+  </script>
+
+  <script> // ------------------------------------------------------------------
+    function addChain(object, n, phi) {
+      for (i = 0; i < n; i++) {
+        var sphere = oneSphere(n, phi, [0, 0, 0], 1, 2 * i * Math.PI / n);
+        var geom = new THREE.SphereGeometry(sphere.radius, 32, 32);
+        geom.translate(sphere.center[0], sphere.center[1], 0);
+        var material = new THREE.MeshNormalMaterial(
+          {
+            wireframe: false,
+            fog: false
+          })
+        var mesh = new THREE.Mesh(geom, material);
+        object.add(mesh);
+      }
+    }
+  </script>
+
+  <script> // ------------------------------------------------------------------
+    function addCyclide(object, n, phi, N) {
+      var pars = cyclideParameters(n, phi);
+      for (var i = 0; i < N; i++) {
+        var angle = 2 * i * Math.PI / N;
+        addCircle(object, pars.mu, pars.a, pars.c, pars.shift, angle, 1);
+        addCircle(object, pars.mu, pars.a, pars.c, pars.shift, angle, -1);
+      }
+    }
+  </script>
+
+  <script> // ------------------------------------------------------------------
+    var nVillarceau = 30;
+    var phi = 0.3;
+  </script>
+
+  <script> // three.js rendering -----------------------------------------------
+    var aspect = window.innerWidth / window.innerHeight;
+    var camera = new THREE.PerspectiveCamera(70, aspect, 1, 10000);
+    camera.position.z = 2;
+
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    var scene = new THREE.Scene();
+    scene.add(camera);
+    var chain = new THREE.Object3D();
+    scene.add(chain);
+
+    window.requestAnimFrame = (function () {
+      return window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        function (callback) {
+          window.setTimeout(callback, 1000 / 60);
+        };
+    })();
+
+    function render() {
+      renderer.render(scene, camera);
+      requestAnimFrame(render);
+    }
+
+    function Rendering(n, phi, cyclide) {
+      chain.children.splice(0, chain.children.length);
+      addChain(chain, n, phi);
+      if (cyclide) {
+        addCyclide(chain, n, phi, nVillarceau);
+      }
+
+      var isDragging = false;
+      var previousMousePosition = {
+        x: 0,
+        y: 0
+      };
+
+      $(document).on('mouseup', function (e) {
+        isDragging = false;
+      });
+
+      $(renderer.domElement).on('mousedown', function (e) {
+        isDragging = true;
+      }).on('mousemove', function (e) {
+        var deltaMove = {
+          x: e.offsetX - previousMousePosition.x,
+          y: e.offsetY - previousMousePosition.y
+        };
+        if (isDragging) {
+          var deltaRotationQuaternion = new THREE.Quaternion()
+            .setFromEuler(new THREE.Euler(
+              Math.PI / 180 * (deltaMove.y * 1),
+              Math.PI / 180 * (deltaMove.x * 1),
+              0,
+              'XYZ'
+            ));
+          chain.quaternion.multiplyQuaternions(deltaRotationQuaternion,
+            chain.quaternion);
+        }
+        previousMousePosition = {
+          x: e.offsetX,
+          y: e.offsetY
+        };
+      });
+
+      render();
+    }
+  </script>
+
+  <script> // ------------------------------------------------------------------
+    Rendering(5, phi, false);
+  </script>
+
+</body>
+
+</html>
