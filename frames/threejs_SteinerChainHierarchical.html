@@ -1,0 +1,270 @@
+<html>
+
+<head>
+  <title>3D Steiner Chain</title>
+  <style>
+    canvas {
+      width: 90%;
+      height: 90%
+    }
+  </style>
+
+  <link rel="stylesheet" href="../libraries/jquery-ui.min.css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script src="../libraries/jquery-ui.js"></script>
+  <script>
+    $(function () {
+      $("#slider").slider({
+        min: 0,
+        max: 180,
+        change: function () {
+          Rendering($("#set_n").spinner("value"), phi,
+            $("#depth").spinner("value"),
+            $(this).slider("option", "value"));
+        }
+      });
+      $("#set_n").spinner({
+        min: 2,
+        stop: function (e, ui) {
+          Rendering(e.target.value, phi, $("#depth").spinner("value"),
+            $("#slider").slider("option", "value"));
+        }
+      });
+      $("#set_n").spinner("value", 5);
+      $("#depth").spinner({
+        min: 1,
+        stop: function (e, ui) {
+          Rendering($("#set_n").spinner("value"), phi, e.target.value,
+            $("#slider").slider("option", "value"));
+        }
+      });
+      $("#depth").spinner("value", 1);
+    });
+  </script>
+
+</head>
+
+<body>
+
+  <script src="three.min.js"></script>
+
+  <script>
+    var phi = 0.3;
+  </script>
+
+  <div style="width: 100%; display: table; background-color: chartreuse; padding-top: 10px">
+    <div style="display: table-row">
+      <div style="width: 400px; display: table-cell;">
+        <label for="set_n" style="margin-left:5px; font-style: italic">Number of spheres:</label>
+        <input id="set_n" style="width: 3em; margin-right:10px;" />
+        <label for="depth" style="margin-left:10px; font-style: italic">Depth:</label>
+        <input id="depth" style="width: 3em; margin-right:10px" />
+      </div>
+      <div style="display: table-cell;">
+        <div id="slider" style="margin-right: 10px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script> // ------------------------------------------------------------------
+    function det3x3(A) {
+      return A[0][0] * A[1][1] * A[2][2]
+        + A[0][1] * A[1][2] * A[2][0]
+        + A[0][2] * A[1][0] * A[2][1]
+        - A[2][0] * A[1][1] * A[0][2]
+        - A[2][1] * A[1][2] * A[0][0]
+        - A[2][2] * A[1][0] * A[0][1];
+    }
+
+    function orient(p1, p2, p3, p4) {
+      var A1 = [p2, p3, p4];
+      var A2 = [p1, p3, p4];
+      var A3 = [p1, p2, p4];
+      var A4 = [p1, p2, p3];
+      return -det3x3(A1) + det3x3(A2) - det3x3(A3) + det3x3(A4);
+    }
+
+    function circumsphere(p1, p2, p3, p4) {
+      var a = orient(p1, p2, p3, p4);
+      var q1 = p1[0] * p1[0] + p1[1] * p1[1] + p1[2] * p1[2];
+      var q2 = p2[0] * p2[0] + p2[1] * p2[1] + p2[2] * p2[2];
+      var q3 = p3[0] * p3[0] + p3[1] * p3[1] + p3[2] * p3[2];
+      var q4 = p4[0] * p4[0] + p4[1] * p4[1] + p4[2] * p4[2];
+      var Dx = orient([q1, p1[1], p1[2]], [q2, p2[1], p2[2]],
+        [q3, p3[1], p3[2]], [q4, p4[1], p4[2]]);
+      var Dy = orient([q1, p1[0], p1[2]], [q2, p2[0], p2[2]],
+        [q3, p3[0], p3[2]], [q4, p4[0], p4[2]]);
+      var Dz = orient([q1, p1[0], p1[1]], [q2, p2[0], p2[1]],
+        [q3, p3[0], p3[1]], [q4, p4[0], p4[1]]);
+      var center = [0.5 / a * Dx, -0.5 / a * Dy, 0.5 / a * Dz];
+      var radius = Math.sqrt(
+        (p1[0] - center[0]) ** 2 +
+        (p1[1] - center[1]) ** 2 +
+        (p1[2] - center[2]) ** 2);
+      return { center: center, radius: radius };
+    }
+
+    function inversion(phi, pnt, r, center) {
+      var invphi = 1 / phi;
+      var k = r * r * (invphi * invphi - 1);
+      var Ix = invphi * r;
+      var vx = pnt[0] - Ix - center[0];
+      var vy = pnt[1] - center[1];
+      var vz = pnt[2] - center[2];
+      var c = k / (vx * vx + vy * vy + vz * vz);
+      var outx = Ix + center[0] - c * vx;
+      var outy = center[1] - c * vy;
+      var outz = center[2] - c * vz;
+      return [outx, outy, outz];
+    }
+
+    function oneSphere(n, phi, center, r, beta) {
+      var sine = Math.sin(Math.PI / n);
+      var coef = 1 / (1 + sine);
+      var cHalfside = coef * r * sine;
+      var cRadius = coef * r;
+      var O1x = 2 / phi * r;
+      var cosbeta = Math.cos(beta); var sinbeta = Math.sin(beta);
+      var pntx = center[0] + cRadius * cosbeta;
+      var pnty = center[1] + cRadius * sinbeta;
+      var pntz = center[2];
+      var p1 = [pntx + cHalfside, pnty, pntz];
+      var p2 = [pntx, pnty + cHalfside, pntz];
+      var p3 = [pntx - cHalfside, pnty, pntz];
+      var p4 = [pntx, pnty, pntz + cHalfside];
+      var q1 = inversion(phi, p1, r, center);
+      var q2 = inversion(phi, p2, r, center);
+      var q3 = inversion(phi, p3, r, center);
+      var q4 = inversion(phi, p4, r, center);
+      var cs = circumsphere(q1, q2, q3, q4);
+      var center2 = [cs.center[0] - O1x, cs.center[1], cs.center[2]];
+      return { center: center2, radius: cs.radius };
+    }
+  </script>
+
+  <script> // ------------------------------------------------------------------
+    function Chain(n, phi, center, r, k) {
+      var out = [];
+      var shift = k * Math.PI / 90;
+      for (i = 0; i < n; i++) {
+        var sphere = oneSphere(n, phi, center, r, shift + 2 * i * Math.PI / n);
+        out.push(sphere);
+      }
+      return out;
+    }
+
+    function Chains(n, phi, depth, k) {
+      if (depth == 1) {
+        return Chain(n, phi, [0, 0, 0], 1, k);
+      }
+      var chns = Chains(n, phi, depth - 1, -k);
+      var out = [];
+      for (var i = 0; i < n ** (depth - 1); i++) {
+        var sphere = chns[i];
+        var newchain = Chain(n, phi, sphere.center, sphere.radius, -k);
+        out = out.concat(newchain);
+      }
+      return out;
+    }
+  </script>
+
+  <script> // ------------------------------------------------------------------
+    function addChain(object, n, phi, depth, k) {
+      var material = new THREE.MeshNormalMaterial(
+        {
+          wireframe: false,
+          fog: false
+        });
+      var spheres = Chains(n, phi, depth, k);
+      for (i = 0; i < spheres.length; i++) {
+        var sphere = spheres[i];
+        var geom = new THREE.SphereGeometry(sphere.radius, 32, 32);
+        geom.translate(sphere.center[0], sphere.center[1], 0);
+        var mesh = new THREE.Mesh(geom, material);
+        object.add(mesh);
+      }
+    }
+  </script>
+
+  <script>
+    var aspect = window.innerWidth / window.innerHeight;
+    var camera = new THREE.PerspectiveCamera(70, aspect, 1, 10000);
+    camera.position.z = 2;
+
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    var scene = new THREE.Scene();
+    scene.add(camera);
+    var chain = new THREE.Object3D();
+    scene.add(chain);
+
+    window.requestAnimFrame = (function () {
+      return window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        function (callback) {
+          window.setTimeout(callback, 1000 / 60);
+        };
+    })();
+
+    function render() {
+      renderer.render(scene, camera);
+
+      chain.rotation.x += 0.001;
+      chain.rotation.y += 0.001;
+
+      requestAnimFrame(render);
+    }
+
+    function Rendering(n, phi, depth, k) {
+      chain.children.splice(0, chain.children.length);
+
+      addChain(chain, n, phi, depth, k);
+
+      var isDragging = false;
+      var previousMousePosition = {
+        x: 0,
+        y: 0
+      };
+
+      $(document).on('mouseup', function (e) {
+        isDragging = false;
+      });
+
+      $(renderer.domElement).on('mousedown', function (e) {
+        isDragging = true;
+      }).on('mousemove', function (e) {
+        var deltaMove = {
+          x: e.offsetX - previousMousePosition.x,
+          y: e.offsetY - previousMousePosition.y
+        };
+        if (isDragging) {
+          var deltaRotationQuaternion = new THREE.Quaternion()
+            .setFromEuler(new THREE.Euler(
+              Math.PI / 180 * (deltaMove.y * 1),
+              Math.PI / 180 * (deltaMove.x * 1),
+              0,
+              'XYZ'
+            ));
+          chain.quaternion.multiplyQuaternions(deltaRotationQuaternion,
+            chain.quaternion);
+        }
+        previousMousePosition = {
+          x: e.offsetX,
+          y: e.offsetY
+        };
+      });
+
+      render();
+    }
+  </script>
+
+  <script>
+    Rendering(5, phi, 1, 0);
+  </script>
+
+</body>
+
+</html>
