@@ -1,0 +1,230 @@
+<html>
+
+<head>
+  <title>Hopf torus</title>
+  <style>
+    canvas {
+      width: 100%;
+      height: 100%
+    }
+  </style>
+
+  <link rel="stylesheet" href="../libraries/jquery-ui/jquery-ui.min.css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script src="../libraries/jquery-ui/jquery-ui.min.js"></script>
+  <script src="../libraries/three.min.js"></script>
+
+  <script>
+    $(function () {
+      $("#k").spinner({
+        min: 1,
+        stop: function (e, ui) {
+          Rendering(npoints, $("#nlobes").spinner("value"), e.target.value);
+        }
+      });
+      $("#k").spinner("value", 2);
+      $("#nlobes").spinner({
+        min: 1,
+        stop: function (e, ui) {
+          Rendering(npoints, e.target.value, $("#k").spinner("value"));
+        }
+      });
+      $("#nlobes").spinner("value", 4);
+    });
+  </script>
+
+</head>
+
+<body>
+
+  <div style="width: 100%; background-color: chartreuse; padding-top: 10px">
+    <label for="nlobes" style="margin-left:5px; font-style: italic">Number of lobes:</label>
+    <input id="nlobes" style="width: 3em; margin-right:10px;" />
+    <label for="k" style="margin-left:10px; font-style: italic">k:</label>
+    <input id="k" style="width: 3em; margin-right:10px" />
+  </div>
+
+  <script> // transformation for torus passing by three points -----------------
+    function TorusTransfo(p1, p2, p3) {
+      var p12 = new THREE.Vector3();
+      p12.addVectors(p1, p2).divideScalar(2);
+      var p23 = new THREE.Vector3();
+      p23.addVectors(p2, p3).divideScalar(2);
+      var xcoef = (p1.y - p2.y) * (p2.z - p3.z) - (p1.z - p2.z) * (p2.y - p3.y);
+      var ycoef = (p1.z - p2.z) * (p2.x - p3.x) - (p1.x - p2.x) * (p2.z - p3.z);
+      var zcoef = (p1.x - p2.x) * (p2.y - p3.y) - (p1.y - p2.y) * (p2.x - p3.x);
+      var offset1 = p1.x * xcoef + p1.y * ycoef + p1.z * zcoef;
+      var v12 = p2.clone(); v12.sub(p1);
+      var v23 = p3.clone(); v23.sub(p2);
+      var offset21 = p12.dot(v12); var offset22 = p23.dot(v23);
+      var M = new THREE.Matrix3();
+      M.set(xcoef, v12.x, v23.x, ycoef, v12.y, v23.y, zcoef, v12.z, v23.z);
+      invM = new THREE.Matrix3();
+      invM.getInverse(M);
+      // calculate center = invM * (offset1, offset21, offset22)
+      var A = invM.toArray();
+      var center = new THREE.Vector3(
+        A[0] * offset1 + A[1] * offset21 + A[2] * offset22,
+        A[3] * offset1 + A[4] * offset21 + A[5] * offset22,
+        A[6] * offset1 + A[7] * offset21 + A[8] * offset22
+      );
+      var v = p1.clone(); v.sub(center);
+      var radius = v.length();
+      var T = new THREE.Matrix4();
+      if (xcoef == 0 && ycoef == 0) {
+        T.identity();
+        T.setPosition(center);
+        return { matrix: T, radius: radius };
+      }
+      var n = new THREE.Vector3(xcoef, ycoef, zcoef);
+      n.normalize();
+      var s = Math.sqrt(n.x * n.x + n.y * n.y);
+      var a = n.x / s; var b = n.y / s;
+      var u = new THREE.Vector3(b, -a, 0);
+      var v = new THREE.Vector3(); v.crossVectors(n, u);
+      T.set(
+        u.x, v.x, n.x, center.x,
+        u.y, v.y, n.y, center.y,
+        u.z, v.z, n.z, center.z,
+        0, 0, 0, 1
+      );
+      return { matrix: T, radius: radius };
+    }
+  </script>
+
+  <script> // add torus to object ----------------------------------------------
+    function addTorus(object, p1, p2, p3, r) {
+      var TR = TorusTransfo(p1, p2, p3);
+      var geom = new THREE.TorusGeometry(TR.radius, r, 16, 64);
+      var mesh = new THREE.Mesh(geom, new THREE.MeshNormalMaterial());
+      mesh.matrix = TR.matrix;
+      mesh.matrixAutoUpdate = false;
+      object.add(mesh);
+    }
+  </script>
+
+  <script> 
+    // "inverse" Hopf map ------------------------------------------------------
+    function hopfinverse(q1, q2, q3, t) {
+      var f = 1 / Math.sqrt(2 * (1 + q3));
+      return [
+        f * (q1 * Math.cos(t) + q2 * Math.sin(t)),
+        f * Math.sin(t) * (1 + q3),
+        f * Math.cos(t) * (1 + q3),
+        f * (q1 * Math.sin(t) - q2 * Math.cos(t))
+      ];
+    }
+
+    // stereographic projection ------------------------------------------------
+    function stereog(x) {
+      var den = 1 - x[3];
+      return new THREE.Vector3(x[0] / den, x[1] / den, x[2] / den);
+    }
+  </script>
+
+  <script> // three.js scene ---------------------------------------------------
+    var scene = new THREE.Scene();
+    var aspect = window.innerWidth / window.innerHeight;
+    var camera = new THREE.PerspectiveCamera(75, aspect, 1, 10000);
+    camera.position.z = 25;
+    scene.add(camera);
+
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    var object = new THREE.Object3D();
+    scene.add(object);
+
+    window.requestAnimFrame = (function () {
+      return window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        function (callback) {
+          window.setTimeout(callback, 1000 / 60);
+        };
+    })();
+
+    function render() {
+      renderer.render(scene, camera);
+      object.rotation.x += 0.001;
+      object.rotation.y += 0.001;
+      requestAnimFrame(render);
+    }
+
+  </script>
+
+  <script> // ------------------------------------------------------------------
+    var r = 0.6;
+
+    function Rendering(npoints, nlobes, k) {
+
+      for ( var i = object.children.length - 1; i >= 0 ; i-- ) {
+        var ch = object.children[i];
+        ch.geometry.dispose();
+        ch.material.dispose();
+      }
+      object.children.splice(0, object.children.length); // clear scene
+
+      for (var i = 0; i < npoints; i++) {
+        var u = i * 2 * Math.PI / npoints;
+        var den = Math.sqrt(1 + k ** 2 * Math.cos(nlobes * u) ** 2);
+        var x = Math.cos(u) / den;
+        var y = Math.sin(u) / den;
+        var z = k * Math.cos(nlobes * u) / den;
+        var c1 = hopfinverse(x, y, z, 0);
+        var c2 = hopfinverse(x, y, z, 2);
+        var c3 = hopfinverse(x, y, z, 4);
+        var cc1 = stereog(c1);
+        var cc2 = stereog(c2);
+        var cc3 = stereog(c3);
+        addTorus(object, cc1, cc2, cc3, r);
+      }
+
+      var isDragging = false;
+      var previousMousePosition = {
+        x: 0,
+        y: 0
+      };
+      $(renderer.domElement).on('mousedown', function (e) {
+        isDragging = true;
+      }).on('mousemove', function (e) {
+        var deltaMove = {
+          x: e.offsetX - previousMousePosition.x,
+          y: e.offsetY - previousMousePosition.y
+        };
+        if (isDragging) {
+          var deltaRotationQuaternion = new THREE.Quaternion()
+            .setFromEuler(new THREE.Euler(
+              Math.PI / 180 * (deltaMove.y * 1),
+              Math.PI / 180 * (deltaMove.x * 1),
+              0,
+              'XYZ'
+            ));
+          object.quaternion.multiplyQuaternions(deltaRotationQuaternion,
+            object.quaternion);
+        }
+        previousMousePosition = {
+          x: e.offsetX,
+          y: e.offsetY
+        };
+      });
+
+      $(document).on('mouseup', function (e) {
+        isDragging = false;
+      });
+
+      render();
+    }
+  </script>
+
+  <script>
+    var npoints = 200;
+    var nlobes = 4;
+    var k = 2;
+    Rendering(npoints, nlobes, k);
+  </script>
+
+</body>
+
+</html>
