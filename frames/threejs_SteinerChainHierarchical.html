@@ -256,13 +256,12 @@
           y: e.offsetY
         };
       });
-
-      render();
     }
   </script>
 
   <script>
     Rendering(5, phi, 1, 0);
+    requestAnimFrame(render);
   </script>
 
 </body>

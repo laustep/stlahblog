@@ -213,8 +213,6 @@
       $(document).on('mouseup', function (e) {
         isDragging = false;
       });
-
-      render();
     }
   </script>
 
@@ -223,6 +221,7 @@
     var nlobes = 4;
     var k = 2;
     Rendering(npoints, nlobes, k);
+    requestAnimFrame(render);
   </script>
 
 </body>

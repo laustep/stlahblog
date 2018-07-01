@@ -253,14 +253,13 @@
           y: e.offsetY
         };
       });
-
-      render();
     }
   </script>
 
   <script> // ------------------------------------------------------------------
     var phi = 0.3;
     Rendering(5, phi, false);
+    requestAnimFrame(render);
   </script>
 
 </body>

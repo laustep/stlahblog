@@ -333,13 +333,12 @@
           y: e.offsetY
         };
       });
-
-      render();
     }
   </script>
 
   <script> // ------------------------------------------------------------------
     Rendering(5, phi, false);
+    requestAnimFrame(render);
   </script>
 
 </body>

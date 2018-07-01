@@ -14,7 +14,7 @@
   <script src="../libraries/three.min.js"></script>
   <script src="../libraries/jquery.min.js"></script>
 
-  <script> // macro
+  <script> // transformation for torus passing by three points -----------------
     function TorusTransfo(p1, p2, p3) {
       var p12 = new THREE.Vector3();
       p12.addVectors(p1, p2).divideScalar(2);
@@ -31,7 +31,7 @@
       M.set(xcoef, v12.x, v23.x, ycoef, v12.y, v23.y, zcoef, v12.z, v23.z);
       invM = new THREE.Matrix3();
       invM.getInverse(M);
-      // center = invM * (offset1, offset21, offset22)
+      // calculate center = invM * (offset1, offset21, offset22)
       var A = invM.toArray();
       var center = new THREE.Vector3(
         A[0] * offset1 + A[1] * offset21 + A[2] * offset22,
@@ -62,7 +62,7 @@
     }
   </script>
 
-  <script> // add torus to object
+  <script> // add torus to object ----------------------------------------------
     function addTorus(object, p1, p2, p3, r) {
       var TR = TorusTransfo(p1, p2, p3);
       var geom = new THREE.TorusGeometry(TR.radius, r, 32, 100);
@@ -107,14 +107,14 @@
     }
   </script>
 
-  <script>
+  <script> // ------------------------------------------------------------------
     var nCirclesByCyclide = 50;
     var nCyclides = 3;
     var phi = 1.2;
     var r = 0.15;
   </script>
 
-  <script> // three.js scene
+  <script> // three.js scene ---------------------------------------------------
     var scene = new THREE.Scene();
     var aspect = window.innerWidth / window.innerHeight;
     var camera = new THREE.PerspectiveCamera(75, aspect, 1, 10000);
@@ -195,26 +195,12 @@
         };
     })();
 
-    var lastFrameTime = new Date().getTime() / 1000;
-    var totalGameTime = 0;
-
-    function update(dt, t) {
-      setTimeout(function () {
-        var currTime = new Date().getTime() / 1000;
-        var dt = currTime - (lastFrameTime || currTime);
-        totalGameTime += dt;
-        update(dt, totalGameTime);
-        lastFrameTime = currTime;
-      }, 0);
-    }
-
     function render() {
       renderer.render(scene, camera);
       requestAnimFrame(render);
     }
 
     render();
-    update(0, totalGameTime);
   </script>
 
 </body>
