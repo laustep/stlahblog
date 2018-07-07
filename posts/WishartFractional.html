@@ -15,7 +15,7 @@
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
-</script>
+  </script>
 </head>
 
 <body>
@@ -36,13 +36,19 @@
       <a href="https://antoineguillot.wordpress.com/blog/">
         <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
       </a>
+      <br />
+      <a href="https://fronkonstin.com/">
+        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+      </a>
     </div>
   </div>
 
   <div class="main">
     <div id="header">
       <div id="logo" style="position:absolute;">
-        <a href="../"><img src="../images/stla.jpg" alt="stla" width="100px" /></a>
+        <a href="../">
+          <img src="../images/stla.jpg" alt="stla" width="100px" />
+        </a>
       </div>
       <div id="navigation" style="margin-top:50px;">
         <a href="../">Home</a>
@@ -91,7 +97,7 @@
 <li><p>using the first step and the two properties of the Wishart distribution that we have seen, it provides a way to simulate <span class="math inline">\(\mathcal{W}(\nu, I_d^n, \Theta)\)</span> where <span class="math inline">\(I_d^n = J_d^1 + \ldots + J_d^n\)</span>;</p></li>
 <li><p>using the second step and the first property of the Wishart distribution that we have seen, it provides a way to simulate <span class="math inline">\(\mathcal{W}(\nu, \Sigma, \Theta)\)</span> for any covariance matrix <span class="math inline">\(\Sigma\)</span>.</p></li>
 </ul>
-<p><span class="math inline">\(\bullet\)</span> <strong>Simulation of <span class="math inline">\(\mathcal{W}(\nu, J_d^1, \Theta)\)</span></strong>. This algorithm runs as follows. Let <span class="math inline">\((L,M,P)\)</span> be an <a href="https://laustep.github.io/stlahblog/posts/extendedCholesky.html">extended Cholesky decomposition</a> of <span class="math inline">\(\Theta\)</span>. Set <span class="math inline">\(Q = \begin{pmatrix} 1 &amp; 0 \\ 0 &amp; P \end{pmatrix}\)</span> and <span class="math inline">\(\widetilde{\Theta} = Q\Theta Q'\)</span>, then set <span class="math inline">\(u = L^{-1}\widetilde{\Theta}_{1, 2:(r+1)}'\)</span> and <span class="math inline">\(v = \widetilde{\Theta}_{1,1} - \sum_{i=1}^r u_i^2\)</span>. Take <span class="math inline">\(Z_1, \ldots, Z_r \sim_{\text{iid}} \mathcal{N}(0,1)\)</span> and set <span class="math inline">\(G_i = u_i + Z_i\)</span>. Finally, take <span class="math inline">\(X \sim \chi^2_{\nu-r, v}\)</span> (noncentral chi-squared distribution) independent of the <span class="math inline">\(Z_i\)</span>, and set <span class="math display">\[
+<p><span class="math inline">\(\bullet\)</span> <strong>Simulation of <span class="math inline">\(\mathcal{W}(\nu, J_d^1, \Theta)\)</span></strong>. This algorithm runs as follows. Let <span class="math inline">\((L,M,P)\)</span> be an <a href="https://laustep.github.io/stlahblog/posts/extendedCholesky.html">extended Cholesky decomposition</a> of <span class="math inline">\(\Theta_{2:d,2:d}\)</span>. Set <span class="math inline">\(Q = \begin{pmatrix} 1 &amp; 0 \\ 0 &amp; P \end{pmatrix}\)</span> and <span class="math inline">\(\widetilde{\Theta} = Q\Theta Q'\)</span>, then set <span class="math inline">\(u = L^{-1}\widetilde{\Theta}_{1, 2:(r+1)}'\)</span> and <span class="math inline">\(v = \widetilde{\Theta}_{1,1} - \sum_{i=1}^r u_i^2\)</span>. Take <span class="math inline">\(Z_1, \ldots, Z_r \sim_{\text{iid}} \mathcal{N}(0,1)\)</span> and set <span class="math inline">\(G_i = u_i + Z_i\)</span>. Finally, take <span class="math inline">\(X \sim \chi^2_{\nu-r, v}\)</span> (noncentral chi-squared distribution) independent of the <span class="math inline">\(Z_i\)</span>, and set <span class="math display">\[
 W =  
 Q' \begin{pmatrix}
 1 &amp; 0 &amp; 0 \\
@@ -167,7 +173,9 @@ Phi_sims &lt;-<span class="st"> </span><span class="kw">sapply</span>(Z, <span c
   <div id="disqus_thread"></div>
   <div class="pagination">
     <ul>
-      <li><a href="http://laustep.github.io/stlahblog/">« Back Home</a></li>
+      <li>
+        <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+      </li>
     </ul>
   </div>
 </body>
@@ -177,7 +185,7 @@ Phi_sims &lt;-<span class="st"> </span><span class="kw">sapply</span>(Z, <span c
   var disqus_shortname = 'stlapblog';
   // required: replace example with your forum shortname
   /* * * DON'T EDIT BELOW THIS LINE * * */
-  (function() {
+  (function () {
     var dsq = document.createElement('script');
     dsq.type = 'text/javascript';
     dsq.async = true;
@@ -186,7 +194,9 @@ Phi_sims &lt;-<span class="st"> </span><span class="kw">sapply</span>(Z, <span c
       document.getElementsByTagName('body')[0]).appendChild(dsq);
   })();
 </script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
 <script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
 <!-- <script>
@@ -200,10 +210,11 @@ Phi_sims &lt;-<span class="st"> </span><span class="kw">sapply</span>(Z, <span c
 <script>
   var pres = document.getElementsByTagName("pre");
   for (var i = 0; i < pres.length; ++i) {
+    
     pres[i].className = pres[i].className + " prettyprint linenums";
+    
   }
   prettyPrint();
-</script>
-
+</script> 
 
 </html>

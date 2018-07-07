@@ -15,7 +15,7 @@
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
-</script>
+  </script>
 </head>
 
 <body>
@@ -36,13 +36,19 @@
       <a href="https://antoineguillot.wordpress.com/blog/">
         <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
       </a>
+      <br />
+      <a href="https://fronkonstin.com/">
+        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+      </a>
     </div>
   </div>
 
   <div class="main">
     <div id="header">
       <div id="logo" style="position:absolute;">
-        <a href="../"><img src="../images/stla.jpg" alt="stla" width="100px" /></a>
+        <a href="../">
+          <img src="../images/stla.jpg" alt="stla" width="100px" />
+        </a>
       </div>
       <div id="navigation" style="margin-top:50px;">
         <a href="../">Home</a>
@@ -66,12 +72,12 @@
 </div>
 
 <p>In <a href="https://laustep.github.io/stlahblog/posts/FloatExpansionHaskell.html">another post</a>, I give the command line to compile Haskell code to a DLL on Windows:</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">ghc -shared FloatExpansion2.hs StartEnd.c -o FloatExpansion2.dll</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">ghc</span> -shared FloatExpansion2.hs StartEnd.c -o FloatExpansion2.dll</code></pre></div>
 <p>This can generate a huge DLL. It is possible to get a smaller one.</p>
 <p>The above example is not too big: the size of <code>FloatExpansion2.dll</code> is 7.6 MB. But let’s take this example.</p>
 <h1 id="strip">Strip</h1>
 <p>The GNU <code>strip</code> program can make the size of a DLL smaller. This program is included in the Haskell platform (if you are a R user, it is included in <code>Rtools</code>). The size of <code>FloatExpansion2.dll</code> decreases to 4.2 MB when I run this command:</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">strip -g -S --strip-unneeded -v FloatExpansion2.dll</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="fu">strip</span> -g -S --strip-unneeded -v FloatExpansion2.dll</code></pre></div>
 <p>The <code>upx</code> program considerably compresses the size of a DLL. However my Haskell DLLs do not work anymore when I compress them with <code>upx</code>.</p>
 <h1 id="module-definition-file">Module definition file</h1>
 <p>To get a smaller DLL, you can list the functions you want to export with the help of a module definition file. For our example, we want to export the <code>floatExpansion</code> function and - don’t forget - the <code>HsStart</code> function. To export these functions only, it suffices to list them in a text file like this:</p>
@@ -79,7 +85,7 @@
  HsStart
  floatExpansion</code></pre>
 <p>and then, assuming this file is named <code>exports.def</code>, run the command</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">ghc -shared FloatExpansion2.hs StartEnd.c -o FloatExpansion2.dll exports.def</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">ghc</span> -shared FloatExpansion2.hs StartEnd.c -o FloatExpansion2.dll exports.def</code></pre></div>
 <p>When I do that, the size of <code>FloatExpansion2.dll</code> is 7.0 MB. This is not a big reduction, but I got a considerable reduction for other DLLs.</p>
 <p>After that, you can use <code>strip</code>. Doing so, the size of <code>FloatExpansion2.dll</code> reduces to 3.5 MB.</p>
 
@@ -96,7 +102,9 @@
   <div id="disqus_thread"></div>
   <div class="pagination">
     <ul>
-      <li><a href="http://laustep.github.io/stlahblog/">« Back Home</a></li>
+      <li>
+        <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+      </li>
     </ul>
   </div>
 </body>
@@ -106,7 +114,7 @@
   var disqus_shortname = 'stlapblog';
   // required: replace example with your forum shortname
   /* * * DON'T EDIT BELOW THIS LINE * * */
-  (function() {
+  (function () {
     var dsq = document.createElement('script');
     dsq.type = 'text/javascript';
     dsq.async = true;
@@ -115,7 +123,9 @@
       document.getElementsByTagName('body')[0]).appendChild(dsq);
   })();
 </script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
 <script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
 <!-- <script>
@@ -134,7 +144,6 @@
     
   }
   prettyPrint();
-</script>
-
+</script> 
 
 </html>
