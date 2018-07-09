@@ -1,0 +1,349 @@
+<html>
+
+<head>
+  <title>Apollonian gasket</title>
+  <style>
+    canvas {
+      width: 100%;
+      height: 100%
+    }
+  </style>
+
+  <script src="../libraries/jquery.min.js"></script>
+  <script src="../libraries/three.min.js"></script>
+  <script src="../libraries/dat.gui.min.js"></script>
+
+</head>
+
+<body>
+
+  <script> // complex numbers operations ---------------------------------------
+
+    function cpxmult(z1, z2) {
+      return new THREE.Vector2(
+        z1.x * z2.x - z1.y * z2.y,
+        z1.y * z2.x + z1.x * z2.y);
+    }
+
+    function cpxsqrt(z) {
+      if (z.v == 0) {
+        if (z.x > 0) {
+          return new THREE.Vector2(Math.sqrt(z.x), 0);
+        } else {
+          return new THREE.Vector2(0, Math.sqrt(-z.x));
+        }
+      } else {
+        var ss = Math.sqrt(Math.sqrt(z.x * z.x + z.y * z.y));
+        var theta = Math.atan2(z.y, z.x);
+        return new THREE.Vector2(
+          ss * Math.cos(theta / 2),
+          ss * Math.sin(theta / 2));
+      }
+    }
+  </script>
+
+
+  <script> // Soddy circles ----------------------------------------------------
+
+    function soddyRadius(r1, r2, r3, sign) {
+      return 1 / (1 / r1 + 1 / r2 + 1 / r3 +
+        sign * 2 * Math.sqrt(1 / r1 / r2 + 1 / r2 / r3 + 1 / r3 / r1));
+    }
+
+    function soddyCenter(A, B, C) {
+      var AB = B.clone(); AB.sub(A);
+      var BC = C.clone(); BC.sub(B);
+      var CA = A.clone(); CA.sub(C);
+      var a = BC.length();
+      var b = CA.length();
+      var c = AB.length();
+      var Delta = 0.5 * Math.abs(AB.x * CA.y - AB.y * CA.x);
+      var tc1 = 1 + 2 * Delta / a / (b + c - a);
+      var tc2 = 1 + 2 * Delta / b / (c + a - b);
+      var tc3 = 1 + 2 * Delta / c / (a + b - c);
+      var den = a * tc1 + b * tc2 + c * tc3;
+      var k1 = a * tc1 / den;
+      var k2 = b * tc2 / den;
+      var k3 = c * tc3 / den;
+      var AA = A.clone(); AA.multiplyScalar(k1);
+      var BB = B.clone(); BB.multiplyScalar(k2);
+      var CC = C.clone(); CC.multiplyScalar(k3);
+      var out = new THREE.Vector2();
+      out.addVectors(AA, BB).add(CC);
+      return out;
+    }
+
+    function soddyCircle(C1, C2, C3) {
+      return {
+        center: soddyCenter(C1.center, C2.center, C3.center),
+        radius: soddyRadius(C1.radius, C2.radius, C3.radius, 1)
+      };
+    }
+
+    function soddyCircle2(C1, C2, C3, rother) {
+      var r1 = C1.radius; var r2 = C2.radius; var r3 = -C3.radius;
+      var other = false;
+      var r = soddyRadius(r1, r2, r3, 1);
+      if (Math.abs((r - rother) / r) < 0.001) {
+        other = true;
+        r = soddyRadius(r1, r2, r3, -1);
+      }
+      var z1 = C1.center; var z2 = C2.center; var z3 = C3.center;
+      var zz1 = z1.clone(); zz1.divideScalar(r1);
+      var zz2 = z2.clone(); zz2.divideScalar(r2);
+      var zz3 = z3.clone(); zz3.divideScalar(r3);
+      var term1 = new THREE.Vector2();
+      term1.addVectors(zz1, zz2).add(zz3);
+      var term2 = new THREE.Vector2();
+      var z1z2 = cpxmult(z1, z2); z1z2.divideScalar(r1 * r2);
+      var z2z3 = cpxmult(z2, z3); z2z3.divideScalar(r2 * r3);
+      var z1z3 = cpxmult(z1, z3); z1z3.divideScalar(r1 * r3);
+      term2.addVectors(z1z2, z2z3).add(z1z3);
+      term2 = cpxsqrt(term2);
+      term2.multiplyScalar(2);
+      var center1 = term1.clone(); center1.sub(term2);
+      var center2 = term1.clone(); center2.add(term2);
+      center1.multiplyScalar(r);
+      center2.multiplyScalar(r);
+      var d1 = (center1.x - z3.x) ** 2 + (center1.y - z3.y) ** 2;
+      var d2 = (center2.x - z3.x) ** 2 + (center2.y - z3.y) ** 2;
+      if (other) {
+        if (d1 < d2) {
+          return { center: center1, radius: r };
+        } else {
+          return { center: center2, radius: r };
+        }
+      } else {
+        if (d1 > d2) {
+          return { center: center1, radius: r };
+        } else {
+          return { center: center2, radius: r };
+        }
+      }
+    }
+    </script>
+
+
+    <script> // functions to get starting circles ------------------------------
+
+    function circumcircle(p1, p2, p3) {
+      var A = new THREE.Matrix3();
+      A.set(
+        p1.x, p2.x, p3.x,
+        p1.y, p2.y, p3.y,
+        1, 1, 1
+      );
+      var a = A.determinant();
+      var q1 = p1.x * p1.x + p1.y * p1.y;
+      var q2 = p2.x * p2.x + p2.y * p2.y;
+      var q3 = p3.x * p3.x + p3.y * p3.y;
+      var X = new THREE.Matrix3();
+      X.set(
+        q1, q2, q3,
+        p1.y, p2.y, p3.y,
+        1, 1, 1
+      );
+      var Y = new THREE.Matrix3();
+      Y.set(
+        q1, q2, q3,
+        p1.x, p2.x, p3.x,
+        1, 1, 1
+      );
+      var Dx = X.determinant();
+      var Dy = Y.determinant();
+      var center = new THREE.Vector2(0.5 / a * Dx, -0.5 / a * Dy);
+      var r = Math.sqrt((p1.x - center.x) * (p1.x - center.x) +
+        (p1.y - center.y) * (p1.y - center.y));
+      return { center: center, radius: r };
+    }
+
+    function inversion(phi, pnt, r, center) {
+      var invphi = 1 / phi;
+      var k = r * r * (invphi * invphi - 1);
+      var Ix = invphi * r;
+      var vx = pnt.x - Ix - center.x;
+      var vy = pnt.y - center.y;
+      var c = k / (vx * vx + vy * vy);
+      var outx = Ix + center.x - c * vx;
+      var outy = center.y - c * vy;
+      return new THREE.Vector2(outx, outy);
+    }
+
+    function oneCircle(phi, center, r, beta) {
+      var sine = Math.sin(Math.PI / 3);
+      var coef = 1 / (1 + sine);
+      var cHalfside = coef * r * sine;
+      var cRadius = coef * r;
+      var O1x = 2 / phi * r;
+      var cosbeta = Math.cos(beta); var sinbeta = Math.sin(beta);
+      var pntx = center.x + cRadius * cosbeta;
+      var pnty = center.y + cRadius * sinbeta;
+      var p1 = new THREE.Vector2(pntx + cHalfside, pnty);
+      var p2 = new THREE.Vector2(pntx, pnty + cHalfside);
+      var p3 = new THREE.Vector2(pntx - cHalfside, pnty);
+      var q1 = inversion(phi, p1, r, center);
+      var q2 = inversion(phi, p2, r, center);
+      var q3 = inversion(phi, p3, r, center);
+      var cs = circumcircle(q1, q2, q3);
+      var center2 = new THREE.Vector2(cs.center.x - O1x, cs.center.y);
+      return { center: center2, radius: cs.radius };
+    }
+
+    function threeCircles(phi, Cbig, shift) {
+      var a = 2 * Math.PI / 3;
+      var C1 = oneCircle(phi, Cbig.center, Cbig.radius, shift);
+      var C2 = oneCircle(phi, Cbig.center, Cbig.radius, shift + a);
+      var C3 = oneCircle(phi, Cbig.center, Cbig.radius, shift + 2 * a);
+      return { C1: C1, C2: C2, C3: C3 };
+    }
+  </script>
+
+
+  <script> // main function ----------------------------------------------------
+    function Apollony(object, depth, C1, C2, C3, Cother, exter) {
+      var material = new THREE.MeshNormalMaterial();
+      var Cnew;
+      if (exter) {
+        Cnew = soddyCircle2(C1, C2, C3, Cother.radius);
+      } else {
+        Cnew = soddyCircle(C1, C2, C3);
+      }
+      var geom = new THREE.SphereGeometry(Cnew.radius, 24, 24);
+      geom.translate(Cnew.center.x, Cnew.center.y, 0);
+      var mesh = new THREE.Mesh(geom, material);
+      object.add(mesh);
+      if (depth > 1) {
+        Apollony(object, depth - 1, Cnew, C2, C3, C1, exter);
+        Apollony(object, depth - 1, C1, Cnew, C3, C2, exter);
+        Apollony(object, depth - 1, C1, C2, Cnew, null, false);
+      }
+    }
+  </script>
+
+
+  <script> // starting parameters ----------------------------------------------
+    var C4 = { center: new THREE.Vector2(0, 0), radius: 1 };
+    var phi = 0.3;
+    var depth = 4;
+    var shift = 0;
+  </script>
+
+
+  <script> // three.js ---------------------------------------------------------
+ 
+    // dat.gui controls
+    var dgcontrols = new function () {
+      this.rotationSpeed = 0.001;
+      this.depth = depth;
+      this.phi = phi;
+      this.shift = shift;
+    }
+    var gui = new dat.GUI({ autoplace: false, width: 400 });
+    gui.add(dgcontrols, 'rotationSpeed', 0, 0.005);
+    var controller_depth =
+      gui.add(dgcontrols, 'depth').min(1).max(6).step(1);
+    controller_depth.onFinishChange(function (value) {
+      Rendering(value, dgcontrols.phi, dgcontrols.shift);
+    });
+    var controller_phi =
+      gui.add(dgcontrols, 'phi').min(-0.95).max(0.95).step(0.02);
+    controller_phi.onFinishChange(function (value) {
+      Rendering(dgcontrols.depth, value, dgcontrols.shift);
+    });
+    var controller_shift =
+      gui.add(dgcontrols, 'shift').min(-90).max(90).step(1);
+    controller_shift.onFinishChange(function (value) {
+      Rendering(dgcontrols.depth, dgcontrols.phi, value);
+    });
+
+    var aspect = window.innerWidth / window.innerHeight;
+    var camera = new THREE.PerspectiveCamera(35, aspect, 1, 10000);
+    camera.position.z = 5;
+
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    var scene = new THREE.Scene();
+    scene.add(camera);
+    var apollony = new THREE.Object3D();
+    scene.add(apollony);
+
+    window.requestAnimFrame = (function () {
+      return window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        function (callback) {
+          window.setTimeout(callback, 1000 / 60);
+        };
+    })();
+
+    function render() {
+      renderer.render(scene, camera);
+      apollony.rotation.x += dgcontrols.rotationSpeed;
+      apollony.rotation.y += dgcontrols.rotationSpeed;
+      requestAnimFrame(render);
+    }
+
+    function Rendering(depth, phi, shift) {
+      for (var i = apollony.children.length - 1; i >= 0; i--) {
+        apollony.children[i].geometry.dispose();
+        apollony.children[i].material.dispose();
+      }
+      apollony.children.splice(0);
+
+      var C1C2C3 = threeCircles(phi, C4, shift);
+      var C1 = C1C2C3.C1;
+      var C2 = C1C2C3.C2;
+      var C3 = C1C2C3.C3;
+
+      Apollony(apollony, depth, C1, C2, C3, null, false);
+      Apollony(apollony, depth, C1, C2, C4, C3, true);
+      Apollony(apollony, depth, C1, C3, C4, C2, true);
+      Apollony(apollony, depth, C2, C3, C4, C1, true);
+
+      var isDragging = false;
+      var previousMousePosition = {
+        x: 0,
+        y: 0
+      };
+
+      $(document).on('mouseup', function (e) {
+        isDragging = false;
+      });
+
+      $(renderer.domElement).on('mousedown', function (e) {
+        isDragging = true;
+      }).on('mousemove', function (e) {
+        var deltaMove = {
+          x: e.offsetX - previousMousePosition.x,
+          y: e.offsetY - previousMousePosition.y
+        };
+        if (isDragging) {
+          var deltaRotationQuaternion = new THREE.Quaternion()
+            .setFromEuler(new THREE.Euler(
+              Math.PI / 180 * (deltaMove.y * 1),
+              Math.PI / 180 * (deltaMove.x * 1),
+              0,
+              'XYZ'
+            ));
+          apollony.quaternion.multiplyQuaternions(deltaRotationQuaternion,
+            apollony.quaternion);
+        }
+        previousMousePosition = {
+          x: e.offsetX,
+          y: e.offsetY
+        };
+      });
+    }
+  </script>
+
+
+  <script> // render -----------------------------------------------------------
+    Rendering(depth, phi, shift);
+    requestAnimFrame(render);
+  </script>
+
+</body>
+
+</html>
