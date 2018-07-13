@@ -34,7 +34,7 @@
 
     var aspect = window.innerWidth / window.innerHeight;
     var camera = new THREE.PerspectiveCamera(50, aspect, 1, 10000);
-    camera.position.z = 3.8;
+    camera.position.z = 4;
     scene.add(camera);
 
     var renderer = new THREE.WebGLRenderer();
@@ -64,9 +64,9 @@
 
     var mesh = new THREE.Mesh(geom, new THREE.MeshNormalMaterial());
 
-    var bretzel = new THREE.Object3D();
-    bretzel.add(mesh);
-    scene.add(bretzel);
+    var cyclide = new THREE.Object3D();
+    cyclide.add(mesh);
+    scene.add(cyclide);
 
     // ------------------------------------------------------------------------
     var isDragging = false;
@@ -89,8 +89,8 @@
             0,
             'XYZ'
           ));
-        bretzel.quaternion.multiplyQuaternions(deltaRotationQuaternion,
-          bretzel.quaternion);
+        cyclide.quaternion.multiplyQuaternions(deltaRotationQuaternion,
+          cyclide.quaternion);
       }
       previousMousePosition = {
         x: e.offsetX,
@@ -102,7 +102,6 @@
       isDragging = false;
     });
 
-    // shim layer with setTimeout fallback ------------------------------------
     window.requestAnimFrame = (function () {
       return window.requestAnimationFrame ||
         window.webkitRequestAnimationFrame ||
@@ -112,26 +111,12 @@
         };
     })();
 
-    var lastFrameTime = new Date().getTime() / 1000;
-    var totalGameTime = 0;
-
-    function update(dt, t) {
-      setTimeout(function () {
-        var currTime = new Date().getTime() / 1000;
-        var dt = currTime - (lastFrameTime || currTime);
-        totalGameTime += dt;
-        update(dt, totalGameTime);
-        lastFrameTime = currTime;
-      }, 0);
-    }
-
     function render() {
       renderer.render(scene, camera);
       requestAnimFrame(render);
     }
 
     render();
-    update(0, totalGameTime);
 
   </script>
 
