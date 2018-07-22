@@ -208,10 +208,14 @@
       } else {
         Cnew = soddyCircle(C1, C2, C3);
       }
-      var geom = new THREE.SphereGeometry(Cnew.radius, 24, 24);
+      var r = Cnew.radius;
+      var n = r > 0.5 ? 32 : (r > 0.25 ? 24 : (r > 0.1 ? 16 : 8));
+      var geom = new THREE.SphereBufferGeometry(r, n, n);
       geom.translate(Cnew.center.x, Cnew.center.y, 0);
       var mesh = new THREE.Mesh(geom, material);
       object.add(mesh);
+      mesh.geometry.dispose();
+      mesh.material.dispose();
       if (depth > 1) {
         Apollony(object, depth - 1, Cnew, C2, C3, C1, exter);
         Apollony(object, depth - 1, C1, Cnew, C3, C2, exter);
