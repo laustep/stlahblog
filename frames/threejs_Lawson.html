@@ -1,0 +1,147 @@
+<html>
+
+<head>
+  <title>Lawson surface</title>
+  <style>
+    canvas {
+      width: 100%;
+      height: 100%
+    }
+  </style>
+</head>
+
+<body>
+  <script src="../libraries/three.min.js"></script>
+  <script src="../libraries/jquery.min.js"></script>
+
+  <script> 
+    // stereographic projection ------------------------------------------------
+    function stereog(x) {
+      var r = Math.acos(x[3]) / Math.PI / Math.sqrt(1 - x[3] * x[3])
+      return new THREE.Vector3(x[0] * r, x[1] * r, x[2] * r);
+    }
+
+    // rotation in 4D space (right-isoclinic) ----------------------------------
+    function rotate4d(alpha, beta, xi, vec) {
+      var a = Math.cos(xi);
+      var b = Math.sin(alpha) * Math.cos(beta) * Math.sin(xi);
+      var c = Math.sin(alpha) * Math.sin(beta) * Math.sin(xi);
+      var d = Math.cos(alpha) * Math.sin(xi);
+      var p = vec[0]; var q = vec[1]; var r = vec[2]; var s = vec[3];
+      return [
+        a * p - b * q - c * r - d * s,
+        a * q + b * p + c * s - d * r,
+        a * r - b * s + c * p + d * q,
+        a * s + b * r - c * q + d * p
+      ];
+    }
+  </script>
+
+  <script>
+    var alpha = 0;
+    var beta = Math.PI / 2;
+    var xi = 0;
+    var uSteps = 199, vSteps = 199;
+  </script>
+
+  <script>
+    function f0(u, v) {
+      // both u and v run from zero to one in Three.js
+      var U = 2 * Math.PI * u;
+      var V = 0.5 * Math.PI * v - Math.PI / 4;
+      var vec = [
+        Math.cos(U) * Math.cos(V),
+        Math.sin(U) * Math.cos(V),
+        Math.cos(2 * U) * Math.sin(V),
+        Math.sin(2 * U) * Math.sin(V)
+      ];
+      return stereog(rotate4d(alpha, beta, xi, vec));
+    }
+    function f(u, v, vector) {
+      var out = f0(u, v);
+      vector.set(out.x, out.y, out.z);
+    }
+  </script>
+
+  <script> // three.js scene ---------------------------------------------------
+    var scene = new THREE.Scene();
+    var aspect = window.innerWidth / window.innerHeight;
+    var camera = new THREE.PerspectiveCamera(75, aspect, 1, 10000);
+    camera.position.z = 2;
+    scene.add(camera);
+
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    var geometry = new THREE.ParametricGeometry(f, uSteps, vSteps);
+    var material = new THREE.MeshNormalMaterial({ wireframe: true });
+    var mesh = new THREE.Mesh(geometry, material);
+
+    scene.add(mesh);
+  </script>
+
+  <script> // mouse dragging ---------------------------------------------------
+    var isDragging = false;
+    var previousMousePosition = { x: 0, y: 0 };
+
+    $(renderer.domElement).on('mousedown', function (e) {
+      isDragging = true;
+    }).on('mousemove', function (e) {
+      var deltaMove = {
+        x: e.offsetX - previousMousePosition.x,
+        y: e.offsetY - previousMousePosition.y
+      };
+      if (isDragging) {
+        var deltaRotationQuaternion = new THREE.Quaternion()
+          .setFromEuler(new THREE.Euler(
+            Math.PI / 180 * (deltaMove.y * 1),
+            Math.PI / 180 * (deltaMove.x * 1),
+            0,
+            'XYZ'
+          ));
+        mesh.quaternion.multiplyQuaternions(deltaRotationQuaternion,
+          mesh.quaternion);
+      }
+      previousMousePosition = {
+        x: e.offsetX,
+        y: e.offsetY
+      };
+    });
+
+    $(document).on('mouseup', function (e) {
+      isDragging = false;
+    });
+  </script>
+
+  <script> // render -----------------------------------------------------------
+    window.requestAnimFrame = (function () {
+      return window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        function (callback) {
+          window.setTimeout(callback, 1000 / 60);
+        };
+    })();
+
+    function render() {
+      renderer.render(scene, camera);
+      mesh.rotation.x += 0.001;
+      mesh.rotation.y += 0.001;
+      xi += 0.001;
+      for (var j = 0; j <= vSteps; j++)
+        for (var i = 0; i < uSteps; i++) {
+          var v = f0(i / uSteps, j / vSteps);
+          geometry.vertices[i + j * uSteps].set(v.x, v.y, v.z);
+        }
+      geometry.verticesNeedUpdate = true;
+
+      requestAnimFrame(render);
+    }
+
+    render();
+  </script>
+
+</body>
+
+</html>
