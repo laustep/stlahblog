@@ -1,0 +1,222 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Triangulated surfaces with plotly in R</title>
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/kate.css" />  
+  <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+</head>
+
+<body>
+  <!-- Sidebar. -->
+  <div class="sidebar">
+    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+      <a href="https://www.r-bloggers.com/">
+        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+      </a>
+      <br />
+      <a href="http://t-redactyl.io/">
+        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
+      </a>
+      <a href="http://timelyportfolio.blogspot.be/">
+        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
+      </a>
+      <br />
+      <a href="https://antoineguillot.wordpress.com/blog/">
+        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+      </a>
+      <br />
+      <a href="https://fronkonstin.com/">
+        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="header">
+      <div id="logo" style="position:absolute;">
+        <a href="../">
+          <img src="../images/stla.jpg" alt="stla" width="100px" />
+        </a>
+      </div>
+      <div id="navigation" style="margin-top:50px;">
+        <a href="../">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../archive.html">Archive</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Triangulated surfaces with plotly in R</h1> <div class="info">
+    Posted on August 16, 2018
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="../tags/R.html">R</a>, <a href="../tags/graphics.html">graphics</a>, <a href="../tags/plotly.html">plotly</a>
+    
+</div>
+
+<p>The <code>plotly</code> package for R has a type <code>mesh3d</code> allowing to draw triangulated surfaces. We will give some examples.</p>
+<h2 id="from-a-mesh3d-object-icosahedron-example">From a <code>mesh3d</code> object: icosahedron example</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tmesh &lt;-<span class="st"> </span>rgl<span class="op">::</span><span class="kw">icosahedron3d</span>()
+<span class="kw">plot_ly</span>(
+  <span class="dt">x =</span> tmesh<span class="op">$</span>vb[<span class="dv">1</span>,], <span class="dt">y =</span> tmesh<span class="op">$</span>vb[<span class="dv">2</span>,], <span class="dt">z =</span> tmesh<span class="op">$</span>vb[<span class="dv">3</span>,],
+  <span class="dt">i =</span> tmesh<span class="op">$</span>it[<span class="dv">1</span>,]<span class="op">-</span><span class="dv">1</span>, <span class="dt">j =</span> tmesh<span class="op">$</span>it[<span class="dv">2</span>,]<span class="op">-</span><span class="dv">1</span>, <span class="dt">k =</span> tmesh<span class="op">$</span>it[<span class="dv">3</span>,]<span class="op">-</span><span class="dv">1</span>,
+  <span class="dt">facecolor =</span> <span class="kw">toRGB</span>(viridisLite<span class="op">::</span><span class="kw">inferno</span>(<span class="dv">20</span>)),
+  <span class="dt">type =</span> <span class="st">&quot;mesh3d&quot;</span>
+) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">layout</span>(<span class="dt">scene =</span> <span class="kw">list</span>(<span class="dt">aspectmode =</span> <span class="st">&quot;data&quot;</span>))</code></pre></div>
+<div class="figure">
+<img src="figures/icosahedron.png" />
+
+</div>
+<h2 id="drawing-a-parametric-surface-cyclide-example">Drawing a parametric surface : cyclide example</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a =<span class="st"> </span><span class="fl">0.94</span>; d =<span class="st"> </span><span class="fl">0.56</span>; c =<span class="st"> </span><span class="fl">0.34</span>; b =<span class="st"> </span><span class="kw">sqrt</span>(a<span class="op">^</span><span class="dv">2</span><span class="op">-</span>c<span class="op">^</span><span class="dv">2</span>)
+fx &lt;-<span class="st"> </span><span class="cf">function</span>(u,v){
+  (d<span class="op">*</span>(c<span class="op">-</span>a<span class="op">*</span><span class="kw">cos</span>(u)<span class="op">*</span><span class="kw">cos</span>(v))<span class="op">+</span>b<span class="op">^</span><span class="dv">2</span><span class="op">*</span><span class="kw">cos</span>(u)) <span class="op">/</span><span class="st"> </span>(a<span class="op">-</span>c<span class="op">*</span><span class="kw">cos</span>(u)<span class="op">*</span><span class="kw">cos</span>(v))
+}
+fy &lt;-<span class="st"> </span><span class="cf">function</span>(u,v){
+  (b<span class="op">*</span><span class="kw">sin</span>(u)<span class="op">*</span>(a<span class="op">-</span>d<span class="op">*</span><span class="kw">cos</span>(v))) <span class="op">/</span><span class="st"> </span>(a<span class="op">-</span>c<span class="op">*</span><span class="kw">cos</span>(u)<span class="op">*</span><span class="kw">cos</span>(v))
+}
+fz &lt;-<span class="st"> </span><span class="cf">function</span>(u,v){
+  (b<span class="op">*</span><span class="kw">sin</span>(v)<span class="op">*</span>(c<span class="op">*</span><span class="kw">cos</span>(u)<span class="op">-</span>d)) <span class="op">/</span><span class="st"> </span>(a<span class="op">-</span>c<span class="op">*</span><span class="kw">cos</span>(u)<span class="op">*</span><span class="kw">cos</span>(v))
+}
+
+<span class="kw">library</span>(misc3d)
+tris &lt;-<span class="st"> </span><span class="kw">parametric3d</span>(fx, fy, fz, 
+                     <span class="dt">umin=</span><span class="dv">0</span>, <span class="dt">umax=</span><span class="dv">2</span><span class="op">*</span>pi, <span class="dt">vmin=</span><span class="dv">0</span>, <span class="dt">vmax=</span><span class="dv">2</span><span class="op">*</span>pi, 
+                     <span class="dt">n=</span><span class="dv">100</span>, <span class="dt">engine=</span><span class="st">&quot;none&quot;</span>)
+
+n &lt;-<span class="st"> </span><span class="kw">nrow</span>(tris<span class="op">$</span>v1)
+cont &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="ot">NA_real_</span>, <span class="dt">ncol=</span><span class="dv">3</span>, <span class="dt">nrow=</span><span class="dv">3</span><span class="op">*</span>n)
+cont[<span class="dv">3</span><span class="op">*</span>(<span class="dv">1</span><span class="op">:</span>n)<span class="op">-</span><span class="dv">2</span>,] &lt;-<span class="st"> </span>tris<span class="op">$</span>v1
+cont[<span class="dv">3</span><span class="op">*</span>(<span class="dv">1</span><span class="op">:</span>n)<span class="op">-</span><span class="dv">1</span>,] &lt;-<span class="st"> </span>tris<span class="op">$</span>v2
+cont[<span class="dv">3</span><span class="op">*</span>(<span class="dv">1</span><span class="op">:</span>n),] &lt;-<span class="st"> </span>tris<span class="op">$</span>v3
+idx &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="dv">0</span><span class="op">:</span>(<span class="dv">3</span><span class="op">*</span>n<span class="op">-</span><span class="dv">1</span>), <span class="dt">ncol=</span><span class="dv">3</span>, <span class="dt">byrow=</span><span class="ot">TRUE</span>)
+
+<span class="kw">plot_ly</span>(
+  <span class="dt">x =</span> cont[,<span class="dv">1</span>], <span class="dt">y =</span> cont[,<span class="dv">2</span>], <span class="dt">z =</span> cont[,<span class="dv">3</span>],
+  <span class="dt">i =</span> idx[,<span class="dv">1</span>], <span class="dt">j =</span> idx[,<span class="dv">2</span>], <span class="dt">k =</span> idx[,<span class="dv">3</span>],
+  <span class="dt">type =</span> <span class="st">&quot;mesh3d&quot;</span>
+) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">layout</span>(<span class="dt">scene =</span> <span class="kw">list</span>(<span class="dt">aspectmode =</span> <span class="st">&quot;data&quot;</span>))</code></pre></div>
+<div class="figure">
+<img src="figures/cyclide_parametric.png" />
+
+</div>
+<p>We can add some colors:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">midpoints &lt;-<span class="st"> </span>(tris<span class="op">$</span>v1 <span class="op">+</span><span class="st"> </span>tris<span class="op">$</span>v2 <span class="op">+</span><span class="st"> </span>tris<span class="op">$</span>v3)<span class="op">/</span><span class="dv">3</span>
+distances &lt;-<span class="st"> </span><span class="kw">apply</span>(midpoints, <span class="dv">1</span>, crossprod)
+intervals &lt;-<span class="st"> </span><span class="kw">cut</span>(distances, <span class="dv">256</span>)
+colorsPalette &lt;-<span class="st"> </span>viridisLite<span class="op">::</span><span class="kw">viridis</span>(<span class="dv">256</span>)
+colors &lt;-<span class="st"> </span>colorsPalette[<span class="kw">as.integer</span>(intervals)]
+
+<span class="kw">plot_ly</span>(
+  <span class="dt">x =</span> cont[,<span class="dv">1</span>], <span class="dt">y =</span> cont[,<span class="dv">2</span>], <span class="dt">z =</span> cont[,<span class="dv">3</span>],
+  <span class="dt">i =</span> idx[,<span class="dv">1</span>], <span class="dt">j =</span> idx[,<span class="dv">2</span>], <span class="dt">k =</span> idx[,<span class="dv">3</span>],
+  <span class="dt">type =</span> <span class="st">&quot;mesh3d&quot;</span>,
+  <span class="dt">facecolor =</span> <span class="kw">toRGB</span>(colors)
+) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">layout</span>(<span class="dt">scene =</span> <span class="kw">list</span>(<span class="dt">aspectmode =</span> <span class="st">&quot;data&quot;</span>))</code></pre></div>
+<div class="figure">
+<img src="figures/cyclide_parametric_colored.png" />
+
+</div>
+<h2 id="drawing-an-isosurface-cyclide-again">Drawing an isosurface: cyclide again</h2>
+<p>I like cyclides…</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a =<span class="st"> </span><span class="fl">0.94</span>; mu =<span class="st"> </span><span class="fl">0.56</span>; c =<span class="st"> </span><span class="fl">0.34</span>
+f &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, z, a, c, mu){
+  b &lt;-<span class="st"> </span><span class="kw">sqrt</span>(a<span class="op">^</span><span class="dv">2</span><span class="op">-</span>c<span class="op">^</span><span class="dv">2</span>)
+  (x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span><span class="op">+</span>z<span class="op">^</span><span class="dv">2</span><span class="op">-</span>mu<span class="op">^</span><span class="dv">2</span><span class="op">+</span>b<span class="op">^</span><span class="dv">2</span>)<span class="op">^</span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span><span class="dv">4</span><span class="op">*</span>(a<span class="op">*</span>x<span class="op">-</span>c<span class="op">*</span>mu)<span class="op">^</span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span><span class="dv">4</span><span class="op">*</span>b<span class="op">^</span><span class="dv">2</span><span class="op">*</span>y<span class="op">^</span><span class="dv">2</span>
+}
+
+x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span>c<span class="op">-</span>mu<span class="op">-</span>a, <span class="kw">abs</span>(mu<span class="op">-</span>c)<span class="op">+</span>a, <span class="dt">length=</span><span class="dv">100</span>) 
+y &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span>mu<span class="op">-</span>a, mu<span class="op">+</span>a, <span class="dt">length=</span><span class="dv">100</span>)
+z &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span>mu<span class="op">-</span>c, mu<span class="op">+</span>c, <span class="dt">length=</span><span class="dv">50</span>) 
+g &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>y, <span class="dt">z=</span>z)
+voxel &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="kw">with</span>(g, <span class="kw">f</span>(x,y,z,a,c,mu)), <span class="kw">c</span>(<span class="dv">100</span>,<span class="dv">100</span>,<span class="dv">50</span>))
+<span class="kw">library</span>(misc3d)
+cont &lt;-<span class="st"> </span><span class="kw">computeContour3d</span>(voxel, <span class="dt">level=</span><span class="dv">0</span>, <span class="dt">x=</span>x, <span class="dt">y=</span>y, <span class="dt">z=</span>z)
+
+idx &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="dv">0</span><span class="op">:</span>(<span class="kw">nrow</span>(cont)<span class="op">-</span><span class="dv">1</span>), <span class="dt">ncol=</span><span class="dv">3</span>, <span class="dt">byrow=</span><span class="ot">TRUE</span>)
+
+<span class="kw">plot_ly</span>(
+  <span class="dt">x =</span> cont[,<span class="dv">1</span>], <span class="dt">y =</span> cont[,<span class="dv">2</span>], <span class="dt">z =</span> cont[,<span class="dv">3</span>],
+  <span class="dt">i =</span> idx[,<span class="dv">1</span>], <span class="dt">j =</span> idx[,<span class="dv">2</span>], <span class="dt">k =</span> idx[,<span class="dv">3</span>],
+  <span class="dt">type =</span> <span class="st">&quot;mesh3d&quot;</span>
+) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">layout</span>(<span class="dt">scene =</span> <span class="kw">list</span>(<span class="dt">aspectmode =</span> <span class="st">&quot;data&quot;</span>))</code></pre></div>
+<div class="figure">
+<img src="figures/cyclide_isosurface.png" />
+
+</div>
+
+    </div>
+
+
+    <div id="footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </div>
+
+  </div>
+
+  <div id="disqus_thread"></div>
+  <div class="pagination">
+    <ul>
+      <li>
+        <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+      </li>
+    </ul>
+  </div>
+</body>
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+<!-- Google Prettify -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+<script>
+  var pres = document.getElementsByTagName("pre");
+  for (var i = 0; i < pres.length; ++i) {
+    
+    pres[i].className = pres[i].className + " prettyprint linenums";
+    
+  }
+  prettyPrint();
+</script> 
+
+</html>
