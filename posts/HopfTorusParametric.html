@@ -1,0 +1,257 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Parametric Hopf torus</title>
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/kate.css" />  
+  <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+</head>
+
+<body>
+  <!-- Sidebar. -->
+  <div class="sidebar">
+    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+      <a href="https://www.r-bloggers.com/">
+        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+      </a>
+      <br />
+      <a href="http://t-redactyl.io/">
+        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
+      </a>
+      <a href="http://timelyportfolio.blogspot.be/">
+        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
+      </a>
+      <br />
+      <a href="https://antoineguillot.wordpress.com/blog/">
+        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+      </a>
+      <br />
+      <a href="https://fronkonstin.com/">
+        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="header">
+      <div id="logo" style="position:absolute;">
+        <a href="../">
+          <img src="../images/stla.jpg" alt="stla" width="100px" />
+        </a>
+      </div>
+      <div id="navigation" style="margin-top:50px;">
+        <a href="../">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../archive.html">Archive</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Parametric Hopf torus</h1> <div class="info">
+    Posted on August 25, 2018
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="../tags/R.html">R</a>, <a href="../tags/graphics.html">graphics</a>, <a href="../tags/rgl.html">rgl</a>, <a href="../tags/asymptote.html">asymptote</a>, <a href="../tags/geometry.html">geometry</a>
+    
+</div>
+
+<p>Identify <span class="math inline">\(S^3\)</span> with the unit quaternions and <span class="math inline">\(S^2\)</span> with the unit quaternions with a null <span class="math inline">\(i\)</span>-part component. Then the Hopf map is expressed as <span class="math display">\[
+\begin{cases} \Pi \colon &amp; S^3  \to S^2 \\ 
+&amp; q  \mapsto \tilde{q} q \end{cases}
+\]</span> where the quaternion <span class="math inline">\(\tilde{q}\)</span> is obtained from <span class="math inline">\(q\)</span> by negating its <span class="math inline">\(i\)</span>-th component.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(onion)
+Pi &lt;-<span class="st"> </span><span class="cf">function</span>(q){
+  qtilde &lt;-<span class="st"> </span>q
+  <span class="kw">i</span>(qtilde) &lt;-<span class="st"> </span><span class="op">-</span><span class="kw">i</span>(q)
+  qtilde<span class="op">*</span>q
+}
+<span class="kw">Pi</span>(<span class="kw">quaternion</span>(<span class="dt">Re=</span><span class="dv">1</span>, <span class="dt">i=</span><span class="dv">2</span>, <span class="dt">j=</span><span class="dv">3</span>, <span class="dt">k=</span><span class="dv">4</span>))
+##    [1]
+## Re -20
+## i    0
+## j   22
+## k   -4</code></pre></div>
+<p>Choose a curve <span class="math inline">\(p \colon [a,b] \to S^2\)</span> and a <em>lift</em> of <span class="math inline">\(p\)</span>, that is a map <span class="math inline">\(y \colon [a,b] \to S^3\)</span> such that <span class="math inline">\(p = \Pi \circ y\)</span>.</p>
+<p>For our illustration, we will take the closed curve <span class="math inline">\(p \colon [0,2\pi] \to S^2\)</span> defined by <span class="math display">\[
+\begin{cases}
+p_1 \colon t \mapsto \sin\bigl(h\cos(nt)\bigr) \\
+p_2 \colon t \mapsto \cos(t)\cos\bigl(h\cos(nt)\bigr) \\
+p_3 \colon t \mapsto \sin(t)\cos\bigl(h\cos(nt)\bigr)
+\end{cases}
+\]</span> where <span class="math inline">\(n\)</span> is an integer.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">h &lt;-<span class="st"> </span><span class="fl">0.4</span>
+n &lt;-<span class="st"> </span><span class="dv">3</span>
+p &lt;-<span class="st"> </span><span class="cf">function</span>(t) <span class="kw">c</span>(<span class="kw">sin</span>(h<span class="op">*</span><span class="kw">cos</span>(n<span class="op">*</span>t)),
+                    <span class="kw">cos</span>(t)<span class="op">*</span><span class="kw">cos</span>(h<span class="op">*</span><span class="kw">cos</span>(n<span class="op">*</span>t)),
+                    <span class="kw">sin</span>(t)<span class="op">*</span><span class="kw">cos</span>(h<span class="op">*</span><span class="kw">cos</span>(n<span class="op">*</span>t)))</code></pre></div>
+<p>The lift is easy to get: simply take <span class="math display">\[
+y(t) = \frac{\bigl(1+p_1(t),0,p_2(t),p_3(t)\bigr)}{\sqrt{2\bigl(1+p_1(t)\bigr)}}.
+\]</span></p>
+<p>Let’s check:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">y &lt;-<span class="st"> </span><span class="cf">function</span>(t){
+  <span class="kw">c</span>(<span class="dv">1</span><span class="op">+</span><span class="kw">p</span>(t)[<span class="dv">1</span>], <span class="dv">0</span>, <span class="kw">p</span>(t)[<span class="dv">2</span>], <span class="kw">p</span>(t)[<span class="dv">3</span>]) <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="dv">2</span><span class="op">*</span>(<span class="dv">1</span><span class="op">+</span><span class="kw">p</span>(t)[<span class="dv">1</span>]))
+}
+<span class="kw">Pi</span>(<span class="kw">as.quaternion</span>(<span class="kw">y</span>(<span class="dv">1</span>), <span class="dt">single=</span><span class="ot">TRUE</span>))
+##           [1]
+## Re -0.3857282
+## i   0.0000000
+## j   0.4984896
+## k   0.7763516
+<span class="kw">p</span>(<span class="dv">1</span>)
+## [1] -0.3857282  0.4984896  0.7763516</code></pre></div>
+<p>Ok.</p>
+<p>The <em>Hopf cylinder</em> of <span class="math inline">\(p\)</span> is then <span class="math inline">\((t,\phi) \mapsto e^{i\phi}y(t)\)</span>, and we say it’s a <em>Hopf torus</em> when the curve <span class="math inline">\(p\)</span> is closed. This is a parametric representation of a Hopf torus.</p>
+<p>Here, the integer <span class="math inline">\(n\)</span> determines the number of lobes of the Hopf torus, and<br />
+the parameter <span class="math inline">\(h\)</span> controls the shape.</p>
+<p>Now, apply the function <span class="math inline">\((t,\phi) \mapsto e^{i\phi}y(t)\)</span> and then apply the<br />
+stereographic projection.</p>
+<p>Below is a R code after we got rid of the quaternions.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">h =<span class="st"> </span><span class="fl">0.4</span>
+n=<span class="st"> </span><span class="dv">3</span> <span class="co"># number of lobes</span>
+F &lt;-<span class="st"> </span><span class="cf">function</span>(t,phi){
+  p2 &lt;-<span class="st"> </span><span class="kw">cos</span>(t) <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(h <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(n<span class="op">*</span>t))
+  p3 &lt;-<span class="st"> </span><span class="kw">sin</span>(t) <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(h <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(n<span class="op">*</span>t))
+  p1 &lt;-<span class="st"> </span><span class="kw">sin</span>(h <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(n<span class="op">*</span>t))
+  ## alternatively, 
+  <span class="co"># den = sqrt(1+h^2*cos(n*t)^2);</span>
+  <span class="co"># p2 = cos(t)/den;</span>
+  <span class="co"># p3 = sin(t)/den;</span>
+  <span class="co"># p1 = h*cos(n*t)/den;</span>
+  ##
+  yden &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="dv">2</span><span class="op">*</span>(<span class="dv">1</span><span class="op">+</span>p1))
+  y1 &lt;-<span class="st"> </span>(<span class="dv">1</span><span class="op">+</span>p1)<span class="op">/</span>yden
+  y2 &lt;-<span class="st"> </span>p2<span class="op">/</span>yden
+  y3 &lt;-<span class="st"> </span>p3<span class="op">/</span>yden
+  cosphi &lt;-<span class="st"> </span><span class="kw">cos</span>(phi)
+  sinphi &lt;-<span class="st"> </span><span class="kw">sin</span>(phi)
+  x1 &lt;-<span class="st"> </span>cosphi<span class="op">*</span>y1
+  x2 &lt;-<span class="st"> </span>sinphi<span class="op">*</span>y1
+  x3 &lt;-<span class="st"> </span>cosphi<span class="op">*</span>y2 <span class="op">-</span><span class="st"> </span>sinphi<span class="op">*</span>y3
+  x4 &lt;-<span class="st"> </span>cosphi<span class="op">*</span>y3 <span class="op">+</span><span class="st"> </span>sinphi<span class="op">*</span>y2  
+  <span class="kw">return</span>(<span class="kw">c</span>(x1<span class="op">/</span>(<span class="dv">1</span><span class="op">-</span>x4), x2<span class="op">/</span>(<span class="dv">1</span><span class="op">-</span>x4), x3<span class="op">/</span>(<span class="dv">1</span><span class="op">-</span>x4)))
+}</code></pre></div>
+<p>Now we can use the <code>misc3d</code> package to plot the projected Hopf torus.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fx &lt;-<span class="st"> </span><span class="kw">Vectorize</span>(<span class="cf">function</span>(u,v) <span class="kw">F</span>(u,v)[<span class="dv">1</span>])
+fy &lt;-<span class="st"> </span><span class="kw">Vectorize</span>(<span class="cf">function</span>(u,v) <span class="kw">F</span>(u,v)[<span class="dv">2</span>])
+fz &lt;-<span class="st"> </span><span class="kw">Vectorize</span>(<span class="cf">function</span>(u,v) <span class="kw">F</span>(u,v)[<span class="dv">3</span>])
+<span class="kw">library</span>(misc3d)
+<span class="kw">parametric3d</span>(fx, fy, fz, 
+             <span class="dt">umin =</span> <span class="dv">0</span>, <span class="dt">umax=</span> <span class="dv">2</span><span class="op">*</span>pi, 
+             <span class="dt">vmin =</span> <span class="dv">0</span>, <span class="dt">vmax =</span> <span class="dv">2</span><span class="op">*</span>pi, 
+             <span class="dt">n =</span> <span class="dv">300</span>, <span class="dt">color =</span> <span class="st">&quot;red&quot;</span>)</code></pre></div>
+<div class="figure">
+<img src="figures/HopfTorus_blog.png" />
+
+</div>
+<p>Since I like Asymptote, I also provide the Asymptote code.</p>
+<div class="sourceCode"><pre class="sourceCode c"><code class="sourceCode c">settings.render = <span class="dv">4</span>;
+settings.outformat=<span class="st">&quot;pdf&quot;</span>;
+
+size(<span class="dv">500</span>,<span class="dv">0</span>);
+import graph3;
+import palette;
+
+real h = <span class="fl">0.4</span>;
+real n = <span class="dv">3</span>;
+triple F(pair uv){
+  real t = uv.x;
+  real phi = uv.y;
+  real p2 = cos(t) * cos(h * cos(n*t));
+  real p3 = sin(t) * cos(h * cos(n*t));
+  real p1 = sin(h * cos(n*t));
+  real yden = sqrt(<span class="dv">2</span>*(<span class="dv">1</span>+p1));
+  real y1 = (<span class="dv">1</span>+p1)/yden;
+  real y2 = p2/yden;
+  real y3 = p3/yden;
+  real cosphi = cos(phi);
+  real sinphi = sin(phi);
+  real x1 = cosphi*y1;
+  real x2 = sinphi*y1;
+  real x3 = cosphi*y2 - sinphi*y3;
+  real x4 = cosphi*y3 + sinphi*y2;  
+  <span class="cf">return</span> (x1/(<span class="dv">1</span>-x4), x2/(<span class="dv">1</span>-x4), x3/(<span class="dv">1</span>-x4));
+}
+
+splinetype[] Notaknot={notaknot,notaknot,notaknot};
+surface s=surface(F,(<span class="dv">0</span>,<span class="dv">0</span>),(2pi,<span class="dv">2</span>*pi),<span class="dv">116</span>,<span class="dv">116</span>,Notaknot,Notaknot);
+s.colors(palette(s.map(abs),Gradient(<span class="dv">8192</span>,yellow,green)));
+draw(rotate(-<span class="dv">20</span>,(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>))*rotate(-<span class="dv">45</span>,(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>))*rotate(<span class="dv">90</span>,(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>))*s);</code></pre></div>
+<div class="figure">
+<img src="figures/HopfTorusParametric00_k1_R.png" />
+
+</div>
+
+    </div>
+
+
+    <div id="footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </div>
+
+  </div>
+
+  <div id="disqus_thread"></div>
+  <div class="pagination">
+    <ul>
+      <li>
+        <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+      </li>
+    </ul>
+  </div>
+</body>
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+<!-- Google Prettify -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+<script>
+  var pres = document.getElementsByTagName("pre");
+  for (var i = 0; i < pres.length; ++i) {
+    
+    pres[i].className = pres[i].className + " prettyprint linenums";
+    
+  }
+  prettyPrint();
+</script> 
+
+</html>
