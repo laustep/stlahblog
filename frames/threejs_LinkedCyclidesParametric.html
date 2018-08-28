@@ -1,0 +1,180 @@
+<html>
+
+<head>
+  <title>Linked cyclides</title>
+  <style>
+    canvas {
+      width: 100%;
+      height: 100%
+    }
+  </style>
+</head>
+
+<body>
+  <script src="../libraries/three.min.js"></script>
+  <script src="../libraries/jquery.min.js"></script>
+  <script src="../libraries/dat.gui.min.js"></script>
+
+  <script> 
+    // "inverse" Hopf map ------------------------------------------------------
+    function hopfinverse(q1, q2, q3, t) {
+      var f = 1 / Math.sqrt(2 * (1 + q3));
+      return [
+        f * (q1 * Math.cos(t) + q2 * Math.sin(t)),
+        f * Math.sin(t) * (1 + q3),
+        f * Math.cos(t) * (1 + q3),
+        f * (q1 * Math.sin(t) - q2 * Math.cos(t))
+      ];
+    }
+
+    // stereographic projection ------------------------------------------------
+    function stereog(x) {
+      var den = 1 - x[3];
+      return new THREE.Vector3(x[0] / den, x[1] / den, x[2] / den);
+    }
+
+    // rotation in 4D space (right-isoclinic) ----------------------------------
+    function rotate4d(alpha, beta, xi, vec) {
+      var a = Math.cos(xi);
+      var b = Math.sin(alpha) * Math.cos(beta) * Math.sin(xi);
+      var c = Math.sin(alpha) * Math.sin(beta) * Math.sin(xi);
+      var d = Math.cos(alpha) * Math.sin(xi);
+      var p = vec[0]; var q = vec[1]; var r = vec[2]; var s = vec[3];
+      return [
+        a * p - b * q - c * r - d * s,
+        a * q + b * p + c * s - d * r,
+        a * r - b * s + c * p + d * q,
+        a * s + b * r - c * q + d * p
+      ];
+    }
+  </script>
+
+  <script>
+    var phi = 1.2;
+    var uSteps = 199; var vSteps = 199;
+  </script>
+
+  <script> // ------------------------------------------------------------------
+    function f0(beta, phi) {
+      return function f(u, v, vector) {
+        var theta = 2 * Math.PI * u;
+        var t = 2 * Math.PI * v;
+        var h = hopfinverse(Math.cos(theta) * Math.cos(phi),
+          Math.sin(theta) * Math.cos(phi),
+          Math.sin(phi), t);
+        var hr = rotate4d(Math.PI / 2, beta, 1, h);
+        var s = stereog(hr);
+        vector.set(s.x, s.y, s.z);
+      }
+    }
+  </script>
+
+  <script> // dat.gui controls -------------------------------------------------
+    var dgcontrols = new function () {
+      this.rotationSpeed = 0.001;
+      this.phi = phi;
+    }
+    var gui = new dat.GUI({ autoplace: false, width: 350 });
+    gui.add(dgcontrols, 'rotationSpeed').min(0).max(0.005).name("Rotation speed");
+    var controller_phi =
+      gui.add(dgcontrols, 'phi').min(0.1).max(1.4).step(0.1);
+    controller_phi.onFinishChange(function (value) {
+      Rendering(value);
+    });
+  </script>
+
+
+  <script> // three.js scene ---------------------------------------------------
+    var scene = new THREE.Scene();
+    var aspect = window.innerWidth / window.innerHeight;
+    var camera = new THREE.PerspectiveCamera(75, aspect, 1, 10000);
+    camera.position.z = 12;
+    scene.add(camera);
+
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    var object = new THREE.Object3D();
+    scene.add(object);
+
+    window.requestAnimFrame = (function () {
+      return window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        function (callback) {
+          window.setTimeout(callback, 1000 / 60);
+        };
+    })();
+
+    function render() {
+      renderer.render(scene, camera);
+      object.rotation.x += dgcontrols.rotationSpeed;
+      object.rotation.y += dgcontrols.rotationSpeed;
+      requestAnimFrame(render);
+    }
+  </script>
+
+  <script> // Rendering function -----------------------------------------------
+    var material = new THREE.MeshNormalMaterial({ wireframe: false });
+
+    function Rendering(phi) {
+      for (var i = object.children.length - 1; i >= 0; i--) {
+        object.children[i].geometry.dispose();
+        object.children[i].material.dispose();
+      }
+      object.children.splice(0);
+
+      var geometry1 = new THREE.ParametricGeometry(f0(0, phi), uSteps, vSteps);
+      var mesh1 = new THREE.Mesh(geometry1, material);
+      object.add(mesh1);
+      var geometry2 = new THREE.ParametricGeometry(
+        f0(2 / 3 * Math.PI, phi), uSteps, vSteps);
+      var mesh2 = new THREE.Mesh(geometry2, material);
+      object.add(mesh2);
+      var geometry3 = new THREE.ParametricGeometry(
+        f0(4 / 3 * Math.PI, phi), uSteps, vSteps);
+      var mesh3 = new THREE.Mesh(geometry3, material);
+      object.add(mesh3);
+
+      var isDragging = false;
+      var previousMousePosition = { x: 0, y: 0 };
+
+      $(renderer.domElement).on('mousedown', function (e) {
+        isDragging = true;
+      }).on('mousemove', function (e) {
+        var deltaMove = {
+          x: e.offsetX - previousMousePosition.x,
+          y: e.offsetY - previousMousePosition.y
+        };
+        if (isDragging) {
+          var deltaRotationQuaternion = new THREE.Quaternion()
+            .setFromEuler(new THREE.Euler(
+              Math.PI / 180 * (deltaMove.y * 1),
+              Math.PI / 180 * (deltaMove.x * 1),
+              0,
+              'XYZ'
+            ));
+          object.quaternion.multiplyQuaternions(deltaRotationQuaternion,
+            object.quaternion);
+        }
+        previousMousePosition = {
+          x: e.offsetX,
+          y: e.offsetY
+        };
+      });
+
+      $(document).on('mouseup', function (e) {
+        isDragging = false;
+      });
+    }
+  </script>
+
+  <script> // render -----------------------------------------------------------
+    Rendering(phi);
+    requestAnimFrame(render);
+  </script>
+
+</body>
+
+</html>
