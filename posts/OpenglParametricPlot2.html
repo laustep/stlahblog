@@ -1,0 +1,367 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Parametric surface in Haskell OpenGL, with surface normals</title>
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/kate.css" />  
+  <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+</head>
+
+<body>
+  <!-- Sidebar. -->
+  <div class="sidebar">
+    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+      <a href="https://www.r-bloggers.com/">
+        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+      </a>
+      <br />
+      <a href="http://t-redactyl.io/">
+        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
+      </a>
+      <a href="http://timelyportfolio.blogspot.be/">
+        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
+      </a>
+      <br />
+      <a href="https://antoineguillot.wordpress.com/blog/">
+        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+      </a>
+      <br />
+      <a href="https://fronkonstin.com/">
+        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="header">
+      <div id="logo" style="position:absolute;">
+        <a href="../">
+          <img src="../images/stla.jpg" alt="stla" width="100px" />
+        </a>
+      </div>
+      <div id="navigation" style="margin-top:50px;">
+        <a href="../">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../archive.html">Archive</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Parametric surface in Haskell OpenGL, with surface normals</h1> <div class="info">
+    Posted on October 23, 2018
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="../tags/haskell.html">haskell</a>, <a href="../tags/graphics.html">graphics</a>, <a href="../tags/opengl.html">opengl</a>
+    
+</div>
+
+<p>Similarly to <a href="https://laustep.github.io/stlahblog/posts/OpenglParametricPlot.html">a previous post</a>, I will show here how to draw a parametric surface with the Haskell OpenGL library, but this time we will include the surface normal at each vertex.</p>
+<p>As the example of a surface, I take the stereographic projection of a Hopf torus. The parameterization is given by the function defined as follows in Haskell:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">type</span> <span class="dt">Point</span> <span class="fu">=</span> (<span class="dt">Double</span>, <span class="dt">Double</span>, <span class="dt">Double</span>)
+
+<span class="ot">hopf ::</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Point</span>
+hopf v <span class="fu">=</span> (x1<span class="fu">/</span>(den<span class="fu">-</span>x4), x2<span class="fu">/</span>(den<span class="fu">-</span>x4), x3<span class="fu">/</span>(den<span class="fu">-</span>x4))
+  <span class="kw">where</span>
+    a <span class="fu">=</span> <span class="fl">0.44</span>
+    nlobes <span class="fu">=</span> <span class="dv">3</span>
+    a1 <span class="fu">=</span> pi<span class="fu">/</span><span class="dv">2</span> <span class="fu">-</span> (pi<span class="fu">/</span><span class="dv">2</span><span class="fu">-</span>a) <span class="fu">*</span> cos(u<span class="fu">*</span>nlobes)
+    a2 <span class="fu">=</span> u <span class="fu">+</span> a<span class="fu">*</span>sin(<span class="dv">2</span><span class="fu">*</span>u<span class="fu">*</span>nlobes)
+    sina1 <span class="fu">=</span> sin a1
+    p1 <span class="fu">=</span> cos a1
+    p2 <span class="fu">=</span> sina1 <span class="fu">*</span> cos a2
+    p3 <span class="fu">=</span> sina1 <span class="fu">*</span> sin a2
+    cosphi <span class="fu">=</span> cos v
+    sinphi <span class="fu">=</span> sin v
+    x1 <span class="fu">=</span> cosphi<span class="fu">*</span>p3 <span class="fu">+</span> sinphi<span class="fu">*</span>p2
+    x2 <span class="fu">=</span> cosphi<span class="fu">*</span>p2 <span class="fu">-</span> sinphi<span class="fu">*</span>p3
+    x3 <span class="fu">=</span> sinphi <span class="fu">*</span> (<span class="dv">1</span><span class="fu">+</span>p1)
+    x4 <span class="fu">=</span> cosphi <span class="fu">*</span> (<span class="dv">1</span><span class="fu">+</span>p1)
+    den <span class="fu">=</span> sqrt(<span class="dv">2</span><span class="fu">*</span>(<span class="dv">1</span><span class="fu">+</span>p1))</code></pre></div>
+<p>for <span class="math inline">\(0 \leq u &lt; 2\pi\)</span> and <span class="math inline">\(0 \leq v &lt; 2\pi\)</span>.</p>
+<p>We will evaluate this function at the vertices of a grid like the one shown below (we will see later why we show the six red triangles on this picture):</p>
+<div class="figure">
+<img src="./figures/OpenglParametricWithNormals-grid-1.png" />
+
+</div>
+<p>We write a function that evaluates the values of a parametrization at the point of this grid and put them in an array:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">import           </span><span class="dt">Data.Array</span>      (<span class="dt">Array</span>, (!), array)
+<span class="kw">import qualified</span> <span class="dt">Data.Array</span> <span class="kw">as</span> <span class="dt">A</span>
+
+<span class="ot">frac ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>
+frac p q <span class="fu">=</span> realToFrac p <span class="fu">/</span> realToFrac q
+
+<span class="ot">allVertices ::</span> (<span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Point</span>) <span class="ot">-&gt;</span> (<span class="dt">Int</span>,<span class="dt">Int</span>) <span class="ot">-&gt;</span> <span class="dt">Array</span> (<span class="dt">Int</span>,<span class="dt">Int</span>) <span class="dt">Point</span>
+allVertices f (n_u, n_v) <span class="fu">=</span> array ((<span class="dv">0</span>,<span class="dv">0</span>), (n_u<span class="fu">-</span><span class="dv">1</span>,n_v<span class="fu">-</span><span class="dv">1</span>)) associations
+  <span class="kw">where</span>
+  u_ <span class="fu">=</span> [<span class="dv">2</span><span class="fu">*</span>pi <span class="fu">*</span> frac i n_u <span class="fu">|</span> i <span class="ot">&lt;-</span> [<span class="dv">0</span> <span class="fu">..</span> n_u<span class="fu">-</span><span class="dv">1</span>]]
+  v_ <span class="fu">=</span> [<span class="dv">2</span><span class="fu">*</span>pi <span class="fu">*</span> frac i n_v <span class="fu">|</span> i <span class="ot">&lt;-</span> [<span class="dv">0</span> <span class="fu">..</span> n_v<span class="fu">-</span><span class="dv">1</span>]]
+  indices <span class="fu">=</span> [(i,j) <span class="fu">|</span> i <span class="ot">&lt;-</span> [<span class="dv">0</span> <span class="fu">..</span> n_u<span class="fu">-</span><span class="dv">1</span>], j <span class="ot">&lt;-</span> [<span class="dv">0</span> <span class="fu">..</span> n_v<span class="fu">-</span><span class="dv">1</span>]]
+  g (i,j) <span class="fu">=</span> ((i,j), f (u_ <span class="fu">!!</span> i) (v_ <span class="fu">!!</span> j))
+  associations <span class="fu">=</span> map g indices</code></pre></div>
+<p>These values are the surface vertices. Now, we write a function that approximates the surface normal at vertex <span class="math inline">\((i,j)\)</span>. This normal approximately is the average of the normals of the six triangles incident to the vertex.</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">type</span> <span class="dt">Vector</span> <span class="fu">=</span> (<span class="dt">Double</span>, <span class="dt">Double</span>, <span class="dt">Double</span>)
+
+<span class="ot">triangleNormal ::</span> (<span class="dt">Point</span>, <span class="dt">Point</span>, <span class="dt">Point</span>) <span class="ot">-&gt;</span> <span class="dt">Vector</span>
+triangleNormal ((x1,x2,x3), (y1,y2,y3), (z1,z2,z3)) <span class="fu">=</span> (a<span class="fu">/</span>norm, b<span class="fu">/</span>norm, c<span class="fu">/</span>norm)
+  <span class="kw">where</span>
+    (a, b, c) <span class="fu">=</span> crossProd (z1<span class="fu">-</span>x1, z2<span class="fu">-</span>x2, z3<span class="fu">-</span>x3) (y1<span class="fu">-</span>x1, y2<span class="fu">-</span>x2, y3<span class="fu">-</span>x3) 
+    crossProd (a1,a2,a3) (b1,b2,b3) <span class="fu">=</span> (a2<span class="fu">*</span>b3<span class="fu">-</span>a3<span class="fu">*</span>b2, a3<span class="fu">*</span>b1<span class="fu">-</span>a1<span class="fu">*</span>b3, a1<span class="fu">*</span>b2<span class="fu">-</span>a2<span class="fu">*</span>b1)
+    norm <span class="fu">=</span> sqrt(a<span class="fu">*</span>a <span class="fu">+</span> b<span class="fu">*</span>b <span class="fu">+</span> c<span class="fu">*</span>c)
+
+<span class="ot">averageNormals ::</span> <span class="dt">Vector</span> <span class="ot">-&gt;</span> <span class="dt">Vector</span> <span class="ot">-&gt;</span> <span class="dt">Vector</span> <span class="ot">-&gt;</span> <span class="dt">Vector</span> <span class="ot">-&gt;</span> <span class="dt">Vector</span> <span class="ot">-&gt;</span> <span class="dt">Vector</span> <span class="ot">-&gt;</span> <span class="dt">Vector</span>
+averageNormals (x1,y1,z1) (x2,y2,z2) (x3,y3,z3) (x4,y4,z4) (x5,y5,z5) (x6,y6,z6) <span class="fu">=</span> 
+  ((x1<span class="fu">+</span>x2<span class="fu">+</span>x3<span class="fu">+</span>x4<span class="fu">+</span>x5<span class="fu">+</span>x6)<span class="fu">/</span><span class="dv">6</span>, (y1<span class="fu">+</span>y2<span class="fu">+</span>y3<span class="fu">+</span>y4<span class="fu">+</span>y5<span class="fu">+</span>y6)<span class="fu">/</span><span class="dv">6</span>, (z1<span class="fu">+</span>z2<span class="fu">+</span>z3<span class="fu">+</span>z4<span class="fu">+</span>z5<span class="fu">+</span>z6)<span class="fu">/</span><span class="dv">6</span>)
+
+<span class="ot">normal_ij ::</span> <span class="dt">Array</span> (<span class="dt">Int</span>,<span class="dt">Int</span>) <span class="dt">Point</span> <span class="ot">-&gt;</span> (<span class="dt">Int</span>, <span class="dt">Int</span>) <span class="ot">-&gt;</span> <span class="dt">Vector</span>
+normal_ij vertices (i,j) <span class="fu">=</span> averageNormals n1 n2 n3 n4 n5 n6
+  <span class="kw">where</span>
+  ((_,_), (n_u',n_v')) <span class="fu">=</span> A.bounds vertices
+  im1 <span class="fu">=</span> <span class="kw">if</span> i<span class="fu">==</span><span class="dv">0</span> <span class="kw">then</span> n_u' <span class="kw">else</span> i<span class="fu">-</span><span class="dv">1</span>
+  ip1 <span class="fu">=</span> <span class="kw">if</span> i<span class="fu">==</span>n_u' <span class="kw">then</span> <span class="dv">0</span> <span class="kw">else</span> i<span class="fu">+</span><span class="dv">1</span>
+  jm1 <span class="fu">=</span> <span class="kw">if</span> j<span class="fu">==</span><span class="dv">0</span> <span class="kw">then</span> n_v' <span class="kw">else</span> j<span class="fu">-</span><span class="dv">1</span>
+  jp1 <span class="fu">=</span> <span class="kw">if</span> j<span class="fu">==</span>n_v' <span class="kw">then</span> <span class="dv">0</span> <span class="kw">else</span> j<span class="fu">+</span><span class="dv">1</span>
+  n1 <span class="fu">=</span> triangleNormal (vertices <span class="fu">!</span> (i,j), vertices <span class="fu">!</span> (i,jp1), vertices <span class="fu">!</span> (ip1,j))
+  n2 <span class="fu">=</span> triangleNormal (vertices <span class="fu">!</span> (i,j), vertices <span class="fu">!</span> (ip1,jm1), vertices <span class="fu">!</span> (i,jm1))
+  n3 <span class="fu">=</span> triangleNormal (vertices <span class="fu">!</span> (i,j), vertices <span class="fu">!</span> (im1,j), vertices <span class="fu">!</span> (im1,jp1))
+  n4 <span class="fu">=</span> triangleNormal (vertices <span class="fu">!</span> (i,j), vertices <span class="fu">!</span> (ip1,j), vertices <span class="fu">!</span> (ip1,jm1))
+  n5 <span class="fu">=</span> triangleNormal (vertices <span class="fu">!</span> (i,j), vertices <span class="fu">!</span> (i,jm1), vertices <span class="fu">!</span> (im1,j))
+  n6 <span class="fu">=</span> triangleNormal (vertices <span class="fu">!</span> (i,j), vertices <span class="fu">!</span> (im1,jp1), vertices <span class="fu">!</span> (i,jp1))</code></pre></div>
+<p>Now we write a function that takes the array of surface vertices as input and returns an array containing the surface normals:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">allNormals ::</span> <span class="dt">Array</span> (<span class="dt">Int</span>,<span class="dt">Int</span>) <span class="dt">Point</span> <span class="ot">-&gt;</span> <span class="dt">Array</span> (<span class="dt">Int</span>,<span class="dt">Int</span>) <span class="dt">Vector</span>
+allNormals vertices <span class="fu">=</span> array bounds associations
+  <span class="kw">where</span>
+  bounds <span class="fu">=</span> A.bounds vertices
+  indices <span class="fu">=</span> A.indices vertices  
+  associations <span class="fu">=</span> map (\(i,j) <span class="ot">-&gt;</span> ((i,j), normal_ij vertices (i,j))) indices</code></pre></div>
+<p>Let’s say that a surface triangle whose each vertex is attached to the<br />
+corresponding surface normal is a n-triangle. To each vertex <span class="math inline">\((i,j)\)</span>, we associate two n-triangles: the lower n-triangle for vertices <span class="math inline">\((i,j)\)</span>-<span class="math inline">\((i+1,j)\)</span>-<span class="math inline">\((i,j+1)\)</span> and the upper n-triangle for vertices <span class="math inline">\((i+1,j+1)\)</span>-<span class="math inline">\((i,j+1)\)</span>-<span class="math inline">\((i+1,j)\)</span>. We write a function that takes as input the two arrays (vertices and normals), an index <span class="math inline">\((i,j)\)</span>, and that returns the two n-triangles:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Graphics.Rendering.OpenGL.GL</span> (<span class="dt">Normal3</span> (..), <span class="dt">Vertex3</span> (..))
+
+<span class="kw">type</span> <span class="dt">NPoint</span> <span class="fu">=</span> (<span class="dt">Vertex3</span> <span class="dt">Double</span>, <span class="dt">Normal3</span> <span class="dt">Double</span>)
+<span class="kw">type</span> <span class="dt">NTriangle</span> <span class="fu">=</span> (<span class="dt">NPoint</span>, <span class="dt">NPoint</span>, <span class="dt">NPoint</span>)
+
+<span class="ot">pointToVertex3 ::</span> <span class="dt">Point</span> <span class="ot">-&gt;</span> <span class="dt">Vertex3</span> <span class="dt">Double</span>
+pointToVertex3 (x,y,z) <span class="fu">=</span> <span class="dt">Vertex3</span> x y z
+
+<span class="ot">vectorToNormal3 ::</span> <span class="dt">Vector</span> <span class="ot">-&gt;</span> <span class="dt">Normal3</span> <span class="dt">Double</span>
+vectorToNormal3 (x,y,z) <span class="fu">=</span> <span class="dt">Normal3</span> x y z
+
+<span class="ot">triangles_ij ::</span> <span class="dt">Array</span> (<span class="dt">Int</span>,<span class="dt">Int</span>) <span class="dt">Point</span> <span class="ot">-&gt;</span> <span class="dt">Array</span> (<span class="dt">Int</span>,<span class="dt">Int</span>) <span class="dt">Vector</span> 
+            <span class="ot">-&gt;</span> (<span class="dt">Int</span>, <span class="dt">Int</span>) <span class="ot">-&gt;</span> (<span class="dt">Int</span>, <span class="dt">Int</span>)
+            <span class="ot">-&gt;</span> (<span class="dt">NTriangle</span>, <span class="dt">NTriangle</span>)
+triangles_ij vertices normals (n_u,n_v) (i,j) <span class="fu">=</span> 
+  (((a,na), (b,nb), (c,nc)), ((c,nc), (b,nb), (d,nd)))
+  <span class="kw">where</span>
+  ip1 <span class="fu">=</span> <span class="kw">if</span> i<span class="fu">==</span>n_u<span class="fu">-</span><span class="dv">1</span> <span class="kw">then</span> <span class="dv">0</span> <span class="kw">else</span> i<span class="fu">+</span><span class="dv">1</span>
+  jp1 <span class="fu">=</span> <span class="kw">if</span> j<span class="fu">==</span>n_v<span class="fu">-</span><span class="dv">1</span> <span class="kw">then</span> <span class="dv">0</span> <span class="kw">else</span> j<span class="fu">+</span><span class="dv">1</span>
+  a <span class="fu">=</span> pointToVertex3 <span class="fu">$</span> vertices <span class="fu">!</span> (i,j)
+  na <span class="fu">=</span> vectorToNormal3 <span class="fu">$</span> normals <span class="fu">!</span> (i,j)
+  c <span class="fu">=</span> pointToVertex3 <span class="fu">$</span> vertices <span class="fu">!</span> (i,jp1)
+  nc <span class="fu">=</span> vectorToNormal3 <span class="fu">$</span> normals <span class="fu">!</span> (i,jp1)
+  d <span class="fu">=</span> pointToVertex3 <span class="fu">$</span> vertices <span class="fu">!</span> (ip1,jp1)
+  nd <span class="fu">=</span> vectorToNormal3 <span class="fu">$</span> normals <span class="fu">!</span> (ip1,jp1)
+  b <span class="fu">=</span> pointToVertex3 <span class="fu">$</span> vertices <span class="fu">!</span> (ip1,j)
+  nb <span class="fu">=</span> vectorToNormal3 <span class="fu">$</span> normals <span class="fu">!</span> (ip1,j)</code></pre></div>
+<p>Finally, we write a function returning the list of all pairs of n-triangles:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">allTriangles ::</span> (<span class="dt">Int</span>,<span class="dt">Int</span>) <span class="ot">-&gt;</span> [(<span class="dt">NTriangle</span>,<span class="dt">NTriangle</span>)]
+allTriangles (n_u,n_v) <span class="fu">=</span>
+  map (triangles_ij vertices normals (n_u,n_v)) indices
+  <span class="kw">where</span>
+  vertices <span class="fu">=</span> allVertices hopf (n_u,n_v)
+  normals <span class="fu">=</span> allNormals vertices
+  indices <span class="fu">=</span> [(i,j) <span class="fu">|</span> i <span class="ot">&lt;-</span> [<span class="dv">0</span> <span class="fu">..</span> n_u<span class="fu">-</span><span class="dv">1</span>], j <span class="ot">&lt;-</span> [<span class="dv">0</span> <span class="fu">..</span> n_v<span class="fu">-</span><span class="dv">1</span>]]</code></pre></div>
+<p>Done. It remains to write the OpenGL side:</p>
+<pre><code>import Data.IORef
+import Graphics.Rendering.OpenGL.GL
+import Graphics.UI.GLUT
+
+hopfTorus :: [(NTriangle,NTriangle)]
+hopfTorus = allTriangles (400,400)
+
+data Context = Context
+    {
+      contextRot1      :: IORef GLfloat
+    , contextRot2      :: IORef GLfloat
+    , contextRot3      :: IORef GLfloat
+    , contextTriangles :: IORef [(NTriangle,NTriangle)]
+    }
+
+white,black,pink :: Color4 GLfloat
+white      = Color4    1   1   1    1
+black      = Color4    0   0   0    1
+pink       = Color4    1   0   0.5  1
+
+display :: Context -&gt; IORef GLdouble -&gt; DisplayCallback
+display context zoom alpha = do
+  clear [ColorBuffer, DepthBuffer]
+  r1 &lt;- get (contextRot1 context)
+  r2 &lt;- get (contextRot2 context)
+  r3 &lt;- get (contextRot3 context)
+  ntriangles &lt;- get (contextTriangles context)
+  let ntriangles' = unzip ntriangles
+      lowerTriangles = fst ntriangles'
+      upperTriangles = snd ntriangles'
+  z &lt;- get zoom
+  loadIdentity
+  (_, size) &lt;- get viewport
+  resize z size
+  rotate r1 $ Vector3 1 0 0
+  rotate r2 $ Vector3 0 1 0
+  rotate r3 $ Vector3 0 0 1
+  renderPrimitive Triangles $ mapM_ drawTriangle lowerTriangles
+  renderPrimitive Triangles $ mapM_ drawTriangle lowerTriangles
+  swapBuffers
+  where
+    drawTriangle ((v1,n1),(v2,n2),(v3,n3)) = do
+      materialDiffuse Front $= pink
+      normal n1
+      vertex v1
+      normal n2
+      vertex v2
+      normal n3
+      vertex v3
+
+resize :: GLdouble -&gt; Size -&gt; IO ()
+resize zoom s@(Size w h) = do
+  viewport $= (Position 0 0, s)
+  matrixMode $= Projection
+  loadIdentity
+  perspective 45.0 (realToFrac w / realToFrac h) 1.0 100.0
+  lookAt (Vertex3 0 0 (24+zoom)) (Vertex3 0 0 0) (Vector3 0 1 0)
+  matrixMode $= Modelview 0
+
+keyboard :: IORef GLfloat -&gt; IORef GLfloat -&gt; IORef GLfloat -- rotations
+         -&gt; IORef GLdouble -- zoom
+         -&gt; IORef [(NTriangle,NTriangle)]
+         -&gt; KeyboardCallback
+keyboard rot1 rot2 rot3 zoom triangles c _ = do
+  case c of
+    'e' -&gt; rot1 $~! subtract 2
+    'r' -&gt; rot1 $~! (+2)
+    't' -&gt; rot2 $~! subtract 2
+    'y' -&gt; rot2 $~! (+2)
+    'u' -&gt; rot3 $~! subtract 2
+    'i' -&gt; rot3 $~! (+2)
+    'm' -&gt; zoom $~! (+0.1)
+    'l' -&gt; zoom $~! subtract 0.1
+    'q' -&gt; leaveMainLoop
+    _   -&gt; return ()
+  postRedisplay Nothing
+
+main :: IO ()
+main = do
+  _ &lt;- getArgsAndInitialize
+  _ &lt;- createWindow &quot;Hopf torus&quot;
+  windowSize $= Size 500 500
+  initialDisplayMode $= [RGBAMode, DoubleBuffered, WithDepthBuffer]
+  clearColor $= black
+  materialAmbient Front $= black
+  lighting $= Enabled
+  light (Light 0) $= Enabled
+  position (Light 0) $= Vertex4 0 0 (-1000) 1
+  ambient (Light 0) $= white
+  diffuse (Light 0) $= white
+  specular (Light 0) $= white
+  depthFunc $= Just Less
+  shadeModel $= Smooth
+  rot1 &lt;- newIORef 0.0
+  rot2 &lt;- newIORef 0.0
+  rot3 &lt;- newIORef 0.0
+  zoom &lt;- newIORef 0.0
+  nlobes' &lt;- newIORef nlobes
+  hopfTorus' &lt;- newIORef hopfTorus
+  displayCallback $= display Context {contextRot1 = rot1,
+                                      contextRot2 = rot2,
+                                      contextRot3 = rot3,
+                                      contextTriangles = hopfTorus'}
+                             zoom 
+  reshapeCallback $= Just (resize 0)
+  keyboardCallback $= Just (keyboard rot1 rot2 rot3 zoom hopfTorus')
+  idleCallback $= Nothing
+  putStrLn &quot;*** Hopf torus ***\n\
+        \    To quit, press q.\n\
+        \    Scene rotation: e, r, t, y, u, i\n\
+        \    Zoom: l, m\n\
+        \&quot;
+  mainLoop</code></pre>
+<p>And this is the result:</p>
+<div class="figure">
+<img src="./figures/OpenglParametricWithNormals-Result.png" />
+
+</div>
+<p>The full code is available in <a href="https://github.com/stla/opengl-HopfTorus">this Github repo</a>.</p>
+
+    </div>
+
+
+    <div id="footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </div>
+
+  </div>
+
+  <div id="disqus_thread"></div>
+  <div class="pagination">
+    <ul>
+      <li>
+        <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+      </li>
+    </ul>
+  </div>
+</body>
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+<!-- Google Prettify -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+<script>
+  var pres = document.getElementsByTagName("pre");
+  for (var i = 0; i < pres.length; ++i) {
+    
+    pres[i].className = pres[i].className + " prettyprint linenums";
+    
+  }
+  prettyPrint();
+</script> 
+
+</html>
