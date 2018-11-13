@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <title>Cyclide</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <script src="../libraries/jquery.min.js"></script>
+    <script src="../libraries/three.min.js"></script>
+    <script src="../libraries/dat.gui.min.js"></script>
+
+    <style>
+        canvas {
+            width: 100%;
+            height: 100%
+        }
+    </style>
+</head>
+
+<body>
+
+    <script> // unit normal vector of torus ------------------------------------
+        function Normal(r, R, u, v) { 
+            return new THREE.Vector3(
+                -Math.cos(u) * Math.cos(v) * Math.sign(r * Math.cos(v) + R),
+                -Math.cos(v) * Math.sign(r * Math.cos(v) + R) * Math.sin(u),
+                -Math.sign(r * Math.cos(v) + R) * Math.sin(v))
+        }
+    </script>
+
+
+    <script> // a mesh of the torus --------------------------------------------
+        function TorusMesh(R, r, nx, ny) {
+            var vertices = new Array(nx);
+            var normals = new Array(nx);
+            for (var i = 0; i < nx; i++) {
+                vertices[i] = new Array(ny);
+                normals[i] = new Array(ny);
+                var u = i / nx * 2 * Math.PI;
+                var cos_u = Math.cos(u);
+                var sin_u = Math.sin(u);
+                var cx = R * cos_u;
+                var cy = R * sin_u;
+                for (var j = 0; j < ny; j++) {
+                    var v = j / ny * 2 * Math.PI;
+                    var rcos_v = r * Math.cos(v);
+                    var rsin_v = r * Math.sin(v);
+                    vertices[i][j] = new THREE.Vector3(
+                        cx + rcos_v * cos_u,
+                        cy + rcos_v * sin_u,
+                        rsin_v
+                    );
+                    normals[i][j] = Normal(r, R, u, v).negate();
+                }
+            }
+
+            return {
+                vertices: vertices,
+                normals: normals
+            }
+        }
+    </script>
+
+
+    <script> // mesh faces -----------------------------------------------------
+        function Faces(normals) {
+            nx = normals.length;
+            ny = normals[0].length;
+            faces = new Array(2 * nx * ny);
+            for (var i = 0; i < nx; i++) {
+                var ip1 = (i == nx - 1 ? 0 : i + 1);
+                for (var j = 0; j < ny; j++) {
+                    var jp1 = (j == ny - 1 ? 0 : j + 1);
+                    faces[2 * i * ny + 2 * j] = new THREE.Face3(
+                        ip1 * ny + j,
+                        i * ny + j,
+                        i * ny + jp1,
+                        [normals[ip1][j], normals[i][j], normals[i][jp1]]);
+                    faces[2 * i * ny + 2 * j + 1] = new THREE.Face3(
+                        ip1 * ny + j,
+                        i * ny + jp1,
+                        ip1 * ny + jp1,
+                        [normals[ip1][j], normals[i][jp1], normals[ip1][jp1]]);
+                }
+            }
+            return faces;
+        }
+    </script>
+
+
+    <script> // a cyclide mesh -------------------------------------------------
+        function CyclideMesh(a, c, mu, nx, ny) {
+            var b = Math.sqrt(a * a - c * c);
+            var bb = b * Math.sqrt(mu * mu - c * c);
+            var omega = (a * mu + bb) / c;
+            var Omega = new THREE.Vector3(omega, 0, 0);
+            var inversion = function (M) {
+                var Omega0 = new THREE.Vector3(omega, 0, 0);
+                var OmegaM = Omega0.sub(M).negate();
+                var k = OmegaM.dot(OmegaM);
+                var Omega0 = new THREE.Vector3(omega, 0, 0);
+                return Omega0.addScaledVector(OmegaM, 1 / k);
+            }
+            var d = (a - c) * (mu - c) + bb;
+            var r = c * c * (mu - c) / ((a + c) * (mu - c) + bb) / d;
+            var R = c * c * (a - c) / ((a - c) * (mu + c) + bb) / d;
+            var omegaT = omega - (b * b * (omega - c)) /
+                ((a - c) * (mu + omega) - b * b) / ((a + c) * (omega - c) + b * b);
+            var tmesh = TorusMesh(R, r, nx, ny);
+            var tvertices = tmesh.vertices;
+            var tnormals = tmesh.normals;
+            var vertices = new Array(nx);
+            var cvertices = new Array(nx * ny);
+            var normals = new Array(nx);
+            var OmegaT = new THREE.Vector3(omegaT, 0, 0);
+            for (var i = 0; i < nx; i++) {
+                vertices[i] = new Array(ny);
+                normals[i] = new Array(ny);
+                for (var j = 0; j < ny; j++) {
+                    var normal = tnormals[i][j];
+                    var vertex = tvertices[i][j];
+                    var zero = new THREE.Vector3();
+                    var foo = inversion(zero.add(normal.multiplyScalar(r)).add(vertex).add(OmegaT));
+                    var zero = new THREE.Vector3();
+                    vertices[i][j] = inversion(zero.add(vertex).add(OmegaT));
+                    var zero = new THREE.Vector3();
+                    normals[i][j] = zero.add(vertices[i][j]).sub(foo).normalize();
+                    cvertices[i * ny + j] = vertices[i][j];
+                }
+            }
+            var cyclideGeometry = new THREE.Geometry();
+            cyclideGeometry.vertices = cvertices;
+            cyclideGeometry.faces = Faces(normals);
+            var cyclideMesh = new THREE.Mesh(
+                cyclideGeometry,
+                // new THREE.MeshPhongMaterial({
+                //     color: 0xff0000,
+                //     emissive: 0xffffff,
+                //     specular: 0xff0000,
+                //     emissiveIntensity: 0.2
+                // })
+                new THREE.MeshNormalMaterial({ wireframe: false })
+            );
+            cyclideMesh.dataCount = Infinity;
+            return cyclideMesh;
+        }
+    </script>
+
+
+    <script> // three js scene -------------------------------------------------
+        var aspect = window.innerWidth / window.innerHeight;
+        var camera = new THREE.PerspectiveCamera(50, aspect, 1, 10000);
+        var scene = new THREE.Scene();
+        var z0 = 7;
+        camera.position.z = z0;
+        scene.add(camera);
+        var light = new THREE.AmbientLight(0x404040);
+        scene.add(light);
+
+        // dat.gui controls -------------------------------------------------
+        var dgcontrols = new function () {
+            this.rotationSpeed = 0.001;
+            this.zoom = z0;
+            this.a = 0.97;
+            this.c = 0.32;
+            this.mu = 0.56;
+        }
+        var gui = new dat.GUI({ autoplace: false, width: 300 });
+        gui.add(dgcontrols, 'rotationSpeed').min(0).max(0.005).name("Rotation speed");
+        var controller_zoom = gui.add(dgcontrols, 'zoom').min(1).max(100);
+        controller_zoom.onFinishChange(function (value) {
+            camera.position.z = value;
+        });
+        var controller_a = gui.add(dgcontrols, 'a').min(0.05).max(20).step(0.05).name("a (> mu)");
+        var controller_c = gui.add(dgcontrols, 'c').min(0.05).max(20).step(0.05);
+        var controller_mu = gui.add(dgcontrols, 'mu').min(0.05).max(20).step(0.05).name("mu (> c)");
+        var conditions = function (a, c, mu) {
+            return (mu > c && a > mu)
+        }
+
+        window.requestAnimFrame = (function () {
+            return window.requestAnimationFrame ||
+                window.webkitRequestAnimationFrame ||
+                window.mozRequestAnimationFrame ||
+                function (callback) {
+                    window.setTimeout(callback, 1000 / 60);
+                };
+        })();
+
+        var object = new THREE.Object3D();
+        var renderer = new THREE.WebGLRenderer();
+        var nx = 180; ny = 120;
+        function render() {
+            renderer.render(scene, camera);
+            object.rotation.x += dgcontrols.rotationSpeed;
+            object.rotation.y += dgcontrols.rotationSpeed;
+            var newCyclide = function (nx, ny) {
+                // REMOVE CYCLIDE
+                object.children[0].geometry.dispose();
+                object.children[0].material.dispose();
+                object.children.splice(0);
+                // New cyclide
+                var CM = CyclideMesh(dgcontrols.a, dgcontrols.c, dgcontrols.mu, nx, ny);
+                object.add(CM);
+                scene.add(object);
+            }
+            controller_a.onFinishChange(function (value) {
+                var test = conditions(value, dgcontrols.c, dgcontrols.mu)
+                if (!test) {
+                    alert("These values are invalid\n (conditions: a > mu > c)")
+                } else {
+                    newCyclide(nx, ny);
+                }
+            })
+            controller_c.onFinishChange(function (value) {
+                var test = conditions(dgcontrols.a, value, dgcontrols.mu)
+                if (!test) {
+                    alert("These values are invalid\n (conditions: a > mu > c)")
+                } else {
+                    newCyclide(nx, ny);
+                }
+            })
+            controller_mu.onFinishChange(function (value) {
+                var test = conditions(dgcontrols.a, dgcontrols.c, value)
+                if (!test) {
+                    alert("These values are invalid\n (conditions: a > mu > c)")
+                } else {
+                    newCyclide(nx, ny);
+                }
+            })
+            requestAnimFrame(render);
+        }
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        var CM = CyclideMesh(dgcontrols.a, dgcontrols.c, dgcontrols.mu, nx, ny);
+        object.add(CM);
+        scene.add(object);
+        renderer.render(scene, camera);
+
+        // run render
+        render()
+        requestAnimFrame(render);
+
+        // ANIMATION
+        var isDragging = false;
+        var previousMousePosition = { x: 0, y: 0 };
+
+        $(renderer.domElement).on('mousedown', function (e) {
+            isDragging = true;
+        }).on('mousemove', function (e) {
+            var deltaMove = {
+                x: e.offsetX - previousMousePosition.x,
+                y: e.offsetY - previousMousePosition.y
+            };
+            if (isDragging) {
+                var deltaRotationQuaternion = new THREE.Quaternion()
+                    .setFromEuler(new THREE.Euler(
+                        Math.PI / 180 * (deltaMove.y * 1),
+                        Math.PI / 180 * (deltaMove.x * 1),
+                        0,
+                        'XYZ'
+                    ));
+                object.quaternion.multiplyQuaternions(deltaRotationQuaternion,
+                    object.quaternion);
+            }
+            previousMousePosition = {
+                x: e.offsetX,
+                y: e.offsetY
+            };
+        });
+
+        $(document).on('mouseup', function (e) {
+            isDragging = false;
+        });
+
+    </script>
+
+</body>
+
+</html>
