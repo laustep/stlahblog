@@ -409,7 +409,7 @@ z &lt;-<span class="st"> </span><span class="fl">0.5</span>
 <pre><code>## [1] 8057.994</code></pre>
 <h1 id="update-2018-11-13">Update 2018-11-13</h1>
 <ul>
-<li>Converting a <code>bigq</code> rational number to a decimal number with <code>as.numeric</code> is not a good It is better to use the <code>mpfr</code> function of the <code>Rmpfr</code> package, or the <code>q2d</code> function of the package <code>rcdd</code>:</li>
+<li>Converting a <code>bigq</code> rational number to a decimal number with <code>as.numeric</code> is not a good idea. It is better to use the <code>mpfr</code> function of the <code>Rmpfr</code> package, or the <code>q2d</code> function of the package <code>rcdd</code>:</li>
 </ul>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">halfpi_bigq &lt;-<span class="st"> </span><span class="kw">bs.pi.gmp</span>(<span class="dv">8</span>)<span class="op">$</span>Sn
 <span class="kw">library</span>(Rmpfr)
