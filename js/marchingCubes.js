@@ -98,6 +98,7 @@ function whichIndicesAndItems(M, m, n) {
 
 // -----------------------------------------------------------------------------
 function kro1(M, nx, ny, n) {
+  /* jshint shadow:true */
   var out = new Array(nx * n + 1);
   for (var i = 0; i < nx * n; i++) {
     out[i] = new Array(ny);
@@ -114,6 +115,7 @@ function kro1(M, nx, ny, n) {
 
 // -----------------------------------------------------------------------------
 function kro2(M, nx, ny, n) {
+  /* jshint shadow:true */
   var out = new Array(nx * n + 1);
   var replicates = new Array(nx * n);
   var count = 0;
@@ -138,6 +140,7 @@ function kro2(M, nx, ny, n) {
 
 // -----------------------------------------------------------------------------
 function replicate(x, counts, n) {
+  /* jshint shadow:true */
   var total = 0;
   for (var i = 0; i < n; i++) {
     total += counts[i];
@@ -168,6 +171,7 @@ function repeach(x, times, n) {
 
 // concatenate rows of a jagged array ------------------------------------------
 function unlist(jagged, jaggedsizes, rows, nrows) {
+  /* jshint shadow:true */
   var count = 0;
   for (var i = 0; i < nrows; i++) {
     count += jaggedsizes[rows[i]];
@@ -235,6 +239,7 @@ function subsetMatrix(M, rows, cols, nrows, ncols) {
 
 // -----------------------------------------------------------------------------
 function whichEqual(v, x, lv) {
+  /* jshint shadow:true */
   var flag = new Array(lv);
   var count = 0;
   for (var i = 0; i < lv; i++) {
@@ -1745,7 +1750,7 @@ function FacesNo7(faces, p1, values, l, j) {
     var D = values[p + e4];
     var temp = faces[i] > 0 ? 1 : -1;
     temp *= (A * B - C * D > 0 ? 1 : -1);
-    index[i] = temp == 1 ? 2 ** (j - 1) : 0;
+    index[i] = (temp == 1 ? Math.pow(2, j - 1) : 0);
   }
   return index;
 }
@@ -1776,7 +1781,7 @@ function Faces7(faces, p1, values, l, j) {
     var totalcond = cond1 * cond2 * cond3 * cond4;
     var temp = faces[i] > 0 ? 1 : -1;
     temp *= (totalcond == 1 ? 1 : -1);
-    index[i] = temp == 1 ? 2 ** (j - 1) : 0;
+    index[i] = temp == 1 ? Math.pow(2, j - 1) : 0;
   }
   return index;
 }
@@ -1814,6 +1819,7 @@ function faceType(M, m, n, level, max) {
 
 // -----------------------------------------------------------------------------
 function levCells(A, nx, ny, nz, level, max) {
+  /* jshint shadow:true */
   var cells = new Array(nz - 1);
   var types = new Array(nz - 1);
   var bottomTypes = faceType(toMatrix(A, nx, ny, 0), nx, ny, level, max);
@@ -1825,8 +1831,8 @@ function levCells(A, nx, ny, nz, level, max) {
       matricialSum(bottomTypes,
         scaleMatrix(16, topTypes, nx - 1, ny - 1), nx - 1, ny - 1);
     var goodcells01 = whichIndicesAndItems(cellTypes, nx - 1, ny - 1);
-    cells[k] = new Array(goodcells01.length)
-    types[k] = new Array(goodcells01.length)
+    cells[k] = new Array(goodcells01.length);
+    types[k] = new Array(goodcells01.length);
     for (var l = 0; l < goodcells01.length; l++) {
       cells[k][l] = goodcells01.indices[l] + (nx - 1) * (ny - 1) * k + 1;
       types[k][l] = goodcells01.items[l];
@@ -1854,6 +1860,7 @@ function levCells(A, nx, ny, nz, level, max) {
 
 // -----------------------------------------------------------------------------
 function GetBasic1(R, nR, vivjvk) {
+  /* jshint shadow:true */
   var indexPtr = new Array(8);
   for (var i = 0; i < 8; i++) {
     indexPtr[i] = new Array(3);
@@ -1961,6 +1968,7 @@ function average8(lambdamu, w, n) {
 
 // -----------------------------------------------------------------------------
 function GetPoints(cubeco, values, p1, x1, x2, n) {
+  /* jshint shadow:true */
   var p1x1 = new Array(n); var p1x2 = new Array(n);
   for (var i = 0; i < n; i++) {
     p1x1[i] = p1[i] + x1[i]; p1x2[i] = p1[i] + x2[i];
@@ -2019,6 +2027,7 @@ function CalPoints(points, n) {
 
 // -----------------------------------------------------------------------------
 function computeContour3d(voxel, nx, ny, nz, max, level) {
+  /* jshint shadow:true */
   var obj_ijkt = levCells(voxel, nx, ny, nz, level, max);
   var ijkt = obj_ijkt.out;
   var nrow = obj_ijkt.outnrow;
@@ -2078,7 +2087,7 @@ function computeContour3d(voxel, nx, ny, nz, max, level) {
       }
     }
     if (special) {
-      console.log("there are special cases")
+      console.log("there are special cases");
     }
     for (var c = 0; c < 7; c++) {
       var R3 = whichEqual(tcase, special_name[c], nrow);

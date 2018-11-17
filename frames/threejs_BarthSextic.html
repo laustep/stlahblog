@@ -11,7 +11,7 @@
 </head>
 
 <body>
-
+    <!-- <script src="http://mrdoob.github.com/three.js/build/three.min.js"></script> -->
     <script src="../libraries/three.min.js"></script>
     <script src="../libraries/jquery.min.js"></script>
     <script src="../js/marchingCubes.js"></script>
@@ -26,10 +26,10 @@
         var f = function (x, y, z) {
             var x2 = x * x; var y2 = y * y; var z2 = z * z;
             var out;
-            if(x2 + y2 + z2 < 3){
+            if (x2 + y2 + z2 < 3) {
                 out = 4 * (phi2 * x2 - y2) * (phi2 * y2 - z2) * (phi2 * z2 - x2) -
-                (1 + 2 * phi) * (x2 + y2 + z2 - 1) ** 2;
-            }else{
+                    (1 + 2 * phi) * (x2 + y2 + z2 - 1) ** 2;
+            } else {
                 out = NaN;
             }
             return out;
@@ -65,7 +65,7 @@
         // mesh ----------------------------------------------------------------
         var geom = new THREE.Geometry();
         geom.vertices = new Array(tris.length);
-        geom.faces = new Array(tris.length/3);
+        geom.faces = new Array(tris.length / 3);
         for (var i = 0; i < tris.length / 3; i++) {
             var v1 = new THREE.Vector3(
                 tris[3 * i][0],
@@ -79,22 +79,22 @@
                 tris[3 * i + 2][0],
                 tris[3 * i + 2][1],
                 tris[3 * i + 2][2]);
-            geom.vertices[3*i] = v1;
-            geom.vertices[3*i+1] = v2;
-            geom.vertices[3*i+2] = v3;
+            geom.vertices[3 * i] = v1;
+            geom.vertices[3 * i + 1] = v2;
+            geom.vertices[3 * i + 2] = v3;
             geom.faces[i] = new THREE.Face3(
                 3 * i,
-                3 * i + 2,
                 3 * i + 1,
-                [gradient(v1).normalize().negate(),
-                gradient(v3).normalize().negate(),
-                gradient(v2).normalize().negate()]
+                3 * i + 2,
+                [gradient(v1).normalize(),
+                gradient(v2).normalize(),
+                gradient(v3).normalize()]
             );
         }
 
-        var bufGeom = new THREE.BufferGeometry().fromGeometry( geom );
-        var mesh = new THREE.Mesh(bufGeom, new THREE.MeshNormalMaterial());
-        mesh.dataCount = Infinity;
+        var bufGeom = new THREE.BufferGeometry().fromGeometry(geom);
+        var mesh = new THREE.Mesh(bufGeom, new THREE.MeshNormalMaterial({ wireframe: false }));
+        //mesh.dataCount = Infinity;
 
         // three js rendering --------------------------------------------------
         var scene = new THREE.Scene();
