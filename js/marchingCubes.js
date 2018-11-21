@@ -71,7 +71,9 @@ function maxArray(A, m, n, p) {
   for (var k = 0; k < p; k++) {
     for (var i = 0; i < m; i++) {
       for (var j = 0; j < n; j++) {
-        max = Math.max(max, A[i][j][k]);
+        if(!isNaN(A[i][j][k])){
+          max = Math.max(max, A[i][j][k]);
+        }
       }
     }  
   }
@@ -1773,6 +1775,10 @@ function Faces7(faces, p1, values, l, j) {
     var c = A0 * C0 - B0 * D0;
     var tmax = -b / (2 * a);
     var maximum = a * tmax * tmax + b * tmax + c;
+    // console.log("a: ", a);
+    // console.log("b: ", b);
+    // console.log("c: ", c);
+    // console.log("tmax: ", tmax);
     maximum = isNaN(maximum) ? -1 : maximum;
     var cond1 = a < 0 ? 1 : 0;
     var cond2 = tmax > 0 ? 1 : 0;
@@ -2168,6 +2174,25 @@ function computeContour3d(voxel, nx, ny, nz, max, level) {
   }
 }
 
+function isNaNvertex(vertex){
+  return isNaN(vertex[0]) || isNaN(vertex[1]) || isNaN(vertex[2]);
+}
+
+function cleanTriangles(triangles){
+  var out = new Array(0);
+  for(var i=0; i<triangles.length/3; i++){
+    var vertex1 = triangles[3*i];
+    var vertex2 = triangles[3*i+1];
+    var vertex3 = triangles[3*i+2];
+    if(!(isNaNvertex(vertex1) || isNaNvertex(vertex2) || isNaNvertex(vertex3))){
+      out.push(vertex1);
+      out.push(vertex2); 
+      out.push(vertex3);
+    }
+  }
+  return out;
+}
+
 // ----------------------------------------------------------------------------
 function marchingCubes(f, level, xmin, xmax, ymin, ymax, zmin, zmax,
   nx, ny, nz, max, rescale, logBounds) { 
@@ -2189,7 +2214,7 @@ function marchingCubes(f, level, xmin, xmax, ymin, ymax, zmin, zmax,
   }
   // marching cubes
   console.log("Marching cubes...");
-  var triangles = computeContour3d(voxel, nx, ny, nz, max, level);
+  var triangles = cleanTriangles(computeContour3d(voxel, nx, ny, nz, max, level));
   var nrows = triangles.length;
   console.log("number of triangles: ", nrows / 3);
   if (logBounds) {
