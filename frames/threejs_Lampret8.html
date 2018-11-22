@@ -1,7 +1,7 @@
 <html>
 
 <head>
-    <title>Togliatti surface</title>
+    <title>Lampret surface 8</title>
     <style>
         canvas {
             width: 100%;
@@ -18,59 +18,20 @@
     <script src="../libraries/dat.gui.min.js"></script>
 
     <script>
-        // global constants  ---------------------------------------------------
-        var c = Math.sqrt(5 - Math.sqrt(5));
-        var cc = 1 + 3 * Math.sqrt(5);
-        var w = 1;
-
         // marching cubes ------------------------------------------------------
         var f = function (x, y, z) {
             var x2 = x * x;
             var y2 = y * y;
             var z2 = z * z;
-            var w2 = w * w;
-            var out;
-            if (x2 + y2 + z2 < 24) {
-                out = 64 * (x - w) *
-                    (x2 * x2 - 4 * x * x2 * w - 10 * x2 * y2 - 4 * x2 * w2 +
-                        16 * x * w * w2 - 20 * x * y2 * w + 5 * y2*y2 +
-                        16 * w2 * w2 - 20 * y2 * w2) -
-                    5 * c * (2 * z - c * w) * (4 * (x2 + y2 - z2) + cc * w2) ** 2;
-            } else {
-                out = NaN;
-            }
-            return out;
+            return (2.92 * (x - 1) * x2 * (x + 1) + 1.7 * y2) ** 2 * (y2 - 0.88) ** 2 +
+                (2.92 * (y - 1) * y2 * (y + 1) + 1.7 * z2) ** 2 * (z2 - 0.88) ** 2 +
+                (2.92 * (z - 1) * z2 * (z + 1) + 1.7 * x2) ** 2 * (x2 - 0.88) ** 2 - 0.02;
         }
         var tris = marchingCubes(f, 0,
-            -5, 5,
-            -5, 5,
-            -4, 4,
+            -1, 1,
+            -1, 1,
+            -1, 1,
             180, 180, 180);
-
-        // gradient ------------------------------------------------------------
-        function gradient(xyz) {
-            var x = xyz.x; var y = xyz.y; var z = xyz.z;
-            var x2 = x * x;
-            var y2 = y * y;
-            var z2 = z * z;
-            var x2y2z2 = 4 * (x2 + y2 - z2)
-            var x3 = x2 * x;
-            var w2 = w * w;
-            var w3 = w2 * w;
-            var ccw2 = cc * w2;
-            return new THREE.Vector3(
-                -80 * c * x * (2 * z - c * w) * (ccw2 + x2y2z2) + 64 * (x - w) *
-                (16 * w3 - 8 * w2 * x - 12 * w * x2 - 20 * w * y2 + 4 * x3 -
-                    20 * x * y2) + 64 * (16 * w2 * w2 + 16 * w3 * x - 4 * w2 * x2 -
-                        20 * w2 * y2 - 4 * w * x3 - 20 * w * x * y2 + x2 * x2 -
-                        10 * x2 * y2 + 5 * y2 * y2),
-                64 * (x - w) * (-40 * w2 * y - 40 * w * x * y -
-                    20 * x2 * y + 20 * y2 * y) - 80 * c * y * (2 * z - c * w) *
-                (ccw2 + x2y2z2),
-                80 * c * z * (2 * z - c * w) * (ccw2 + x2y2z2) -
-                10 * c * (ccw2 + x2y2z2) ** 2
-            )
-        }
 
         // mesh ----------------------------------------------------------------
         var geom = new THREE.Geometry();
@@ -90,29 +51,25 @@
                 tris[3 * i + 2][1],
                 tris[3 * i + 2][2]);
             geom.vertices[3 * i] = v1;
-            geom.vertices[3 * i + 1] = v2;
-            geom.vertices[3 * i + 2] = v3;
+            geom.vertices[3 * i + 1] = v3;
+            geom.vertices[3 * i + 2] = v2;
             geom.faces[i] = new THREE.Face3(
                 3 * i,
                 3 * i + 1,
-                3 * i + 2,
-                [gradient(v1).normalize(),
-                gradient(v2).normalize(),
-                gradient(v3).normalize()]
+                3 * i + 2
             );
         }
+        geom.computeVertexNormals();
 
         var bufGeom = new THREE.BufferGeometry().fromGeometry(geom);
-        var mesh = new THREE.Mesh(bufGeom, 
-            new THREE.MeshNormalMaterial({ wireframe: false, side: THREE.DoubleSide }));
-        //mesh.dataCount = Infinity;
-        mesh.doubleSided = true;
+        var mesh = new THREE.Mesh(bufGeom,
+            new THREE.MeshNormalMaterial({ wireframe: false }));
 
         // three js rendering --------------------------------------------------
         var scene = new THREE.Scene();
         var aspect = window.innerWidth / window.innerHeight;
         var camera = new THREE.PerspectiveCamera(50, aspect, 1, 10000);
-        camera.position.z = 13;
+        camera.position.z = 4.3;
         scene.add(camera);
 
         var renderer = new THREE.WebGLRenderer();
