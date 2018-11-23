@@ -116,7 +116,7 @@
         scene.add(camera);
         //
         var map = new THREE.TextureLoader().load('textures/GSK.jpg');
-        map.wrapS = map.wrapT = THREE.RepeatWrapping;
+        map.wrapS = map.wrapT = THREE.MirroredRepeatWrapping;
         map.anisotropy = 16;
         map.repeat = new THREE.Vector2(13, 13);
         var material = new THREE.MeshPhongMaterial({ map: map, side: THREE.DoubleSide });
