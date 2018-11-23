@@ -118,6 +118,7 @@
         var map = new THREE.TextureLoader().load('textures/GSK.jpg');
         map.wrapS = map.wrapT = THREE.RepeatWrapping;
         map.anisotropy = 16;
+        map.repeat = new THREE.Vector2(3, 3);
         var material = new THREE.MeshPhongMaterial({ map: map, side: THREE.DoubleSide });
 
         function Rendering(A, n) {
