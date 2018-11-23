@@ -115,10 +115,10 @@
         camera.add(pointLight);
         scene.add(camera);
         //
-        var map = new THREE.TextureLoader().load('textures/UV_Grid_Sm.jpg');
+        var map = new THREE.TextureLoader().load('textures/gsk-logo.png');
         map.wrapS = map.wrapT = THREE.RepeatWrapping;
         map.anisotropy = 16;
-        var material = new THREE.MeshPhongMaterial({ map: map, side: THREE.DoubleSide });
+        var material = new THREE.MeshPhongMaterial({ map: map });
 
         function Rendering(A, n) {
 
