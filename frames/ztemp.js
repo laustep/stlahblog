@@ -479,3 +479,47 @@ $(document).on('mouseup', function(e) {
 // render -----------------------------------------------------------
 render();
 requestAnimFrame(render);
+
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+var transfoMatrices = new Array(20);
+var rotationMatrices = new Array(20);
+for (var i = 0; i < 20; i++) {
+  var axis2 = new THREE.Vector3().fromArray(points[i]);
+  transfoMatrices[i] = reorient(axis1, axis2);
+  rotationMatrices[i] = getRotation(new THREE.Vector3(0, -h, 0), axis2);
+}
+var tori = new Array(20);
+var cones = new Array(20);
+for (var i = 0; i < 20; i++) {
+  tori[i] = new THREE.Mesh(bufGeom, material);
+  object.add(tori[i]);
+  var cone = new THREE.Mesh(coneGeom, coneMaterial);
+  cone.matrix = rotationMatrices[i];
+  cone.matrixAutoUpdate = false;
+  object.add(cone);
+}
+scene.add(object);
+
+// rendering function ------------------------------------------------------
+var kk = 0;
+function render() {
+  object.rotation.x += dgcontrols.rotationSpeed;
+  object.rotation.y += dgcontrols.rotationSpeed;
+  for (var i = 0; i < 20; i++) {
+    var transfoMatrix = new THREE.Matrix4()
+      .makeRotationAxis(new THREE.Vector3(0, 0, 1), kk * 2 * pi / 180)
+      .premultiply(transfoMatrices[i]);
+    tori[i].matrix = transfoMatrix;
+    tori[i].matrixAutoUpdate = false;
+  }
+  renderer.render(scene, camera);
+  camera.position.z = dgcontrols.cameraz;
+  kk += 1;
+  if (kk == 180) {
+    kk = 0;
+  }
+  requestAnimFrame(render);
+}
