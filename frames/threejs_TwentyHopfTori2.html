@@ -167,17 +167,14 @@
     for (var k = 0; k < 180; k++) {
       objects[k] = new THREE.Object3D();
       for (var i = 0; i < 20; i++) {
-        //var axis2 = new THREE.Vector3().fromArray(points[i]);
         var mesh = new THREE.Mesh(bufGeom, material);
         var transfoMatrix = new THREE.Matrix4()
           .makeRotationAxis(new THREE.Vector3(0, 0, 1), k * 2 * pi / 180)
           .premultiply(transfoMatrices[i]);
         mesh.matrix = transfoMatrix;
-        if(k==90) {console.log(transfoMatrices[i]); console.log(mesh.matrix);}
         mesh.matrixAutoUpdate = false;
         objects[k].add(mesh);
         var cone = new THREE.Mesh(coneGeom, coneMaterial);
-        // var RotationMatrix = getRotation(new THREE.Vector3(0, -h, 0), axis2);
         cone.matrix = rotationMatrices[i];
         cone.matrixAutoUpdate = false;
         objects[k].add(cone);
@@ -195,7 +192,6 @@
     })();
 
     var kk = 0;
-
     function render() {
       for (var k = 0; k < 180; k++) {
         objects[k].rotation.x += dgcontrols.rotationSpeed;
