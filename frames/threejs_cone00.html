@@ -1,0 +1,181 @@
+<html>
+
+<head>
+  <title>Cone</title>
+  <style>
+    canvas {
+      width: 100%;
+      height: 100%
+    }
+  </style>
+</head>
+
+<body>
+  <!-- <script src="http://mrdoob.github.com/three.js/build/three.min.js"></script> -->
+  <script src="../libraries/three.min.js"></script>
+  <script src="../libraries/jquery.min.js"></script>
+
+  <script> // mesh parameters --------------------------------------------------
+    var nstacks = 3;
+    var nslices = 5;
+    var h = 4;
+    var r = 1;
+    var R = 3;
+  </script>
+
+  <script> // grid -------------------------------------------------------------
+    h = r<R ? h : -h;
+    var d = r<R ? h*r/R : h*R/r;
+    nstacks = nstacks + 1;
+    var u_ = new Array(nstacks);
+    for(var i=0; i<nstacks; i++){
+      u_[i] = (h-d) * i/(nstacks-1);
+    }
+    var v_ = new Array(nslices);
+    for(var i=0; i<nslices; i++){
+      v_[i] = 2*Math.PI * i/nslices;
+    }
+  </script>
+
+  <script> // vertices and normals ---------------------------------------------
+    var vertices = new Array(nstacks*nslices);
+    var normals = new Array(nstacks*nslices);
+    for(var i=0; i<nstacks; i++){
+      var g = (h-u_[i])/h * R;
+      for(var j=0; j<nslices; j++){
+        var v = new THREE.Vector3(
+          g * Math.cos(v_[j]),
+          g * Math.sin(v_[j]),
+          r < R ? u_[i] * h/(h-d) : u_[i] * h/(h-d) - h
+        );
+        vertices[i*nslices+j] = v;
+        var vx = v.x; var vy = v.y;
+        var normxy = Math.sqrt(vx*vx + vy*vy);
+        var t1 = new THREE.Vector3(
+          (r-R) * vx / normxy,
+          (r-R) * vy / normxy,
+          h
+        );
+        var t2 = new THREE.Vector3(
+          -vy, vx, 0
+        )
+        normals[i*nslices+j] = t1.cross(t2).normalize().negate();
+      }
+    }
+  </script>
+
+  <script> // mesh -------------------------------------------------------------
+    var geom = new THREE.Geometry();
+    for (var i = 0; i < (nstacks-1); i++){
+      for(var j=0; j<nslices; j++){
+        var jp1 = j == nslices-1 ? 0 : j+1;
+        geom.vertices.push(vertices[i*nslices+j]);
+        geom.vertices.push(vertices[i*nslices+jp1]);
+        geom.vertices.push(vertices[(i+1)*nslices+j]);
+        geom.faces.push(new THREE.Face3(
+            6 * (i*nslices+j),
+            6 * (i*nslices+j) + 1,
+            6 * (i*nslices+j) + 2,
+            [normals[i*nslices+j],
+            normals[i*nslices+jp1],
+            normals[(i+1)*nslices+j]]
+        ));
+        geom.vertices.push(vertices[(i+1)*nslices+j]);
+        geom.vertices.push(vertices[i*nslices+jp1]);
+        geom.vertices.push(vertices[(i+1)*nslices+jp1]);
+        geom.faces.push(new THREE.Face3(
+            6 * (i*nslices+j) + 3,
+            6 * (i*nslices+j) + 4,
+            6 * (i*nslices+j) + 5,
+            [normals[(i+1)*nslices+j],
+            normals[i*nslices+jp1],
+            normals[(i+1)*nslices+jp1]]
+        ));
+      }
+    }
+  </script>
+
+  <script> // dat.gui controls -------------------------------------------------
+
+  </script>
+
+  <script> // three.js scene ---------------------------------------------------
+    var scene = new THREE.Scene();
+    var aspect = window.innerWidth / window.innerHeight;
+    var camera = new THREE.PerspectiveCamera(75, aspect, 1, 10000);
+    camera.position.z = 12.2;
+    scene.add(camera);
+
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    var object = new THREE.Object3D();
+    var bufGeom = new THREE.BufferGeometry().fromGeometry(geom);
+    var conemesh = new THREE.Mesh(bufGeom,
+      new THREE.MeshNormalMaterial({side: THREE.DoubleSide}));
+    object.add(conemesh);
+    var helper = new THREE.VertexNormalsHelper( conemesh, 2, 0x00ff00, 1 );
+    object.add( helper );
+    scene.add(object);
+
+    // rendering function ------------------------------------------------------
+    window.requestAnimFrame = (function() {
+      return window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        function(callback) {
+          window.setTimeout(callback, 1000 / 60);
+        };
+    })();
+
+    function render() {
+      renderer.render(scene, camera);
+      requestAnimFrame(render);
+    }
+  </script>
+
+  <script> // dragging ---------------------------------------------------------
+    var isDragging = false;
+    var previousMousePosition = {
+      x: 0,
+      y: 0
+    };
+
+    $(renderer.domElement).on('mousedown', function(e) {
+      isDragging = true;
+    }).on('mousemove', function(e) {
+      var deltaMove = {
+        x: e.offsetX - previousMousePosition.x,
+        y: e.offsetY - previousMousePosition.y
+      };
+      if (isDragging) {
+        var deltaRotationQuaternion = new THREE.Quaternion()
+          .setFromEuler(new THREE.Euler(
+            Math.PI / 180 * (deltaMove.y * .5),
+            Math.PI / 180 * (deltaMove.x * .5),
+            0,
+            'XYZ'
+          ));
+        object.quaternion.multiplyQuaternions(deltaRotationQuaternion,
+          object.quaternion);
+      }
+      previousMousePosition = {
+        x: e.offsetX,
+        y: e.offsetY
+      };
+    });
+
+    $(document).on('mouseup', function(e) {
+      isDragging = false;
+    });
+  </script>
+
+  <script> // render -----------------------------------------------------------
+    render();
+    requestAnimFrame(render);
+  </script>
+
+</body>
+
+</html>
