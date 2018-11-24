@@ -16,8 +16,7 @@
   <script src="../libraries/jquery.min.js"></script>
   <script src="../libraries/dat.gui.min.js"></script>
 
-  <script>
-    // some constants ---------------------------------------------------
+  <script> // some constants ---------------------------------------------------
     var A = 0.44;
     var n = 3;
     var uSteps = 150,
@@ -26,8 +25,7 @@
     var scale = 0.03;
   </script>
 
-  <script>
-    // twenty points on the sphere --------------------------------------
+  <script> // twenty points on the sphere --------------------------------------
     var phi = (1 + Math.sqrt(5)) / 2;
     var a = 1 / Math.sqrt(3);
     var b = a / phi;
@@ -56,8 +54,7 @@
     ];
   </script>
 
-  <script>
-    // some useful functions --------------------------------------------
+  <script> // some useful functions --------------------------------------------
     function reorient(axis1, axis2) {
       var vX1 = axis1.normalize();
       var vX2 = axis2.normalize();
@@ -77,7 +74,6 @@
         0, 0, 0, 1);
       return A;
     }
-
     function getRotation(U, V) {
       var ma = U.length();
       var mb = V.length(); // should be = ma
@@ -91,8 +87,7 @@
     }
   </script>
 
-  <script>
-    // parameterization -------------------------------------------------
+  <script> // parameterization -------------------------------------------------
     function f0(u, v, A, n) {
       // both u and v run from zero to one in Three.js
       var t = n * 2 * pi * u;
@@ -115,7 +110,6 @@
       return new THREE.Vector3(x1 / (1 - x4), x2 / (1 - x4), x3 / (1 - x4))
         .multiplyScalar(scale);
     }
-
     function g(A, n) {
       return function f(u, v, vector) {
         var out = f0(u, v, A, n);
@@ -124,8 +118,7 @@
     }
   </script>
 
-  <script>
-    // dat.gui controls -------------------------------------------------
+  <script> // dat.gui controls -------------------------------------------------
     var dgcontrols = new function() {
       this.rotationSpeed = 0.001;
       this.cameraz = 2.2;
@@ -140,44 +133,55 @@
       .name("Rotation speed");
   </script>
 
-  <script>
-    // three.js scene ---------------------------------------------------
+  <script> // three.js scene ---------------------------------------------------
     var scene = new THREE.Scene();
     var aspect = window.innerWidth / window.innerHeight;
     var camera = new THREE.PerspectiveCamera(75, aspect, 1, 10000);
     camera.position.z = 2.2;
+    var ambientLight = new THREE.AmbientLight(0xcccccc, 0.4);
+    scene.add(ambientLight);
+    var pointLight = new THREE.PointLight(0xffffff, 0.8);
+    camera.add(pointLight);
+    scene.add(camera);
 
     var renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    var scene = new THREE.Scene();
     var object = new THREE.Object3D();
     var axis1 = new THREE.Vector3(0, 0, 1);
     var bufGeom = new THREE.ParametricBufferGeometry(g(A, n), uSteps, vSteps);
-    var material = new THREE.MeshNormalMaterial({
-      wireframe: false
-    });
+    var map = new THREE.TextureLoader().load('textures/whitesmoke.png');
+    //map.wrapS = map.wrapT = THREE.RepeatWrapping;
+    map.anisotropy = 16;
+    //map.repeat = new THREE.Vector2(13, 13);
+    var material = new THREE.MeshPhongMaterial({ map: map });
     var h = Math.sqrt(3 * a * a);
     var coneGeom = new THREE.ConeBufferGeometry(0.04, h, 32)
       .translate(0, -h / 2, 0);
     var coneMaterial = new THREE.MeshNormalMaterial({
       wireframe: false
     });
-    var transfoMatrices = new Array(20);
-    var rotationMatrices = new Array(20);
-    for (var i = 0; i < 20; i++) {
-      var axis2 = new THREE.Vector3().fromArray(points[i]);
-      transfoMatrices[i] = reorient(axis1, axis2);
-      rotationMatrices[i] = getRotation(new THREE.Vector3(0, -h, 0), axis2);
+
+    var rotationMatrices = new Array(180);
+    for (var k = 0; k < 180; k++) {
+      rotationMatrices[k] = new THREE.Matrix4()
+        .makeRotationAxis(new THREE.Vector3(0, 0, 1), k * 2 * pi / 180);
     }
+    var transfoMatrices = new Array(20);
     var tori = new Array(20);
     var cones = new Array(20);
     for (var i = 0; i < 20; i++) {
+      var axis2 = new THREE.Vector3().fromArray(points[i]);
+      transfoMatrices[i] = new Array(180);
+      var M = reorient(axis1, axis2);
+      for (var k = 0; k < 180; k++) {
+        transfoMatrices[i][k] = M.clone().multiply(rotationMatrices[k]);
+      }
       tori[i] = new THREE.Mesh(bufGeom, material);
       object.add(tori[i]);
       var cone = new THREE.Mesh(coneGeom, coneMaterial);
-      cone.matrix = rotationMatrices[i];
+      cone.matrix = getRotation(new THREE.Vector3(0, -h, 0), axis2);
       cone.matrixAutoUpdate = false;
       object.add(cone);
     }
@@ -194,23 +198,15 @@
     })();
 
     var kk = 0;
-
     function render() {
-      //      for (var k = 0; k < 180; k++) {
       object.rotation.x += dgcontrols.rotationSpeed;
       object.rotation.y += dgcontrols.rotationSpeed;
       for (var i = 0; i < 20; i++) {
-        var transfoMatrix = new THREE.Matrix4()
-          .makeRotationAxis(new THREE.Vector3(0, 0, 1), kk * 2 * pi / 180)
-          .premultiply(transfoMatrices[i]);
-        tori[i].matrix = transfoMatrix;
+        tori[i].matrix = transfoMatrices[i][kk];
         tori[i].matrixAutoUpdate = false;
       }
-      //      }
-      // scene.add(objects[kk]);
       renderer.render(scene, camera);
       camera.position.z = dgcontrols.cameraz;
-      // scene.remove(objects[kk]);
       kk += 1;
       if (kk == 180) {
         kk = 0;
@@ -219,8 +215,7 @@
     }
   </script>
 
-  <script>
-    // dragging ---------------------------------------------------------
+  <script> // dragging ---------------------------------------------------------
     var isDragging = false;
     var previousMousePosition = {
       x: 0,
@@ -242,10 +237,8 @@
             0,
             'XYZ'
           ));
-        for (var k = 0; k < 180; k++) {
-          objects[k].quaternion.multiplyQuaternions(deltaRotationQuaternion,
-            objects[k].quaternion);
-        }
+        object.quaternion.multiplyQuaternions(deltaRotationQuaternion,
+          object.quaternion);
       }
       previousMousePosition = {
         x: e.offsetX,
@@ -258,8 +251,7 @@
     });
   </script>
 
-  <script>
-    // render -----------------------------------------------------------
+  <script> // render -----------------------------------------------------------
     render();
     requestAnimFrame(render);
   </script>
