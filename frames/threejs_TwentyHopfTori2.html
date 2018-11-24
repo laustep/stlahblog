@@ -156,14 +156,12 @@
     var coneMaterial = new THREE.MeshNormalMaterial({
       wireframe: false
     });
-    coneMaterial.color.setRGB(1,0,1);
 
     var rotationMatrices = new Array(180);
     for (var k = 0; k < 180; k++) {
       rotationMatrices[k] = new THREE.Matrix4()
         .makeRotationAxis(new THREE.Vector3(0, 0, 1), k * 2 * pi / 180);
     }
-
     var transfoMatrices = new Array(20);
     var tori = new Array(20);
     var cones = new Array(20);
