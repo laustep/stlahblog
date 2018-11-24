@@ -152,9 +152,9 @@
     var axis1 = new THREE.Vector3(0, 0, 1);
     var bufGeom = new THREE.ParametricBufferGeometry(g(A, n), uSteps, vSteps);
     var map = new THREE.TextureLoader().load('textures/red_whitesmoke.png');
-    //map.wrapS = map.wrapT = THREE.RepeatWrapping;
+    map.wrapS = map.wrapT = THREE.RepeatWrapping;
     map.anisotropy = 16;
-    //map.repeat = new THREE.Vector2(13, 13);
+    map.repeat = new THREE.Vector2(13, 13);
     var material = new THREE.MeshPhongMaterial({ map: map });
     var h = Math.sqrt(3 * a * a);
     var coneGeom = new THREE.ConeBufferGeometry(0.04, h, 32)
