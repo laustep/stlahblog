@@ -17,10 +17,10 @@
 
   <script> // mesh parameters --------------------------------------------------
     var nstacks = 3;
-    var nslices = 5;
-    var h = 4;
-    var r = 1;
-    var R = 3;
+    var nslices = 6;
+    var h = 5;
+    var r = 4;
+    var R = 2;
   </script>
 
   <script> // grid -------------------------------------------------------------
@@ -52,14 +52,20 @@
         var vx = v.x; var vy = v.y;
         var normxy = Math.sqrt(vx*vx + vy*vy);
         var t1 = new THREE.Vector3(
-          (r-R) * vx / normxy,
-          (r-R) * vy / normxy,
-          h
+          // (r-R) * vx / normxy,
+          // (r-R) * vy / normxy,
+          -R/h * Math.cos(v_[j]),
+          -R/h * Math.sin(v_[j]),
+          h/(h-d)
         );
         var t2 = new THREE.Vector3(
           -vy, vx, 0
         )
-        normals[i*nslices+j] = t1.cross(t2).normalize().negate();
+        if(R>r){
+          normals[i*nslices+j] = t1.cross(t2).normalize().negate(); // ne dépend pas de i => sortir de la boucle
+        }else{
+          normals[i*nslices+j] = t1.cross(t2).normalize().negate();
+        }
       }
     }
   </script>
@@ -95,7 +101,8 @@
     }
   </script>
 
-  <script> // dat.gui controls -------------------------------------------------
+  <script> // transfo matrix  --------------------------------------------------
+    
 
   </script>
 
