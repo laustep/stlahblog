@@ -19,9 +19,9 @@
     // mesh parameters ---------------------------------------------------------
     var nstacks = 3;
     var nslices = 6;
-    var h = 5;
-    var r = 4;
-    var R = 5;
+    var h = 6;
+    var r = 2;
+    var R = 4;
   </script>
 
   <script>
@@ -39,44 +39,35 @@
       for (var i = 0; i < nslices; i++) {
         v_[i] = 2 * Math.PI * i / nslices;
       }
+      //
+      var hdivhmd = h / (h - d);
       // vertices & normals ----------------------------------------------------
       var vertices = new Array(nstacks * nslices);
       var normals = new Array(nstacks * nslices);
       for (var i = 0; i < nstacks; i++) {
-        var g = (h - u_[i]) / h * R;
+        var g = h - u_[i];
+        var f_i = u_[i] * hdivhmd;
         for (var j = 0; j < nslices; j++) {
+          var cosv = R/h * Math.cos(v_[j]);
+          var sinv = R/h * Math.sin(v_[j]);
           var v = new THREE.Vector3(
-            g * Math.cos(v_[j]),
-            g * Math.sin(v_[j]),
-            r < R ? u_[i] * h / (h - d) : u_[i] * h / (h - d) - h
+            g * cosv,
+            g * sinv,
+            r < R ? f_i : f_i - h
           );
           vertices[i * nslices + j] = v;
-          var vx = v.x;
-          var vy = v.y;
-          var normxy = Math.sqrt(vx * vx + vy * vy);
+          var vx = v.x; var vy = v.y;
           var t1 = new THREE.Vector3(
-            // (r-R) * vx / normxy,
-            // (r-R) * vy / normxy,
-            -R / h * Math.cos(v_[j]),
-            -R / h * Math.sin(v_[j]),
-            h / (h - d)
+            - cosv,
+            - sinv,
+            hdivhmd
           );
           var t2 = new THREE.Vector3(
             -vy, vx, 0
           )
-          if (R > r) {
-            normals[i * nslices + j] = t1.cross(t2).normalize().negate(); // ne dépend pas de i => sortir de la boucle
-          } else {
-            normals[i * nslices + j] = t1.cross(t2).normalize().negate();
-          }
+          normals[i * nslices + j] = t1.cross(t2).normalize().negate();
         }
       }
-      //     return {vertices:vertices; normals: normals};
-      //   }
-      //
-      //
-      //
-      // <script>
       // mesh --------------------------------------------------------------------
       var geom = new THREE.Geometry();
       for (var i = 0; i < (nstacks - 1); i++) {
@@ -120,42 +111,21 @@
   </script>
 
   <script>
-    // transfo matrix  ---------------------------------------------------------
-    function transfoMatrixCone(cr1, r1, cr2, r2) {
+  // cone mesh -----------------------------------------------------------------
+    function ConeMesh(cr1, r1, cr2, r2, nstacks, nslices){
       if (r2 > r1) {
-        return transfoMatrixCone(cr2, r2, cr1, r1);
-      }
-      var w = cr2.sub(cr1);
-      var wnorm = w.length();
-      var s = Math.sqrt(w.x * w.x + w.y * w.y);
-      var u = new THREE.Vector3(
-        w.y / s, -w.x / s, 0
-      );
-      var v = w.cross(u);
-      var M = new THREE.Matrix4().set(
-        u.x, v.x, w.x, cr1.x,
-        u.y, v.y, w.y, cr1.y,
-        u.z, v.z, w.z, cr1.z,
-        0, 0, 0, 1
-      );
-      return M;
-    }
-  </script>
-
-  <script>
-    function ConeMesh(cr1, r1, cr2, r2, nstacks, nslices){//, nstacks, nslices) {
-      if (r2 > r1) {
-        return ConeMesh(cr2, r2, cr1, r1, nstacks, nslices);//, nstacks, nslices)
+        return ConeMesh(cr2, r2, cr1, r1, nstacks, nslices);
       }
       var w0 = cr2.sub(cr1);
       var conemesh0 = Cmesh0(w0.length(), r1, r2, nstacks, nslices);
       var w = w0.normalize();
       var wx = w.x; var wy = w.y;
-      var s = Math.sqrt(w.x * w.x + w.y * w.y); // TODO: s=0
-      console.log(s);
+      var s = Math.sqrt(w.x * w.x + w.y * w.y);
+      if(s == 0){
+        return new THREE.Matrix4();
+      }
       var u = new THREE.Vector3(wy / s, -wx / s, 0);
       var v = w.clone().cross(u);
-      console.log(v);
       var m = new THREE.Matrix4().set(
         u.x, v.x, w.x, cr1.x,
         u.y, v.y, w.y, cr1.y,
@@ -181,18 +151,17 @@
     document.body.appendChild(renderer.domElement);
 
     var object = new THREE.Object3D();
-    // var bufGeom = new THREE.BufferGeometry().fromGeometry(geom);
     var conemesh0 = Cmesh0(h, R, r, 3, 8);
     object.add(conemesh0);
     var helper0 = new THREE.VertexNormalsHelper(conemesh0, 2, 0x00ff00, 1);
     object.add(helper0);
 
-    var conemesh = ConeMesh(new THREE.Vector3(R+r,0,0), R, new THREE.Vector3(R+r,10,0), 2, 3, 8)
+    var conemesh = ConeMesh(new THREE.Vector3(R+r,0,0), r, new THREE.Vector3(R+r,10,0), R, 3, 8)
     object.add(conemesh);
     var helper = new THREE.VertexNormalsHelper(conemesh, 2, 0x00ff00, 1);
     object.add(helper);
 
-    var conemesh2 = ConeMesh(new THREE.Vector3(R+r,0,0), R, new THREE.Vector3(R+r,-10,0), 2, 3, 8)
+    var conemesh2 = ConeMesh(new THREE.Vector3(R+r,0,0), r, new THREE.Vector3(R+r,-10,0), R, 3, 8)
     object.add(conemesh2);
     var helper2 = new THREE.VertexNormalsHelper(conemesh2, 2, 0x00ff00, 1);
     object.add(helper2);
