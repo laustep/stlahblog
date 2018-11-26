@@ -459,11 +459,28 @@
   </script>
 
   <script>
+    // dat.gui controls --------------------------------------------------------
+    var z0 = 5.5;
+    var dgcontrols = new function() {
+      this.cameraz = 5.5;
+      this.rotationSpeed = 25;
+    }
+    var gui = new dat.GUI({
+      autoplace: false,
+      width: 300
+    });
+    gui.add(dgcontrols, 'cameraz').min(1).max(10).step(0.5)
+      .name("Camera position");
+    gui.add(dgcontrols, 'rotationSpeed').min(0).max(100).step(5)
+      .name("Speed of 4D rotation");
+  </script>
+
+  <script>
     // three.js scene ---------------------------------------------------
     var scene = new THREE.Scene();
     var aspect = window.innerWidth / window.innerHeight;
     var camera = new THREE.PerspectiveCamera(75, aspect, 1, 10000);
-    camera.position.z = 5.5;
+    camera.position.z = z0;
     var renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
@@ -486,7 +503,7 @@
       renderer.render(scene, camera);
       //object.rotation.x += dgcontrols.rotationSpeed;
       //object.rotation.y += dgcontrols.rotationSpeed;
-      //camera.position.z = dgcontrols.cameraz;
+      camera.position.z = dgcontrols.cameraz;
       scene.remove(object);
       k += 1;
       if (k == 180) {
@@ -494,7 +511,7 @@
       }
       setTimeout(function() {
         requestAnimationFrame(render);
-      }, 1000 / 25);
+      }, 1000 / dgcontrols.rotationSpeed);
     }
   </script>
 

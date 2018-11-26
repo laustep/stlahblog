@@ -1001,4 +1001,39 @@ function render() {
   }, 1000 / 25);
 }
 
+// dragging ----------------------------------------------------------------
+var isDragging = false;
+var previousMousePosition = {
+  x: 0,
+  y: 0
+};
+$(renderer.domElement).on('mousedown', function(e) {
+  isDragging = true;
+}).on('mousemove', function(e) {
+  var deltaMove = {
+    x: e.offsetX - previousMousePosition.x,
+    y: e.offsetY - previousMousePosition.y
+  };
+  if (isDragging) {
+    var deltaRotationQuaternion = new THREE.Quaternion()
+      .setFromEuler(new THREE.Euler(
+        Math.PI / 180 * (deltaMove.y * .5),
+        Math.PI / 180 * (deltaMove.x * .5),
+        0,
+        'XYZ'
+      ));
+    for(var i=0; i<180; i++){
+      Objects[i].quaternion.multiplyQuaternions(deltaRotationQuaternion,
+        Objects[i].quaternion);
+    }
+  }
+  previousMousePosition = {
+    x: e.offsetX,
+    y: e.offsetY
+  };
+});
+$(document).on('mouseup', function(e) {
+  isDragging = false;
+});
+
 render();
