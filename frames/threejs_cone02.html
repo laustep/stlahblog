@@ -26,6 +26,7 @@
 
   <script>
     // basic mesh---------------------------------------------------------------
+    // problems if R<r but anyway this case is never used by ConeMesh
     function Cmesh0(h, R, r, nstacks, nslices) {
       h = r < R ? h : -h;
       var ratio = r < R ? r / R : R / r;
@@ -41,17 +42,18 @@
         v_[i] = 2 * Math.PI * i / nslices;
       }
       // vertices & normals ----------------------------------------------------
+      Rbig = Math.max(r,R);
       var vertices = new Array(nstacks * nslices);
       var normals = new Array(nstacks * nslices);
       for (var i = 0; i < nstacks; i++) {
         var g = 1+ k*u_[i];
         for (var j = 0; j < nslices; j++) {
-          var cosv = R * Math.cos(v_[j]);
-          var sinv = R * Math.sin(v_[j]);
+          var cosv = Rbig * Math.cos(v_[j]);
+          var sinv = Rbig * Math.sin(v_[j]);
           var v = new THREE.Vector3(
             g * cosv,
             g * sinv,
-            r < R ? u_[i] : u_[i] - h
+            r < R ? u_[i] : u_[i] - h // if R<r, cone is upside down...!
           );
           vertices[i * nslices + j] = v;
           var t1 = new THREE.Vector3(
@@ -148,10 +150,15 @@
     document.body.appendChild(renderer.domElement);
 
     var object = new THREE.Object3D();
-    var conemesh0 = Cmesh0(h, r, r, 3, 8);
+    var conemesh0 = Cmesh0(h, R, r, 3, 8);
     object.add(conemesh0);
     var helper0 = new THREE.VertexNormalsHelper(conemesh0, 2, 0x00ff00, 1);
     object.add(helper0);
+    var conemesh0a = Cmesh0(h, r, R, 3, 8);
+    conemesh0a.position.set(-6,0,0);
+    object.add(conemesh0a);
+    var helper0a = new THREE.VertexNormalsHelper(conemesh0a, 2, 0x00ff00, 1);
+    object.add(helper0a);
 
     var conemesh = ConeMesh(new THREE.Vector3(R+r,0,0), r, new THREE.Vector3(R+r,10,0), R, 3, 8)
     object.add(conemesh);

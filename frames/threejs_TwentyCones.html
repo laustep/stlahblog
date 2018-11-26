@@ -70,13 +70,14 @@
         v_[i] = 2 * Math.PI * i / nslices;
       }
       // vertices & normals ----------------------------------------------------
+      Rbig = Math.max(r,R);
       var vertices = new Array(nstacks * nslices);
       var normals = new Array(nstacks * nslices);
       for (var i = 0; i < nstacks; i++) {
         var g = 1 + k * u_[i];
         for (var j = 0; j < nslices; j++) {
-          var cosv = R * Math.cos(v_[j]);
-          var sinv = R * Math.sin(v_[j]);
+          var cosv = Rbig * Math.cos(v_[j]);
+          var sinv = Rbig * Math.sin(v_[j]);
           var v = new THREE.Vector3(
             g * cosv,
             g * sinv,
