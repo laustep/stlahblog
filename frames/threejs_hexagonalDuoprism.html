@@ -288,7 +288,7 @@
       return [x[0] / (r - x[3]), x[1] / (r - x[3]), x[2] / (r - x[3])];
     }
     function mstereo(x, r2) {
-      var c = Math.acos(x[3])/Math.PI/Math.sqrt(r2 - x[3]*x[3]);
+      var c = Math.acos(x[3]/r)/Math.PI/Math.sqrt(r2 - x[3]*x[3]);
       return [c*x[0], c*x[1], c*x[2]];
     }
   </script>
