@@ -59,14 +59,10 @@
             var vY = vX1.clone().cross(vX2).normalize();
             var vZ1 = vX1.clone().cross(vY).normalize();
             var vZ2 = vX2.clone().cross(vY).normalize();
-            //var M1array = new Array(9);
             var M1array = [vX1.x, vX1.y, vX1.z, vY.x, vY.y, vY.z, vZ1.x, vZ1.y, vZ1.z];
-            var M1 = new THREE.Matrix3();
-            M1.fromArray(M1array);
+            var M1 = new THREE.Matrix3().fromArray(M1array);
             var M2array = [vX2.x, vY.x, vZ2.x, vX2.y, vY.y, vZ2.y, vX2.z, vY.z, vZ2.z];
-            var M2 = new THREE.Matrix3();
-            M2.fromArray(M2array);
-            // console.log(M1); console.log(M2);
+            var M2 = new THREE.Matrix3().fromArray(M2array);
             var M = M1.clone().multiply(M2);
             var elems = M.elements;
             var A = new THREE.Matrix4();
@@ -74,23 +70,9 @@
                 elems[3], elems[4], elems[5], axis2.y,
                 elems[6], elems[7], elems[8], axis2.z,
                 0, 0, 0, 1);
-            // var B = new THREE.Matrix4();
-            // B.set(elems[0], elems[1], elems[2], 0,
-            //     elems[3], elems[4], elems[5], 0,
-            //     elems[6], elems[7], elems[8], 0,
-            //     0, 0, 0, 1);
             return A;
         }
-        //        var r = reorient(new THREE.Vector3(1, 2, 3), new THREE.Vector3(2, 2, 2));
-        // //' @description Get the rotation transforming U to V
-        // function quaternion2matrix(q) {
-        //     return new THREE.Matrix4().set(
-        //         1 - 2 * q.z ** 2 - 2 * q.w ** 2, 2 * q.y * q.z - 2 * q.w * q.x, 2 * q.y * q.w + 2 * q.z * q.x, 0,
-        //         2 * q.y * q.z + 2 * q.w * q.x, 1 - 2 * q.y ** 2 - 2 * q.w ** 2, 2 * q.z * q.w - 2 * q.y * q.x, 0,
-        //         2 * q.y * q.w - 2 * q.z * q.x, 2 * q.z * q.w + 2 * q.y * q.x, 1 - 2 * q.y ** 2 - 2 * q.z ** 2, 0,
-        //         0, 0, 0, 1
-        //     )
-        // }
+        // Get the rotation transforming U to V
         function getRotation(U, V) {
             var ma = U.length();
             var mb = V.length(); // should be = ma
