@@ -510,7 +510,7 @@
       });
     }
     var k = 0;
-    var winding = 0;
+    //var winding = 0;
     var frame = 0;
 
     function screenshotName(i){
@@ -527,7 +527,7 @@
       var object = Objects[k];
       scene.add(object);
       renderer.render(scene, camera);
-      if (dgcontrols.save && frame < 10) {
+      if (dgcontrols.save && frame < 180) {
         var dataurl = renderer.domElement.toDataURL();
         var file = dataURLtoFile(dataurl, screenshotName(frame));
         saveAs(file);
@@ -540,7 +540,7 @@
       k += 1;
       if (k == 180) {
         k = 0;
-        winding += 1;
+        //winding += 1;
       }
       setTimeout(function() {
         requestAnimationFrame(render);
