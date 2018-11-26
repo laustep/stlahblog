@@ -59,6 +59,9 @@
       [a, -0.5, 0.0, -1.0],
       [a, -0.5, a, -0.5]
     ];
+    var facetVertices = [0,5,6,30,11,35,12,17,18,23,24,29];
+    var otherVertices = [1,2,3,4,7,8,9,10,13,14,15,16,19,20,21,22,25,26,27,28,
+      31,32,33,34]
     // edges -------------------------------------------------------------------
     var facetEdges = [
       [0, 5],
@@ -299,10 +302,22 @@
       //
       var object = new THREE.Object3D();
       // vertices
-      for (var j = 0; j < vertices.length; j++) {
-        var geoSphere = new THREE.SphereBufferGeometry(0.1, 16, 16);
-        var sphere = new THREE.Mesh(geoSphere, new THREE.MeshNormalMaterial());
-        sphere.position.set(points[j][0], points[j][1], points[j][2]);
+      for (var j = 0; j < facetVertices.length; j++) {
+        var index = facetVertices[j];
+        var geoSphere = new THREE.SphereBufferGeometry(0.06, 16, 16);
+        var map = new THREE.TextureLoader().load("./textures/red.png");
+        var material = new THREE.MeshPhongMaterial({ map: map });
+        var sphere = new THREE.Mesh(geoSphere, material);
+        sphere.position.set(points[index][0], points[index][1], points[index][2]);
+        object.add(sphere);
+      }
+      for (var j = 0; j < otherVertices.length; j++) {
+        var index = otherVertices[j];
+        var geoSphere = new THREE.SphereBufferGeometry(0.06, 16, 16);
+        var map = new THREE.TextureLoader().load("./textures/whitesmoke.png");
+        var material = new THREE.MeshPhongMaterial({ map: map });
+        var sphere = new THREE.Mesh(geoSphere, material);
+        sphere.position.set(points[index][0], points[index][1], points[index][2]);
         object.add(sphere);
       }
       // edges
@@ -311,7 +326,7 @@
         var pt2 = points[otherEdges[j][1]];
         var cr1 = new THREE.Vector3().fromArray(pt1);
         var cr2 = new THREE.Vector3().fromArray(pt2);
-        var conemesh = ConeMesh(cr1, 0.07, cr2, 0.07, 3, 30, "./textures/whitesmoke.png");
+        var conemesh = ConeMesh(cr1, 0.04, cr2, 0.04, 3, 30, "./textures/whitesmoke.png");
         object.add(conemesh);
       }
       for (var j = 0; j < facetEdges.length; j++) {
@@ -319,7 +334,7 @@
         var pt2 = points[facetEdges[j][1]];
         var cr1 = new THREE.Vector3().fromArray(pt1);
         var cr2 = new THREE.Vector3().fromArray(pt2);
-        var conemesh = ConeMesh(cr1, 0.07, cr2, 0.07, 3, 30, "./textures/red.png");
+        var conemesh = ConeMesh(cr1, 0.04, cr2, 0.04, 3, 30, "./textures/red.png");
         object.add(conemesh);
       }
       //
@@ -329,9 +344,9 @@
 
   <script>
     // dat.gui controls --------------------------------------------------------
-    var z0 = 5.5;
+    var z0 = 2;
     var dgcontrols = new function() {
-      this.cameraz = 5.5;
+      this.cameraz = z0;
       this.rotationSpeed = 25;
     }
     var gui = new dat.GUI({
@@ -354,6 +369,10 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
     var scene = new THREE.Scene();
+    var ambientLight = new THREE.AmbientLight(0xcccccc, 0.4);
+    scene.add(ambientLight);
+    var pointLight = new THREE.PointLight(0xffffff, 0.8);
+    camera.add(pointLight);
     scene.add(camera);
     // render function
     window.requestAnimFrame = (function() {
