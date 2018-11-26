@@ -299,7 +299,7 @@
     var Objects = new Array(180);
     for (var i = 0; i < 180; i++) {
       var points = vertices.map(function(vertex) {
-        return mstereo(rightIsoclinic(0, 0, 2 * i * Math.PI / 180, vertex), r2)
+        return mstereo(rightIsoclinic(Math.PI/2, 0, 2 * i * Math.PI / 180, vertex), r2)
       });
       //
       var object = new THREE.Object3D();
