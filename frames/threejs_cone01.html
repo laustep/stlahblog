@@ -29,6 +29,7 @@
     function Cmesh0(h, R, r, nstacks, nslices) {
       h = r < R ? h : -h;
       var d = r < R ? h * r / R : h * R / r;
+      var hdivhmd = h / (h - d);
       // grid ------------------------------------------------------------------
       nstacks = nstacks + 1;
       var u_ = new Array(nstacks);
@@ -39,8 +40,6 @@
       for (var i = 0; i < nslices; i++) {
         v_[i] = 2 * Math.PI * i / nslices;
       }
-      //
-      var hdivhmd = h / (h - d);
       // vertices & normals ----------------------------------------------------
       var vertices = new Array(nstacks * nslices);
       var normals = new Array(nstacks * nslices);
@@ -56,14 +55,13 @@
             r < R ? f_i : f_i - h
           );
           vertices[i * nslices + j] = v;
-          var vx = v.x; var vy = v.y;
           var t1 = new THREE.Vector3(
             - cosv,
             - sinv,
             hdivhmd
           );
           var t2 = new THREE.Vector3(
-            -vy, vx, 0
+            -v.y, v.x, 0
           )
           normals[i * nslices + j] = t1.cross(t2).normalize().negate();
         }
