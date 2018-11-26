@@ -28,8 +28,8 @@
     // basic mesh---------------------------------------------------------------
     // problems if R<r but anyway this case is never used by ConeMesh
     function Cmesh0(h, R, r, nstacks, nslices) {
-      h = r < R ? h : -h;
-      var ratio = r < R ? r / R : R / r;
+      h = r <= R ? h : -h;
+      var ratio = r <= R ? r / R : R / r;
       var k = (ratio-1)/h;
       // grid ------------------------------------------------------------------
       nstacks = nstacks + 1;
@@ -53,7 +53,7 @@
           var v = new THREE.Vector3(
             g * cosv,
             g * sinv,
-            r < R ? u_[i] : u_[i] - h // if R<r, cone is upside down...!
+            r <= R ? u_[i] : u_[i] - h // if R<r, cone is upside down...!
           );
           vertices[i * nslices + j] = v;
           var t1 = new THREE.Vector3(
@@ -121,7 +121,7 @@
       var wx = w.x; var wy = w.y;
       var s = Math.sqrt(w.x * w.x + w.y * w.y);
       if(s == 0){
-        return new THREE.Matrix4();
+        return conemesh0;
       }
       var u = new THREE.Vector3(wy / s, -wx / s, 0);
       var v = w.clone().cross(u);
