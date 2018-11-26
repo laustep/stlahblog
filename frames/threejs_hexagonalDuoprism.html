@@ -143,7 +143,7 @@
 
   <script>
     // basic mesh---------------------------------------------------------------
-    function Cmesh0(h, R, r, nstacks, nslices, texfile) {
+    function Cmesh0(h, R, r, nstacks, nslices, map) {
       if (r > R) {
         throw new Error("Ooops !");
       }
@@ -218,7 +218,7 @@
         }
       }
       var bufGeom = new THREE.BufferGeometry().fromGeometry(geom);
-      var map = new THREE.TextureLoader().load(texfile);
+      // var map = new THREE.TextureLoader().load(texfile);
       // map.wrapS = map.wrapT = THREE.RepeatWrapping;
       // map.anisotropy = 16;
       // map.repeat = new THREE.Vector2(13, 13);
@@ -229,9 +229,9 @@
     }
 
     // general cone mesh -------------------------------------------------------
-    function ConeMesh(cr1, r1, cr2, r2, nstacks, nslices, texfile) {
+    function ConeMesh(cr1, r1, cr2, r2, nstacks, nslices, map) {
       if (r2 > r1) {
-        return ConeMesh(cr2, r2, cr1, r1, nstacks, nslices, texfile);
+        return ConeMesh(cr2, r2, cr1, r1, nstacks, nslices, map);
       }
       var w0 = cr2.sub(cr1);
       var conemesh0 = Cmesh0(w0.length(), r1, r2, nstacks, nslices, texfile);
@@ -294,6 +294,8 @@
   </script>
 
   <script>
+    var map_whitesmoke = new THREE.TextureLoader().load("./textures/whitesmoke.png");
+    var map_red = new THREE.TextureLoader().load("./textures/red.png");
     var Objects = new Array(180);
     for (var i = 0; i < 180; i++) {
       var points = vertices.map(function(vertex) {
@@ -305,8 +307,8 @@
       for (var j = 0; j < facetVertices.length; j++) {
         var index = facetVertices[j];
         var geoSphere = new THREE.SphereBufferGeometry(0.06, 16, 16);
-        var map = new THREE.TextureLoader().load("./textures/red.png");
-        var material = new THREE.MeshPhongMaterial({ map: map });
+        // var map = new THREE.TextureLoader().load("./textures/red.png");
+        var material = new THREE.MeshPhongMaterial({ map: map_red });
         var sphere = new THREE.Mesh(geoSphere, material);
         sphere.position.set(points[index][0], points[index][1], points[index][2]);
         object.add(sphere);
@@ -314,8 +316,8 @@
       for (var j = 0; j < otherVertices.length; j++) {
         var index = otherVertices[j];
         var geoSphere = new THREE.SphereBufferGeometry(0.06, 16, 16);
-        var map = new THREE.TextureLoader().load("./textures/whitesmoke.png");
-        var material = new THREE.MeshPhongMaterial({ map: map });
+        // var map = new THREE.TextureLoader().load("./textures/whitesmoke.png");
+        var material = new THREE.MeshPhongMaterial({ map: map_whitesmoke });
         var sphere = new THREE.Mesh(geoSphere, material);
         sphere.position.set(points[index][0], points[index][1], points[index][2]);
         object.add(sphere);
@@ -326,7 +328,7 @@
         var pt2 = points[otherEdges[j][1]];
         var cr1 = new THREE.Vector3().fromArray(pt1);
         var cr2 = new THREE.Vector3().fromArray(pt2);
-        var conemesh = ConeMesh(cr1, 0.04, cr2, 0.04, 3, 30, "./textures/whitesmoke.png");
+        var conemesh = ConeMesh(cr1, 0.04, cr2, 0.04, 3, 30, map_whitesmoke);
         object.add(conemesh);
       }
       for (var j = 0; j < facetEdges.length; j++) {
@@ -334,7 +336,7 @@
         var pt2 = points[facetEdges[j][1]];
         var cr1 = new THREE.Vector3().fromArray(pt1);
         var cr2 = new THREE.Vector3().fromArray(pt2);
-        var conemesh = ConeMesh(cr1, 0.04, cr2, 0.04, 3, 30, "./textures/red.png");
+        var conemesh = ConeMesh(cr1, 0.04, cr2, 0.04, 3, 30, map_red);
         object.add(conemesh);
       }
       //
