@@ -19,10 +19,12 @@
   <script>
     var pi = Math.PI;
     var scale = 0.4;
-    var uSteps = 149, vSteps = 149;
+    var uSteps = 149,
+      vSteps = 149;
   </script>
 
   <script>
+    // twenty points on the unit sphere ----------------------------------------
     var phi = (1 + Math.sqrt(5)) / 2;
     var a = 1 / Math.sqrt(3);
     var b = a / phi;
@@ -52,6 +54,7 @@
   </script>
 
   <script>
+    // translate and reorient --------------------------------------------------
     function translateAndReorient(axis, vector) {
       var vX1 = axis.normalize();
       var vX2 = vector.normalize();
@@ -71,7 +74,7 @@
         0, 0, 0, 1);
       return A;
     }
-    // Get the rotation transforming U to V
+    // Get the rotation transforming U to V ------------------------------------
     function getRotation(U, V) {
       var ma = U.length();
       var mb = V.length(); // should be = ma
@@ -83,7 +86,7 @@
       var quat = new THREE.Quaternion().set(W.x, W.y, W.z, c / ma2);
       return new THREE.Matrix4().makeRotationFromQuaternion(quat);
     }
-
+    //
     function addTransReorientedMesh(geom, material, object, axis, vector) {
       var mesh = new THREE.Mesh(geom, material);
       var transfoMatrix = translateAndReorient(axis, vector);
@@ -99,13 +102,14 @@
   </script>
 
   <script>
-    // parameterization -------------------------------------------------
+    // parameterization --------------------------------------------------------
     function f0(u, v) {
       // both u and v run from zero to one in Three.js
       var x = u;
       var theta = 2 * pi + 16 * pi * v;
       phi = pi / 2 * Math.exp(-theta / (8 * pi))
-      var beta = 1 - (1 / 2) * ((5 / 4) * (1 - ((3.6 * theta) % (2 * pi)) / pi) ** 2 - 1 / 4) ** 2
+      var beta = 1 - (1 / 2) *
+        ((5 / 4) * (1 - ((3.6 * theta) % (2 * pi)) / pi) ** 2 - 1 / 4) ** 2
       var y = 1.95653 * x ** 2 * (1.27689 * x - 1) ** 2 * Math.sin(phi)
       var r = beta * (x * Math.sin(phi) + y * Math.cos(phi))
       return new THREE.Vector3(
@@ -114,6 +118,7 @@
         beta * (x * Math.cos(phi) - y * Math.sin(phi))
       ).multiplyScalar(scale);
     }
+
     function g() {
       return function f(u, v, vector) {
         var out = f0(u, v);
@@ -123,7 +128,7 @@
   </script>
 
   <script>
-    // dat.gui controls -------------------------------------------------
+    // dat.gui controls --------------------------------------------------------
     var z0 = 2.7;
     var dgcontrols = new function() {
       this.rotationSpeed = 0.001;
@@ -133,12 +138,14 @@
       autoplace: false,
       width: 300
     });
-    gui.add(dgcontrols, 'cameraz').min(2).max(10).step(0.1).name("Camera position");
-    gui.add(dgcontrols, 'rotationSpeed').min(0).max(0.005).name("Rotation speed");
+    gui.add(dgcontrols, 'cameraz').min(2).max(10).step(0.1)
+      .name("Camera position");
+    gui.add(dgcontrols, 'rotationSpeed').min(0).max(0.005)
+      .name("Rotation speed");
   </script>
 
   <script>
-    // three.js scene ---------------------------------------------------
+    // three.js scene ----------------------------------------------------------
     var scene = new THREE.Scene();
     var aspect = window.innerWidth / window.innerHeight;
     var camera = new THREE.PerspectiveCamera(75, aspect, 1, 10000);
@@ -163,13 +170,12 @@
       map: map_red,
       side: THREE.DoubleSide
     });
-//    var material = new THREE.MeshNormalMaterial({ wireframe: false, side: THREE.DoubleSide });
     var h = 1;
     var epsilon = 0.1;
-    var coneGeom = new THREE.ConeBufferGeometry(0.04, h+epsilon, 32)
-                        .translate(0, -(h+epsilon) / 2, 0);
-//    var coneMaterial = new THREE.MeshNormalMaterial({ wireframe: false });
-    var map_green = new THREE.TextureLoader().load('textures/darkolivegreen.png');
+    var coneGeom = new THREE.ConeBufferGeometry(0.04, h + epsilon, 32)
+      .translate(0, -(h + epsilon) / 2, 0);
+    var map_green = new THREE.TextureLoader()
+      .load('textures/darkolivegreen.png');
     var coneMaterial = new THREE.MeshPhongMaterial({
       map: map_green
     });
@@ -198,7 +204,7 @@
   </script>
 
   <script>
-    // dragging & animation  ------------------------------------------
+    // dragging ----------------------------------------------------------------
     var isDragging = false;
     var previousMousePosition = {
       x: 0,
@@ -235,7 +241,7 @@
   </script>
 
   <script>
-    // render -----------------------------------------------------------
+    // render ------------------------------------------------------------------
     render();
   </script>
 

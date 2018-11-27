@@ -24,7 +24,7 @@
         var scale = 0.03;
     </script>
 
-    <script>
+    <script> // twenty points on the unit ball ---------------------------------
         var phi = (1 + Math.sqrt(5)) / 2;
         var a = 1 / Math.sqrt(3);
         var b = a / phi;
@@ -53,15 +53,18 @@
     </script>
 
     <script>
+        // translate and reorient ----------------------------------------------
         function reorient(axis1, axis2) {
             var vX1 = axis1.normalize();
             var vX2 = axis2.normalize();
             var vY = vX1.clone().cross(vX2).normalize();
             var vZ1 = vX1.clone().cross(vY).normalize();
             var vZ2 = vX2.clone().cross(vY).normalize();
-            var M1array = [vX1.x, vX1.y, vX1.z, vY.x, vY.y, vY.z, vZ1.x, vZ1.y, vZ1.z];
+            var M1array =
+              [vX1.x, vX1.y, vX1.z, vY.x, vY.y, vY.z, vZ1.x, vZ1.y, vZ1.z];
             var M1 = new THREE.Matrix3().fromArray(M1array);
-            var M2array = [vX2.x, vY.x, vZ2.x, vX2.y, vY.y, vZ2.y, vX2.z, vY.z, vZ2.z];
+            var M2array =
+              [vX2.x, vY.x, vZ2.x, vX2.y, vY.y, vZ2.y, vX2.z, vY.z, vZ2.z];
             var M2 = new THREE.Matrix3().fromArray(M2array);
             var M = M1.clone().multiply(M2);
             var elems = M.elements;
@@ -72,7 +75,7 @@
                 0, 0, 0, 1);
             return A;
         }
-        // Get the rotation transforming U to V
+        // Get the rotation transforming U to V --------------------------------
         function getRotation(U, V) {
             var ma = U.length();
             var mb = V.length(); // should be = ma
@@ -84,13 +87,7 @@
             var quat = new THREE.Quaternion().set(W.x, W.y, W.z, c / ma2);
             return new THREE.Matrix4().makeRotationFromQuaternion(quat);
         }
-        // var u = new THREE.Vector3(1, 0, 0);
-        // var v = new THREE.Vector3(1, 2, 3).normalize();
-        // var R = getRotation(u, v).transpose().elements;
-        // console.log(R[0] * u.x + R[1] * u.y + R[2] * u.z);
-        // console.log(R[4] * u.x + R[5] * u.y + R[6] * u.z);
-        // console.log(R[8] * u.x + R[9] * u.y + R[10] * u.z);
-        // console.log(R);
+        //
         function addReorientedMesh(geom, material, object, axis1, axis2) {
             var mesh = new THREE.Mesh(geom, material);
             var transfoMatrix = reorient(axis1, axis2);
@@ -105,7 +102,7 @@
         }
     </script>
 
-    <script> // parameterization -------------------------------------------------
+    <script> // parameterization -----------------------------------------------
         function f0(u, v, A, n) {
             // both u and v run from zero to one in Three.js
             var t = n * 2 * pi * u;
@@ -125,7 +122,11 @@
             var x4 = sinphi * y1;
             var x2 = cosphi * y2 - sinphi * y3;
             var x1 = cosphi * y3 + sinphi * y2;
-            return new THREE.Vector3(x1 / (1 - x4), x2 / (1 - x4), x3 / (1 - x4)).multiplyScalar(scale);
+            return new THREE.Vector3(
+              x1 / (1 - x4),
+              x2 / (1 - x4),
+              x3 / (1 - x4)
+            ).multiplyScalar(scale);
         }
         function g(A, n) {
             return function f(u, v, vector) {
@@ -135,17 +136,19 @@
         }
     </script>
 
-    <script> // dat.gui controls -------------------------------------------------
+    <script> // dat.gui controls -----------------------------------------------
         var dgcontrols = new function () {
             this.rotationSpeed = 0.001;
             this.cameraz = 2.2;
         }
         var gui = new dat.GUI({ autoplace: false, width: 300 });
-        gui.add(dgcontrols, 'cameraz').min(2.2).max(10).step(0.1).name("Camera position");
-        gui.add(dgcontrols, 'rotationSpeed').min(0).max(0.005).name("Rotation speed");
+        gui.add(dgcontrols, 'cameraz').min(2.2).max(10).step(0.1)
+          .name("Camera position");
+        gui.add(dgcontrols, 'rotationSpeed').min(0).max(0.005)
+          .name("Rotation speed");
     </script>
 
-    <script> // three.js scene ---------------------------------------------------
+    <script> // three.js scene -------------------------------------------------
         var scene = new THREE.Scene();
         var aspect = window.innerWidth / window.innerHeight;
         var camera = new THREE.PerspectiveCamera(75, aspect, 1, 10000);
@@ -159,7 +162,6 @@
         var object = new THREE.Object3D();
         var axis1 = new THREE.Vector3(0, 0, 1);
         var bufGeom = new THREE.ParametricBufferGeometry(g(A, n), uSteps, vSteps);
-        //var bufGeom = new THREE.BufferGeometry().fromGeometry(geometry);
         var ambientLight = new THREE.AmbientLight(0xcccccc, 0.4);
         scene.add(ambientLight);
         var pointLight = new THREE.PointLight(0xffffff, 0.8);
@@ -172,8 +174,9 @@
         var material = new THREE.MeshPhongMaterial({ map: map });
         //var material = new THREE.MeshNormalMaterial({ wireframe: false });
         var h = Math.sqrt(3 * a * a);
-        var coneGeom = new THREE.ConeBufferGeometry(0.04, h, 32).translate(0, -h / 2, 0);
-        var coneMaterial = new THREE.MeshNormalMaterial({ wireframe: false }); // new THREE.MeshBasicMaterial({ color: 0x556b2f });
+        var coneGeom = new THREE.ConeBufferGeometry(0.04, h, 32)
+          .translate(0, -h / 2, 0);
+        var coneMaterial = new THREE.MeshNormalMaterial({ wireframe: false });
         for (var i = 0; i < 20; i++) {
             var axis2 = new THREE.Vector3().fromArray(points[i]);
             addReorientedMesh(bufGeom, material, object, axis1, axis2);
@@ -198,7 +201,7 @@
         }
     </script>
 
-    <script> // dragging & animation  ------------------------------------------
+    <script> // dragging -------------------------------------------------------
         var isDragging = false;
         var previousMousePosition = { x: 0, y: 0 };
 
@@ -231,9 +234,8 @@
         });
     </script>
 
-    <script> // render -----------------------------------------------------------
+    <script> // render ---------------------------------------------------------
         render();
-        requestAnimFrame(render);
     </script>
 
 </body>
