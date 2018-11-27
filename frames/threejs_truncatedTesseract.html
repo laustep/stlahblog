@@ -239,7 +239,7 @@
   </script>
 
   <script>
-    // basic mesh---------------------------------------------------------------
+    // basic cone mesh ---------------------------------------------------------
     function Cmesh0(h, R, r, nstacks, nslices) {
       if(r>R){
         throw new Error("Ooops !");
@@ -281,7 +281,7 @@
           normals[i * nslices + j] = t1.cross(t2).normalize().negate();
         }
       }
-      // mesh --------------------------------------------------------------------
+      // mesh ------------------------------------------------------------------
       var geom = new THREE.Geometry();
       for (var i = 0; i < (nstacks - 1); i++) {
         for (var j = 0; j < nslices; j++) {
@@ -321,7 +321,6 @@
         }));
       return conemesh;
     }
-
     // general cone mesh -------------------------------------------------------
     function ConeMesh(cr1, r1, cr2, r2, nstacks, nslices) {
       if (r2 > r1) {
@@ -449,7 +448,7 @@
     // dat.gui controls --------------------------------------------------------
     var z0 = 5.5;
     var dgcontrols = new function () {
-      this.cameraz = 5.5;
+      this.cameraz = z0;
       this.rotationSpeed = 25;
     }
     var gui = new dat.GUI({
