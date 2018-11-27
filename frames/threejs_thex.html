@@ -1,0 +1,538 @@
+<html>
+
+<head>
+  <title>Thex (truncated 16-cell)</title>
+  <style>
+    canvas {
+      width: 100%;
+      height: 100%
+    }
+  </style>
+</head>
+
+<body>
+  <script src="../libraries/three.min.js"></script>
+  <script src="../libraries/jquery.min.js"></script>
+  <script src="../libraries/dat.gui.min.js"></script>
+
+  <script>
+    // vertices  ---------------------------------------------------------------
+    var r = Math.sqrt(5);
+    var r2 = 5;
+    var vertices = [
+      [ 0 , 0 , -1 , -2 ]
+    , [ 0 , 0 , -1 , 2 ]
+    , [ 0 , 0 , 1 , -2 ]
+    , [ 0 , 0 , 1 , 2 ]
+    , [ 0 , 0 , -2 , -1 ]
+    , [ 0 , 0 , 2 , -1 ]
+    , [ 0 , 0 , -2 , 1 ]
+    , [ 0 , 0 , 2 , 1 ]
+    , [ 0 , -1 , 0 , -2 ]
+    , [ 0 , -1 , 0 , 2 ]
+    , [ 0 , 1 , 0 , -2 ]
+    , [ 0 , 1 , 0 , 2 ]
+    , [ 0 , -1 , -2 , 0 ]
+    , [ 0 , -1 , 2 , 0 ]
+    , [ 0 , 1 , -2 , 0 ]
+    , [ 0 , 1 , 2 , 0 ]
+    , [ 0 , -2 , 0 , -1 ]
+    , [ 0 , 2 , 0 , -1 ]
+    , [ 0 , -2 , 0 , 1 ]
+    , [ 0 , 2 , 0 , 1 ]
+    , [ 0 , -2 , -1 , 0 ]
+    , [ 0 , 2 , -1 , 0 ]
+    , [ 0 , -2 , 1 , 0 ]
+    , [ 0 , 2 , 1 , 0 ]
+    , [ -1 , 0 , 0 , -2 ]
+    , [ -1 , 0 , 0 , 2 ]
+    , [ 1 , 0 , 0 , -2 ]
+    , [ 1 , 0 , 0 , 2 ]
+    , [ -1 , 0 , -2 , 0 ]
+    , [ -1 , 0 , 2 , 0 ]
+    , [ 1 , 0 , -2 , 0 ]
+    , [ 1 , 0 , 2 , 0 ]
+    , [ -1 , -2 , 0 , 0 ]
+    , [ -1 , 2 , 0 , 0 ]
+    , [ 1 , -2 , 0 , 0 ]
+    , [ 1 , 2 , 0 , 0 ]
+    , [ -2 , 0 , 0 , -1 ]
+    , [ 2 , 0 , 0 , -1 ]
+    , [ -2 , 0 , 0 , 1 ]
+    , [ 2 , 0 , 0 , 1 ]
+    , [ -2 , 0 , -1 , 0 ]
+    , [ 2 , 0 , -1 , 0 ]
+    , [ -2 , 0 , 1 , 0 ]
+    , [ 2 , 0 , 1 , 0 ]
+    , [ -2 , -1 , 0 , 0 ]
+    , [ 2 , -1 , 0 , 0 ]
+    , [ -2 , 1 , 0 , 0 ]
+    , [ 2 , 1 , 0 , 0 ] ];
+    // edges -------------------------------------------------------------------
+    var edges = [
+      [ 0 , 4 ]
+    , [ 0 , 8 ]
+    , [ 0 , 10 ]
+    , [ 0 , 24 ]
+    , [ 0 , 26 ]
+    , [ 1 , 6 ]
+    , [ 1 , 9 ]
+    , [ 1 , 11 ]
+    , [ 1 , 25 ]
+    , [ 1 , 27 ]
+    , [ 2 , 5 ]
+    , [ 2 , 8 ]
+    , [ 2 , 10 ]
+    , [ 2 , 24 ]
+    , [ 2 , 26 ]
+    , [ 3 , 7 ]
+    , [ 3 , 9 ]
+    , [ 3 , 11 ]
+    , [ 3 , 25 ]
+    , [ 3 , 27 ]
+    , [ 4 , 12 ]
+    , [ 4 , 14 ]
+    , [ 4 , 28 ]
+    , [ 4 , 30 ]
+    , [ 5 , 13 ]
+    , [ 5 , 15 ]
+    , [ 5 , 29 ]
+    , [ 5 , 31 ]
+    , [ 6 , 12 ]
+    , [ 6 , 14 ]
+    , [ 6 , 28 ]
+    , [ 6 , 30 ]
+    , [ 7 , 13 ]
+    , [ 7 , 15 ]
+    , [ 7 , 29 ]
+    , [ 7 , 31 ]
+    , [ 8 , 16 ]
+    , [ 8 , 24 ]
+    , [ 8 , 26 ]
+    , [ 9 , 18 ]
+    , [ 9 , 25 ]
+    , [ 9 , 27 ]
+    , [ 10 , 17 ]
+    , [ 10 , 24 ]
+    , [ 10 , 26 ]
+    , [ 11 , 19 ]
+    , [ 11 , 25 ]
+    , [ 11 , 27 ]
+    , [ 12 , 20 ]
+    , [ 12 , 28 ]
+    , [ 12 , 30 ]
+    , [ 13 , 22 ]
+    , [ 13 , 29 ]
+    , [ 13 , 31 ]
+    , [ 14 , 21 ]
+    , [ 14 , 28 ]
+    , [ 14 , 30 ]
+    , [ 15 , 23 ]
+    , [ 15 , 29 ]
+    , [ 15 , 31 ]
+    , [ 16 , 20 ]
+    , [ 16 , 22 ]
+    , [ 16 , 32 ]
+    , [ 16 , 34 ]
+    , [ 17 , 21 ]
+    , [ 17 , 23 ]
+    , [ 17 , 33 ]
+    , [ 17 , 35 ]
+    , [ 18 , 20 ]
+    , [ 18 , 22 ]
+    , [ 18 , 32 ]
+    , [ 18 , 34 ]
+    , [ 19 , 21 ]
+    , [ 19 , 23 ]
+    , [ 19 , 33 ]
+    , [ 19 , 35 ]
+    , [ 20 , 32 ]
+    , [ 20 , 34 ]
+    , [ 21 , 33 ]
+    , [ 21 , 35 ]
+    , [ 22 , 32 ]
+    , [ 22 , 34 ]
+    , [ 23 , 33 ]
+    , [ 23 , 35 ]
+    , [ 24 , 36 ]
+    , [ 25 , 38 ]
+    , [ 26 , 37 ]
+    , [ 27 , 39 ]
+    , [ 28 , 40 ]
+    , [ 29 , 42 ]
+    , [ 30 , 41 ]
+    , [ 31 , 43 ]
+    , [ 32 , 44 ]
+    , [ 33 , 46 ]
+    , [ 34 , 45 ]
+    , [ 35 , 47 ]
+    , [ 36 , 40 ]
+    , [ 36 , 42 ]
+    , [ 36 , 44 ]
+    , [ 36 , 46 ]
+    , [ 37 , 41 ]
+    , [ 37 , 43 ]
+    , [ 37 , 45 ]
+    , [ 37 , 47 ]
+    , [ 38 , 40 ]
+    , [ 38 , 42 ]
+    , [ 38 , 44 ]
+    , [ 38 , 46 ]
+    , [ 39 , 41 ]
+    , [ 39 , 43 ]
+    , [ 39 , 45 ]
+    , [ 39 , 47 ]
+    , [ 40 , 44 ]
+    , [ 40 , 46 ]
+    , [ 41 , 45 ]
+    , [ 41 , 47 ]
+    , [ 42 , 44 ]
+    , [ 42 , 46 ]
+    , [ 43 , 45 ]
+    , [ 43 , 47 ] ];
+    // octahedra ---------------------------------------------------------------
+    var octahedra = [
+      [17, 19, 21, 23, 33, 35],
+      [0, 2, 8, 10, 24, 26],
+      [1, 3, 9, 11, 25, 27],
+      [5, 7, 13, 15, 29, 31],
+      [16, 18, 20, 22, 32, 34],
+      [36, 38, 40, 42, 44, 46],
+      [4, 6, 12, 14, 28, 30],
+      [37, 39, 41, 43, 45, 47]
+    ];
+  </script>
+
+  <script>
+    // basic cone mesh ---------------------------------------------------------
+    function Cmesh0(h, R, r, nstacks, nslices, material) {
+      if(r>R){
+        throw new Error("Ooops !");
+      }
+      var ratio = r / R;
+      var k = (ratio - 1) / h;
+      // grid ------------------------------------------------------------------
+      nstacks = nstacks + 1;
+      var u_ = new Array(nstacks);
+      for (var i = 0; i < nstacks; i++) {
+        u_[i] = h * i / (nstacks - 1);
+      }
+      var v_ = new Array(nslices);
+      for (var i = 0; i < nslices; i++) {
+        v_[i] = 2 * Math.PI * i / nslices;
+      }
+      // vertices & normals ----------------------------------------------------
+      var vertices = new Array(nstacks * nslices);
+      var normals = new Array(nstacks * nslices);
+      for (var i = 0; i < nstacks; i++) {
+        var g = 1 + k * u_[i];
+        for (var j = 0; j < nslices; j++) {
+          var cosv = R * Math.cos(v_[j]);
+          var sinv = R * Math.sin(v_[j]);
+          var v = new THREE.Vector3(
+            g * cosv,
+            g * sinv,
+            u_[i]
+          );
+          vertices[i * nslices + j] = v;
+          var t1 = new THREE.Vector3(
+            k * cosv,
+            k * sinv,
+            1
+          );
+          var t2 = new THREE.Vector3(
+            -v.y, v.x, 0
+          )
+          normals[i * nslices + j] = t1.cross(t2).normalize().negate();
+        }
+      }
+      // mesh ------------------------------------------------------------------
+      var geom = new THREE.Geometry();
+      for (var i = 0; i < (nstacks - 1); i++) {
+        for (var j = 0; j < nslices; j++) {
+          var jp1 = j == nslices - 1 ? 0 : j + 1;
+          geom.vertices.push(vertices[i * nslices + j]);
+          geom.vertices.push(vertices[i * nslices + jp1]);
+          geom.vertices.push(vertices[(i + 1) * nslices + j]);
+          geom.faces.push(new THREE.Face3(
+            6 * (i * nslices + j),
+            6 * (i * nslices + j) + 1,
+            6 * (i * nslices + j) + 2,
+            [
+              normals[i * nslices + j],
+              normals[i * nslices + jp1],
+              normals[(i + 1) * nslices + j]
+            ]
+          ));
+          geom.vertices.push(vertices[(i + 1) * nslices + j]);
+          geom.vertices.push(vertices[i * nslices + jp1]);
+          geom.vertices.push(vertices[(i + 1) * nslices + jp1]);
+          geom.faces.push(new THREE.Face3(
+            6 * (i * nslices + j) + 3,
+            6 * (i * nslices + j) + 4,
+            6 * (i * nslices + j) + 5,
+            [
+              normals[(i + 1) * nslices + j],
+              normals[i * nslices + jp1],
+              normals[(i + 1) * nslices + jp1]
+            ]
+          ));
+        }
+      }
+      var bufGeom = new THREE.BufferGeometry().fromGeometry(geom);
+      var conemesh = new THREE.Mesh(bufGeom, material);
+      return conemesh;
+    }
+    // general cone mesh -------------------------------------------------------
+    function ConeMesh(cr1, r1, cr2, r2, nstacks, nslices, material) {
+      if (r2 > r1) {
+        return ConeMesh(cr2, r2, cr1, r1, nstacks, nslices, material);
+      }
+      var w0 = cr2.sub(cr1);
+      var conemesh0 = Cmesh0(w0.length(), r1, r2, nstacks, nslices, material);
+      var w = w0.normalize();
+      var wx = w.x; var wy = w.y;
+      var s = Math.sqrt(wx * wx + wy * wy);
+      if (s == 0) {
+        var coef = w.z > 0 ? 1 : -1;
+        var m = new THREE.Matrix4().set(
+          1, 0, 0, cr1.x,
+          0, coef, 0, cr1.y,
+          0, 0, coef, cr1.z,
+          0, 0, 0, 1
+        )
+        conemesh0.matrix = m;
+        conemesh0.matrixAutoUpdate = false;
+        return conemesh0;
+      }
+      var u = new THREE.Vector3(wy / s, -wx / s, 0);
+      var v = w.clone().cross(u);
+      var m = new THREE.Matrix4().set(
+        u.x, v.x, w.x, cr1.x,
+        u.y, v.y, w.y, cr1.y,
+        u.z, v.z, w.z, cr1.z,
+        0, 0, 0, 1
+      )
+      conemesh0.matrix = m;
+      conemesh0.matrixAutoUpdate = false;
+      return conemesh0;
+    }
+  </script>
+
+  <script>
+    // rotation in 4D space
+    function rightIsoclinic(theta, phi, alpha, x) {
+      var x0 = x[0], x1 = x[1], x2 = x[2], x3 = x[3];
+      var q0 = Math.cos(alpha);
+      var q1 = Math.sin(theta) * Math.cos(phi) * Math.sin(alpha);
+      var q2 = Math.sin(theta) * Math.sin(phi) * Math.sin(alpha);
+      var q3 = Math.cos(theta) * Math.sin(alpha);
+      return [
+        q0 * x0 - q1 * x1 - q2 * x2 - q3 * x3,
+        q1 * x0 + q0 * x1 + q3 * x2 - q2 * x3,
+        q2 * x0 - q3 * x1 + q0 * x2 + q1 * x3,
+        q3 * x0 + q2 * x1 - q1 * x2 + q0 * x3
+      ];
+    }
+    // stereographic projection
+    function stereo(x, r) {
+      return [x[0] / (r - x[3]), x[1] / (r - x[3]), x[2] / (r - x[3])];
+    }
+    function mstereo(x, r2) {
+      var c = Math.acos(x[3]/r)/Math.PI/Math.sqrt(r2 - x[3]*x[3]);
+      return [c*x[0], c*x[1], c*x[2]];
+    }
+  </script>
+
+  <script>
+    var map_gold = new THREE.TextureLoader().load("./textures/gold.png");
+    var material = new THREE.MeshPhongMaterial({ map: map_gold });
+    var Objects = new Array(180);
+    for (var i = 0; i < 180; i++) {
+      var points = vertices.map(function (vertex) {
+        return mstereo(rightIsoclinic(Math.PI/4, Math.PI/4,
+          2 * i * Math.PI / 180, vertex), r2)
+      });
+      //
+      var object = new THREE.Object3D();
+      // vertices -> spheres
+      for (var j = 0; j < vertices.length; j++) {
+        var geoSphere = new THREE.SphereBufferGeometry(0.02, 16, 16);
+        var sphere = new THREE.Mesh(geoSphere, material);
+        sphere.position.set(points[j][0], points[j][1], points[j][2]);
+        object.add(sphere);
+      }
+      // edges
+      for (var j = 0; j < edges.length; j++) {
+        var pt1 = points[edges[j][0]];
+        var pt2 = points[edges[j][1]];
+        var cr1 = new THREE.Vector3().fromArray(pt1);
+        var cr2 = new THREE.Vector3().fromArray(pt2);
+        var conemesh = ConeMesh(cr1, 0.015, cr2, 0.015, 3, 30, material);
+        object.add(conemesh);
+      }
+      // tetrahedra
+      [17, 19, 21, 23, 33, 35]
+      for (var j = 0; j < octahedra.length; j++) {
+        var geoOctahedron = new THREE.Geometry();
+        var indices = octahedra[j];
+        geoOctahedron.vertices.push(
+          new THREE.Vector3().fromArray(points[indices[0]]),
+          new THREE.Vector3().fromArray(points[indices[2]]),
+          new THREE.Vector3().fromArray(points[indices[4]])
+        );
+        geoOctahedron.faces.push(new THREE.Face3(0, 1, 2));
+        geoOctahedron.vertices.push(
+          new THREE.Vector3().fromArray(points[indices[0]]),
+          new THREE.Vector3().fromArray(points[indices[2]]),
+          new THREE.Vector3().fromArray(points[indices[5]])
+        );
+        geoOctahedron.faces.push(new THREE.Face3(3, 4, 5));
+        geoOctahedron.vertices.push(
+          new THREE.Vector3().fromArray(points[indices[0]]),
+          new THREE.Vector3().fromArray(points[indices[3]]),
+          new THREE.Vector3().fromArray(points[indices[4]])
+        );
+        geoOctahedron.faces.push(new THREE.Face3(6, 7, 8));
+        geoOctahedron.vertices.push(
+          new THREE.Vector3().fromArray(points[indices[0]]),
+          new THREE.Vector3().fromArray(points[indices[3]]),
+          new THREE.Vector3().fromArray(points[indices[5]])
+        );
+        geoOctahedron.faces.push(new THREE.Face3(9, 10, 11));
+        geoOctahedron.vertices.push(
+          new THREE.Vector3().fromArray(points[indices[1]]),
+          new THREE.Vector3().fromArray(points[indices[2]]),
+          new THREE.Vector3().fromArray(points[indices[4]])
+        );
+        geoOctahedron.faces.push(new THREE.Face3(12, 13, 14));
+        geoOctahedron.vertices.push(
+          new THREE.Vector3().fromArray(points[indices[1]]),
+          new THREE.Vector3().fromArray(points[indices[2]]),
+          new THREE.Vector3().fromArray(points[indices[5]])
+        );
+        geoOctahedron.faces.push(new THREE.Face3(15, 16, 17));
+        geoOctahedron.vertices.push(
+          new THREE.Vector3().fromArray(points[indices[1]]),
+          new THREE.Vector3().fromArray(points[indices[3]]),
+          new THREE.Vector3().fromArray(points[indices[4]])
+        );
+        geoOctahedron.faces.push(new THREE.Face3(18, 19, 20));
+        geoOctahedron.vertices.push(
+          new THREE.Vector3().fromArray(points[indices[1]]),
+          new THREE.Vector3().fromArray(points[indices[3]]),
+          new THREE.Vector3().fromArray(points[indices[5]])
+        );
+        geoOctahedron.faces.push(new THREE.Face3(21, 22, 23));
+        var octaMaterial = new THREE.MeshBasicMaterial({
+          color: 0xff00ff,
+          transparent: true,
+          opacity: 0.3,
+          side: THREE.DoubleSide
+        });
+        var octahedron = new THREE.Mesh(geoOctahedron, octaMaterial);
+        object.add(octahedron);
+      }
+      //
+      Objects[i] = object;
+    }
+  </script>
+
+  <script>
+    // dat.gui controls --------------------------------------------------------
+    var z0 = 2;
+    var dgcontrols = new function () {
+      this.cameraz = z0;
+      this.rotationSpeed = 25;
+    }
+    var gui = new dat.GUI({
+      autoplace: false,
+      width: 300
+    });
+    gui.add(dgcontrols, 'cameraz').min(1).max(3).step(0.25)
+      .name("Camera position");
+    gui.add(dgcontrols, 'rotationSpeed').min(1).max(100).step(3)
+      .name("Speed of 4D rotation");
+  </script>
+
+  <script>
+    // three.js scene ---------------------------------------------------
+    var scene = new THREE.Scene();
+    var aspect = window.innerWidth / window.innerHeight;
+    var camera = new THREE.PerspectiveCamera(75, aspect, 1, 10000);
+    camera.position.z = z0;
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+    var scene = new THREE.Scene();
+    scene.add(camera);
+    // render function
+    window.requestAnimFrame = (function () {
+      return window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        function (callback) {
+          window.setTimeout(callback, 1000 / 60);
+        };
+    })();
+    var k = 0;
+    function render() {
+      var object = Objects[k];
+      scene.add(object);
+      renderer.render(scene, camera);
+      camera.position.z = dgcontrols.cameraz;
+      scene.remove(object);
+      k += 1;
+      if (k == 180) {
+        k = 0;
+      }
+      setTimeout(function () {
+        requestAnimationFrame(render);
+      }, 1000 / dgcontrols.rotationSpeed);
+    }
+  </script>
+
+  <script>
+    // dragging ----------------------------------------------------------------
+    var isDragging = false;
+    var previousMousePosition = {
+      x: 0,
+      y: 0
+    };
+    $(renderer.domElement).on('mousedown', function (e) {
+      isDragging = true;
+    }).on('mousemove', function (e) {
+      var deltaMove = {
+        x: e.offsetX - previousMousePosition.x,
+        y: e.offsetY - previousMousePosition.y
+      };
+      if (isDragging) {
+        var deltaRotationQuaternion = new THREE.Quaternion()
+          .setFromEuler(new THREE.Euler(
+            Math.PI / 180 * (deltaMove.y * .5),
+            Math.PI / 180 * (deltaMove.x * .5),
+            0,
+            'XYZ'
+          ));
+        for (var i = 0; i < 180; i++) {
+          Objects[i].quaternion.multiplyQuaternions(deltaRotationQuaternion,
+            Objects[i].quaternion);
+        }
+      }
+      previousMousePosition = {
+        x: e.offsetX,
+        y: e.offsetY
+      };
+    });
+    $(document).on('mouseup', function (e) {
+      isDragging = false;
+    });
+  </script>
+
+  <script>
+    render();
+  </script>
+
+</body>
+
+</html>
