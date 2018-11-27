@@ -1,0 +1,244 @@
+<html>
+
+<head>
+  <title>Bouquet of roses</title>
+  <style>
+    canvas {
+      width: 100%;
+      height: 100%
+    }
+  </style>
+</head>
+
+<body>
+  <!-- <script src="http://mrdoob.github.com/three.js/build/three.min.js"></script> -->
+  <script src="../libraries/three.min.js"></script>
+  <script src="../libraries/jquery.min.js"></script>
+  <script src="../libraries/dat.gui.min.js"></script>
+
+  <script>
+    var pi = Math.PI;
+    var scale = 0.4;
+    var uSteps = 149, vSteps = 149;
+  </script>
+
+  <script>
+    var phi = (1 + Math.sqrt(5)) / 2;
+    var a = 1 / Math.sqrt(3);
+    var b = a / phi;
+    var c = a * phi;
+    var points = [
+      [a, a, a],
+      [a, a, -a],
+      [a, -a, a],
+      [-a, -a, a],
+      [-a, a, -a],
+      [-a, a, a],
+      [0, b, -c],
+      [0, -b, -c],
+      [0, -b, c],
+      [c, 0, -b],
+      [-c, 0, -b],
+      [-c, 0, b],
+      [b, c, 0],
+      [b, -c, 0],
+      [-b, -c, 0],
+      [-b, c, 0],
+      [0, b, c],
+      [a, -a, -a],
+      [c, 0, b],
+      [-a, -a, -a]
+    ];
+  </script>
+
+  <script>
+    function translateAndReorient(axis, vector) {
+      var vX1 = axis.normalize();
+      var vX2 = vector.normalize();
+      var vY = vX1.clone().cross(vX2).normalize();
+      var vZ1 = vX1.clone().cross(vY).normalize();
+      var vZ2 = vX2.clone().cross(vY).normalize();
+      var M1array = [vX1.x, vX1.y, vX1.z, vY.x, vY.y, vY.z, vZ1.x, vZ1.y, vZ1.z];
+      var M1 = new THREE.Matrix3().fromArray(M1array);
+      var M2array = [vX2.x, vY.x, vZ2.x, vX2.y, vY.y, vZ2.y, vX2.z, vY.z, vZ2.z];
+      var M2 = new THREE.Matrix3().fromArray(M2array);
+      var M = M1.clone().multiply(M2);
+      var elems = M.elements;
+      var A = new THREE.Matrix4();
+      A.set(elems[0], elems[1], elems[2], vector.x,
+        elems[3], elems[4], elems[5], vector.y,
+        elems[6], elems[7], elems[8], vector.z,
+        0, 0, 0, 1);
+      return A;
+    }
+    // Get the rotation transforming U to V
+    function getRotation(U, V) {
+      var ma = U.length();
+      var mb = V.length(); // should be = ma
+      var d = U.x * V.x + U.y * V.y + U.z * V.z;
+      var c = Math.sqrt(ma * mb + d);
+      var ma2 = Math.sqrt(2) * ma;
+      var r = 1 / ma2 / c;
+      var W = U.clone().cross(V).multiplyScalar(r);
+      var quat = new THREE.Quaternion().set(W.x, W.y, W.z, c / ma2);
+      return new THREE.Matrix4().makeRotationFromQuaternion(quat);
+    }
+
+    function addTransReorientedMesh(geom, material, object, axis, vector) {
+      var mesh = new THREE.Mesh(geom, material);
+      var transfoMatrix = translateAndReorient(axis, vector);
+      mesh.matrix = transfoMatrix;
+      mesh.matrixAutoUpdate = false;
+      object.add(mesh);
+      var cone = new THREE.Mesh(coneGeom, coneMaterial);
+      var B = getRotation(new THREE.Vector3(0, -h, 0), vector);
+      cone.matrix = B;
+      cone.matrixAutoUpdate = false;
+      object.add(cone);
+    }
+  </script>
+
+  <script>
+    // parameterization -------------------------------------------------
+    function f0(u, v) {
+      // both u and v run from zero to one in Three.js
+      var x = u;
+      var theta = 2 * pi + 16 * pi * v;
+      phi = pi / 2 * Math.exp(-theta / (8 * pi))
+      var beta = 1 - (1 / 2) * ((5 / 4) * (1 - ((3.6 * theta) % (2 * pi)) / pi) ** 2 - 1 / 4) ** 2
+      var y = 1.95653 * x ** 2 * (1.27689 * x - 1) ** 2 * Math.sin(phi)
+      var r = beta * (x * Math.sin(phi) + y * Math.cos(phi))
+      return new THREE.Vector3(
+        r * Math.cos(theta),
+        r * Math.sin(theta),
+        beta * (x * Math.cos(phi) - y * Math.sin(phi))
+      ).multiplyScalar(scale);
+    }
+    function g() {
+      return function f(u, v, vector) {
+        var out = f0(u, v);
+        vector.set(out.x, out.y, out.z);
+      }
+    }
+  </script>
+
+  <script>
+    // dat.gui controls -------------------------------------------------
+    var z0 = 2.7;
+    var dgcontrols = new function() {
+      this.rotationSpeed = 0.001;
+      this.cameraz = z0;
+    }
+    var gui = new dat.GUI({
+      autoplace: false,
+      width: 300
+    });
+    gui.add(dgcontrols, 'cameraz').min(2).max(10).step(0.1).name("Camera position");
+    gui.add(dgcontrols, 'rotationSpeed').min(0).max(0.005).name("Rotation speed");
+  </script>
+
+  <script>
+    // three.js scene ---------------------------------------------------
+    var scene = new THREE.Scene();
+    var aspect = window.innerWidth / window.innerHeight;
+    var camera = new THREE.PerspectiveCamera(75, aspect, 1, 10000);
+    camera.position.z = z0;
+
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x363940, 1);
+    document.body.appendChild(renderer.domElement);
+
+    var scene = new THREE.Scene();
+    var object = new THREE.Object3D();
+    var axis = new THREE.Vector3(0, 0, 1);
+    var bufGeom = new THREE.ParametricBufferGeometry(g(), uSteps, vSteps);
+    var ambientLight = new THREE.AmbientLight(0xcccccc, 0.4);
+    scene.add(ambientLight);
+    var pointLight = new THREE.PointLight(0xffffff, 0.8);
+    camera.add(pointLight);
+    scene.add(camera);
+    var map_red = new THREE.TextureLoader().load('textures/red.png');
+    var material = new THREE.MeshPhongMaterial({
+      map: map_red,
+      side: THREE.DoubleSide
+    });
+//    var material = new THREE.MeshNormalMaterial({ wireframe: false, side: THREE.DoubleSide });
+    var h = 1;
+    var epsilon = 0.1;
+    var coneGeom = new THREE.ConeBufferGeometry(0.04, h+epsilon, 32)
+                        .translate(0, -(h+epsilon) / 2, 0);
+//    var coneMaterial = new THREE.MeshNormalMaterial({ wireframe: false });
+    var map_green = new THREE.TextureLoader().load('textures/darkolivegreen.png');
+    var coneMaterial = new THREE.MeshPhongMaterial({
+      map: map_green
+    });
+    for (var i = 0; i < 20; i++) {
+      var vector = new THREE.Vector3().fromArray(points[i]);
+      addTransReorientedMesh(bufGeom, material, object, axis, vector);
+    }
+    scene.add(object);
+
+    window.requestAnimFrame = (function() {
+      return window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        function(callback) {
+          window.setTimeout(callback, 1000 / 60);
+        };
+    })();
+
+    function render() {
+      renderer.render(scene, camera);
+      object.rotation.x += dgcontrols.rotationSpeed;
+      object.rotation.y += dgcontrols.rotationSpeed;
+      camera.position.z = dgcontrols.cameraz;
+      requestAnimFrame(render);
+    }
+  </script>
+
+  <script>
+    // dragging & animation  ------------------------------------------
+    var isDragging = false;
+    var previousMousePosition = {
+      x: 0,
+      y: 0
+    };
+
+    $(renderer.domElement).on('mousedown', function(e) {
+      isDragging = true;
+    }).on('mousemove', function(e) {
+      var deltaMove = {
+        x: e.offsetX - previousMousePosition.x,
+        y: e.offsetY - previousMousePosition.y
+      };
+      if (isDragging) {
+        var deltaRotationQuaternion = new THREE.Quaternion()
+          .setFromEuler(new THREE.Euler(
+            Math.PI / 180 * (deltaMove.y * .5),
+            Math.PI / 180 * (deltaMove.x * .5),
+            0,
+            'XYZ'
+          ));
+        object.quaternion.multiplyQuaternions(deltaRotationQuaternion,
+          object.quaternion);
+      }
+      previousMousePosition = {
+        x: e.offsetX,
+        y: e.offsetY
+      };
+    });
+
+    $(document).on('mouseup', function(e) {
+      isDragging = false;
+    });
+  </script>
+
+  <script>
+    // render -----------------------------------------------------------
+    render();
+  </script>
+
+</body>
+
+</html>
