@@ -1,0 +1,440 @@
+<html>
+
+<head>
+    <title>da Vinci's 72-sided sphere</title>
+    <style>
+        canvas {
+            width: 100%;
+            height: 100%
+        }
+    </style>
+</head>
+
+<body>
+    <script src="../libraries/three.min.js"></script>
+    <script src="../libraries/jquery.min.js"></script>
+    <script src="../libraries/dat.gui.min.js"></script>
+
+    <script> // vertices and edges  --------------------------------------------
+        var vertices = [
+          [1.61352, -0.43234, 1.1862],
+          [1.18118, -1.18118, 1.1862],
+          [0.43234, -1.61352, 1.1862],
+          [-0.43234, -1.61352, 1.1862],
+          [-1.18118, -1.18118, 1.1862],
+          [-1.61352, -0.43234, 1.1862],
+          [-1.61352, 0.43234, 1.1862],
+          [-1.18118, 1.18118, 1.1862],
+          [-0.43234, 1.61352, 1.1862],
+          [0.43234, 1.61352, 1.1862],
+          [1.18118, 1.18118, 1.1862],
+          [1.61352, 0.43234, 1.1862],
+          [1.61352, -0.43234, -1.1862],
+          [1.61352, 0.43234, -1.1862],
+          [1.18118, 1.18118, -1.1862],
+          [0.43234, 1.61352, -1.1862],
+          [-0.43234, 1.61352, -1.1862],
+          [-1.18118, 1.18118, -1.1862],
+          [-1.61352, 0.43234, -1.1862],
+          [-1.61352, -0.43234, -1.1862],
+          [-1.18118, -1.18118, -1.1862],
+          [-0.43234, -1.61352, -1.1862],
+          [0.43234, -1.61352, -1.1862],
+          [1.18118, -1.18118, -1.1862],
+          [2.0102, 0.53863, 0],
+          [1.47157, 1.47157, 0],
+          [0.53863, 2.0102, 0],
+          [-0.53863, 2.0102, 0],
+          [-1.47157, 1.47157, 0],
+          [-2.0102, 0.53863, 0],
+          [-2.0102, -0.53863, 0],
+          [-1.47157, -1.47157, 0],
+          [-0.53863, -2.0102, 0],
+          [0.53863, -2.0102, 0],
+          [1.47157, -1.47157, 0],
+          [2.0102, -0.53863, 0],
+          [0.89068, 0.23866, 1.77777],
+          [0.89068, -0.23866, 1.77777],
+          [0.65202, -0.65202, 1.77777],
+          [0.23866, -0.89068, 1.77777],
+          [-0.23866, -0.89068, 1.77777],
+          [-0.65202, -0.65202, 1.77777],
+          [-0.89068, -0.23866, 1.77777],
+          [-0.89068, 0.23866, 1.77777],
+          [-0.65202, 0.65202, 1.77777],
+          [-0.23866, 0.89068, 1.77777],
+          [0.23866, 0.89068, 1.77777],
+          [0.65202, 0.65202, 1.77777],
+          [0.65202, -0.65202, -1.77777],
+          [0.89068, -0.23866, -1.77777],
+          [0.89068, 0.23866, -1.77777],
+          [0.65202, 0.65202, -1.77777],
+          [0.23866, 0.89068, -1.77777],
+          [-0.23866, 0.89068, -1.77777],
+          [-0.65202, 0.65202, -1.77777],
+          [-0.89068, 0.23866, -1.77777],
+          [-0.89068, -0.23866, -1.77777],
+          [-0.65202, -0.65202, -1.77777],
+          [-0.23866, -0.89068, -1.77777],
+          [0.23866, -0.89068, -1.77777],
+          [0, 0, 2.04922],
+          [0, 0, -2.04922]
+        ];
+        var edges = [
+          [0,11],
+          [11,24],
+          [24,35],
+          [10,25],
+          [9,26],
+          [8,27],
+          [7,28],
+          [6,29],
+          [5,30],
+          [4,31],
+          [3,32],
+          [2,33],
+          [1,34],
+          [0,35],
+          [12,35],
+          [13,24],
+          [24,25],
+          [14,25],
+          [25,26],
+          [15,26],
+          [26,27],
+          [16,27],
+          [27,28],
+          [17,28],
+          [28,29],
+          [18,29],
+          [29,30],
+          [19,30],
+          [30,31],
+          [20,31],
+          [31,32],
+          [21,32],
+          [32,33],
+          [22,33],
+          [33,34],
+          [12,23],
+          [23,34],
+          [34,35],
+          [0,37],
+          [0,1],
+          [1,38],
+          [1,2],
+          [2,39],
+          [2,3],
+          [3,40],
+          [3,4],
+          [4,41],
+          [4,5],
+          [5,42],
+          [5,6],
+          [6,43],
+          [6,7],
+          [7,44],
+          [7,8],
+          [8,45],
+          [8,9],
+          [9,46],
+          [9,10],
+          [10,47],
+          [10,11],
+          [11,36],
+          [36,47],
+          [12,49],
+          [12,13],
+          [13,50],
+          [13,14],
+          [14,51],
+          [14,15],
+          [15,52],
+          [15,16],
+          [16,53],
+          [16,17],
+          [17,54],
+          [17,18],
+          [18,55],
+          [18,19],
+          [19,56],
+          [19,20],
+          [20,57],
+          [20,21],
+          [21,58],
+          [21,22],
+          [22,59],
+          [22,23],
+          [23,48],
+          [48,59],
+          [36,60],
+          [36,37],
+          [37,60],
+          [37,38],
+          [38,60],
+          [38,39],
+          [39,60],
+          [39,40],
+          [40,60],
+          [40,41],
+          [41,60],
+          [41,42],
+          [42,60],
+          [42,43],
+          [43,60],
+          [43,44],
+          [44,60],
+          [44,45],
+          [45,60],
+          [45,46],
+          [46,60],
+          [46,47],
+          [47,60],
+          [48,61],
+          [48,49],
+          [49,61],
+          [49,50],
+          [50,61],
+          [50,51],
+          [51,61],
+          [51,52],
+          [52,61],
+          [52,53],
+          [53,61],
+          [53,54],
+          [54,61],
+          [54,55],
+          [55,61],
+          [55,56],
+          [56,61],
+          [56,57],
+          [57,61],
+          [57,58],
+          [58,61],
+          [58,59],
+          [59,61]
+        ];
+    </script>
+
+    <script> // Cone mesh ------------------------------------------------------
+      // basic cone mesh -------------------------------------------------------
+      function Cmesh0(h, R, r, nstacks, nslices, material) {
+        if(r>R){
+          throw new Error("Ooops !");
+        }
+        var ratio = r / R;
+        var k = (ratio - 1) / h;
+        // grid ----------------------------------------------------------------
+        nstacks = nstacks + 1;
+        var u_ = new Array(nstacks);
+        for (var i = 0; i < nstacks; i++) {
+          u_[i] = h * i / (nstacks - 1);
+        }
+        var v_ = new Array(nslices);
+        for (var i = 0; i < nslices; i++) {
+          v_[i] = 2 * Math.PI * i / nslices;
+        }
+        // vertices & normals --------------------------------------------------
+        var vertices = new Array(nstacks * nslices);
+        var normals = new Array(nstacks * nslices);
+        for (var i = 0; i < nstacks; i++) {
+          var g = 1 + k * u_[i];
+          for (var j = 0; j < nslices; j++) {
+            var cosv = R * Math.cos(v_[j]);
+            var sinv = R * Math.sin(v_[j]);
+            var v = new THREE.Vector3(
+              g * cosv,
+              g * sinv,
+              u_[i]
+            );
+            vertices[i * nslices + j] = v;
+            var t1 = new THREE.Vector3(
+              k * cosv,
+              k * sinv,
+              1
+            );
+            var t2 = new THREE.Vector3(
+              -v.y, v.x, 0
+            )
+            normals[i * nslices + j] = t1.cross(t2).normalize().negate();
+          }
+        }
+        // mesh ----------------------------------------------------------------
+        var geom = new THREE.Geometry();
+        for (var i = 0; i < (nstacks - 1); i++) {
+          for (var j = 0; j < nslices; j++) {
+            var jp1 = j == nslices - 1 ? 0 : j + 1;
+            geom.vertices.push(vertices[i * nslices + j]);
+            geom.vertices.push(vertices[i * nslices + jp1]);
+            geom.vertices.push(vertices[(i + 1) * nslices + j]);
+            geom.faces.push(new THREE.Face3(
+              6 * (i * nslices + j),
+              6 * (i * nslices + j) + 1,
+              6 * (i * nslices + j) + 2,
+              [
+                normals[i * nslices + j],
+                normals[i * nslices + jp1],
+                normals[(i + 1) * nslices + j]
+              ]
+            ));
+            geom.vertices.push(vertices[(i + 1) * nslices + j]);
+            geom.vertices.push(vertices[i * nslices + jp1]);
+            geom.vertices.push(vertices[(i + 1) * nslices + jp1]);
+            geom.faces.push(new THREE.Face3(
+              6 * (i * nslices + j) + 3,
+              6 * (i * nslices + j) + 4,
+              6 * (i * nslices + j) + 5,
+              [
+                normals[(i + 1) * nslices + j],
+                normals[i * nslices + jp1],
+                normals[(i + 1) * nslices + jp1]
+              ]
+            ));
+          }
+        }
+        var bufGeom = new THREE.BufferGeometry().fromGeometry(geom);
+        var conemesh = new THREE.Mesh(bufGeom, material);
+        return conemesh;
+      }
+      // general cone mesh -----------------------------------------------------
+      function ConeMesh(cr1, r1, cr2, r2, nstacks, nslices, material) {
+        if (r2 > r1) {
+          return ConeMesh(cr2, r2, cr1, r1, nstacks, nslices, material);
+        }
+        var w0 = cr2.clone().sub(cr1);
+        var conemesh0 = Cmesh0(w0.length(), r1, r2, nstacks, nslices, material);
+        var w = w0.normalize();
+        var wx = w.x; var wy = w.y;
+        var s = Math.sqrt(wx * wx + wy * wy);
+        if (s == 0) {
+          console.log("s=0");
+          var coef = w.z > 0 ? 1 : -1;
+          var m = new THREE.Matrix4().set(
+            1, 0, 0, cr1.x,
+            0, coef, 0, cr1.y,
+            0, 0, coef, cr1.z,
+            0, 0, 0, 1
+          )
+          conemesh0.matrix = m;
+          conemesh0.matrixAutoUpdate = false;
+          return conemesh0;
+        }
+        var u = new THREE.Vector3(wy / s, -wx / s, 0);
+        var v = w.clone().cross(u);
+        var m = new THREE.Matrix4().set(
+          u.x, v.x, w.x, cr1.x,
+          u.y, v.y, w.y, cr1.y,
+          u.z, v.z, w.z, cr1.z,
+          0, 0, 0, 1
+        )
+        conemesh0.matrix = m;
+        conemesh0.matrixAutoUpdate = false;
+        return conemesh0;
+      }
+    </script>
+
+    <script> // dat.gui controls -----------------------------------------------
+        var z0 = 4;
+        var dgcontrols = new function () {
+            this.rotationSpeed = 0.001;
+            this.cameraz = z0;
+        }
+        var gui = new dat.GUI({ autoplace: false, width: 300 });
+        gui.add(dgcontrols, 'cameraz').min(1).max(10).step(0.1)
+          .name("Camera position");
+        gui.add(dgcontrols, 'rotationSpeed').min(0).max(0.005)
+          .name("Rotation speed");
+    </script>
+
+    <script> // three.js scene -------------------------------------------------
+        var scene = new THREE.Scene();
+        var aspect = window.innerWidth / window.innerHeight;
+        var camera = new THREE.PerspectiveCamera(75, aspect, 1, 10000);
+        camera.position.z = z0;
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+        var object = new THREE.Object3D();
+        var ambientLight = new THREE.AmbientLight(0xcccccc, 0.4);
+        scene.add(ambientLight);
+        var pointLight = new THREE.PointLight(0xffffff, 0.8);
+        camera.add(pointLight);
+        scene.add(camera);
+        var map_gold = new THREE.TextureLoader().load('textures/gold.png');
+        var material_gold = new THREE.MeshPhongMaterial({ map: map_gold });
+        var material = new THREE.MeshNormalMaterial();
+
+        for(var i=0; i<edges.length; i++){
+          var edge = edges[i];
+          var cr1 = new THREE.Vector3().fromArray(vertices[edge[0]]);
+          var cr2 = new THREE.Vector3().fromArray(vertices[edge[1]]);
+          var conemesh = ConeMesh(cr1, 0.04, cr2, 0.04, 3, 30, material);
+          object.add(conemesh);
+        }
+        var geoSphere = new THREE.SphereBufferGeometry(0.05, 16, 16);
+        for(var i=0; i<vertices.length; i++){
+          var sphere = new THREE.Mesh(geoSphere, material);
+          sphere.position.set(vertices[i][0],vertices[i][1],vertices[i][2]);
+          object.add(sphere);
+        }
+
+        scene.add(object);
+
+        window.requestAnimFrame = (function () {
+            return window.requestAnimationFrame ||
+                window.webkitRequestAnimationFrame ||
+                window.mozRequestAnimationFrame ||
+                function (callback) {
+                    window.setTimeout(callback, 1000 / 60);
+                };
+        })();
+
+        function render() {
+            renderer.render(scene, camera);
+            object.rotation.x += dgcontrols.rotationSpeed;
+            object.rotation.y += dgcontrols.rotationSpeed;
+            camera.position.z = dgcontrols.cameraz;
+            requestAnimFrame(render);
+        }
+    </script>
+
+    <script> // dragging -------------------------------------------------------
+        var isDragging = false;
+        var previousMousePosition = { x: 0, y: 0 };
+
+        $(renderer.domElement).on('mousedown', function (e) {
+            isDragging = true;
+        }).on('mousemove', function (e) {
+            var deltaMove = {
+                x: e.offsetX - previousMousePosition.x,
+                y: e.offsetY - previousMousePosition.y
+            };
+            if (isDragging) {
+                var deltaRotationQuaternion = new THREE.Quaternion()
+                    .setFromEuler(new THREE.Euler(
+                        Math.PI / 180 * (deltaMove.y * .5),
+                        Math.PI / 180 * (deltaMove.x * .5),
+                        0,
+                        'XYZ'
+                    ));
+                object.quaternion.multiplyQuaternions(deltaRotationQuaternion,
+                    object.quaternion);
+            }
+            previousMousePosition = {
+                x: e.offsetX,
+                y: e.offsetY
+            };
+        });
+
+        $(document).on('mouseup', function (e) {
+            isDragging = false;
+        });
+    </script>
+
+    <script> // render ---------------------------------------------------------
+        render();
+    </script>
+
+</body>
+
+</html>
