@@ -32,7 +32,6 @@
         var hull = new THREE.Mesh(geom, new THREE.MeshNormalMaterial());
     </script>
 
-
     <script> // dat.gui controls -----------------------------------------------
         var z0 = 2;
         var dgcontrols = new function () {
@@ -55,13 +54,7 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
         var object = new THREE.Object3D();
-        // var ambientLight = new THREE.AmbientLight(0xcccccc, 0.4);
-        // scene.add(ambientLight);
-        // var pointLight = new THREE.PointLight(0xffffff, 0.8);
-        // camera.add(pointLight);
         scene.add(camera);
-        // var map_gold = new THREE.TextureLoader().load('textures/gold.png');
-        // var material_gold = new THREE.MeshPhongMaterial({ map: map_gold });
         object.add(hull);
         scene.add(object);
 
