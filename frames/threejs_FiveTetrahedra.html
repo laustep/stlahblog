@@ -15,11 +15,6 @@
     <script src="../libraries/jquery.min.js"></script>
     <script src="../libraries/dat.gui.min.js"></script>
 
-    <script>
-        var nstacks = 3;
-        var nslices = 30;
-    </script>
-
     <script> // twenty points on the unit ball ---------------------------------
         var phi = (1 + Math.sqrt(5)) / 2;
         var a = 1 / Math.sqrt(3);
@@ -47,31 +42,31 @@
             [c, 0, b],
             [-a, -a, -a]];
         // indices of the five tetrahedra --------------------------------------
-        var tetra1 = [
-          [16,13, 1],
-          [16,10,13],
-          [10, 1,13],
-          [10,16, 1] ];
-        var tetra2 = [
-          [17, 0, 3],
-          [17, 4, 0],
-          [ 4,17, 3],
-          [ 4, 3, 0] ];
-        var tetra3 = [
-          [18, 5,14],
-          [18, 6, 5],
-          [18,14, 6],
-          [ 6,14, 5] ];
-        var tetra4 = [
-          [ 2,12,11],
-          [ 2, 7,12],
-          [ 7,11,12],
-          [11, 7, 2] ];
-        var tetra5 = [
-          [19,15, 9],
-          [19, 8,15],
-          [ 8, 9,15],
-          [19, 9, 8] ];
+        var tetra1 = [16, 13, 1, 10];
+          // [16,13, 1],
+          // [16,10,13],
+          // [10, 1,13],
+          // [10,16, 1] ];
+        var tetra2 = [17, 0, 3, 4];
+          // [17, 0, 3],
+          // [17, 4, 0],
+          // [ 4,17, 3],
+          // [ 4, 3, 0] ];
+        var tetra3 = [18, 5, 14, 6];
+          // [18, 5,14],
+          // [18, 6, 5],
+          // [18,14, 6],
+          // [ 6,14, 5] ];
+        var tetra4 = [2, 12, 11, 7];
+          // [ 2,12,11],
+          // [ 2, 7,12],
+          // [ 7,11,12],
+          // [11, 7, 2] ];
+        var tetra5 = [19, 15, 9, 8];
+          // [19,15, 9],
+          // [19, 8,15],
+          // [ 8, 9,15],
+          // [19, 9, 8] ];
         var tetrahedra = [tetra1,tetra2,tetra3,tetra4,tetra5];
     </script>
 
@@ -192,27 +187,38 @@
       }
     </script>
 
-    <script>
+    <script> // add tetrahedron to object --------------------------------------
       function addEdges(object, which, material){
         var tetra = tetrahedra[which];
-        for(var i = 0; i<1; i++){
-          var face = tetra[i];
-          var pt1 = vertices[face[0]];
-          var pt2 = vertices[face[1]];
-          var pt3 = vertices[face[2]];
-          var cr1 = new THREE.Vector3().fromArray(pt1);
-          var cr2 = new THREE.Vector3().fromArray(pt2);
-          var cr3 = new THREE.Vector3().fromArray(pt3);
-          console.log(cr1); console.log(cr2);
-          var conemesh1 = ConeMesh(cr1, 0.04, cr2, 0.04, 3, 30, material);
-          object.add(conemesh1);
-          console.log(cr2); console.log(cr3);
-          var conemesh2 = ConeMesh(cr2, 0.04, cr3, 0.04, 3, 30, material);
-          object.add(conemesh2);
-          console.log(cr3); console.log(cr1);
-          var conemesh3 = ConeMesh(cr3, 0.04, cr1, 0.04, 3, 30, material);
-          object.add(conemesh3);
-        }
+        var cr1 = new THREE.Vector3().fromArray(vertices[tetra[0]]);
+        var cr2 = new THREE.Vector3().fromArray(vertices[tetra[1]]);
+        var cr3 = new THREE.Vector3().fromArray(vertices[tetra[2]]);
+        var cr4 = new THREE.Vector3().fromArray(vertices[tetra[3]]);
+        var conemesh1 = ConeMesh(cr1, 0.04, cr2, 0.04, 3, 30, material);
+        object.add(conemesh1);
+        var conemesh2 = ConeMesh(cr1, 0.04, cr3, 0.04, 3, 30, material);
+        object.add(conemesh2);
+        var conemesh3 = ConeMesh(cr1, 0.04, cr4, 0.04, 3, 30, material);
+        object.add(conemesh3);
+        var conemesh4 = ConeMesh(cr2, 0.04, cr3, 0.04, 3, 30, material);
+        object.add(conemesh4);
+        var conemesh5 = ConeMesh(cr2, 0.04, cr4, 0.04, 3, 30, material);
+        object.add(conemesh5);
+        var conemesh6 = ConeMesh(cr3, 0.04, cr4, 0.04, 3, 30, material);
+        object.add(conemesh6);
+        var geoSphere = new THREE.SphereBufferGeometry(0.05, 16, 16);
+        var sphere1 = new THREE.Mesh(geoSphere, material);
+        sphere1.position.set(cr1.x, cr1.y, cr1.z);
+        object.add(sphere1);
+        var sphere2 = new THREE.Mesh(geoSphere, material);
+        sphere2.position.set(cr2.x, cr2.y, cr2.z);
+        object.add(sphere2);
+        var sphere3 = new THREE.Mesh(geoSphere, material);
+        sphere3.position.set(cr3.x, cr3.y, cr3.z);
+        object.add(sphere3);
+        var sphere4 = new THREE.Mesh(geoSphere, material);
+        sphere4.position.set(cr4.x, cr4.y, cr4.z);
+        object.add(sphere4);
       }
     </script>
 
@@ -223,7 +229,7 @@
             this.cameraz = z0;
         }
         var gui = new dat.GUI({ autoplace: false, width: 300 });
-        gui.add(dgcontrols, 'cameraz').min(2.2).max(10).step(0.1)
+        gui.add(dgcontrols, 'cameraz').min(1).max(10).step(0.1)
           .name("Camera position");
         gui.add(dgcontrols, 'rotationSpeed').min(0).max(0.005)
           .name("Rotation speed");
@@ -234,29 +240,30 @@
         var aspect = window.innerWidth / window.innerHeight;
         var camera = new THREE.PerspectiveCamera(75, aspect, 1, 10000);
         camera.position.z = z0;
-
         var renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
-
-        var scene = new THREE.Scene();
         var object = new THREE.Object3D();
-        // var ambientLight = new THREE.AmbientLight(0xcccccc, 0.4);
-        // scene.add(ambientLight);
-        // var pointLight = new THREE.PointLight(0xffffff, 0.8);
-        // camera.add(pointLight);
+        var ambientLight = new THREE.AmbientLight(0xcccccc, 0.4);
+        scene.add(ambientLight);
+        var pointLight = new THREE.PointLight(0xffffff, 0.8);
+        camera.add(pointLight);
         scene.add(camera);
-        // var map = new THREE.TextureLoader().load('textures/GSK.jpg');
-        // map.wrapS = map.wrapT = THREE.RepeatWrapping;
-        // map.anisotropy = 16;
-        // map.repeat = new THREE.Vector2(13, 13);
-        // var material = new THREE.MeshPhongMaterial({ map: map });
-        var material = new THREE.MeshNormalMaterial({ wireframe: false });
-//        addEdges(object, 0, new THREE.MeshNormalMaterial({ wireframe: false }));
-//        addEdges(object, 1, new THREE.MeshNormalMaterial({ wireframe: false }));
-//        addEdges(object, 2, new THREE.MeshNormalMaterial({ wireframe: false }));
-//        addEdges(object, 3, new THREE.MeshNormalMaterial({ wireframe: false }));
-        addEdges(object, 4, new THREE.MeshNormalMaterial({ wireframe: false }));
+        var map_gold = new THREE.TextureLoader().load('textures/gold.png');
+        var material_gold = new THREE.MeshPhongMaterial({ map: map_gold });
+        var map_whitesmoke = new THREE.TextureLoader().load('textures/whitesmoke.png');
+        var material_whitesmoke = new THREE.MeshPhongMaterial({ map: map_whitesmoke });
+        var map_fuchsia = new THREE.TextureLoader().load('textures/fuchsia.png');
+        var material_fuchsia = new THREE.MeshPhongMaterial({ map: map_fuchsia });
+        var map_dogreen = new THREE.TextureLoader().load('textures/darkolivegreen.png');
+        var material_dogreen = new THREE.MeshPhongMaterial({ map: map_dogreen });
+        var map_ored = new THREE.TextureLoader().load('textures/orangeRed.png');
+        var material_ored = new THREE.MeshPhongMaterial({ map: map_ored });
+        addEdges(object, 0, material_gold);
+        addEdges(object, 1, material_whitesmoke);
+        addEdges(object, 2, material_fuchsia);
+        addEdges(object, 3, material_dogreen);
+        addEdges(object, 4, material_ored);
         scene.add(object);
 
         window.requestAnimFrame = (function () {
