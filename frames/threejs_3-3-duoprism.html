@@ -1,0 +1,330 @@
+<html>
+
+<head>
+    <title>3,3-duoprism</title>
+
+    <script src="../libraries/three.min.js"></script>
+    <script src="../libraries/jquery.min.js"></script>
+    <script src="../libraries/dat.gui.min.js"></script>
+
+    <style>
+        canvas {
+            width: 100%;
+            height: 100%
+        }
+    </style>
+</head>
+
+<body>
+
+  <script> // vertices and edges -----------------------------------------------
+    var pi = Math.PI;
+    var poly1 = [
+      [Math.cos(0), Math.sin(0)],
+      [Math.cos(2*pi/3), Math.sin(2*pi/3)],
+      [Math.cos(4*pi/3), Math.sin(4*pi/3)]
+    ]
+    var poly2 = poly1;
+    var vertices = new Array(3);
+    for(var i = 0; i < 3; i++){
+      vertices[i] = new Array(3);
+      for(var j = 0; j < 3; j++){
+        vertices[i][j] = poly1[i].concat(poly2[j]);
+      }
+    }
+    var edges1 = [[0,1],[1,2],[2,0]];
+    var edges2 = edges1;
+    var edges = [
+      [[0,0], [0,1]],
+      [[0,0], [1,0]],
+      [[0,1], [1,1]],
+      [[1,0], [1,1]],
+      [[0,0], [0,2]],
+      [[0,0], [2,0]],
+      [[0,1], [0,2]],
+      [[0,1], [2,1]],
+      [[0,2], [1,2]],
+      [[0,2], [2,2]],
+      [[1,0], [2,0]],
+      [[1,0], [1,2]],
+      [[1,1], [1,2]],
+      [[1,1], [2,1]],
+      [[1,2], [2,2]],
+      [[2,0], [2,1]],
+      [[2,0], [2,2]],
+      [[2,1], [2,2]]
+    ];
+    var r = Math.sqrt(2);
+  </script>
+
+  <script> // Cone mesh --------------------------------------------------------
+    // basic cone mesh ---------------------------------------------------------
+    function Cmesh0(h, R, r, nstacks, nslices, material) {
+      if(r>R){
+        throw new Error("Ooops !");
+      }
+      var ratio = r / R;
+      var k = (ratio - 1) / h;
+      // grid ------------------------------------------------------------------
+      nstacks = nstacks + 1;
+      var u_ = new Array(nstacks);
+      for (var i = 0; i < nstacks; i++) {
+        u_[i] = h * i / (nstacks - 1);
+      }
+      var v_ = new Array(nslices);
+      for (var i = 0; i < nslices; i++) {
+        v_[i] = 2 * Math.PI * i / nslices;
+      }
+      // vertices & normals ----------------------------------------------------
+      var vertices = new Array(nstacks * nslices);
+      var normals = new Array(nstacks * nslices);
+      for (var i = 0; i < nstacks; i++) {
+        var g = 1 + k * u_[i];
+        for (var j = 0; j < nslices; j++) {
+          var cosv = R * Math.cos(v_[j]);
+          var sinv = R * Math.sin(v_[j]);
+          var v = new THREE.Vector3(
+            g * cosv,
+            g * sinv,
+            u_[i]
+          );
+          vertices[i * nslices + j] = v;
+          var t1 = new THREE.Vector3(
+            k * cosv,
+            k * sinv,
+            1
+          );
+          var t2 = new THREE.Vector3(
+            -v.y, v.x, 0
+          )
+          normals[i * nslices + j] = t1.cross(t2).normalize().negate();
+        }
+      }
+      // mesh ------------------------------------------------------------------
+      var geom = new THREE.Geometry();
+      for (var i = 0; i < (nstacks - 1); i++) {
+        for (var j = 0; j < nslices; j++) {
+          var jp1 = j == nslices - 1 ? 0 : j + 1;
+          geom.vertices.push(vertices[i * nslices + j]);
+          geom.vertices.push(vertices[i * nslices + jp1]);
+          geom.vertices.push(vertices[(i + 1) * nslices + j]);
+          geom.faces.push(new THREE.Face3(
+            6 * (i * nslices + j),
+            6 * (i * nslices + j) + 1,
+            6 * (i * nslices + j) + 2,
+            [
+              normals[i * nslices + j],
+              normals[i * nslices + jp1],
+              normals[(i + 1) * nslices + j]
+            ]
+          ));
+          geom.vertices.push(vertices[(i + 1) * nslices + j]);
+          geom.vertices.push(vertices[i * nslices + jp1]);
+          geom.vertices.push(vertices[(i + 1) * nslices + jp1]);
+          geom.faces.push(new THREE.Face3(
+            6 * (i * nslices + j) + 3,
+            6 * (i * nslices + j) + 4,
+            6 * (i * nslices + j) + 5,
+            [
+              normals[(i + 1) * nslices + j],
+              normals[i * nslices + jp1],
+              normals[(i + 1) * nslices + jp1]
+            ]
+          ));
+        }
+      }
+      var bufGeom = new THREE.BufferGeometry().fromGeometry(geom);
+      var conemesh = new THREE.Mesh(bufGeom, material);
+      return conemesh;
+    }
+    // general cone mesh -------------------------------------------------------
+    function ConeMesh(cr1, r1, cr2, r2, nstacks, nslices, material) {
+      if (r2 > r1) {
+        return ConeMesh(cr2, r2, cr1, r1, nstacks, nslices, material);
+      }
+      var w0 = cr2.clone().sub(cr1);
+      var conemesh0 = Cmesh0(w0.length(), r1, r2, nstacks, nslices, material);
+      var w = w0.normalize();
+      var wx = w.x; var wy = w.y;
+      var s = Math.sqrt(wx * wx + wy * wy);
+      if (s == 0) {
+        var coef = w.z > 0 ? 1 : -1;
+        var m = new THREE.Matrix4().set(
+          1, 0, 0, cr1.x,
+          0, coef, 0, cr1.y,
+          0, 0, coef, cr1.z,
+          0, 0, 0, 1
+        )
+        conemesh0.matrix = m;
+        conemesh0.matrixAutoUpdate = false;
+        return conemesh0;
+      }
+      var u = new THREE.Vector3(wy / s, -wx / s, 0);
+      var v = w.clone().cross(u);
+      var m = new THREE.Matrix4().set(
+        u.x, v.x, w.x, cr1.x,
+        u.y, v.y, w.y, cr1.y,
+        u.z, v.z, w.z, cr1.z,
+        0, 0, 0, 1
+      )
+      conemesh0.matrix = m;
+      conemesh0.matrixAutoUpdate = false;
+      return conemesh0;
+    }
+  </script>
+
+  <script> // 4D-related functions ---------------------------------------------
+    // rotation in 4D space
+    function rightIsoclinic(theta, phi, alpha, x) {
+      var x0 = x[0], x1 = x[1], x2 = x[2], x3 = x[3];
+      var q0 = Math.cos(alpha);
+      var q1 = Math.sin(theta) * Math.cos(phi) * Math.sin(alpha);
+      var q2 = Math.sin(theta) * Math.sin(phi) * Math.sin(alpha);
+      var q3 = Math.cos(theta) * Math.sin(alpha);
+      return [
+        q0 * x0 - q1 * x1 - q2 * x2 - q3 * x3,
+        q1 * x0 + q0 * x1 + q3 * x2 - q2 * x3,
+        q2 * x0 - q3 * x1 + q0 * x2 + q1 * x3,
+        q3 * x0 + q2 * x1 - q1 * x2 + q0 * x3
+      ];
+    }
+    // stereographic projection
+    function stereo(x, r) {
+      return [x[0] / (r - x[3]), x[1] / (r - x[3]), x[2] / (r - x[3])];
+    }
+  </script>
+
+  <script> // build the 180 objects --------------------------------------------
+    var Objects = new Array(180);
+    var coneMaterial = new THREE.MeshNormalMaterial();
+    var sphereMaterial = new THREE.MeshNormalMaterial();
+    for (var i = 0; i < 180; i++) {
+      // rotated vertices
+      var points = new Array(3);
+      for(var j = 0; j < 3; j++){
+        points[j] = new Array(3);
+        for(var k = 0; k < 3; k++){
+          points[j][k] = stereo(rightIsoclinic(pi/2, 0, 2 * i * pi / 180, vertices[j][k]), r);
+        }
+      }
+      //
+      var object = new THREE.Object3D();
+      // vertices
+      for (var j = 0; j < 3; j++) {
+        for(var k = 0; k < 3; k++){
+          var geoSphere = new THREE.SphereBufferGeometry(0.1, 16, 16);
+          var sphere = new THREE.Mesh(geoSphere, sphereMaterial);
+          sphere.position.set(points[j][k][0], points[j][k][1], points[j][k][2]);
+          object.add(sphere);
+        }
+      }
+      // edges
+      for (var j = 0; j < edges.length; j++) {
+        var pt1 = points[edges[j][0][0]][edges[j][0][1]];
+        var pt2 = points[edges[j][1][0]][edges[j][1][1]];
+        var cr1 = new THREE.Vector3().fromArray(pt1);
+        var cr2 = new THREE.Vector3().fromArray(pt2);
+        var conemesh = ConeMesh(cr1, 0.07, cr2, 0.07, 3, 30, coneMaterial);
+        object.add(conemesh);
+      }
+      //
+      //object.position.set(0,1,0);
+      Objects[i] = object;
+    }
+  </script>
+
+  <script> // dat.gui controls -------------------------------------------------
+    var z0 = 4.5;
+    var dgcontrols = new function () {
+      this.cameraz = z0;
+      this.rotationSpeed = 25;
+    }
+    var gui = new dat.GUI({
+      autoplace: false,
+      width: 300
+    });
+    gui.add(dgcontrols, 'cameraz').min(1).max(10).step(0.5)
+      .name("Camera position");
+    gui.add(dgcontrols, 'rotationSpeed').min(1).max(100).step(3)
+      .name("Speed of 4D rotation");
+  </script>
+
+  <script> // three.js scene ---------------------------------------------------
+    var scene = new THREE.Scene();
+    var aspect = window.innerWidth / window.innerHeight;
+    var camera = new THREE.PerspectiveCamera(75, aspect, 1, 10000);
+    camera.position.z = z0;
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+    var scene = new THREE.Scene();
+    scene.add(camera);
+    // render function
+    window.requestAnimFrame = (function () {
+      return window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        function (callback) {
+          window.setTimeout(callback, 1000 / 60);
+        };
+    })();
+    var k = 0;
+    function render() {
+      var object = Objects[k];
+      camera.position.z = dgcontrols.cameraz;
+      scene.add(object);
+      renderer.render(scene, camera);
+      scene.remove(object);
+      k += 1;
+      if (k == 180) {
+        k = 0;
+      }
+      setTimeout(function () {
+        requestAnimationFrame(render);
+      }, 1000 / dgcontrols.rotationSpeed);
+    }
+  </script>
+
+  <script> // dragging ---------------------------------------------------------
+    var isDragging = false;
+    var previousMousePosition = {
+      x: 0,
+      y: 0
+    };
+    $(renderer.domElement).on('mousedown', function (e) {
+      isDragging = true;
+    }).on('mousemove', function (e) {
+      var deltaMove = {
+        x: e.offsetX - previousMousePosition.x,
+        y: e.offsetY - previousMousePosition.y
+      };
+      if (isDragging) {
+        var deltaRotationQuaternion = new THREE.Quaternion()
+          .setFromEuler(new THREE.Euler(
+            Math.PI / 180 * (deltaMove.y * .5),
+            Math.PI / 180 * (deltaMove.x * .5),
+            0,
+            'XYZ'
+          ));
+        for (var i = 0; i < 180; i++) {
+          Objects[i].quaternion.multiplyQuaternions(deltaRotationQuaternion,
+            Objects[i].quaternion);
+        }
+      }
+      previousMousePosition = {
+        x: e.offsetX,
+        y: e.offsetY
+      };
+    });
+    $(document).on('mouseup', function (e) {
+      isDragging = false;
+    });
+  </script>
+
+  <script>
+    render();
+  </script>
+
+</body>
+
+</html>
