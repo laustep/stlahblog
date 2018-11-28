@@ -326,7 +326,7 @@
       if (r2 > r1) {
         return ConeMesh(cr2, r2, cr1, r1, nstacks, nslices);
       }
-      var w0 = cr2.sub(cr1);
+      var w0 = cr2.clone().sub(cr1);
       var conemesh0 = Cmesh0(w0.length(), r1, r2, nstacks, nslices);
       var w = w0.normalize();
       var wx = w.x; var wy = w.y;

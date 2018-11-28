@@ -1,0 +1,319 @@
+<html>
+
+<head>
+    <title>Compound of five tetrahedra</title>
+    <style>
+        canvas {
+            width: 100%;
+            height: 100%
+        }
+    </style>
+</head>
+
+<body>
+    <script src="../libraries/three.min.js"></script>
+    <script src="../libraries/jquery.min.js"></script>
+    <script src="../libraries/dat.gui.min.js"></script>
+
+    <script>
+        var nstacks = 3;
+        var nslices = 30;
+    </script>
+
+    <script> // twenty points on the unit ball ---------------------------------
+        var phi = (1 + Math.sqrt(5)) / 2;
+        var a = 1 / Math.sqrt(3);
+        var b = a / phi;
+        var c = a * phi;
+        var vertices =
+            [[a, a, a],
+            [a, a, -a],
+            [a, -a, a],
+            [-a, -a, a],
+            [-a, a, -a],
+            [-a, a, a],
+            [0, b, -c],
+            [0, -b, -c],
+            [0, -b, c],
+            [c, 0, -b],
+            [-c, 0, -b],
+            [-c, 0, b],
+            [b, c, 0],
+            [b, -c, 0],
+            [-b, -c, 0],
+            [-b, c, 0],
+            [0, b, c],
+            [a, -a, -a],
+            [c, 0, b],
+            [-a, -a, -a]];
+        // indices of the five tetrahedra --------------------------------------
+        var tetra1 = [
+          [16,13, 1],
+          [16,10,13],
+          [10, 1,13],
+          [10,16, 1] ];
+        var tetra2 = [
+          [17, 0, 3],
+          [17, 4, 0],
+          [ 4,17, 3],
+          [ 4, 3, 0] ];
+        var tetra3 = [
+          [18, 5,14],
+          [18, 6, 5],
+          [18,14, 6],
+          [ 6,14, 5] ];
+        var tetra4 = [
+          [ 2,12,11],
+          [ 2, 7,12],
+          [ 7,11,12],
+          [11, 7, 2] ];
+        var tetra5 = [
+          [19,15, 9],
+          [19, 8,15],
+          [ 8, 9,15],
+          [19, 9, 8] ];
+        var tetrahedra = [tetra1,tetra2,tetra3,tetra4,tetra5];
+    </script>
+
+    <script>
+      // basic cone mesh ---------------------------------------------------------
+      function Cmesh0(h, R, r, nstacks, nslices, material) {
+        if(r>R){
+          throw new Error("Ooops !");
+        }
+        var ratio = r / R;
+        var k = (ratio - 1) / h;
+        // grid ------------------------------------------------------------------
+        nstacks = nstacks + 1;
+        var u_ = new Array(nstacks);
+        for (var i = 0; i < nstacks; i++) {
+          u_[i] = h * i / (nstacks - 1);
+        }
+        var v_ = new Array(nslices);
+        for (var i = 0; i < nslices; i++) {
+          v_[i] = 2 * Math.PI * i / nslices;
+        }
+        // vertices & normals ----------------------------------------------------
+        var vertices = new Array(nstacks * nslices);
+        var normals = new Array(nstacks * nslices);
+        for (var i = 0; i < nstacks; i++) {
+          var g = 1 + k * u_[i];
+          for (var j = 0; j < nslices; j++) {
+            var cosv = R * Math.cos(v_[j]);
+            var sinv = R * Math.sin(v_[j]);
+            var v = new THREE.Vector3(
+              g * cosv,
+              g * sinv,
+              u_[i]
+            );
+            vertices[i * nslices + j] = v;
+            var t1 = new THREE.Vector3(
+              k * cosv,
+              k * sinv,
+              1
+            );
+            var t2 = new THREE.Vector3(
+              -v.y, v.x, 0
+            )
+            normals[i * nslices + j] = t1.cross(t2).normalize().negate();
+          }
+        }
+        // mesh ------------------------------------------------------------------
+        var geom = new THREE.Geometry();
+        for (var i = 0; i < (nstacks - 1); i++) {
+          for (var j = 0; j < nslices; j++) {
+            var jp1 = j == nslices - 1 ? 0 : j + 1;
+            geom.vertices.push(vertices[i * nslices + j]);
+            geom.vertices.push(vertices[i * nslices + jp1]);
+            geom.vertices.push(vertices[(i + 1) * nslices + j]);
+            geom.faces.push(new THREE.Face3(
+              6 * (i * nslices + j),
+              6 * (i * nslices + j) + 1,
+              6 * (i * nslices + j) + 2,
+              [
+                normals[i * nslices + j],
+                normals[i * nslices + jp1],
+                normals[(i + 1) * nslices + j]
+              ]
+            ));
+            geom.vertices.push(vertices[(i + 1) * nslices + j]);
+            geom.vertices.push(vertices[i * nslices + jp1]);
+            geom.vertices.push(vertices[(i + 1) * nslices + jp1]);
+            geom.faces.push(new THREE.Face3(
+              6 * (i * nslices + j) + 3,
+              6 * (i * nslices + j) + 4,
+              6 * (i * nslices + j) + 5,
+              [
+                normals[(i + 1) * nslices + j],
+                normals[i * nslices + jp1],
+                normals[(i + 1) * nslices + jp1]
+              ]
+            ));
+          }
+        }
+        var bufGeom = new THREE.BufferGeometry().fromGeometry(geom);
+        var conemesh = new THREE.Mesh(bufGeom, material);
+        return conemesh;
+      }
+      // general cone mesh -------------------------------------------------------
+      function ConeMesh(cr1, r1, cr2, r2, nstacks, nslices, material) {
+        if (r2 > r1) {
+          return ConeMesh(cr2, r2, cr1, r1, nstacks, nslices, material);
+        }
+        var w0 = cr2.clone().sub(cr1);
+        var conemesh0 = Cmesh0(w0.length(), r1, r2, nstacks, nslices, material);
+        var w = w0.normalize();
+        var wx = w.x; var wy = w.y;
+        var s = Math.sqrt(wx * wx + wy * wy);
+        if (s == 0) {
+          console.log("s=0");
+          var coef = w.z > 0 ? 1 : -1;
+          var m = new THREE.Matrix4().set(
+            1, 0, 0, cr1.x,
+            0, coef, 0, cr1.y,
+            0, 0, coef, cr1.z,
+            0, 0, 0, 1
+          )
+          conemesh0.matrix = m;
+          conemesh0.matrixAutoUpdate = false;
+          return conemesh0;
+        }
+        var u = new THREE.Vector3(wy / s, -wx / s, 0);
+        var v = w.clone().cross(u);
+        var m = new THREE.Matrix4().set(
+          u.x, v.x, w.x, cr1.x,
+          u.y, v.y, w.y, cr1.y,
+          u.z, v.z, w.z, cr1.z,
+          0, 0, 0, 1
+        )
+        conemesh0.matrix = m;
+        conemesh0.matrixAutoUpdate = false;
+        return conemesh0;
+      }
+    </script>
+
+    <script>
+      function addEdges(object, which, material){
+        var tetra = tetrahedra[which];
+        for(var i = 0; i<1; i++){
+          var face = tetra[i];
+          var pt1 = vertices[face[0]];
+          var pt2 = vertices[face[1]];
+          var pt3 = vertices[face[2]];
+          var cr1 = new THREE.Vector3().fromArray(pt1);
+          var cr2 = new THREE.Vector3().fromArray(pt2);
+          var cr3 = new THREE.Vector3().fromArray(pt3);
+          console.log(cr1); console.log(cr2);
+          var conemesh1 = ConeMesh(cr1, 0.04, cr2, 0.04, 3, 30, material);
+          object.add(conemesh1);
+          console.log(cr2); console.log(cr3);
+          var conemesh2 = ConeMesh(cr2, 0.04, cr3, 0.04, 3, 30, material);
+          object.add(conemesh2);
+          console.log(cr3); console.log(cr1);
+          var conemesh3 = ConeMesh(cr3, 0.04, cr1, 0.04, 3, 30, material);
+          object.add(conemesh3);
+        }
+      }
+    </script>
+
+    <script> // dat.gui controls -----------------------------------------------
+        var z0 = 2.2;
+        var dgcontrols = new function () {
+            this.rotationSpeed = 0.001;
+            this.cameraz = z0;
+        }
+        var gui = new dat.GUI({ autoplace: false, width: 300 });
+        gui.add(dgcontrols, 'cameraz').min(2.2).max(10).step(0.1)
+          .name("Camera position");
+        gui.add(dgcontrols, 'rotationSpeed').min(0).max(0.005)
+          .name("Rotation speed");
+    </script>
+
+    <script> // three.js scene -------------------------------------------------
+        var scene = new THREE.Scene();
+        var aspect = window.innerWidth / window.innerHeight;
+        var camera = new THREE.PerspectiveCamera(75, aspect, 1, 10000);
+        camera.position.z = z0;
+
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        var scene = new THREE.Scene();
+        var object = new THREE.Object3D();
+        // var ambientLight = new THREE.AmbientLight(0xcccccc, 0.4);
+        // scene.add(ambientLight);
+        // var pointLight = new THREE.PointLight(0xffffff, 0.8);
+        // camera.add(pointLight);
+        scene.add(camera);
+        // var map = new THREE.TextureLoader().load('textures/GSK.jpg');
+        // map.wrapS = map.wrapT = THREE.RepeatWrapping;
+        // map.anisotropy = 16;
+        // map.repeat = new THREE.Vector2(13, 13);
+        // var material = new THREE.MeshPhongMaterial({ map: map });
+        var material = new THREE.MeshNormalMaterial({ wireframe: false });
+//        addEdges(object, 0, new THREE.MeshNormalMaterial({ wireframe: false }));
+//        addEdges(object, 1, new THREE.MeshNormalMaterial({ wireframe: false }));
+//        addEdges(object, 2, new THREE.MeshNormalMaterial({ wireframe: false }));
+//        addEdges(object, 3, new THREE.MeshNormalMaterial({ wireframe: false }));
+        addEdges(object, 4, new THREE.MeshNormalMaterial({ wireframe: false }));
+        scene.add(object);
+
+        window.requestAnimFrame = (function () {
+            return window.requestAnimationFrame ||
+                window.webkitRequestAnimationFrame ||
+                window.mozRequestAnimationFrame ||
+                function (callback) {
+                    window.setTimeout(callback, 1000 / 60);
+                };
+        })();
+
+        function render() {
+            renderer.render(scene, camera);
+            object.rotation.x += dgcontrols.rotationSpeed;
+            object.rotation.y += dgcontrols.rotationSpeed;
+            camera.position.z = dgcontrols.cameraz;
+            requestAnimFrame(render);
+        }
+    </script>
+
+    <script> // dragging -------------------------------------------------------
+        var isDragging = false;
+        var previousMousePosition = { x: 0, y: 0 };
+
+        $(renderer.domElement).on('mousedown', function (e) {
+            isDragging = true;
+        }).on('mousemove', function (e) {
+            var deltaMove = {
+                x: e.offsetX - previousMousePosition.x,
+                y: e.offsetY - previousMousePosition.y
+            };
+            if (isDragging) {
+                var deltaRotationQuaternion = new THREE.Quaternion()
+                    .setFromEuler(new THREE.Euler(
+                        Math.PI / 180 * (deltaMove.y * .5),
+                        Math.PI / 180 * (deltaMove.x * .5),
+                        0,
+                        'XYZ'
+                    ));
+                object.quaternion.multiplyQuaternions(deltaRotationQuaternion,
+                    object.quaternion);
+            }
+            previousMousePosition = {
+                x: e.offsetX,
+                y: e.offsetY
+            };
+        });
+
+        $(document).on('mouseup', function (e) {
+            isDragging = false;
+        });
+    </script>
+
+    <script> // render ---------------------------------------------------------
+        render();
+    </script>
+
+</body>
+
+</html>
