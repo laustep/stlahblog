@@ -299,10 +299,7 @@
 
   <script> // dragging ---------------------------------------------------------
     var isDragging = false;
-    var previousMousePosition = {
-      x: 0,
-      y: 0
-    };
+    var previousMousePosition = {x: 0, y: 0};
     $(renderer.domElement).on('mousedown', function(e) {
       isDragging = true;
     }).on('mousemove', function(e) {
@@ -326,7 +323,6 @@
         y: e.offsetY
       };
     });
-
     $(document).on('mouseup', function(e) {
       isDragging = false;
     });
