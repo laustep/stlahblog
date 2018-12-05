@@ -24,7 +24,7 @@
     var pi = Math.PI;
   </script>
 
-  <script>
+  <script> // twenty points on the unit sphere ---------------------------------
     var phi = (1 + Math.sqrt(5)) / 2;
     var a = 1 / Math.sqrt(3);
     var b = a / phi;
@@ -53,7 +53,7 @@
     ];
   </script>
 
-  <script> // Cone mesh
+  <script> // Cone mesh --------------------------------------------------------
     // basic cone mesh ---------------------------------------------------------
     function Cmesh0(h, R, r, nstacks, nslices, materialFront, materialBack) {
       if(r>R){
@@ -182,17 +182,21 @@
         }
       }
       var bufGeom = new THREE.BufferGeometry().fromGeometry(geom);
-      var material = materialBack === null ? materialFront : [materialFront, materialBack];
+      var material = materialBack === null ?
+        materialFront : [materialFront, materialBack];
       var conemesh = new THREE.Mesh(bufGeom, material);
       return conemesh;
     }
     // general cone mesh -------------------------------------------------------
-    function ConeMesh(cr1, r1, cr2, r2, nstacks, nslices, materialFront, materialBack) {
+    function ConeMesh(cr1, r1, cr2, r2, nstacks, nslices,
+        materialFront, materialBack) {
       if (r2 > r1) {
-        return ConeMesh(cr2, r2, cr1, r1, nstacks, nslices, materialFront, materialBack);
+        return ConeMesh(cr2, r2, cr1, r1, nstacks, nslices,
+          materialFront, materialBack);
       }
       var w0 = cr2.clone().sub(cr1);
-      var conemesh0 = Cmesh0(w0.length(), r1, r2, nstacks, nslices, materialFront, materialBack);
+      var conemesh0 = Cmesh0(w0.length(), r1, r2, nstacks, nslices,
+        materialFront, materialBack);
       var w = w0.normalize();
       var wx = w.x; var wy = w.y;
       var s = Math.sqrt(wx * wx + wy * wy);
@@ -222,9 +226,7 @@
     }
   </script>
 
-
-  <script>
-    // dat.gui controls -------------------------------------------------
+  <script> // dat.gui controls -------------------------------------------------
     var dgcontrols = new function() {
       this.rotationSpeed = 0.001;
       this.cameraz = 2.2;
@@ -233,12 +235,13 @@
       autoplace: false,
       width: 300
     });
-    gui.add(dgcontrols, 'cameraz').min(1).max(10).step(0.1).name("Camera position");
-    gui.add(dgcontrols, 'rotationSpeed').min(0).max(0.005).name("Rotation speed");
+    gui.add(dgcontrols, 'cameraz').min(1).max(10).step(0.1)
+      .name("Camera position");
+    gui.add(dgcontrols, 'rotationSpeed').min(0).max(0.005)
+      .name("Rotation speed");
   </script>
 
-  <script>
-    // three.js scene ---------------------------------------------------
+  <script> // three.js scene ---------------------------------------------------
     var aspect = window.innerWidth / window.innerHeight;
     var camera = new THREE.PerspectiveCamera(75, aspect, 1, 10000);
     camera.position.z = 2.2;
@@ -287,14 +290,12 @@
     }
   </script>
 
-  <script>
-    // dragging ----------------------------------------------------------------
+  <script> // dragging ---------------------------------------------------------
     var isDragging = false;
     var previousMousePosition = {
       x: 0,
       y: 0
     };
-
     $(renderer.domElement).on('mousedown', function(e) {
       isDragging = true;
     }).on('mousemove', function(e) {
@@ -324,10 +325,8 @@
     });
   </script>
 
-  <script>
-    // render -----------------------------------------------------------
+  <script> // render -----------------------------------------------------------
     render();
-    requestAnimFrame(render);
   </script>
 
 </body>
