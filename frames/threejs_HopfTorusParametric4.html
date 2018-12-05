@@ -23,8 +23,18 @@
     <script>
         var A = 0.44;
         var n = 3;
-        var uSteps = 349, vSteps = 349;
+        var uSteps = 400, vSteps = 400;
         var pi = Math.PI;
+        function getMinMax(arr) {
+          let min = arr[0];
+          let max = arr[0];
+          let i = arr.length;
+          while (i--) {
+              min = arr[i] < min ? arr[i] : min;
+              max = arr[i] > max ? arr[i] : max;
+          }
+          return { min, max };
+        }
     </script>
 
     <script> // parameterization -----------------------------------------------
@@ -69,8 +79,11 @@
             norms[i*vSteps+j] = HTarray[i][j].length();
           }
         }
-        var maxNorm = Math.max.apply(null, norms);
-        var minNorm = Math.min.apply(null, norms);
+        var MinMax = getMinMax(norms);
+        var minNorm = MinMax.min;
+        var maxNorm = MinMax.max;
+        // var maxNorm = Math.max.apply(null, norms);
+        // var minNorm = Math.min.apply(null, norms);
         var Normals = new Array(uSteps);
         for(var i=0; i<uSteps; i++){
           Normals[i] = new Array(vSteps);
