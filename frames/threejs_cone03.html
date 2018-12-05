@@ -1,0 +1,260 @@
+<html>
+
+<head>
+  <title>Cone</title>
+  <style>
+    canvas {
+      width: 100%;
+      height: 100%
+    }
+  </style>
+</head>
+
+<body>
+  <!-- <script src="http://mrdoob.github.com/three.js/build/three.min.js"></script> -->
+  <script src="../libraries/three.min.js"></script>
+  <script src="../libraries/jquery.min.js"></script>
+
+  <script>
+    // mesh parameters ---------------------------------------------------------
+    var nstacks = 3;
+    var nslices = 6;
+    var h = 6;
+    var r = 2;
+    var R = 4;
+  </script>
+
+  <script>
+    // basic cone mesh ---------------------------------------------------------
+    function Cmesh0(h, R, r, nstacks, nslices, materialFront, materialBack) {
+      if(r>R){
+        throw new Error("Ooops !");
+      }
+      var ratio = r / R;
+      var k = (ratio - 1) / h;
+      // grid ------------------------------------------------------------------
+      nstacks = nstacks + 1;
+      var u_ = new Array(nstacks);
+      for (var i = 0; i < nstacks; i++) {
+        u_[i] = h * i / (nstacks - 1);
+      }
+      var v_ = new Array(nslices);
+      for (var i = 0; i < nslices; i++) {
+        v_[i] = 2 * Math.PI * i / nslices;
+      }
+      // vertices & normals ----------------------------------------------------
+      var vertices = new Array(nstacks * nslices);
+      var normals = new Array(nstacks * nslices);
+      for (var i = 0; i < nstacks; i++) {
+        var g = 1 + k * u_[i];
+        for (var j = 0; j < nslices; j++) {
+          var cosv = R * Math.cos(v_[j]);
+          var sinv = R * Math.sin(v_[j]);
+          var v = new THREE.Vector3(
+            g * cosv,
+            g * sinv,
+            u_[i]
+          );
+          vertices[i * nslices + j] = v;
+          var t1 = new THREE.Vector3(
+            k * cosv,
+            k * sinv,
+            1
+          );
+          var t2 = new THREE.Vector3(
+            -v.y, v.x, 0
+          )
+          normals[i * nslices + j] = t1.cross(t2).normalize().negate();
+        }
+      }
+      // mesh ------------------------------------------------------------------
+      var geom = new THREE.Geometry();
+      for (var i = 0; i < (nstacks - 1); i++) {
+        for (var j = 0; j < nslices; j++) {
+          var jp1 = j == nslices - 1 ? 0 : j + 1;
+          geom.vertices.push(vertices[i * nslices + j]);
+          geom.vertices.push(vertices[i * nslices + jp1]);
+          geom.vertices.push(vertices[(i + 1) * nslices + j]);
+          geom.faces.push(new THREE.Face3(
+            6 * (i * nslices + j),
+            6 * (i * nslices + j) + 1,
+            6 * (i * nslices + j) + 2,
+            [
+              normals[i * nslices + j],
+              normals[i * nslices + jp1],
+              normals[(i + 1) * nslices + j]
+            ],
+            null, 0
+          ));
+          geom.faces.push(new THREE.Face3(
+            6 * (i * nslices + j),
+            6 * (i * nslices + j) + 1,
+            6 * (i * nslices + j) + 2,
+            [
+              normals[i * nslices + j],
+              normals[i * nslices + jp1],
+              normals[(i + 1) * nslices + j]
+            ],
+            null, 1
+          ));
+          geom.vertices.push(vertices[(i + 1) * nslices + j]);
+          geom.vertices.push(vertices[i * nslices + jp1]);
+          geom.vertices.push(vertices[(i + 1) * nslices + jp1]);
+          geom.faces.push(new THREE.Face3(
+            6 * (i * nslices + j) + 3,
+            6 * (i * nslices + j) + 4,
+            6 * (i * nslices + j) + 5,
+            [
+              normals[(i + 1) * nslices + j],
+              normals[i * nslices + jp1],
+              normals[(i + 1) * nslices + jp1]
+            ],
+            null, 0
+          ));
+          geom.faces.push(new THREE.Face3(
+            6 * (i * nslices + j) + 3,
+            6 * (i * nslices + j) + 4,
+            6 * (i * nslices + j) + 5,
+            [
+              normals[(i + 1) * nslices + j],
+              normals[i * nslices + jp1],
+              normals[(i + 1) * nslices + jp1]
+            ],
+            null, 1
+          ));
+        }
+      }
+      var bufGeom = new THREE.BufferGeometry().fromGeometry(geom);
+      var conemesh = new THREE.Mesh(bufGeom, [materialFront,materialBack]);
+      return conemesh;
+    }
+    // general cone mesh -------------------------------------------------------
+    function ConeMesh(cr1, r1, cr2, r2, nstacks, nslices, materialFront, materialBack) {
+      if (r2 > r1) {
+        return ConeMesh(cr2, r2, cr1, r1, nstacks, nslices, materialFront, materialBack);
+      }
+      var w0 = cr2.clone().sub(cr1);
+      var conemesh0 = Cmesh0(w0.length(), r1, r2, nstacks, nslices, materialFront, materialBack);
+      var w = w0.normalize();
+      var wx = w.x; var wy = w.y;
+      var s = Math.sqrt(wx * wx + wy * wy);
+      if (s == 0) {
+        var coef = w.z > 0 ? 1 : -1;
+        var m = new THREE.Matrix4().set(
+          1, 0, 0, cr1.x,
+          0, coef, 0, cr1.y,
+          0, 0, coef, cr1.z,
+          0, 0, 0, 1
+        )
+        conemesh0.matrix = m;
+        conemesh0.matrixAutoUpdate = false;
+        return conemesh0;
+      }
+      var u = new THREE.Vector3(wy / s, -wx / s, 0);
+      var v = w.clone().cross(u);
+      var m = new THREE.Matrix4().set(
+        u.x, v.x, w.x, cr1.x,
+        u.y, v.y, w.y, cr1.y,
+        u.z, v.z, w.z, cr1.z,
+        0, 0, 0, 1
+      )
+      conemesh0.matrix = m;
+      conemesh0.matrixAutoUpdate = false;
+      return conemesh0;
+    }
+  </script>
+
+  <script>
+    // three.js scene ---------------------------------------------------
+    var scene = new THREE.Scene();
+    var aspect = window.innerWidth / window.innerHeight;
+    var camera = new THREE.PerspectiveCamera(75, aspect, 1, 10000);
+    camera.position.z = 25;
+    scene.add(camera);
+
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    var object = new THREE.Object3D();
+
+    var orangeRed = new THREE.MeshBasicMaterial({
+      color: 0xff4000,
+      side: THREE.FrontSide
+    });
+    var gold = new THREE.MeshBasicMaterial({
+      color: 0xf5d700,
+      side: THREE.BackSide
+    });
+    var nmat = new THREE.MeshNormalMaterial({side: THREE.BackSide});
+    var conemesh = ConeMesh(new THREE.Vector3(R+r,0,0), r,
+      new THREE.Vector3(R+r,10,0), R, 3, 8,
+      orangeRed, nmat);
+    object.add(conemesh);
+    var helper = new THREE.VertexNormalsHelper(conemesh, 2, 0x00ff00, 1);
+    object.add(helper);
+
+    scene.add(object);
+
+    // rendering function ------------------------------------------------------
+    window.requestAnimFrame = (function() {
+      return window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        function(callback) {
+          window.setTimeout(callback, 1000 / 60);
+        };
+    })();
+
+    function render() {
+      renderer.render(scene, camera);
+      requestAnimFrame(render);
+    }
+  </script>
+
+  <script>
+    // dragging ---------------------------------------------------------
+    var isDragging = false;
+    var previousMousePosition = {
+      x: 0,
+      y: 0
+    };
+
+    $(renderer.domElement).on('mousedown', function(e) {
+      isDragging = true;
+    }).on('mousemove', function(e) {
+      var deltaMove = {
+        x: e.offsetX - previousMousePosition.x,
+        y: e.offsetY - previousMousePosition.y
+      };
+      if (isDragging) {
+        var deltaRotationQuaternion = new THREE.Quaternion()
+          .setFromEuler(new THREE.Euler(
+            Math.PI / 180 * (deltaMove.y * .5),
+            Math.PI / 180 * (deltaMove.x * .5),
+            0,
+            'XYZ'
+          ));
+        object.quaternion.multiplyQuaternions(deltaRotationQuaternion,
+          object.quaternion);
+      }
+      previousMousePosition = {
+        x: e.offsetX,
+        y: e.offsetY
+      };
+    });
+
+    $(document).on('mouseup', function(e) {
+      isDragging = false;
+    });
+  </script>
+
+  <script>
+    // render -----------------------------------------------------------
+    render();
+    requestAnimFrame(render);
+  </script>
+
+</body>
+
+</html>
