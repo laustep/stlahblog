@@ -53,11 +53,13 @@
     ];
   </script>
 
-  <script>
-    // basic mesh --------------------------------------------------------------
-    function Cmesh0(h, R, r, nstacks, nslices) {
-      h = r < R ? h : -h;
-      var ratio = r < R ? r / R : R / r;
+  <script> // Cone mesh
+    // basic cone mesh ---------------------------------------------------------
+    function Cmesh0(h, R, r, nstacks, nslices, material) {
+      if(r>R){
+        throw new Error("Ooops !");
+      }
+      var ratio = r / R;
       var k = (ratio - 1) / h;
       // grid ------------------------------------------------------------------
       nstacks = nstacks + 1;
@@ -70,18 +72,17 @@
         v_[i] = 2 * Math.PI * i / nslices;
       }
       // vertices & normals ----------------------------------------------------
-      Rbig = Math.max(r,R);
       var vertices = new Array(nstacks * nslices);
       var normals = new Array(nstacks * nslices);
       for (var i = 0; i < nstacks; i++) {
         var g = 1 + k * u_[i];
         for (var j = 0; j < nslices; j++) {
-          var cosv = Rbig * Math.cos(v_[j]);
-          var sinv = Rbig * Math.sin(v_[j]);
+          var cosv = R * Math.cos(v_[j]);
+          var sinv = R * Math.sin(v_[j]);
           var v = new THREE.Vector3(
             g * cosv,
             g * sinv,
-            r < R ? u_[i] : u_[i] - h
+            u_[i]
           );
           vertices[i * nslices + j] = v;
           var t1 = new THREE.Vector3(
@@ -129,28 +130,25 @@
         }
       }
       var bufGeom = new THREE.BufferGeometry().fromGeometry(geom);
-      var conemesh = new THREE.Mesh(bufGeom,
-        new THREE.MeshNormalMaterial({
-          side: THREE.DoubleSide
-        }));
+      var conemesh = new THREE.Mesh(bufGeom, material);
       return conemesh;
     }
     // general cone mesh -------------------------------------------------------
-    function ConeMesh(cr1, r1, cr2, r2, nstacks, nslices) {
+    function ConeMesh(cr1, r1, cr2, r2, nstacks, nslices, material) {
       if (r2 > r1) {
-        return ConeMesh(cr2, r2, cr1, r1, nstacks, nslices);
+        return ConeMesh(cr2, r2, cr1, r1, nstacks, nslices, material);
       }
       var w0 = cr2.clone().sub(cr1);
-      var conemesh0 = Cmesh0(w0.length(), r1, r2, nstacks, nslices);
+      var conemesh0 = Cmesh0(w0.length(), r1, r2, nstacks, nslices, material);
       var w = w0.normalize();
-      var wx = w.x;
-      var wy = w.y;
-      var s = Math.sqrt(w.x * w.x + w.y * w.y);
+      var wx = w.x; var wy = w.y;
+      var s = Math.sqrt(wx * wx + wy * wy);
       if (s == 0) {
+        var coef = w.z > 0 ? 1 : -1;
         var m = new THREE.Matrix4().set(
           1, 0, 0, cr1.x,
-          0, w.z>0 ? 1 : -1, 0, cr1.y,
-          0, 0, w.z>0 ? 1 : -1, cr1.z,
+          0, coef, 0, cr1.y,
+          0, 0, coef, cr1.z,
           0, 0, 0, 1
         )
         conemesh0.matrix = m;
@@ -200,10 +198,11 @@
     var scene = new THREE.Scene();
     scene.add(camera);
     var object = new THREE.Object3D();
+    var coneMaterial = new THREE.MeshNormalMaterial({side : THREE.DoubleSide});
     for (var i = 0; i < 20; i++) {
       var cr2 = new THREE.Vector3().fromArray(points[i]);
       var cr1 = cr2.clone().multiplyScalar(0.1);
-      var mesh = ConeMesh(cr1, r, cr2, R, nstacks, nslices);
+      var mesh = ConeMesh(cr1, r, cr2, R, nstacks, nslices, coneMaterial);
       object.add(mesh);
     }
     scene.add(object);

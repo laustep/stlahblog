@@ -1,3 +1,20 @@
+var b = (Math.sqrt(5) - 1) / 2;
+var a = 1 - b;
+var vertices0 = [ 
+  [a, b, 0],
+  [-a, b, 0],
+  [0, a, -b],
+  [b, 0, -a],
+  [0, a, b],
+  [-b, 0, -a],
+  [b, 0, a],
+  [-b, 0, a],
+  [0, -a, -b],
+  [0, -a, b],
+  [-a, -b, 0],
+  [a, -b, 0] ];
+
+
 var otherEdges = [
 	[ 0 , 1 ]
 , [ 1 , 2 ]
