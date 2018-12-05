@@ -82,8 +82,18 @@
         var MinMax = getMinMax(norms);
         var minNorm = MinMax.min;
         var maxNorm = MinMax.max;
+        var rangeNorm = maxNorm - minNorm;
         // var maxNorm = Math.max.apply(null, norms);
         // var minNorm = Math.min.apply(null, norms);
+        var Colors = new Array(uSteps);
+        for(var i=0; i<uSteps; i++){
+          Colors[i] = new Array(vSteps);
+          for(var j=0; j<vSteps; j++){
+            Colors[i][j] = new THREE.Color(scale.viridis(
+              (norms[i*vSteps+j]-minNorm) / rangeNorm
+            ));
+          }
+        }
         var Normals = new Array(uSteps);
         for(var i=0; i<uSteps; i++){
           Normals[i] = new Array(vSteps);
@@ -117,55 +127,49 @@
             geom.vertices.push(HTarray[i][jp1]);
             geom.vertices.push(HTarray[ip1][j]);
             geom.faces.push(new THREE.Face3(
-              6 * (i * vSteps + j),
-              6 * (i * vSteps + j) + 1,
-              6 * (i * vSteps + j) + 2,
+              4 * (i * vSteps + j),
+              4 * (i * vSteps + j) + 1,
+              4 * (i * vSteps + j) + 2,
               [
                 Normals[i][j],
                 Normals[i][jp1],
                 Normals[ip1][j]
               ],
               [
-                new THREE.Color(scale.viridis(
-                  (norms[i*vSteps+j]-minNorm)/(maxNorm-minNorm)
-                )),
-                new THREE.Color(scale.viridis(
-                  (norms[i*vSteps+jp1]-minNorm)/(maxNorm-minNorm)
-                )),
-                new THREE.Color(scale.viridis(
-                  (norms[ip1*vSteps+j]-minNorm)/(maxNorm-minNorm)
-                ))
+                Colors[i][j],
+                Colors[i][jp1],
+                Colors[ip1][j]
               ]
             ));
-            geom.vertices.push(HTarray[i][jp1]);
+            //geom.vertices.push(HTarray[i][jp1]);
             geom.vertices.push(HTarray[ip1][jp1]);
-            geom.vertices.push(HTarray[ip1][j]);
+            //geom.vertices.push(HTarray[ip1][j]);
             geom.faces.push(new THREE.Face3(
-              6 * (i * vSteps + j) + 3,
-              6 * (i * vSteps + j) + 4,
-              6 * (i * vSteps + j) + 5,
+              4 * (i * vSteps + j) + 1,
+              4 * (i * vSteps + j) + 3,
+              4 * (i * vSteps + j) + 2,
               [
                 Normals[i][jp1],
                 Normals[ip1][jp1],
                 Normals[ip1][j]
               ],
               [
-                new THREE.Color(scale.viridis(
-                  (norms[i*vSteps+jp1]-minNorm)/(maxNorm-minNorm)
-                )),
-                new THREE.Color(scale.viridis(
-                  (norms[ip1*vSteps+jp1]-minNorm)/(maxNorm-minNorm)
-                )),
-                new THREE.Color(scale.viridis(
-                  (norms[ip1*vSteps+j]-minNorm)/(maxNorm-minNorm)
-                ))
+                Colors[i][jp1],
+                Colors[ip1][jp1],
+                Colors[ip1][j]
               ]
             ));
           }
         }
         var bufGeom = new THREE.BufferGeometry().fromGeometry(geom);
         var mesh = new THREE.Mesh(bufGeom,
-          new THREE.MeshPhongMaterial({ vertexColors: THREE.VertexColors }));
+          new THREE.MeshPhongMaterial(
+            {
+              vertexColors: THREE.VertexColors,
+              specular: new THREE.Color(0xffffff),
+              shininess: 100
+            }
+          ));
     </script>
 
     <script> // dat.gui controls -----------------------------------------------
@@ -181,7 +185,7 @@
           .name("Rotation speed");
     </script>
 
-    <script> // three.js scene ---------------------------------------------------
+    <script> // three.js scene -------------------------------------------------
 //        var scene = new THREE.Scene();
         var aspect = window.innerWidth / window.innerHeight;
         var camera = new THREE.PerspectiveCamera(75, aspect, 1, 10000);
