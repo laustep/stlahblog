@@ -24,8 +24,8 @@
   <script>
     var R = 0.1,
       r = 0.02;
-    var nstacks = 29,
-      nslices = 60;
+    var nstacks = 9,
+      nslices = 15;
     var pi = Math.PI;
   </script>
 
@@ -182,6 +182,7 @@
       var bufGeom = new THREE.BufferGeometry().fromGeometry(geom);
       var material = materialBack === null ?
         materialFront : [materialFront, materialBack];
+      console.log(geom);
       var conemesh = new THREE.Mesh(bufGeom, material);
       return conemesh;
     }
