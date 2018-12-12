@@ -154,16 +154,13 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    var scene = new THREE.Scene();
     var object = new THREE.Object3D();
     var axis1 = new THREE.Vector3(0, 0, 1);
     var bufGeom = new THREE.ParametricBufferGeometry(g(A, n), uSteps, vSteps);
     var h = Math.sqrt(3 * a * a);
     var coneGeom = new THREE.ConeBufferGeometry(0.04, h, 32)
       .translate(0, -h / 2, 0);
-    var coneMaterial = new THREE.MeshNormalMaterial({
-      wireframe: false
-    });
+    var coneMaterial = new THREE.MeshPhongMaterial({color: 0xf5d700});
 
     var rotationMatrices = new Array(180);
     for (var k = 0; k < 180; k++) {
