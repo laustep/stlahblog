@@ -1,0 +1,203 @@
+<html>
+
+<head>
+    <title>Toroidal helix</title>
+    <script src="../libraries/three.min.js"></script>
+    <script src="../libraries/jquery.min.js"></script>
+    <script src="../libraries/dat.gui.min.js"></script>
+
+    <style>
+        canvas {
+            width: 100%;
+            height: 100%
+        }
+    </style>
+</head>
+
+<body>
+
+    <script>
+        var R = 4;
+        var r = 1;
+        var w = 15;
+        var uSteps = 500, vSteps = 50;
+        var pi = Math.PI;
+        var a = 0.5;
+    </script>
+
+    <script> // parameterization -----------------------------------------------
+        function helix(t, R, r, w){
+          return new THREE.Vector3(
+            (R + r*Math.cos(t))*Math.cos(t/w),
+            (R + r*Math.cos(t))*Math.sin(t/w),
+            r*Math.sin(t)
+          );
+        }
+        function dhelix(t, R, r, w){
+          return new THREE.Vector3(
+            -r*Math.sin(t)*Math.cos(t/w) - (R+r*Math.cos(t))/w*Math.sin(t/w),
+            -r*Math.sin(t)*Math.sin(t/w) + (R+r*Math.cos(t))/w*Math.cos(t/w),
+            r*Math.cos(t)
+          );
+        }
+        function ddhelix(t, R, r, w){
+          return new THREE.Vector3(
+            -r*Math.cos(t)*Math.cos(t/w) + r*Math.sin(t)/w*Math.sin(t/w) +
+              r*Math.sin(t)/w*Math.sin(t/w) - (R+r*Math.cos(t))/w/w*Math.cos(t/w),
+            -r*Math.cos(t)*Math.sin(t/w) - r*Math.sin(t)/w*Math.cos(t/w) -
+              r*Math.sin(t)/w*Math.cos(t/w) - (R+r*Math.cos(t))/w/w*Math.sin(t/w),
+            -r*Math.sin(t)
+          ).normalize();
+        }
+        function binormal(t, R, r, w){
+          return dhelix(t, R, r, w).cross(ddhelix(t, R, r, w)).normalize();
+        }
+        function shift(u, v, R, r, w){
+          return ddhelix(u, R, r, w).multiplyScalar(Math.cos(v))
+                  .add(binormal(u, R, r, w).multiplyScalar(Math.sin(v)));
+        }
+        function f(u, v, R, r, w, a){
+            return helix(u, R, r, w)
+              .add(shift(u, v, R, r, w).multiplyScalar(a));
+        }
+    </script>
+
+    <script> // mesh -----------------------------------------------------------
+        var u_ = new Array(uSteps);
+        var v_ = new Array(vSteps);
+        for(var i=0; i<uSteps; i++){
+          u_[i] = w*i/uSteps*2*pi;
+        }
+        for(var j=0; j<vSteps; j++){
+          v_[j] = j/vSteps*2*pi;
+        }
+        var THarray = new Array(uSteps);
+        var Normals = new Array(uSteps);
+        for(var i=0; i<uSteps; i++){
+          THarray[i] = new Array(vSteps);
+          Normals[i] = new Array(vSteps);
+          for(var j=0; j<vSteps; j++){
+            THarray[i][j] = f(u_[i], v_[j], R, r, w, a);
+            Normals[i][j] = shift(u_[i], v_[j], R, r, w).normalize();
+          }
+        }
+        var geom = new THREE.Geometry();
+        for (var i = 0; i < uSteps; i++) {
+          var ip1 = i == uSteps - 1 ? 0 : i + 1;
+          for (var j = 0; j < vSteps; j++) {
+            var jp1 = j == vSteps - 1 ? 0 : j + 1;
+            geom.vertices.push(THarray[i][j]);
+            geom.vertices.push(THarray[i][jp1]);
+            geom.vertices.push(THarray[ip1][j]);
+            geom.faces.push(new THREE.Face3(
+              4 * (i * vSteps + j),
+              4 * (i * vSteps + j) + 1,
+              4 * (i * vSteps + j) + 2,
+              [
+                Normals[i][j],
+                Normals[i][jp1],
+                Normals[ip1][j]
+              ]
+            ));
+            geom.vertices.push(THarray[ip1][jp1]);
+            geom.faces.push(new THREE.Face3(
+              4 * (i * vSteps + j) + 1,
+              4 * (i * vSteps + j) + 3,
+              4 * (i * vSteps + j) + 2,
+              [
+                Normals[i][jp1],
+                Normals[ip1][jp1],
+                Normals[ip1][j]
+              ]
+            ));
+          }
+        }
+        var bufGeom = new THREE.BufferGeometry().fromGeometry(geom);
+        var mesh = new THREE.Mesh(bufGeom, new THREE.MeshNormalMaterial());
+    </script>
+
+    <script> // dat.gui controls -----------------------------------------------
+        var z0 = 10;
+        var dgcontrols = new function () {
+            this.rotationSpeed = 0.001;
+            this.cameraz = z0;
+        }
+        var gui = new dat.GUI({ autoplace: false, width: 300 });
+        gui.add(dgcontrols, 'cameraz').min(5).max(30).step(1)
+          .name("Camera position");
+        gui.add(dgcontrols, 'rotationSpeed').min(0).max(0.005)
+          .name("Rotation speed");
+    </script>
+
+    <script> // three.js scene -------------------------------------------------
+        var aspect = window.innerWidth / window.innerHeight;
+        var camera = new THREE.PerspectiveCamera(75, aspect, 1, 10000);
+        camera.position.z = z0;
+        var scene = new THREE.Scene();
+        scene.add(camera);
+
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x0f0f0f, 1);
+        document.body.appendChild(renderer.domElement);
+
+        var object = new THREE.Object3D();
+        object.add(mesh);
+        scene.add(object);
+
+        window.requestAnimFrame = (function () {
+            return window.requestAnimationFrame ||
+                window.webkitRequestAnimationFrame ||
+                window.mozRequestAnimationFrame ||
+                function (callback) {
+                    window.setTimeout(callback, 1000 / 60);
+                };
+        })();
+
+        function render() {
+            object.rotation.x += dgcontrols.rotationSpeed;
+            object.rotation.y += dgcontrols.rotationSpeed;
+            camera.position.z = dgcontrols.cameraz;
+            renderer.render(scene, camera);
+            requestAnimFrame(render);
+        }
+    </script>
+
+    <script> // dragging -------------------------------------------------------
+        var isDragging = false;
+        var previousMousePosition = { x: 0, y: 0 };
+        $(renderer.domElement).on('mousedown', function (e) {
+            isDragging = true;
+        }).on('mousemove', function (e) {
+            var deltaMove = {
+                x: e.offsetX - previousMousePosition.x,
+                y: e.offsetY - previousMousePosition.y
+            };
+            if (isDragging) {
+                var deltaRotationQuaternion = new THREE.Quaternion()
+                    .setFromEuler(new THREE.Euler(
+                        Math.PI / 180 * (deltaMove.y * 1),
+                        Math.PI / 180 * (deltaMove.x * 1),
+                        0,
+                        'XYZ'
+                    ));
+                object.quaternion.multiplyQuaternions(deltaRotationQuaternion,
+                    object.quaternion);
+            }
+            previousMousePosition = {
+                x: e.offsetX,
+                y: e.offsetY
+            };
+        });
+        $(document).on('mouseup', function (e) {
+            isDragging = false;
+        });
+    </script>
+
+    <script> // render ---------------------------------------------------------
+        render();
+    </script>
+
+</body>
+
+</html>
