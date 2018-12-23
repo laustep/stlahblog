@@ -217,16 +217,16 @@ server &lt;-<span class="st"> </span><span class="cf">function</span>(input, out
 </div>
 <h1 id="ggplotly">ggplotly</h1>
 <p>Beware if you use <code>ggplotly</code>. It pertubs the order of the rows of the dataset. Do in this way:</p>
-<pre><code>  output[[&quot;plotly&quot;]] &lt;- renderPlotly({
-    gg &lt;- ggplot(dat, aes(x=variable, y=value, ids=1:nrow(dat))) + 
-      geom_boxplot()
-    ggly &lt;- ggplotly(gg, tooltip = &quot;y&quot;)
-    ids &lt;- ggly$x$data[[1]]$ids
-    ggly$x$data[[1]]$text &lt;- 
-      with(dat, paste0(&quot;&lt;b&gt; group: &lt;/b&gt;&quot;, Group, &quot;&lt;br/&gt;&quot;,
-                       &quot;&lt;b&gt; sample: &lt;/b&gt;&quot;, Sample, &quot;&lt;br/&gt;&quot;)[ids]
-    ggly %&gt;% onRender(addHoverBehavior)
-  })</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">  output[[<span class="st">&quot;plotly&quot;</span>]] &lt;-<span class="st"> </span><span class="kw">renderPlotly</span>({
+    gg &lt;-<span class="st"> </span><span class="kw">ggplot</span>(dat, <span class="kw">aes</span>(<span class="dt">x=</span>variable, <span class="dt">y=</span>value, <span class="dt">ids=</span><span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(dat))) <span class="op">+</span><span class="st"> </span>
+<span class="st">      </span><span class="kw">geom_boxplot</span>()
+    ggly &lt;-<span class="st"> </span><span class="kw">ggplotly</span>(gg, <span class="dt">tooltip =</span> <span class="st">&quot;y&quot;</span>)
+    ids &lt;-<span class="st"> </span>ggly<span class="op">$</span>x<span class="op">$</span>data[[<span class="dv">1</span>]]<span class="op">$</span>ids
+    ggly<span class="op">$</span>x<span class="op">$</span>data[[<span class="dv">1</span>]]<span class="op">$</span>text &lt;-<span class="st"> </span>
+<span class="st">      </span><span class="kw">with</span>(dat, <span class="kw">paste0</span>(<span class="st">&quot;&lt;b&gt; group: &lt;/b&gt;&quot;</span>, Group, <span class="st">&quot;&lt;br/&gt;&quot;</span>,
+                       <span class="st">&quot;&lt;b&gt; sample: &lt;/b&gt;&quot;</span>, Sample, <span class="st">&quot;&lt;br/&gt;&quot;</span>)[ids]
+    ggly <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">onRender</span>(addHoverBehavior)
+  <span class="er">}</span>)</code></pre></div>
 
     </div>
 
