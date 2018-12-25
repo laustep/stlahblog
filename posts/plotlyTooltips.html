@@ -72,7 +72,7 @@
 </div>
 
 <p>I’ve found several questions on Stackoverflow asking for tooltips on the outliers of a <code>plotly</code> boxplot. Here I provide a solution using Shiny and the <a href="http://qtip2.com/">qTip2</a> Javascript library.</p>
-<p>Below is the Shiny app. Download the files <code>jquery.qtip.min.css</code> and <code>jquery.qtip.min.js</code> and put them in the <code>www</code> subfolder.</p>
+<p>Below is the Shiny app. Download the two files <code>jquery.qtip.min.css</code> and <code>jquery.qtip.min.js</code> and put them in the <code>www</code> subfolder.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(plotly)
 <span class="kw">library</span>(shiny)
 <span class="kw">library</span>(shinyjs)
@@ -117,6 +117,8 @@ addHoverBehavior &lt;-<span class="st"> </span><span class="kw">c</span>(
   <span class="st">&quot;      Shiny.setInputValue('top_pct', top_px/rect.height);&quot;</span>,
   <span class="st">&quot;      Shiny.setInputValue('d_y', d.y);&quot;</span>,
   <span class="st">&quot;      Shiny.setInputValue('d_text', d.text);&quot;</span>,
+  <span class="st">&quot;    }else{&quot;</span>,
+  <span class="st">&quot;      $('#hover_info').qtip('hide');&quot;</span>,
   <span class="st">&quot;    }&quot;</span>,
   <span class="st">&quot;  });&quot;</span>,
   <span class="st">&quot;  el.on('plotly_unhover', function(data) {&quot;</span>,
