@@ -94,7 +94,7 @@
           -1.6, 1.6,
           -1.6, 1.6,
           -1.6, 1.6,
-          120, 120, 120);
+          100, 100, 100);
 
       // gradient ------------------------------------------------------------
       function gradient(xyz) {
@@ -149,7 +149,7 @@
       }
 
       var bufGeom = new THREE.BufferGeometry().fromGeometry(geom);
-      var Barth = new THREE.Mesh(bufGeom, new THREE.MeshNormalMaterial());
+      var Barth = new THREE.Mesh(bufGeom, new THREE.MeshNormalMaterial({side: THREE.FrontSide}));
     </script>
 
   <script> // ------------------------------------------------------------------
@@ -224,7 +224,30 @@
       var q4 = inversion(alpha, p4, r, center);
       var cs = circumsphere(q1, q2, q3, q4);
       var center2 = [cs.center[0] - O1x, cs.center[1], cs.center[2]];
-      return { center: center2, radius: cs.radius/Math.sqrt(3) };
+      return { center: center2, radius: cs.radius };
+    }
+
+    function iSphere(n, alpha, center, r) {
+      var sine = Math.sin(Math.PI / n);
+      var coef = 1 / (1 + sine);
+      var halfside = r * sine;
+      var sRadius = coef * (r-halfside);
+      var O1x = 2 / alpha * r;
+      var p1 = [sRadius, 0, 0];
+      var p2 = [0, sRadius, 0];
+      var p3 = [-sRadius, 0, 0];
+      var p4 = [0, 0, sRadius];
+      var q1 = inversion(alpha, p1, r, [0,0,0]);
+      var q2 = inversion(alpha, p2, r, [0,0,0]);
+      var q3 = inversion(alpha, p3, r, [0,0,0]);
+      var q4 = inversion(alpha, p4, r, [0,0,0]);
+      var cs = circumsphere(q1, q2, q3, q4);
+      var center2 = [
+        cs.center[0] - O1x + center[0],
+        cs.center[1] + center[1],
+        cs.center[2] + center[2]
+      ];
+      return { center: center2, radius: cs.radius };
     }
   </script>
 
@@ -236,31 +259,45 @@
         var sphere = oneSphere(n, beta, center, r, shift + 2 * i * Math.PI / n);
         out.push(sphere);
       }
-      return out;
+      return {spheres: out, isphere: iSphere(n,beta,center,r)};
     }
 
     function Chains(n, beta, depth, k) {
       if (depth == 1) {
-        return Chain(n, beta, [0, 0, 0], 1, k);
+        var chain = Chain(n, beta, [0, 0, 0], 1, k);
+        return {spheres: chain.spheres, ispheres: [chain.isphere]};
       }
       var chns = Chains(n, beta, depth - 1, -k);
-      var out = [];
+      var spheres = [];
+      var ispheres = chns.ispheres;
       for (var i = 0; i < n ** (depth - 1); i++) {
-        var sphere = chns[i];
+        var sphere = chns.spheres[i];
         var newchain = Chain(n, beta, sphere.center, sphere.radius, -k);
-        out = out.concat(newchain);
+        spheres = spheres.concat(newchain.spheres);
+        ispheres.push(newchain.isphere);
       }
-      return out;
+      return {spheres: spheres, ispheres: ispheres};
     }
   </script>
 
   <script> // ------------------------------------------------------------------
+    var material = new THREE.MeshNormalMaterial();
     function addChain(object, n, beta, depth, k) {
-      var spheres = Chains(n, beta, depth, k);
-      for (i = 0; i < spheres.length; i++) {
+      var chains = Chains(n, beta, depth, k);
+      var ispheres = chains.ispheres;
+      for (var i = 0; i < ispheres.length; i++) {
+        var isphere = ispheres[i];
+        var geometry = new THREE.SphereBufferGeometry(isphere.radius, 16, 16);
+        var insphere = new THREE.Mesh(geometry, material);
+        insphere.position.set(isphere.center[0],isphere.center[1],isphere.center[2]);
+        object.add(insphere);
+      }
+      var spheres = chains.spheres;
+      for (var i = 0; i < spheres.length; i++) {
         var mesh = Barth.clone();
         var sphere = spheres[i];
-        mesh.scale.set(sphere.radius,sphere.radius,sphere.radius);
+        var s = sphere.radius / Math.sqrt(3);
+        mesh.scale.set(s,s,s);
         mesh.position.set(sphere.center[0], sphere.center[1], 0);
         object.add(mesh);
       }
@@ -329,8 +366,8 @@
         if (isDragging) {
           var deltaRotationQuaternion = new THREE.Quaternion()
             .setFromEuler(new THREE.Euler(
-              Math.PI / 180 * (deltaMove.y * 1),
-              Math.PI / 180 * (deltaMove.x * 1),
+              Math.PI / 180 * (deltaMove.y * 0.5),
+              Math.PI / 180 * (deltaMove.x * 0.5),
               0,
               'XYZ'
             ));
