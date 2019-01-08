@@ -4,12 +4,14 @@
   <title>Steiner chain of Barth sextics</title>
   <style>
     html, body {
-       margin: 1px;
+       margin: 0;
        height: 100%;
+       width: 100%;
     }
     #c {
        width: 100%;
-
+       box-sizing: border-box;
+       display: block;
     }
   </style>
 
@@ -71,6 +73,7 @@
 
   <script>
     var beta = 0.3;
+    var nv = 80;
   </script>
 
   <script>
@@ -94,7 +97,7 @@
           -1.6, 1.6,
           -1.6, 1.6,
           -1.6, 1.6,
-          100, 100, 100);
+          nv, nv, nv);
 
       // gradient ------------------------------------------------------------
       function gradient(xyz) {
@@ -136,20 +139,20 @@
               tris[3 * i + 2][1],
               tris[3 * i + 2][2]);
           geom.vertices[3 * i] = v1;
-          geom.vertices[3 * i + 1] = v2;
-          geom.vertices[3 * i + 2] = v3;
+          geom.vertices[3 * i + 1] = v3;
+          geom.vertices[3 * i + 2] = v2;
           geom.faces[i] = new THREE.Face3(
               3 * i,
               3 * i + 1,
               3 * i + 2,
               [gradient(v1).normalize(),
-              gradient(v2).normalize(),
-              gradient(v3).normalize()]
+              gradient(v3).normalize(),
+              gradient(v2).normalize()]
           );
       }
 
       var bufGeom = new THREE.BufferGeometry().fromGeometry(geom);
-      var Barth = new THREE.Mesh(bufGeom, new THREE.MeshNormalMaterial({side: THREE.FrontSide}));
+      var Barth = new THREE.Mesh(bufGeom, new THREE.MeshNormalMaterial({side: THREE.BackSide}));
     </script>
 
   <script> // ------------------------------------------------------------------
@@ -307,21 +310,40 @@
   <script>
     var container = document.getElementById("c");
     var div = document.getElementById("controls");
-    $(container).css("height", window.innerHeight - $(div).height() - 8);
+    $(container).css("height", window.innerHeight - $(div).height() - 10);// 10 = padding
     var width = $(container).width();
-    var height = $(container).height() - $(div).height() - 8;
+    var height = $(container).height() - $(div).height();
     var aspect = width / height;
     var camera = new THREE.PerspectiveCamera(70, aspect, 1, 10000);
     camera.position.z = 2;
 
-    var canvas = document.querySelector("#c");
-    var renderer = new THREE.WebGLRenderer({canvas: canvas});
+    var renderer = new THREE.WebGLRenderer({canvas: container});
     renderer.setSize(width, height);
+
+    $(window).on("resize", function(){
+      $(container).css("width", window.innerWidth);
+      $(container).css("height", window.innerHeight - $(div).height() - 10);
+      camera.aspect = renderer.domElement.clientWidth / renderer.domElement.clientHeight;
+      camera.updateProjectionMatrix();
+    })
 
     var scene = new THREE.Scene();
     scene.add(camera);
     var chain = new THREE.Object3D();
     scene.add(chain);
+
+    //This will add a starfield to the background
+    var starsGeometry = new THREE.Geometry();
+    for ( var i = 0; i < 10000; i ++ ) {
+    	var star = new THREE.Vector3();
+    	star.x = THREE.Math.randFloatSpread( 2000 );
+    	star.y = THREE.Math.randFloatSpread( 2000 );
+    	star.z = THREE.Math.randFloatSpread( 2000 );
+    	starsGeometry.vertices.push( star );
+    }
+    var starsMaterial = new THREE.PointsMaterial( { color: 0x888888 } );
+    var starField = new THREE.Points( starsGeometry, starsMaterial );
+    scene.add( starField );
 
     window.requestAnimFrame = (function () {
       return window.requestAnimationFrame ||
