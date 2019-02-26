@@ -1,0 +1,165 @@
+<html>
+
+<head>
+  <title>Cylinder to torus</title>
+  <style>
+    html, body {
+       margin: 0;
+       height: 100%;
+       width: 100%;
+    }
+    #c {
+       width: 100%;
+       box-sizing: border-box;
+       display: block;
+    }
+  </style>
+
+  <link rel="stylesheet" href="../libraries/jquery-ui/jquery-ui.min.css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script src="../libraries/jquery-ui/jquery-ui.min.js"></script>
+  <script src="../libraries/three.min.js"></script>
+
+  <script>
+    var nframes = 100;
+    var frame = 10;
+    $(function () {
+      $("#slider").slider({
+        min: 0,
+        max: nframes-1,
+        value: frame,
+        change: function () {
+          frame = $(this).slider("option", "value");
+        },
+        slide: function () {
+          frame = $(this).slider("option", "value");
+        }
+      });
+    });
+  </script>
+
+</head>
+
+<body>
+
+  <div id="controls" style="width: 100%; display: table; background-color: chartreuse; padding-top: 10px; padding-bottom: 10px;">
+    <div style="display: table-row">
+      <div style="display: table-cell;">
+        <div id="slider" style="margin-right: 30px; margin-left: 30px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <canvas id="c"></canvas>
+
+  <script>
+    var material = new THREE.MeshNormalMaterial({ side: THREE.DoubleSide });
+    function Torus(A, r, a){
+      var geometry = 
+        new THREE.TorusBufferGeometry(
+              r, 0.1, 48, 64, 2*a
+            );
+      var torus = new THREE.Mesh(geometry, material);
+      torus.position.set(A.x, A.y, A.z);
+      return torus;
+    }  
+  </script>
+
+  <script>
+    var Objects = new Array(nframes);
+    for(var i = 0; i < nframes; i++){
+      var object = new THREE.Object3D();
+      var a = 0.1 + i/(nframes-1) * (Math.PI - 0.1);
+      var r = 1/2/a;
+      var A = new THREE.Vector3(-r, 0, 0);
+      object.add(Torus(A, r, a));
+      Objects[i] = object;
+    }
+  </script>
+
+  <script>
+    var container = document.getElementById("c");
+    var div = document.getElementById("controls");
+    $(container).css("height", window.innerHeight - $(div).height() - 40);
+    var width = $(container).width();
+    var height = $(container).height() - $(div).height();
+    var aspect = width / height;
+    var camera = new THREE.PerspectiveCamera(70, aspect, 1, 10000);
+    camera.position.z = 2;
+
+    var renderer = new THREE.WebGLRenderer({canvas: container});
+    renderer.setSize(width, height);
+
+    $(window).on("resize", function(){
+      $(container).css("width", window.innerWidth);
+      $(container).css("height", window.innerHeight - $(div).height() - 20);
+      camera.aspect = renderer.domElement.clientWidth / renderer.domElement.clientHeight;
+      camera.updateProjectionMatrix();
+    })
+
+    var scene = new THREE.Scene();
+    scene.add(camera);
+
+    window.requestAnimFrame = (function () {
+      return window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        function (callback) {
+          window.setTimeout(callback, 1000 / 60);
+        };
+    })();
+
+    function render() {
+      var object = Objects[frame];
+      scene.add(object);
+      renderer.render(scene, camera);
+      for(var i = 0; i < nframes; i++){
+        Objects[i].rotation.x += 0.001;
+        Objects[i].rotation.y += 0.001;
+      }
+      scene.remove(object);
+      requestAnimFrame(render);
+    }
+  </script>
+
+  <script> // mouse dragging ---------------------------------------------------
+    var isDragging = false;
+    var previousMousePosition = { x: 0, y: 0 };
+    $(renderer.domElement).on('mousedown', function (e) {
+      isDragging = true;
+    }).on('mousemove', function (e) {
+      var deltaMove = {
+        x: e.offsetX - previousMousePosition.x,
+        y: e.offsetY - previousMousePosition.y
+      };
+      if (isDragging) {
+        var deltaRotationQuaternion = new THREE.Quaternion()
+          .setFromEuler(new THREE.Euler(
+            Math.PI / 180 * (deltaMove.y * 1),
+            Math.PI / 180 * (deltaMove.x * 1),
+            0,
+            'XYZ'
+          ));
+        for (var i = 0; i < nframes; i++) {
+          Objects[i].quaternion.multiplyQuaternions(deltaRotationQuaternion,
+            Objects[i].quaternion);
+        }
+      }
+      previousMousePosition = {
+        x: e.offsetX,
+        y: e.offsetY
+      };
+    });
+    $(document).on('mouseup', function (e) {
+      isDragging = false;
+    });
+  </script>
+
+
+  <script>
+    requestAnimFrame(render);
+  </script>
+
+</body>
+
+</html>
