@@ -1,0 +1,263 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Multiple integral over a polyhedron</title>
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/pandoc-solarized.css" />  
+  <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+</head>
+
+<body>
+  <!-- Sidebar. -->
+  <div class="sidebar">
+    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+      <a href="https://www.r-bloggers.com/">
+        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+      </a>
+      <br />
+      <a href="http://t-redactyl.io/">
+        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
+      </a>
+      <a href="http://timelyportfolio.blogspot.be/">
+        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
+      </a>
+      <br />
+      <a href="https://antoineguillot.wordpress.com/blog/">
+        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+      </a>
+      <br />
+      <a href="https://fronkonstin.com/">
+        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="header">
+      <div id="logo" style="position:absolute;">
+        <a href="../">
+          <img src="../images/stla.jpg" alt="stla" width="100px" />
+        </a>
+      </div>
+      <div id="navigation" style="margin-top:50px;">
+        <a href="../">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../archive.html">Archive</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Multiple integral over a polyhedron</h1> <div class="info">
+    Posted on February 27, 2019
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="../tags/R.html">R</a>, <a href="../tags/maths.html">maths</a>, <a href="../tags/geometry.html">geometry</a>
+    
+</div>
+
+<p>You are a R user and you have to evaluate the integral <span class="math display">\[
+\int_{-5}^4\int_{-5}^{3-x}\int_{-10}^{6-x-y} f(x,y,z)
+\,\mathrm{d}z\,\mathrm{d}y\,\mathrm{d}x
+\]</span> for a certain function <span class="math inline">\(f\)</span>. How?</p>
+<p>A possibility is to nest the <code>integrate</code> function:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span><span class="cf">function</span>(x,y,z) x <span class="op">+</span><span class="st"> </span>y<span class="op">*</span>z
+<span class="kw">integrate</span>(<span class="kw">Vectorize</span>(<span class="cf">function</span>(x) { 
+  <span class="kw">integrate</span>(<span class="kw">Vectorize</span>(<span class="cf">function</span>(y) { 
+    <span class="kw">integrate</span>(<span class="cf">function</span>(z) { 
+      <span class="kw">f</span>(x,y,z) 
+    }, <span class="op">-</span><span class="dv">10</span>, <span class="dv">6</span><span class="op">-</span>x<span class="op">-</span>y)<span class="op">$</span>value
+   }), <span class="op">-</span><span class="dv">5</span>, <span class="dv">3</span><span class="op">-</span>x)<span class="op">$</span>value 
+}), <span class="op">-</span><span class="dv">5</span>, <span class="dv">4</span>) 
+## -5358.3 with absolute error &lt; 9.5e-11</code></pre></div>
+<p>This approach works well in general. But it has one default: the estimate of the absolute error it returns is not reliable, because the estimates of the absolute errors of the inner integrals are not taken into account.</p>
+<p>We provide another way to evaluate this integral, giving a reliable estimate of the absolute error.</p>
+<p>The domain of integration is defined by the set of inequalities: <span class="math display">\[
+\left\{\begin{matrix}
+-5 &amp; \leq &amp; x &amp; \leq &amp; 4 \\
+-5 &amp; \leq &amp; y &amp; \leq &amp; 3-x \\
+-10 &amp; \leq &amp; z &amp; \leq &amp; 6-x-y
+\end{matrix}
+\right.
+\]</span> which is equivalent to <span class="math display">\[
+\left\{\begin{matrix}
+-x &amp; \leq &amp; 5 \\
+x &amp; \leq &amp; 4 \\
+-y &amp; \leq &amp; 5 \\
+x+y &amp; \leq &amp; 3 \\
+-z &amp; \leq &amp; 10 \\
+x+y+z &amp; \leq &amp; 6
+\end{matrix}
+\right..
+\]</span> This set of inequalities defines a convex polyhedron. We can get the vertices of this polyhedron with the <code>rcdd</code> package:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">A &lt;-<span class="st"> </span><span class="kw">rbind</span>(
+  <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="co"># -x</span>
+  <span class="kw">c</span>( <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="co"># x</span>
+  <span class="kw">c</span>( <span class="dv">0</span>,<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>), <span class="co"># -y</span>
+  <span class="kw">c</span>( <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>), <span class="co"># x+y</span>
+  <span class="kw">c</span>( <span class="dv">0</span>, <span class="dv">0</span>,<span class="op">-</span><span class="dv">1</span>), <span class="co"># -z</span>
+  <span class="kw">c</span>( <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>)  <span class="co"># x+y+z</span>
+)
+b &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">10</span>, <span class="dv">6</span>)
+<span class="kw">library</span>(rcdd)
+<span class="kw">scdd</span>(<span class="kw">makeH</span>(A,b))<span class="op">$</span>output[,<span class="op">-</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>)]
+##      [,1] [,2] [,3]
+## [1,]   -5   -5   16
+## [2,]   -5    8    3
+## [3,]    4   -1    3
+## [4,]    4   -5    7
+## [5,]    4   -1  -10
+## [6,]    4   -5  -10
+## [7,]   -5    8  -10
+## [8,]   -5   -5  -10</code></pre></div>
+<p>Alternatively, we can also get the vertices with the <code>vertexenum</code> package:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(vertexenum)
+<span class="kw">enumerate.vertices</span>(A,b)
+##      [,1] [,2] [,3]
+## [1,]    4   -1    3
+## [2,]    4   -5    7
+## [3,]   -5   -5   16
+## [4,]   -5    8    3
+## [5,]    4   -1  -10
+## [6,]    4   -5  -10
+## [7,]   -5   -5  -10
+## [8,]   -5    8  -10</code></pre></div>
+<p>Then, to evaluate the integral, we proceed as follows:</p>
+<ul>
+<li><p>split the polyhedron into simplices (tetrahedra), with the <code>geometry</code> package;</p></li>
+<li><p>evaluate the integral over the union of these simplices with the <code>SimplicialCubature</code> package.</p></li>
+</ul>
+<p>Let’s go. We split the polyhedron:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vertices &lt;-<span class="st"> </span><span class="kw">enumerate.vertices</span>(A,b)
+<span class="kw">library</span>(geometry)
+ix &lt;-<span class="st"> </span><span class="kw">delaunayn</span>(vertices)</code></pre></div>
+<p>Here is the polyhedron splitted into simplices:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(rgl)
+triangles &lt;-<span class="st"> </span><span class="kw">do.call</span>(
+  cbind,
+  <span class="kw">lapply</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(ix), <span class="cf">function</span>(i) <span class="kw">combn</span>(ix[i,], <span class="dv">3</span>))
+)
+mesh &lt;-<span class="st"> </span><span class="kw">tmesh3d</span>(<span class="kw">t</span>(vertices), triangles, <span class="dt">homogeneous =</span> <span class="ot">FALSE</span>)
+<span class="kw">view3d</span>(<span class="dv">80</span>, <span class="dv">10</span>, <span class="dt">zoom =</span> <span class="fl">0.6</span>)
+<span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">&quot;yellow&quot;</span>, <span class="dt">alpha =</span> <span class="fl">0.3</span>)
+<span class="kw">wire3d</span>(mesh)</code></pre></div>
+<div class="figure">
+<img src="./figures/integralPolyhedron-polyhedron-1.png" />
+
+</div>
+<p>We store the union of the obtained simplices in an array <code>S</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">S &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="ot">NA_real_</span>, <span class="dt">dim=</span><span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">4</span>,<span class="kw">nrow</span>(ix)))
+<span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(ix)){
+  S[,,i] &lt;-<span class="st"> </span><span class="kw">t</span>(vertices[ix[i,],])
+}</code></pre></div>
+<p>Now we are ready to use the <code>SimplicialCubature</code> package. Let’s define the function <span class="math inline">\(f\)</span> before, for example:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span><span class="cf">function</span>(xyz){
+  xyz[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>xyz[<span class="dv">2</span>]<span class="op">*</span>xyz[<span class="dv">3</span>] <span class="co"># f(x,y,z) = x + y*z</span>
+}</code></pre></div>
+<p>Finally:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(SimplicialCubature)
+<span class="kw">adaptIntegrateSimplex</span>(f, S)
+## $integral
+## [1] -5358.3
+## 
+## $estAbsError
+## [1] 1.18797e-08
+## 
+## $functionEvaluations
+## [1] 330
+## 
+## $returnCode
+## [1] 0
+## 
+## $message
+## [1] &quot;OK&quot;</code></pre></div>
+<p>We get the estimated value of the integral with a reliable estimate of the absolute error.</p>
+<p>For this example, we can do better. The function <span class="math inline">\(f\)</span> is a polynomial: <span class="math display">\[
+f(x,y,z) = x + yz.
+\]</span></p>
+<p>Then we can get the exact value of the integral by using the <code>integrateSimplexPolynomial</code> function of the <code>SimplicialCubature</code> package. Firstly, we have to define the polynomial with the <code>definePoly</code> function. One has <span class="math display">\[
+f(x,y,z) = c_1 \times x^{\alpha_1}y^{\beta_1}z^{\gamma_1} \, + \,
+c_2 \times x^{\alpha_2}y^{\beta_2}z^{\gamma_2}
+\]</span> with <span class="math inline">\(c_1 = 1\)</span>, <span class="math inline">\(c_2=1\)</span>, <span class="math inline">\((\alpha_1,\beta_1,\gamma_1)=(1,0,0)\)</span>, <span class="math inline">\((\alpha_2,\beta_2,\gamma_2)=(0,1,1)\)</span>. Then the polynomial is defined in this way:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">P &lt;-<span class="st"> </span><span class="kw">definePoly</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>), <span class="kw">rbind</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>), <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>)))</code></pre></div>
+<p>And its integral is obtained in this way:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">integrateSimplexPolynomial</span>(P, S)
+## $integral
+## [1] -5358.3
+## 
+## $functionEvaluations
+## [1] 24</code></pre></div>
+
+    </div>
+
+
+    <div id="footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </div>
+
+  </div>
+
+  <div id="disqus_thread"></div>
+  <div class="pagination">
+    <ul>
+      <li>
+        <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+      </li>
+    </ul>
+  </div>
+</body>
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+<!-- Google Prettify -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+<script>
+  var pres = document.getElementsByTagName("pre");
+  for (var i = 0; i < pres.length; ++i) {
+    
+    pres[i].className = pres[i].className + " prettyprint linenums";
+    
+  }
+  prettyPrint();
+</script> 
+
+</html>
