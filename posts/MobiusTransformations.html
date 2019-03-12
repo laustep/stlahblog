@@ -1,0 +1,465 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Generalized circles and Möbius transformations</title>
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/pandoc-solarized.css" />  
+  <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+</head>
+
+<body>
+  <!-- Sidebar. -->
+  <div class="sidebar">
+    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+      <a href="https://www.r-bloggers.com/">
+        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+      </a>
+      <br />
+      <a href="http://t-redactyl.io/">
+        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
+      </a>
+      <a href="http://timelyportfolio.blogspot.be/">
+        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
+      </a>
+      <br />
+      <a href="https://antoineguillot.wordpress.com/blog/">
+        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+      </a>
+      <br />
+      <a href="https://fronkonstin.com/">
+        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="header">
+      <div id="logo" style="position:absolute;">
+        <a href="../">
+          <img src="../images/stla.jpg" alt="stla" width="100px" />
+        </a>
+      </div>
+      <div id="navigation" style="margin-top:50px;">
+        <a href="../">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../archive.html">Archive</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Generalized circles and Möbius transformations</h1> <div class="info">
+    Posted on March 12, 2019
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="../tags/R.html">R</a>, <a href="../tags/maths.html">maths</a>, <a href="../tags/geometry.html">geometry</a>
+    
+</div>
+
+<p>It is well known that a Möbius transformation maps a generalized circle to a generalized circle. In this blog post, not only we prove this fact, but we also provide the equation of the image generalized circle.</p>
+<h1 id="generalized-circle">Generalized circle</h1>
+<p>A <em>generalized circle</em> is a circle or a line. We shall see that a generalized circle <span class="math inline">\(\mathcal{C}\)</span> has equation <span class="math display">\[
+Az\bar{z} + \bar{\gamma}z + \gamma\bar{z} = D 
+\]</span> where <span class="math inline">\(A\)</span> and <span class="math inline">\(D\)</span> are real numbers, <span class="math inline">\(\gamma \in \mathbb{C}\)</span>, and</p>
+<ul>
+<li><p><span class="math inline">\(A=0\)</span>, <span class="math inline">\(D \geq 0\)</span>, <span class="math inline">\(\gamma \neq 0\)</span>, when <span class="math inline">\(\mathcal{C}\)</span> is a line;</p></li>
+<li><p><span class="math inline">\(A \neq 0\)</span> when <span class="math inline">\(\mathcal{C}\)</span> is a circle, and <span class="math inline">\({|\gamma|}^2 + AD &gt; 0\)</span>.</p></li>
+</ul>
+<h2 id="circle-equation">Circle equation</h2>
+<p>The circle with center <span class="math inline">\(z_0\)</span> and radius <span class="math inline">\(R\)</span> has equation <span class="math inline">\(|z-z_0|=R\)</span>. Now, <span class="math display">\[
+|z-z_0|=R \ \ \iff \ \ {|z-z_0|}^2=R^2 
+\ \ \iff (z-z_0)\overline{(z-z_0)} = R^2
+\]</span> <span class="math display">\[
+\tag{1}\iff \ \ 
+z \bar z - \bar{z_0}z - z_0\bar{z} = R^2 - {|z_0|}^2.
+\]</span></p>
+<p>Now, let the equation <span class="math display">\[
+Az\bar{z} + \bar{\gamma}z + \gamma\bar{z} = D 
+\]</span> with <span class="math inline">\(A\)</span>, <span class="math inline">\(D\)</span> real numbers, <span class="math inline">\(A \neq 0\)</span>, and <span class="math inline">\(\gamma \in \mathbb{C}\)</span>.</p>
+<p>It is equivalent to <span class="math display">\[
+z\bar{z} + \frac{\bar{\gamma}}{A}z + \frac{\gamma}{A}\bar{z} 
+ = \frac{D}{A}.
+\]</span></p>
+<p>Then it has the same form as <span class="math inline">\((1)\)</span> with <span class="math display">\[
+z_0 = - \frac{\gamma}{A}
+\]</span> and <span class="math display">\[
+R^2 = {|z_0|}^2 + \frac{D}{A} &gt; 0.
+\]</span> Thus <span class="math display">\[
+\dfrac{{|\gamma|}^2}{A^2} + \frac{D}{A} &gt; 0, 
+\]</span> that is <span class="math inline">\({|\gamma|}^2 + AD &gt; 0\)</span>.</p>
+<h2 id="line-equation">Line equation</h2>
+<p>The general equation of a line is <span class="math display">\[
+\cos\theta \cdot x + \sin\theta \cdot y = d 
+\]</span> where <span class="math inline">\(\theta \in [0,2\pi)\)</span> is the <em>direction</em> of the line, and <span class="math inline">\(d \geq 0\)</span> is its <em>offset</em>.</p>
+<p>Letting <span class="math inline">\(z = x+iy\)</span>, it is equivalent to <span class="math display">\[
+\bar{\gamma}z + \gamma\bar{z} = D 
+\]</span> with <span class="math inline">\(\cos\theta = \frac{\Re(\gamma)}{|\gamma|}\)</span> and <span class="math inline">\(\sin\theta = \frac{\Im(\gamma)}{|\gamma|}\)</span>, hence <span class="math inline">\(\theta = \textrm{arg}(\gamma)\)</span>, and <span class="math inline">\(d = \frac{D}{2|\gamma|}\)</span>. Indeed, <span class="math display">\[
+\bar{\gamma}z + \gamma\bar{z} = D  
+\ \ \iff \ \ 
+\frac{\bar{\gamma}}{|\gamma|} z + \frac{\gamma}{|\gamma|}\bar{z} 
+ = \frac{D}{|\gamma|} 
+\]</span> <span class="math display">\[
+\ \ \iff
+\left( \frac{\bar{\gamma} + \gamma}{|\gamma|} \right) x 
+ + \left( \frac{\bar{\gamma} - \gamma}{|\gamma|} \right) i y 
+ = \frac{D}{|\gamma|} 
+\]</span> <span class="math display">\[
+\ \ \iff
+\left( \frac{\Re(\gamma)}{|\gamma|} \right) x 
+ + \left( \frac{\Im(\gamma)}{|\gamma|} \right) y 
+ = \frac{D}{2|\gamma|}. 
+\]</span></p>
+<p>Conversely, if the equation <span class="math inline">\(\cos\theta \cdot x + \sin\theta \cdot y = d\)</span> is given, then one can take <span class="math inline">\(\gamma = \cos\theta + i \sin\theta\)</span>, and <span class="math inline">\(D = 2d\)</span>.</p>
+<h1 id="mobius-transformations">Möbius transformations</h1>
+<p>A <em>Möbius transformation</em> is a function <span class="math inline">\(M \colon \hat{\mathbb{C}} \to \hat{\mathbb{C}}\)</span> of the form <span class="math display">\[
+M(z) = \frac{az+b}{cz+d},
+\]</span> where <span class="math inline">\(a\)</span>, <span class="math inline">\(b\)</span>, <span class="math inline">\(c\)</span>, <span class="math inline">\(d\)</span> are complex numbers satisfying <span class="math inline">\(ad - bc \neq 0\)</span>, and we agree with</p>
+<ul>
+<li><p><span class="math inline">\(M(\infty) = \infty\)</span> if <span class="math inline">\(c = 0\)</span> (hence <span class="math inline">\(d \neq 0\)</span>);</p></li>
+<li><p>otherwise, <span class="math inline">\(M(\infty) = a/c\)</span> and <span class="math inline">\(M(-d/c) = \infty\)</span>.</p></li>
+</ul>
+<p>We say that the matrix <span class="math display">\[
+A = \begin{pmatrix} a &amp; b \\ c &amp; d \end{pmatrix}
+\]</span> is <em>associated</em> with <span class="math inline">\(M\)</span>. Note that <span class="math inline">\(A\)</span> is invertible because of the condition <span class="math inline">\(ad - bc \neq 0\)</span>.</p>
+<p>Also note that <span class="math inline">\(M(z) \equiv z\)</span> means that the identity matrix is associated with <span class="math inline">\(M\)</span>.</p>
+<h2 id="composition-of-mobius-transformations">Composition of Möbius transformations</h2>
+<p>Let <span class="math inline">\(M_1\)</span> and <span class="math inline">\(M_2\)</span> be two Möbius transformations, <span class="math inline">\(A_1\)</span> a matrix associated with <span class="math inline">\(M_1\)</span> and <span class="math inline">\(A_2\)</span> a matrix associated with <span class="math inline">\(M_2\)</span>. Then <span class="math inline">\(M := M_1 \circ M_2\)</span> is a Möbius transformation and <span class="math inline">\(A_1A_2\)</span> is a matrix associated with <span class="math inline">\(M\)</span>.</p>
+<p>As a consequence, any Möbius transformation <span class="math inline">\(M\)</span> is invertible and its inverse is the Möbius transformation associated to the matrix <span class="math inline">\(\begin{pmatrix} d &amp; -b \\ -c &amp; a \end{pmatrix}\)</span> if <span class="math inline">\(\begin{pmatrix} a &amp; b \\ c &amp; d \end{pmatrix}\)</span> is a matrix associated with <span class="math inline">\(M\)</span>.</p>
+<h2 id="image-of-a-generalized-circle">Image of a generalized circle</h2>
+<p>We shall see that a Möbius transformations maps a generalized circle to a generalized circle. We denote by <span class="math inline">\(M\)</span> the Möbius transformation associated to <span class="math inline">\(\begin{pmatrix} a &amp; b \\ c &amp; d \end{pmatrix}\)</span>.</p>
+<h3 id="image-of-a-circle">Image of a circle</h3>
+<p>Let <span class="math inline">\(\mathcal{C}\)</span> be the circle of center <span class="math inline">\(z_0\)</span> and radius <span class="math inline">\(R\)</span>. We have seen that <span class="math inline">\(\mathcal{C}\)</span> has equation <span class="math display">\[
+z \bar z - \bar{z_0}z - z_0\bar{z} = R^2 - {|z_0|}^2.
+\]</span> We set <span class="math inline">\(H = R^2 - {|z_0|}^2\)</span>. Inserting <span class="math inline">\(z = M^{-1}(w) = \frac{dw - b}{a - cw}\)</span>, we get <span class="math display">\[
+(dw - b)\overline{(dw - b)} 
+ - \bar{z_0}(dw - b)\overline{(a - cw)}
+ - z_0 \overline{(dw - b)}(a-cw) \\
+ = H (a - cw)\overline{(a - cw)}, 
+\]</span> that is, <span class="math display">\[
+\begin{align}
+&amp; \Bigl( d\bar{d} + d\bar{c}\bar{z_0} + \bar{d}c z_0 
+  - H c\bar{c} \Bigr) w \bar{w} \\ 
+\qquad &amp;  - \Bigl( d\bar{b} + d\bar{a}\bar{z_0} + c\bar{b}z_0 
+    - H c\bar{a} \Bigr) w \\ 
+\qquad &amp;  - \Bigl( b\bar{d} + b\bar{c}\bar{z_0} + \bar{d}a z_0 
+      - H a\bar{c} \Bigr) \bar{w} \\
+ = &amp; \; H a\bar{a} - b\bar{b} - b\bar{a}\bar{z_0} - \bar{b}a z_0.
+\end{align}
+\]</span> Now, <span class="math display">\[
+\begin{align}
+d\bar{d} + d\bar{c}\bar{z_0} + \bar{d} c z_0 - H c\bar{c} 
+ &amp; = (d + c z_0)\overline{(d + c z_0)} - R^2 c\bar{c} \\
+ &amp; = {|d+c z_0|}^2 - R^2{|c|}^2 \\ &amp; =: A,
+\end{align}
+\]</span> <span class="math display">\[
+\begin{align}
+H a\bar{c} - b\bar{d} - b\bar{c}\bar{z_0} - \bar{d}a z_0   
+ &amp; = R^2 a\bar{c} - (a z_0 + b)\overline{(c z_0 + d)} \\ &amp; =: \gamma,
+\end{align}
+\]</span> <span class="math display">\[
+\begin{align}
+H a\bar{a} - b\bar{b} - b\bar{a}\bar{z_0} - \bar{b}a z_0   
+ &amp; = R^2 a\bar{a} - (b + a z_0)\overline{(b + a z_0)} \\ 
+ &amp; = R^2{|a|}^2 - {|b + a z_0|}^2 \\ &amp; =: D.
+\end{align}
+\]</span> The equation is <span class="math display">\[
+A w\bar{w} + \bar\gamma w + \gamma\bar{w} = D.
+\]</span></p>
+<p>If <span class="math inline">\(\boxed{A \neq 0}\)</span>, that is <span class="math inline">\(|d+c z_0| \neq R|c|\)</span>, this is the equation of the circle with center <span class="math inline">\(-\gamma/A\)</span> and radius <span class="math inline">\(\sqrt{\frac{{|\gamma|}^2}{A^2} + \frac{D}{A}}\)</span>.</p>
+<p>Let’s check with R. To do so, we use the <code>circumcircle</code> function below, which returns the center and the radius of the circle passing by <code>z1</code>, <code>z2</code>, <code>z3</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">circumcircle &lt;-<span class="st"> </span><span class="cf">function</span>(z1,z2,z3){
+  x1 &lt;-<span class="st"> </span><span class="kw">Re</span>(z1); y1 &lt;-<span class="st"> </span><span class="kw">Im</span>(z1); p1 &lt;-<span class="st"> </span><span class="kw">c</span>(x1,y1)
+  x2 &lt;-<span class="st"> </span><span class="kw">Re</span>(z2); y2 &lt;-<span class="st"> </span><span class="kw">Im</span>(z2); p2 &lt;-<span class="st"> </span><span class="kw">c</span>(x2,y2)
+  x3 &lt;-<span class="st"> </span><span class="kw">Re</span>(z3); y3 &lt;-<span class="st"> </span><span class="kw">Im</span>(z3); p3 &lt;-<span class="st"> </span><span class="kw">c</span>(x3,y3)
+  a &lt;-<span class="st"> </span><span class="kw">det</span>(<span class="kw">cbind</span>(<span class="kw">rbind</span>(p1,p2,p3),<span class="dv">1</span>))
+  q1 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">crossprod</span>(p1))
+  q2 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">crossprod</span>(p2))
+  q3 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">crossprod</span>(p3))
+  q &lt;-<span class="st"> </span><span class="kw">c</span>(q1,q2,q3)
+  x &lt;-<span class="st"> </span><span class="kw">c</span>(x1,x2,x3)
+  y &lt;-<span class="st"> </span><span class="kw">c</span>(y1,y2,y3)
+  Dx &lt;-<span class="st"> </span><span class="kw">det</span>(<span class="kw">cbind</span>(q,y,<span class="dv">1</span>))
+  Dy &lt;-<span class="st"> </span><span class="op">-</span><span class="kw">det</span>(<span class="kw">cbind</span>(q,x,<span class="dv">1</span>))
+  c &lt;-<span class="st"> </span><span class="kw">det</span>(<span class="kw">cbind</span>(q,x,y))
+  center &lt;-<span class="st"> </span><span class="kw">c</span>(Dx,Dy)<span class="op">/</span>a<span class="op">/</span><span class="dv">2</span>
+  r &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(center<span class="op">-</span>p1)))
+  <span class="kw">list</span>(<span class="dt">center =</span> center[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>center[<span class="dv">2</span>], <span class="dt">radius =</span> r)
+}</code></pre></div>
+<p>Let’s take an example:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Mobius &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, d){
+  <span class="cf">function</span>(z){
+    (a<span class="op">*</span>z<span class="op">+</span>b) <span class="op">/</span><span class="st"> </span>(c<span class="op">*</span>z<span class="op">+</span>d)
+  }
+}
+a &lt;-<span class="st"> </span><span class="dv">4</span>; b &lt;-<span class="st"> </span>1i; c &lt;-<span class="st"> </span>2i; d &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">+</span>3i
+M &lt;-<span class="st"> </span><span class="kw">Mobius</span>(a,b,c,d)
+<span class="co"># define circle C</span>
+z0 &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">+</span>1i; R &lt;-<span class="st"> </span><span class="dv">2</span>
+<span class="co"># three points on M(C)</span>
+z1 &lt;-<span class="st"> </span><span class="kw">M</span>(z0<span class="op">+</span>R); z2 &lt;-<span class="st"> </span><span class="kw">M</span>(z0<span class="op">-</span>R); z3 &lt;-<span class="st"> </span><span class="kw">M</span>(z0 <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>R)
+<span class="co"># circumcircle of z1, z2, z3</span>
+cc &lt;-<span class="st"> </span><span class="kw">circumcircle</span>(z1, z2, z3)
+<span class="co"># calculation of A, gamma, D</span>
+A &lt;-<span class="st"> </span><span class="kw">Mod</span>(d<span class="op">+</span>c<span class="op">*</span>z0)<span class="op">^</span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span>R<span class="op">^</span><span class="dv">2</span><span class="op">*</span><span class="kw">Mod</span>(c)<span class="op">^</span><span class="dv">2</span>
+gamma &lt;-<span class="st"> </span>R<span class="op">^</span><span class="dv">2</span><span class="op">*</span>a<span class="op">*</span><span class="kw">Conj</span>(c) <span class="op">-</span><span class="st"> </span>(a<span class="op">*</span>z0 <span class="op">+</span><span class="st"> </span>b) <span class="op">*</span><span class="st"> </span><span class="kw">Conj</span>(c<span class="op">*</span>z0 <span class="op">+</span><span class="st"> </span>d)
+D &lt;-<span class="st"> </span>R<span class="op">^</span><span class="dv">2</span><span class="op">*</span><span class="kw">Mod</span>(a)<span class="op">^</span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span><span class="kw">Mod</span>(b <span class="op">+</span><span class="st"> </span>a<span class="op">*</span>z0)<span class="op">^</span><span class="dv">2</span>
+<span class="co"># center</span>
+<span class="op">-</span>gamma<span class="op">/</span>A
+## [1] 0.7941176-0.8529412i
+cc<span class="op">$</span>center
+## [1] 0.7941176-0.8529412i
+<span class="co"># radius </span>
+<span class="kw">sqrt</span>(<span class="kw">Mod</span>(gamma)<span class="op">^</span><span class="dv">2</span><span class="op">/</span>A<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>D<span class="op">/</span>A)
+## [1] 0.7892005
+cc<span class="op">$</span>radius
+## [1] 0.7892005</code></pre></div>
+<p>We have the following alternative expressions of the center and the radius: <span class="math display">\[
+w_0 = M\left(z_0 - R^2\overline{\left(\frac{d}{c}+z_0\right)} \right), \\
+R' = \bigl| w_0 - M(z_0+R) \bigr|.
+\]</span></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">z &lt;-<span class="st"> </span>z0 <span class="op">-</span><span class="st"> </span>R<span class="op">^</span><span class="dv">2</span><span class="op">/</span><span class="kw">Conj</span>(d<span class="op">/</span>c<span class="op">+</span>z0) 
+( w0 &lt;-<span class="st"> </span><span class="kw">M</span>(z) ) <span class="co"># center</span>
+## [1] 0.7941176-0.8529412i
+<span class="kw">Mod</span>(w0 <span class="op">-</span><span class="st"> </span><span class="kw">M</span>(z0<span class="op">+</span>R)) <span class="co"># radius</span>
+## [1] 0.7892005</code></pre></div>
+<p>This code also works for <span class="math inline">\(c = 0\)</span>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">MC &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, d, z0, R){
+  M &lt;-<span class="st"> </span><span class="kw">Mobius</span>(a,b,c,d)
+  z &lt;-<span class="st"> </span>z0 <span class="op">-</span><span class="st"> </span>R<span class="op">^</span><span class="dv">2</span><span class="op">/</span><span class="kw">Conj</span>(d<span class="op">/</span>c<span class="op">+</span>z0) 
+  w0 &lt;-<span class="st"> </span><span class="kw">M</span>(z) 
+  <span class="kw">list</span>(<span class="dt">center =</span> w0, <span class="dt">radius =</span> <span class="kw">Mod</span>(w0 <span class="op">-</span><span class="st"> </span><span class="kw">M</span>(z0<span class="op">+</span>R)))
+}
+c &lt;-<span class="st"> </span><span class="dv">0</span>
+M &lt;-<span class="st"> </span><span class="kw">Mobius</span>(a,b,c,d)
+z1 &lt;-<span class="st"> </span><span class="kw">M</span>(z0<span class="op">+</span>R); z2 &lt;-<span class="st"> </span><span class="kw">M</span>(z0<span class="op">-</span>R); z3 &lt;-<span class="st"> </span><span class="kw">M</span>(z0 <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>R)
+<span class="kw">circumcircle</span>(z1, z2, z3)
+## $center
+## [1] 2.3-1.9i
+## 
+## $radius
+## [1] 2.529822
+<span class="kw">MC</span>(a, b, c, d, z0, R)
+## $center
+## [1] 2.3-1.9i
+## 
+## $radius
+## [1] 2.529822</code></pre></div>
+<p>Now, consider the case when <span class="math inline">\(\boxed{A=0}\)</span>, that is <span class="math inline">\(|d/c+z_0| = R\)</span>. The equation is <span class="math display">\[
+\bar\gamma w + \gamma\bar{w} = D.
+\]</span> And this is the equation of a line, whose direction and offset are given by the formulas we have previously seen.</p>
+<h3 id="image-of-a-line">Image of a line</h3>
+<p>Now, let <span class="math inline">\(\mathcal{L}\)</span> be the line having equation <span class="math display">\[
+\bar{\gamma_0} z + \gamma_0\bar{z} = D_0.
+\]</span> Inserting <span class="math inline">\(z = M^{-1}(w) = \frac{dw - b}{a - cw}\)</span>, we get the following equation for <span class="math inline">\(M(\mathcal{L})\)</span>: <span class="math display">\[
+\bar{\gamma_0} (dw - b)\overline{(a-cw)} 
+ + \gamma_0 \overline{(dw - b)}(a-cw) 
+ = D_0(a-cw)\overline{(a-cw)}.
+\]</span> It is equivalent to <span class="math display">\[
+\begin{align*}
+&amp; -\Bigl( \bar{\gamma_0}d\bar{c} + \gamma_0 \bar{d}c 
+    + D_0 c\bar{c} \Bigr) w\bar{w}  \\
+\qquad &amp; 
+ + \Bigl( \bar{\gamma_0}d\bar{a} + \gamma_0 \bar{b}c + D_0 c\bar{a} \Bigr) w \\ 
+\qquad &amp; 
+ + \Bigl( \bar{\gamma_0}b\bar{c} + \gamma_0 \bar{d}a + D_0 \bar{c}a \Bigr) \bar{w} \\
+ &amp; \qquad = \; D_0 a \bar{a} + \bar{\gamma_0}b\bar{a} + \gamma_0\bar{b}a, 
+\end{align*}
+\]</span> that is <span class="math display">\[
+A w\bar{w} + \bar{\gamma}w + \gamma\bar{w} = D
+\]</span> with <span class="math display">\[
+A = -2\;\Re(\gamma_0 c \bar{d}) - D_0 {|c|}^2, \\ 
+\gamma = \bar{\gamma_0}b\bar{c} + \gamma_0 \bar{d}a + D_0 \bar{c}a, \\ 
+D = D_0{|a|}^2 + 2\;\Re(\gamma_0 \bar{b}a).
+\]</span></p>
+<p>Again, there are two cases. We get a circle if <span class="math inline">\(A \neq 0\)</span>, and a line otherwise.</p>
+<p>Let’s check an example with <span class="math inline">\(A=0\)</span>. Our current value of <span class="math inline">\(c\)</span> in R is <span class="math inline">\(0\)</span>, so we have <span class="math inline">\(A=0\)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># define the line L</span>
+theta &lt;-<span class="st"> </span><span class="dv">1</span>
+offset &lt;-<span class="st"> </span><span class="dv">2</span>
+<span class="co"># three points on M(L)</span>
+x &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>)
+y &lt;-<span class="st"> </span>(offset <span class="op">-</span><span class="st"> </span><span class="kw">cos</span>(theta)<span class="op">*</span>x) <span class="op">/</span><span class="st"> </span><span class="kw">sin</span>(theta)
+z1 &lt;-<span class="st"> </span><span class="kw">M</span>(x[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>y[<span class="dv">1</span>]) 
+z2 &lt;-<span class="st"> </span><span class="kw">M</span>(x[<span class="dv">2</span>] <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>y[<span class="dv">2</span>]) 
+z3 &lt;-<span class="st"> </span><span class="kw">M</span>(x[<span class="dv">3</span>] <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>y[<span class="dv">3</span>])
+<span class="co"># these points are aligned:</span>
+<span class="kw">Im</span>((z2<span class="op">-</span>z1)<span class="op">/</span>(z3<span class="op">-</span>z1)) <span class="co"># aligned &lt;=&gt; 0</span>
+## [1] -7.157799e-17</code></pre></div>
+<p>Now let’s check an example with <span class="math inline">\(A \neq 0\)</span>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Mobius transformation</span>
+c &lt;-<span class="st"> </span><span class="dv">6</span> <span class="co"># don't take c = 0, otherwise A=0</span>
+M &lt;-<span class="st"> </span><span class="kw">Mobius</span>(a,b,c,d)
+<span class="co"># three points on M(L)</span>
+z1 &lt;-<span class="st"> </span><span class="kw">M</span>(x[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>y[<span class="dv">1</span>]) 
+z2 &lt;-<span class="st"> </span><span class="kw">M</span>(x[<span class="dv">2</span>] <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>y[<span class="dv">2</span>]) 
+z3 &lt;-<span class="st"> </span><span class="kw">M</span>(x[<span class="dv">3</span>] <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>y[<span class="dv">3</span>])
+<span class="co"># calculation of A, gamma, D</span>
+gamma0 &lt;-<span class="st"> </span><span class="kw">cos</span>(theta) <span class="op">+</span><span class="st"> </span>1i <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(theta)
+D0 &lt;-<span class="st"> </span><span class="dv">2</span> <span class="op">*</span><span class="st"> </span>offset
+A &lt;-<span class="st"> </span><span class="op">-</span><span class="dv">2</span> <span class="op">*</span><span class="st"> </span><span class="kw">Re</span>(gamma0<span class="op">*</span>c<span class="op">*</span><span class="kw">Conj</span>(d)) <span class="op">-</span><span class="st"> </span>D0<span class="op">*</span><span class="kw">Mod</span>(c)<span class="op">^</span><span class="dv">2</span> 
+gamma &lt;-<span class="st"> </span><span class="kw">Conj</span>(gamma0)<span class="op">*</span>b<span class="op">*</span><span class="kw">Conj</span>(c) <span class="op">+</span><span class="st"> </span>gamma0<span class="op">*</span><span class="kw">Conj</span>(d)<span class="op">*</span>a <span class="op">+</span><span class="st"> </span>D0<span class="op">*</span><span class="kw">Conj</span>(c)<span class="op">*</span>a
+D &lt;-<span class="st"> </span>D0 <span class="op">*</span><span class="st"> </span><span class="kw">Mod</span>(a)<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span><span class="kw">Re</span>(gamma0<span class="op">*</span><span class="kw">Conj</span>(b)<span class="op">*</span>a)
+<span class="co"># circumcircle</span>
+cc &lt;-<span class="st"> </span><span class="kw">circumcircle</span>(z1, z2, z3)
+<span class="co"># center</span>
+<span class="op">-</span>gamma<span class="op">/</span>A
+## [1] 0.626783+0.0006863i
+cc<span class="op">$</span>center
+## [1] 0.626783+0.0006863i
+<span class="co"># radius </span>
+<span class="kw">sqrt</span>(<span class="kw">Mod</span>(gamma)<span class="op">^</span><span class="dv">2</span><span class="op">/</span>A<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>D<span class="op">/</span>A)
+## [1] 0.03988958
+cc<span class="op">$</span>radius
+## [1] 0.03988958</code></pre></div>
+<h1 id="r-code">R code</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Mobius &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, d){
+  <span class="cf">function</span>(z){
+    (a<span class="op">*</span>z<span class="op">+</span>b) <span class="op">/</span><span class="st"> </span>(c<span class="op">*</span>z<span class="op">+</span>d)
+  }
+}
+
+Mod2 &lt;-<span class="st"> </span><span class="cf">function</span>(z){
+  <span class="kw">Re</span>(z)<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="kw">Im</span>(z)<span class="op">^</span><span class="dv">2</span>
+}
+
+MobiusImageOfCircle &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, d, z0, R){
+  gamma &lt;-<span class="st"> </span>R<span class="op">*</span>R<span class="op">*</span>a<span class="op">*</span><span class="kw">Conj</span>(c) <span class="op">-</span><span class="st"> </span>(a<span class="op">*</span>z0 <span class="op">+</span><span class="st"> </span>b) <span class="op">*</span><span class="st"> </span><span class="kw">Conj</span>(c<span class="op">*</span>z0 <span class="op">+</span><span class="st"> </span>d)
+  D &lt;-<span class="st"> </span>R<span class="op">*</span>R<span class="op">*</span><span class="kw">Mod2</span>(a) <span class="op">-</span><span class="st"> </span><span class="kw">Mod2</span>(b <span class="op">+</span><span class="st"> </span>a<span class="op">*</span>z0)
+  x1 &lt;-<span class="st"> </span><span class="kw">Mod2</span>(d<span class="op">+</span>c<span class="op">*</span>z0)
+  x2 &lt;-<span class="st"> </span>R<span class="op">*</span>R<span class="op">*</span><span class="kw">Mod2</span>(c)
+  <span class="cf">if</span>(x1 <span class="op">!=</span><span class="st"> </span>x2){
+    A &lt;-<span class="st"> </span>x1 <span class="op">-</span><span class="st"> </span>x2
+    out &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">center =</span> <span class="op">-</span>gamma<span class="op">/</span>A, <span class="dt">radius =</span> <span class="kw">sqrt</span>(<span class="kw">Mod2</span>(gamma)<span class="op">/</span>A<span class="op">/</span>A <span class="op">+</span><span class="st"> </span>D<span class="op">/</span>A))
+    <span class="kw">attr</span>(out, <span class="st">&quot;type&quot;</span>) &lt;-<span class="st"> &quot;circle&quot;</span>
+  }<span class="cf">else</span>{
+    out &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">theta =</span> <span class="kw">Arg</span>(gamma) <span class="op">%%</span><span class="st"> </span>(<span class="dv">2</span><span class="op">*</span>pi), <span class="dt">offset =</span> D<span class="op">/</span><span class="dv">2</span><span class="op">/</span><span class="kw">Mod</span>(gamma))
+    <span class="kw">attr</span>(out, <span class="st">&quot;type&quot;</span>) &lt;-<span class="st"> &quot;line&quot;</span>
+  }
+  out
+}
+
+MobiusImageOfLine &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, d, theta, offset){
+  gamma0 &lt;-<span class="st"> </span><span class="kw">cos</span>(theta) <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span><span class="kw">sin</span>(theta)
+  D0 &lt;-<span class="st"> </span><span class="dv">2</span> <span class="op">*</span><span class="st"> </span>offset
+  A &lt;-<span class="st"> </span><span class="op">-</span><span class="dv">2</span> <span class="op">*</span><span class="st"> </span><span class="kw">Re</span>(gamma0<span class="op">*</span>c<span class="op">*</span><span class="kw">Conj</span>(d)) <span class="op">-</span><span class="st"> </span>D0<span class="op">*</span><span class="kw">Mod2</span>(c) 
+  gamma &lt;-<span class="st"> </span><span class="kw">Conj</span>(gamma0)<span class="op">*</span>b<span class="op">*</span><span class="kw">Conj</span>(c) <span class="op">+</span><span class="st"> </span>gamma0<span class="op">*</span><span class="kw">Conj</span>(d)<span class="op">*</span>a <span class="op">+</span><span class="st"> </span>D0<span class="op">*</span><span class="kw">Conj</span>(c)<span class="op">*</span>a
+  D &lt;-<span class="st"> </span>D0<span class="op">*</span><span class="kw">Mod2</span>(a) <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span><span class="kw">Re</span>(gamma0<span class="op">*</span><span class="kw">Conj</span>(b)<span class="op">*</span>a)
+  <span class="cf">if</span>(A <span class="op">!=</span><span class="st"> </span><span class="dv">0</span>){
+    out &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">center =</span> <span class="op">-</span>gamma<span class="op">/</span>A, <span class="dt">radius =</span> <span class="kw">sqrt</span>(<span class="kw">Mod2</span>(gamma)<span class="op">/</span>A<span class="op">/</span>A <span class="op">+</span><span class="st"> </span>D<span class="op">/</span>A))
+    <span class="kw">attr</span>(out, <span class="st">&quot;type&quot;</span>) &lt;-<span class="st"> &quot;circle&quot;</span>
+  }<span class="cf">else</span>{
+    out &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">theta =</span> <span class="kw">Arg</span>(gamma) <span class="op">%%</span><span class="st"> </span>(<span class="dv">2</span><span class="op">*</span>pi), <span class="dt">offset =</span> D<span class="op">/</span><span class="dv">2</span><span class="op">/</span><span class="kw">Mod</span>(gamma))
+    <span class="kw">attr</span>(out, <span class="st">&quot;type&quot;</span>) &lt;-<span class="st"> &quot;line&quot;</span>
+  }
+  out
+}
+
+MobiusImage &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, d, gcircle){
+  <span class="cf">if</span>(<span class="kw">attr</span>(gcircle, <span class="st">&quot;type&quot;</span>) <span class="op">==</span><span class="st"> &quot;circle&quot;</span>){
+    <span class="kw">MobiusImageOfCircle</span>(a, b, c, d, gcircle<span class="op">$</span>center, gcircle<span class="op">$</span>radius)
+  }<span class="cf">else</span>{
+    <span class="kw">MobiusImageOfLine</span>(a, b, c, d, gcircle<span class="op">$</span>theta, gcircle<span class="op">$</span>offset)
+  }
+}
+
+<span class="co"># plot ####</span>
+drawLine &lt;-<span class="st"> </span><span class="cf">function</span>(line, ...){
+  theta &lt;-<span class="st"> </span>line<span class="op">$</span>theta; offset &lt;-<span class="st"> </span>line<span class="op">$</span>offset
+  <span class="cf">if</span>(<span class="kw">sin</span>(theta) <span class="op">!=</span><span class="st"> </span><span class="dv">0</span>){
+    <span class="kw">abline</span>(<span class="dt">a =</span> offset<span class="op">/</span><span class="kw">sin</span>(theta), <span class="dt">b =</span> <span class="op">-</span><span class="dv">1</span><span class="op">/</span><span class="kw">tan</span>(theta), ...)
+  }<span class="cf">else</span>{
+    <span class="kw">abline</span>(<span class="dt">v =</span> offset<span class="op">/</span><span class="kw">cos</span>(theta), ...)
+  }
+}
+
+drawCircle &lt;-<span class="st"> </span><span class="cf">function</span>(circle, ...){
+  plotrix<span class="op">::</span><span class="kw">draw.circle</span>(<span class="kw">Re</span>(circle<span class="op">$</span>center), <span class="kw">Im</span>(circle<span class="op">$</span>center), 
+                       circle<span class="op">$</span>radius, ...)
+}
+
+drawGCircle &lt;-<span class="st"> </span><span class="cf">function</span>(gcircle, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>, ...){
+  <span class="cf">if</span>(<span class="kw">attr</span>(gcircle, <span class="st">&quot;type&quot;</span>) <span class="op">==</span><span class="st"> &quot;circle&quot;</span>){
+    <span class="kw">drawCircle</span>(gcircle, <span class="dt">border =</span> color, ...)
+  }<span class="cf">else</span>{
+    <span class="kw">drawLine</span>(gcircle, <span class="dt">col =</span> color, ...)
+  }
+}</code></pre></div>
+<h1 id="references">References</h1>
+<ul>
+<li><p>D. A. Brannan, M. F. Esplen, J. J. Gray. <em>Geometry</em>, second edition. Cambridge University Press, 2012.</p></li>
+<li><p>D. Mumford, C. Series, D. Wright. <em>Indra’s Pearls: The Vision of Felix Klein</em>. Cambridge University Press, 2002.</p></li>
+</ul>
+
+    </div>
+
+
+    <div id="footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </div>
+
+  </div>
+
+  <div id="disqus_thread"></div>
+  <div class="pagination">
+    <ul>
+      <li>
+        <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+      </li>
+    </ul>
+  </div>
+</body>
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+<!-- Google Prettify -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+<script>
+  var pres = document.getElementsByTagName("pre");
+  for (var i = 0; i < pres.length; ++i) {
+    
+    pres[i].className = pres[i].className + " prettyprint linenums";
+    
+  }
+  prettyPrint();
+</script> 
+
+</html>
