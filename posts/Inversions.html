@@ -1,0 +1,367 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Generalized circles and inversions</title>
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/pandoc-solarized.css" />  
+  <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+</head>
+
+<body>
+  <!-- Sidebar. -->
+  <div class="sidebar">
+    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+      <a href="https://www.r-bloggers.com/">
+        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+      </a>
+      <br />
+      <a href="http://t-redactyl.io/">
+        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
+      </a>
+      <a href="http://timelyportfolio.blogspot.be/">
+        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
+      </a>
+      <br />
+      <a href="https://antoineguillot.wordpress.com/blog/">
+        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+      </a>
+      <br />
+      <a href="https://fronkonstin.com/">
+        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="header">
+      <div id="logo" style="position:absolute;">
+        <a href="../">
+          <img src="../images/stla.jpg" alt="stla" width="100px" />
+        </a>
+      </div>
+      <div id="navigation" style="margin-top:50px;">
+        <a href="../">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../archive.html">Archive</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Generalized circles and inversions</h1> <div class="info">
+    Posted on March 13, 2019
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="../tags/R.html">R</a>, <a href="../tags/maths.html">maths</a>, <a href="../tags/geometry.html">geometry</a>
+    
+</div>
+
+<p>Let <span class="math inline">\(\iota_0\)</span> be the inversion with respect to the unit circle: <span class="math display">\[
+\iota_0(z) = \frac{1}{\bar{z}}, \quad z \neq 0.
+\]</span></p>
+<p>Consider a <a href="https://laustep.github.io/stlahblog/posts/MobiusTransformations.html">generalized circle</a> <span class="math inline">\(\mathcal{G}\mathcal{C}\)</span> having equation <span class="math display">\[
+\boxed{Az\bar{z} + \bar{\gamma}z + \gamma\bar{z} = D}
+\]</span> which is equivalent, by dividing by <span class="math inline">\(z\bar{z}\)</span>, to <span class="math display">\[
+A + \bar{\gamma}\frac{1}{\bar{z}} + \gamma\frac{1}{z} = \frac{D}{z\bar{z}}.
+\]</span></p>
+<p>Plugging <span class="math inline">\(z = \iota_0^{-1}(w) = 1/\bar{w}\)</span> into this equation, we get the following equation of <span class="math inline">\(\iota_0(\mathcal{G}\mathcal{C})\)</span>: <span class="math display">\[
+A + \bar{\gamma}w + \gamma\bar{w} = D w\bar{w} \\
+\iff \, 
+\boxed{D w\bar{w} - \bar{\gamma}w - \gamma\bar{w} = A}.
+\]</span> This is the equation of a generalized circle.</p>
+<p>Now consider the inversion <span class="math inline">\(\iota\)</span> with respect to the circle of center <span class="math inline">\(c\)</span> and radius <span class="math inline">\(r\)</span>: <span class="math display">\[
+\iota(z) = c + \frac{r^2}{\overline{z-c}}, \quad z \neq c.
+\]</span></p>
+<p>One has <span class="math display">\[
+\iota = f^{-1} \circ \iota_0 \circ f
+\]</span> where <span class="math inline">\(f(z) = \frac{z-c}{r}\)</span>, and <span class="math inline">\(f^{-1}(z) = rz + c\)</span>.</p>
+<p>The transformation <span class="math inline">\(f\)</span> is a “scaling-translation”. It is clear that it maps a generalized circle to a generalized circle, and this also holds for <span class="math inline">\(f^{-1}\)</span>. Therefore, <span class="math inline">\(\iota\)</span> maps any generalized circle to a generalized circle. This result is well-known. Here, we will give the equation of the image generalized circle.</p>
+<h1 id="case-when-mathcalgmathcalc-is-a-circle">Case when <span class="math inline">\(\mathcal{G}\mathcal{C}\)</span> is a circle</h1>
+<p>Assume that <span class="math inline">\(\mathcal{G}\mathcal{C}\)</span> is the circle <span class="math inline">\(\mathcal{C}_0\)</span> with center <span class="math inline">\(z_0\)</span> and radius <span class="math inline">\(R_0\)</span>. Then <span class="math inline">\(f(\mathcal{C_0})\)</span> is the circle <span class="math inline">\(\mathcal{C_1}\)</span> with center <span class="math inline">\(z_1 = \frac{z_0-c}{r}\)</span> and radius <span class="math inline">\(R_1 = \frac{R_0}{r}\)</span>. It has equation <span class="math display">\[
+z\bar{z} - \bar{z_1}z - z_1\bar{z} = D_1
+\]</span> with <span class="math inline">\(D_1 = R_1^2-{|z_1|}^2\)</span>.</p>
+<p>Then <span class="math inline">\(\iota_0(\mathcal{C_1})\)</span> is the generalized circle having equation <span class="math display">\[
+D_1 z\bar{z} + \bar{z_1}z + z_1\bar{z} = 1.
+\]</span></p>
+<h3 id="case-d_1-neq-0">Case <span class="math inline">\(D_1 \neq 0\)</span></h3>
+<p>If <span class="math inline">\(D_1 \neq 0\)</span>, the above equation of <span class="math inline">\(\iota_0(\mathcal{C_1})\)</span> is the equation of a circle <span class="math inline">\(\mathcal{C}_2\)</span> with center <span class="math inline">\(z_2 = -\frac{z_1}{D_1}\)</span> and radius <span class="math display">\[
+R_2 = \sqrt{\frac{{|z_1|}^2}{D_1^2} + \frac{1}{D_1}}.
+\]</span></p>
+<p>Now, <span class="math inline">\(f^{-1}(\mathcal{C}_2) = \iota(\mathcal{C}_0)\)</span> is the circle with center <span class="math inline">\(r z_2 + c\)</span> and radius <span class="math inline">\(r R_2\)</span>.</p>
+<h3 id="case-d_1-0">Case <span class="math inline">\(D_1 = 0\)</span></h3>
+<p>If <span class="math inline">\(D_1=0\)</span>, our equation of <span class="math inline">\(\iota_0(\mathcal{C_1})\)</span> is <span class="math display">\[
+\bar{z_1}z + z_1\bar{z} = 1,
+\]</span> which is the equation of a line <span class="math inline">\(\mathcal{L_2}\)</span>, with direction <span class="math inline">\(\theta_2 = \textrm{arg}(z_1)\)</span> and offset <span class="math inline">\(d_2 = \frac{1}{2{|z_1|}^2}\)</span>.</p>
+<p>Then <span class="math inline">\(f^{-1}(\mathcal{L}_2) = \iota(\mathcal{C}_0)\)</span> is a line parallel to <span class="math inline">\(\mathcal{L}_2\)</span>, that is, its direction is <span class="math inline">\(\theta_2\)</span>. To get its offset, take a point <span class="math inline">\(w_2\)</span> on <span class="math inline">\(\mathcal{L}_2\)</span>: <span class="math display">\[
+w_2 = \begin{cases}
+\dfrac{1}{2 \Re(z_1)} &amp; \text{if } \Im(z_1) = 0 \\
+\dfrac{i}{2 \Im(z_1)} &amp; \text{if } \Im(z_1) \neq 0
+\end{cases}
+\]</span> and take its image <span class="math inline">\(w_3 = f^{-1}(w_2) = r w_2 + c\)</span>. Then the offset is <span class="math display">\[
+\cos(\theta_2) \Re(w_3) + \sin(\theta_2) \Im(w_3) \\
+\qquad = \frac{\Re(z_1)}{|z_1|}\Re(w_3) +  \frac{\Im(z_1)}{|z_1|}\Im(w_3).
+\]</span></p>
+<h1 id="case-when-mathcalgmathcalc-is-a-line">Case when <span class="math inline">\(\mathcal{G}\mathcal{C}\)</span> is a line</h1>
+<p>Now assume that <span class="math inline">\(\mathcal{G}\mathcal{C}\)</span> is the line <span class="math inline">\(\mathcal{L}_0\)</span> with direction <span class="math inline">\(\theta_0\)</span> and offset <span class="math inline">\(d_0\)</span>. Its image <span class="math inline">\(f(\mathcal{L}_0)\)</span> is a line <span class="math inline">\(\mathcal{L}_1\)</span> parallel to <span class="math inline">\(\mathcal{L}_0\)</span>, that is the direction of <span class="math inline">\(\mathcal{L}_1\)</span> is <span class="math inline">\(\theta_0\)</span>. To get its offset, take a point <span class="math inline">\(w_0\)</span> on <span class="math inline">\(\mathcal{L}_0\)</span>: <span class="math display">\[
+w_0 = \begin{cases}
+\dfrac{d_0}{\cos(\theta_0)} &amp; \text{if } \sin(\theta_0) = 0 \\
+i\dfrac{d_0}{\sin(\theta_0)} &amp; \text{if } \sin(\theta_0) \neq 0
+\end{cases}
+\]</span> and take its image <span class="math inline">\(w_1 = f(w_0) = \frac{w_0-c}{r}\)</span>. Then the offset of <span class="math inline">\(\mathcal{L}_1\)</span> is <span class="math display">\[
+d_1 = \cos(\theta_0) \Re(w_1) + \sin(\theta_0) \Im(w_1)
+\]</span> and the line <span class="math inline">\(\mathcal{L}_1\)</span> has equation <span class="math display">\[
+\bar{\gamma_1}z + \gamma_1\bar{z} = D_1 
+\]</span> with <span class="math inline">\(\gamma_1 = \cos(\theta_0) + i\sin(\theta_0)\)</span> and <span class="math inline">\(D_1 = 2d_1\)</span>.</p>
+<p>Therefore, <span class="math inline">\(\iota_0(\mathcal{L}_1)\)</span> is the generalized circle having equation <span class="math display">\[
+D_1 z\bar{z} - \bar{\gamma_1}z - \gamma_1\bar{z} = 0.
+\]</span></p>
+<h3 id="case-d_1-neq-0-1">Case <span class="math inline">\(D_1 \neq 0\)</span></h3>
+<p>If <span class="math inline">\(D_1 \neq 0\)</span>, then <span class="math inline">\(\iota_0(\mathcal{L}_1)\)</span> is the circle <span class="math inline">\(\mathcal{C}_2\)</span> with center <span class="math inline">\(z_2 = \frac{\gamma_1}{D_1}\)</span> and radius <span class="math inline">\(R_2 = \frac{|\gamma_1|}{|D_1|}\)</span>. Then <span class="math inline">\(f^{-1}(\mathcal{C}_2) = \iota(\mathcal{L}_0)\)</span> is the circle with center <span class="math inline">\(r z_2 + c\)</span> and radius <span class="math inline">\(r R_2\)</span>.</p>
+<h3 id="case-d_1-0-1">Case <span class="math inline">\(D_1 = 0\)</span></h3>
+<p>If <span class="math inline">\(D_1 = 0\)</span>, then <span class="math inline">\(\iota_0(\mathcal{L}_1)\)</span> is the line <span class="math inline">\(\mathcal{L}_2\)</span> having equation <span class="math display">\[
+\bar{\gamma_1}z + \gamma_1\bar{z} = 0.
+\]</span> Its direction is <span class="math inline">\(\textrm{arg}(\gamma_1) = \theta_0\)</span> and its offset is <span class="math inline">\(0\)</span>.</p>
+<p>Then <span class="math inline">\(f^{-1}(\mathcal{L}_2) = \iota(\mathcal{C}_0)\)</span> is a line <span class="math inline">\(\mathcal{L}_3\)</span> parallel to <span class="math inline">\(\mathcal{L}_2\)</span>, that is, its direction is <span class="math inline">\(\theta_0\)</span>. The line <span class="math inline">\(\mathcal{L}_2\)</span> passes through <span class="math inline">\(0\)</span>, therefore the point <span class="math inline">\(f^{-1}(0) = c\)</span> belongs to <span class="math inline">\(\mathcal{L}_3\)</span>. Consequently, the offset of <span class="math inline">\(\mathcal{L}_3\)</span> is <span class="math display">\[
+\cos(\theta_0) \Re(c) + \sin(\theta_0) \Im(c).
+\]</span></p>
+<h1 id="r-code">R code</h1>
+<p>We firstly write a function <code>iotaCircle</code> which calculates the image of a circle.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># squared modulus</span>
+Mod2 &lt;-<span class="st"> </span><span class="cf">function</span>(z){
+  <span class="kw">Re</span>(z)<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="kw">Im</span>(z)<span class="op">^</span><span class="dv">2</span>
+}
+<span class="co"># image of a circle</span>
+iotaCircle &lt;-<span class="st"> </span><span class="cf">function</span>(c, r, circle, <span class="dt">tol =</span> <span class="kw">sqrt</span>(.Machine<span class="op">$</span>double.eps)){
+  z0 &lt;-<span class="st"> </span>circle<span class="op">$</span>center; R0 &lt;-<span class="st"> </span>circle<span class="op">$</span>radius
+  z1 &lt;-<span class="st"> </span>(z0<span class="op">-</span>c)<span class="op">/</span>r
+  D1 &lt;-<span class="st"> </span>(R0<span class="op">/</span>r)<span class="op">^</span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span><span class="kw">Mod2</span>(z1)
+  <span class="cf">if</span>(<span class="kw">abs</span>(D1) <span class="op">&gt;</span><span class="st"> </span>tol){
+    z2 &lt;-<span class="st"> </span><span class="op">-</span>z1<span class="op">/</span>D1
+    R2 &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">Mod2</span>(z2) <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span>D1)
+    out &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">center =</span> r<span class="op">*</span>z2<span class="op">+</span>c, <span class="dt">radius =</span> r<span class="op">*</span>R2)
+    <span class="kw">attr</span>(out, <span class="st">&quot;type&quot;</span>) &lt;-<span class="st"> &quot;circle&quot;</span>
+  }<span class="cf">else</span>{
+    theta2 &lt;-<span class="st"> </span><span class="kw">Arg</span>(z1) <span class="op">%%</span><span class="st"> </span>(<span class="dv">2</span><span class="op">*</span>pi)
+    w2 &lt;-<span class="st"> </span><span class="kw">ifelse</span>(<span class="kw">Im</span>(z1) <span class="op">==</span><span class="st"> </span><span class="dv">0</span>, <span class="dv">1</span><span class="op">/</span><span class="dv">2</span><span class="op">/</span><span class="kw">Re</span>(z1), 1i<span class="op">/</span><span class="dv">2</span><span class="op">/</span><span class="kw">Im</span>(z1))
+    w3 &lt;-<span class="st"> </span>r<span class="op">*</span>w2 <span class="op">+</span><span class="st"> </span>c
+    out &lt;-<span class="st"> </span><span class="kw">list</span>(
+      <span class="dt">theta =</span> theta2, 
+      <span class="dt">offset =</span> (<span class="kw">Re</span>(z1)<span class="op">*</span><span class="kw">Re</span>(w3)<span class="op">+</span><span class="kw">Im</span>(z1)<span class="op">*</span><span class="kw">Im</span>(w3))<span class="op">/</span><span class="kw">Mod</span>(z1)
+    )
+    <span class="kw">attr</span>(out, <span class="st">&quot;type&quot;</span>) &lt;-<span class="st"> &quot;line&quot;</span>
+  }
+  out
+}</code></pre></div>
+<p>Let’s check the function <code>iotaCircle</code>. To do so, we use the <code>circumcircle</code> function below, which returns the center and the radius of the circle passing by <code>z1</code>, <code>z2</code>, <code>z3</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">circumcircle &lt;-<span class="st"> </span><span class="cf">function</span>(z1,z2,z3){
+  x1 &lt;-<span class="st"> </span><span class="kw">Re</span>(z1); y1 &lt;-<span class="st"> </span><span class="kw">Im</span>(z1); p1 &lt;-<span class="st"> </span><span class="kw">c</span>(x1,y1)
+  x2 &lt;-<span class="st"> </span><span class="kw">Re</span>(z2); y2 &lt;-<span class="st"> </span><span class="kw">Im</span>(z2); p2 &lt;-<span class="st"> </span><span class="kw">c</span>(x2,y2)
+  x3 &lt;-<span class="st"> </span><span class="kw">Re</span>(z3); y3 &lt;-<span class="st"> </span><span class="kw">Im</span>(z3); p3 &lt;-<span class="st"> </span><span class="kw">c</span>(x3,y3)
+  a &lt;-<span class="st"> </span><span class="kw">det</span>(<span class="kw">cbind</span>(<span class="kw">rbind</span>(p1,p2,p3),<span class="dv">1</span>))
+  q1 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">crossprod</span>(p1)); q2 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">crossprod</span>(p2)); q3 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">crossprod</span>(p3))
+  q &lt;-<span class="st"> </span><span class="kw">c</span>(q1,q2,q3)
+  x &lt;-<span class="st"> </span><span class="kw">c</span>(x1,x2,x3)
+  y &lt;-<span class="st"> </span><span class="kw">c</span>(y1,y2,y3)
+  Dx &lt;-<span class="st"> </span><span class="kw">det</span>(<span class="kw">cbind</span>(q,y,<span class="dv">1</span>))
+  Dy &lt;-<span class="st"> </span><span class="op">-</span><span class="kw">det</span>(<span class="kw">cbind</span>(q,x,<span class="dv">1</span>))
+  c &lt;-<span class="st"> </span><span class="kw">det</span>(<span class="kw">cbind</span>(q,x,y))
+  center &lt;-<span class="st"> </span><span class="kw">c</span>(Dx,Dy)<span class="op">/</span>a<span class="op">/</span><span class="dv">2</span>
+  r &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(center<span class="op">-</span>p1)))
+  <span class="kw">list</span>(<span class="dt">center =</span> center[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>center[<span class="dv">2</span>], <span class="dt">radius =</span> r)
+}</code></pre></div>
+<p>Now let’s check <code>iotaCircle</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># define iota</span>
+c &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">+</span><span class="st"> </span>2i; r &lt;-<span class="st"> </span><span class="dv">3</span>
+iota &lt;-<span class="st"> </span><span class="cf">function</span>(z){
+  c <span class="op">+</span><span class="st"> </span>r<span class="op">^</span><span class="dv">2</span><span class="op">/</span><span class="kw">Conj</span>(z<span class="op">-</span>c)
+}
+<span class="co"># define C0 - a case when iota(C0) is a circle ####</span>
+z0 &lt;-<span class="st"> </span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>3i; R0 &lt;-<span class="st"> </span><span class="dv">2</span>
+<span class="kw">iotaCircle</span>(c, r, <span class="dt">circle =</span> <span class="kw">list</span>(<span class="dt">center =</span> z0, <span class="dt">radius =</span> R0))
+## $center
+## [1] -3.5-2.5i
+## 
+## $radius
+## [1] 9
+## 
+## attr(,&quot;type&quot;)
+## [1] &quot;circle&quot;
+<span class="kw">circumcircle</span>(<span class="kw">iota</span>(z0<span class="op">+</span>R0), <span class="kw">iota</span>(z0<span class="op">-</span>R0), <span class="kw">iota</span>(z0<span class="op">+</span>1i<span class="op">*</span>R0))
+## $center
+## [1] -3.5-2.5i
+## 
+## $radius
+## [1] 9
+<span class="co"># now, a case when iota(C0) is a line ####</span>
+R0 &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="dv">2</span>)
+w1 &lt;-<span class="st"> </span><span class="kw">iota</span>(z0<span class="op">+</span>R0); w2 &lt;-<span class="st"> </span><span class="kw">iota</span>(z0<span class="op">-</span>R0); w3 &lt;-<span class="st"> </span><span class="kw">iota</span>(z0<span class="op">+</span>1i<span class="op">*</span>R0)
+(w2<span class="op">-</span>w1)<span class="op">/</span>(w3<span class="op">-</span>w1) <span class="co"># aligned &lt;=&gt; Im = 0</span>
+## [1] 3.414214+0i
+(L &lt;-<span class="st"> </span><span class="kw">iotaCircle</span>(c, r, <span class="dt">circle =</span> <span class="kw">list</span>(<span class="dt">center =</span> z0, <span class="dt">radius =</span> R0)))
+## $theta
+## [1] 0.7853982
+## 
+## $offset
+## [1] 5.303301
+## 
+## attr(,&quot;type&quot;)
+## [1] &quot;line&quot;
+<span class="kw">cos</span>(L<span class="op">$</span>theta)<span class="op">*</span><span class="kw">Re</span>(w1) <span class="op">+</span><span class="st"> </span><span class="kw">sin</span>(L<span class="op">$</span>theta)<span class="op">*</span><span class="kw">Im</span>(w1) <span class="co"># = L$offset</span>
+## [1] 5.303301
+<span class="kw">cos</span>(L<span class="op">$</span>theta)<span class="op">*</span><span class="kw">Re</span>(w2) <span class="op">+</span><span class="st"> </span><span class="kw">sin</span>(L<span class="op">$</span>theta)<span class="op">*</span><span class="kw">Im</span>(w2) <span class="co"># = L$offset</span>
+## [1] 5.303301
+<span class="kw">cos</span>(L<span class="op">$</span>theta)<span class="op">*</span><span class="kw">Re</span>(w3) <span class="op">+</span><span class="st"> </span><span class="kw">sin</span>(L<span class="op">$</span>theta)<span class="op">*</span><span class="kw">Im</span>(w3) <span class="co"># = L$offset</span>
+## [1] 5.303301</code></pre></div>
+<p>Now we write a function <code>iotaLine</code> which calculates the image of a line.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">iotaLine &lt;-<span class="st"> </span><span class="cf">function</span>(c, r, line, <span class="dt">tol =</span> <span class="kw">sqrt</span>(.Machine<span class="op">$</span>double.eps)){
+  theta0 &lt;-<span class="st"> </span>line<span class="op">$</span>theta; d0 &lt;-<span class="st"> </span>line<span class="op">$</span>offset
+  w0 &lt;-<span class="st"> </span><span class="kw">ifelse</span>(<span class="kw">sin</span>(theta0) <span class="op">==</span><span class="st"> </span><span class="dv">0</span>, d0<span class="op">/</span><span class="kw">cos</span>(theta0), 1i<span class="op">*</span>d0<span class="op">/</span><span class="kw">sin</span>(theta0))
+  w1 &lt;-<span class="st"> </span>(w0<span class="op">-</span>c)<span class="op">/</span>r
+  D1 &lt;-<span class="st"> </span><span class="dv">2</span> <span class="op">*</span><span class="st"> </span>(<span class="kw">cos</span>(theta0)<span class="op">*</span><span class="kw">Re</span>(w1) <span class="op">+</span><span class="st"> </span><span class="kw">sin</span>(theta0)<span class="op">*</span><span class="kw">Im</span>(w1))
+  <span class="cf">if</span>(<span class="kw">abs</span>(D1)<span class="op">&gt;</span>tol){
+    gamma1 &lt;-<span class="st"> </span><span class="kw">cos</span>(theta0) <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span><span class="kw">sin</span>(theta0)
+    z2 &lt;-<span class="st"> </span>gamma1<span class="op">/</span>D1
+    R2 &lt;-<span class="st"> </span><span class="kw">Mod</span>(gamma1<span class="op">/</span>D1)
+    out &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">center =</span> r<span class="op">*</span>z2<span class="op">+</span>c, <span class="dt">radius =</span> r<span class="op">*</span>R2)
+    <span class="kw">attr</span>(out, <span class="st">&quot;type&quot;</span>) &lt;-<span class="st"> &quot;circle&quot;</span>
+  }<span class="cf">else</span>{
+    out &lt;-<span class="st"> </span><span class="kw">list</span>(
+      <span class="dt">theta =</span> theta0, 
+      <span class="dt">offset =</span> <span class="kw">cos</span>(theta0)<span class="op">*</span><span class="kw">Re</span>(c)<span class="op">+</span><span class="kw">sin</span>(theta0)<span class="op">*</span><span class="kw">Im</span>(c)
+    )
+    <span class="kw">attr</span>(out, <span class="st">&quot;type&quot;</span>) &lt;-<span class="st"> &quot;line&quot;</span>
+  }
+  out
+}</code></pre></div>
+<p>Let’s check <code>iotaLine</code>. Firstly, a case when the image is a circle.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># define L0</span>
+theta0 &lt;-<span class="st"> </span><span class="dv">1</span>; d0 &lt;-<span class="st"> </span><span class="dv">2</span>
+theta0 &lt;-<span class="st"> </span>pi<span class="op">/</span><span class="dv">4</span>; d0 &lt;-<span class="st"> </span><span class="dv">0</span>
+<span class="co"># take three points on iota(L0)</span>
+x &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>)
+y &lt;-<span class="st"> </span>(d0 <span class="op">-</span><span class="st"> </span><span class="kw">cos</span>(theta0)<span class="op">*</span>x) <span class="op">/</span><span class="st"> </span><span class="kw">sin</span>(theta0)
+w1 &lt;-<span class="st"> </span><span class="kw">iota</span>(x[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>y[<span class="dv">1</span>])
+w2 &lt;-<span class="st"> </span><span class="kw">iota</span>(x[<span class="dv">2</span>] <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>y[<span class="dv">2</span>])
+w3 &lt;-<span class="st"> </span><span class="kw">iota</span>(x[<span class="dv">3</span>] <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>y[<span class="dv">3</span>])
+<span class="co"># check</span>
+<span class="kw">circumcircle</span>(w1,w2,w3)
+## $center
+## [1] -0.5+0.5i
+## 
+## $radius
+## [1] 2.12132
+<span class="kw">iotaLine</span>(c, r, <span class="kw">list</span>(<span class="dt">theta =</span> theta0, <span class="dt">offset =</span> d0))
+## $center
+## [1] -0.5+0.5i
+## 
+## $radius
+## [1] 2.12132
+## 
+## attr(,&quot;type&quot;)
+## [1] &quot;circle&quot;</code></pre></div>
+<p>Now a case when the image is a line.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># define iota</span>
+c &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">-</span>1i 
+iota &lt;-<span class="st"> </span><span class="cf">function</span>(z){
+  c <span class="op">+</span><span class="st"> </span>r<span class="op">^</span><span class="dv">2</span><span class="op">/</span><span class="kw">Conj</span>(z<span class="op">-</span>c)
+}
+<span class="co"># define L0</span>
+theta0 &lt;-<span class="st"> </span>pi<span class="op">/</span><span class="dv">4</span>; d0 &lt;-<span class="st"> </span><span class="dv">0</span>
+<span class="co"># take three points on iota(L0)</span>
+x &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">4</span>)
+y &lt;-<span class="st"> </span>(d0 <span class="op">-</span><span class="st"> </span><span class="kw">cos</span>(theta0)<span class="op">*</span>x) <span class="op">/</span><span class="st"> </span><span class="kw">sin</span>(theta0)
+w1 &lt;-<span class="st"> </span><span class="kw">iota</span>(x[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>y[<span class="dv">1</span>])
+w2 &lt;-<span class="st"> </span><span class="kw">iota</span>(x[<span class="dv">2</span>] <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>y[<span class="dv">2</span>])
+w3 &lt;-<span class="st"> </span><span class="kw">iota</span>(x[<span class="dv">3</span>] <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>y[<span class="dv">3</span>])
+<span class="co"># check</span>
+(w2<span class="op">-</span>w1)<span class="op">/</span>(w3<span class="op">-</span>w1) <span class="co"># aligned &lt;=&gt; Im = 0</span>
+## [1] 1.5+0i
+( L &lt;-<span class="st"> </span><span class="kw">iotaLine</span>(c, r, <span class="kw">list</span>(<span class="dt">theta =</span> theta0, <span class="dt">offset =</span> d0)) )
+## $theta
+## [1] 0.7853982
+## 
+## $offset
+## [1] 1.110223e-16
+## 
+## attr(,&quot;type&quot;)
+## [1] &quot;line&quot;
+<span class="kw">cos</span>(L<span class="op">$</span>theta)<span class="op">*</span><span class="kw">Re</span>(w1) <span class="op">+</span><span class="st"> </span><span class="kw">sin</span>(L<span class="op">$</span>theta)<span class="op">*</span><span class="kw">Im</span>(w1) <span class="co"># = L$offset</span>
+## [1] -4.440892e-16
+<span class="kw">cos</span>(L<span class="op">$</span>theta)<span class="op">*</span><span class="kw">Re</span>(w2) <span class="op">+</span><span class="st"> </span><span class="kw">sin</span>(L<span class="op">$</span>theta)<span class="op">*</span><span class="kw">Im</span>(w2) <span class="co"># = L$offset</span>
+## [1] -4.440892e-16
+<span class="kw">cos</span>(L<span class="op">$</span>theta)<span class="op">*</span><span class="kw">Re</span>(w3) <span class="op">+</span><span class="st"> </span><span class="kw">sin</span>(L<span class="op">$</span>theta)<span class="op">*</span><span class="kw">Im</span>(w3) <span class="co"># = L$offset</span>
+## [1] -4.440892e-16</code></pre></div>
+
+    </div>
+
+
+    <div id="footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </div>
+
+  </div>
+
+  <div id="disqus_thread"></div>
+  <div class="pagination">
+    <ul>
+      <li>
+        <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+      </li>
+    </ul>
+  </div>
+</body>
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+<!-- Google Prettify -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+<script>
+  var pres = document.getElementsByTagName("pre");
+  for (var i = 0; i < pres.length; ++i) {
+    
+    pres[i].className = pres[i].className + " prettyprint linenums";
+    
+  }
+  prettyPrint();
+</script> 
+
+</html>
