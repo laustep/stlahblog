@@ -306,6 +306,171 @@ w3 &lt;-<span class="st"> </span><span class="kw">iota</span>(x[<span class="dv"
 ## [1] -4.440892e-16
 <span class="kw">cos</span>(L<span class="op">$</span>theta)<span class="op">*</span><span class="kw">Re</span>(w3) <span class="op">+</span><span class="st"> </span><span class="kw">sin</span>(L<span class="op">$</span>theta)<span class="op">*</span><span class="kw">Im</span>(w3) <span class="co"># = L$offset</span>
 ## [1] -4.440892e-16</code></pre></div>
+<p>Finally, let’s put things together in a single function.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">iotaGcircle &lt;-<span class="st"> </span><span class="cf">function</span>(c, r, gcircle){
+  <span class="cf">if</span>(<span class="kw">attr</span>(gcircle, <span class="st">&quot;type&quot;</span>) <span class="op">==</span><span class="st"> &quot;circle&quot;</span>){
+    <span class="kw">iotaCircle</span>(c, r, gcircle)
+  }<span class="cf">else</span>{
+    <span class="kw">iotaLine</span>(c, r, gcircle)
+  }
+}</code></pre></div>
+<h1 id="illustration">Illustration</h1>
+<p>We will make a beautiful picture of inverted circles. This is borrowed from this <a href="http://xahlee.info/SpecialPlaneCurves_dir/InversionGallery_dir/inversionGallery.html">circle inversion gallery</a>.</p>
+<p>Firstly, let’s write a function which draws a generalized circle. We use the <code>draw.circle</code> function of the <code>plotrix</code> package.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(plotrix)
+drawLine &lt;-<span class="st"> </span><span class="cf">function</span>(line, ...){
+  theta &lt;-<span class="st"> </span>line<span class="op">$</span>theta; offset &lt;-<span class="st"> </span>line<span class="op">$</span>offset
+  <span class="cf">if</span>(<span class="kw">sin</span>(theta) <span class="op">!=</span><span class="st"> </span><span class="dv">0</span>){
+    <span class="kw">abline</span>(<span class="dt">a =</span> offset<span class="op">/</span><span class="kw">sin</span>(theta), <span class="dt">b =</span> <span class="op">-</span><span class="dv">1</span><span class="op">/</span><span class="kw">tan</span>(theta), ...)
+  }<span class="cf">else</span>{
+    <span class="kw">abline</span>(<span class="dt">v =</span> offset<span class="op">/</span><span class="kw">cos</span>(theta), ...)
+  }
+}
+drawCircle &lt;-<span class="st"> </span><span class="cf">function</span>(circle, ...){
+  <span class="kw">draw.circle</span>(<span class="kw">Re</span>(circle<span class="op">$</span>center), <span class="kw">Im</span>(circle<span class="op">$</span>center), circle<span class="op">$</span>radius, ...)
+}
+drawGcircle &lt;-<span class="st"> </span><span class="cf">function</span>(gcircle, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>, ...){
+  <span class="cf">if</span>(<span class="kw">attr</span>(gcircle, <span class="st">&quot;type&quot;</span>) <span class="op">==</span><span class="st"> &quot;circle&quot;</span>){
+    <span class="kw">drawCircle</span>(gcircle, <span class="dt">border =</span> color, ...)
+  }<span class="cf">else</span>{
+    <span class="kw">drawLine</span>(gcircle, <span class="dt">col =</span> color, ...)
+  }
+}</code></pre></div>
+<p>We start with five circles.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># generation 0</span>
+gen0 &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="kw">c</span>(<span class="dv">0</span>, pi<span class="op">/</span><span class="dv">2</span>, pi, <span class="dv">3</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">2</span>), <span class="cf">function</span>(beta){
+  out &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">center =</span> <span class="kw">cos</span>(beta)<span class="op">+</span>1i<span class="op">*</span><span class="kw">sin</span>(beta), <span class="dt">radius =</span> <span class="dv">1</span>, <span class="dt">gen =</span> <span class="dv">0</span>)
+  <span class="kw">attr</span>(out, <span class="st">&quot;type&quot;</span>) &lt;-<span class="st"> &quot;circle&quot;</span>
+  out
+}, <span class="dt">simplify =</span> <span class="ot">FALSE</span>)
+gen0[[<span class="dv">5</span>]] &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">center =</span> <span class="dv">0</span><span class="op">+</span>0i, <span class="dt">radius =</span> <span class="dv">2</span>, <span class="dt">gen =</span> <span class="dv">0</span>)
+<span class="kw">attr</span>(gen0[[<span class="dv">5</span>]], <span class="st">&quot;type&quot;</span>) &lt;-<span class="st"> &quot;circle&quot;</span>
+<span class="co"># plot</span>
+<span class="kw">par</span>(<span class="dt">bg =</span> <span class="st">&quot;black&quot;</span>, <span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>))
+<span class="kw">plot</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dt">type=</span><span class="st">&quot;n&quot;</span>, <span class="dt">xlim=</span><span class="kw">c</span>(<span class="op">-</span><span class="fl">2.3</span>,<span class="fl">2.3</span>), <span class="dt">ylim=</span><span class="kw">c</span>(<span class="op">-</span><span class="fl">2.3</span>,<span class="fl">2.3</span>),   
+     <span class="dt">asp=</span><span class="dv">1</span>, <span class="dt">axes=</span><span class="ot">FALSE</span>, <span class="dt">xlab=</span><span class="ot">NA</span>, <span class="dt">ylab=</span><span class="ot">NA</span>)
+<span class="kw">invisible</span>(<span class="kw">lapply</span>(gen0, drawGcircle, <span class="dt">color =</span> <span class="st">&quot;yellow&quot;</span>, <span class="dt">lwd =</span> <span class="dv">2</span>))</code></pre></div>
+<div class="figure">
+<img src="./figures/Inversions-gen0-1.png" />
+
+</div>
+<p>Now, we invert each of these five circles with respect to the other ones:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># generation 1</span>
+n0 &lt;-<span class="st"> </span><span class="kw">length</span>(gen0)
+n1 &lt;-<span class="st"> </span>n0<span class="op">*</span>(n0<span class="op">-</span><span class="dv">1</span>)
+gen1 &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;list&quot;</span>, n1)
+k &lt;-<span class="st"> </span><span class="dv">0</span>
+<span class="cf">while</span>(k <span class="op">&lt;</span><span class="st"> </span>n1){
+  <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>n0){
+    <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>n0){
+      <span class="cf">if</span>(i <span class="op">!=</span><span class="st"> </span>j){
+        k &lt;-<span class="st"> </span>k<span class="op">+</span><span class="dv">1</span>
+        gen1[[k]] &lt;-<span class="st"> </span>
+<span class="st">          </span><span class="kw">iotaGcircle</span>(gen0[[i]]<span class="op">$</span>center, gen0[[i]]<span class="op">$</span>radius, gen0[[j]])
+        gen1[[k]]<span class="op">$</span>base &lt;-<span class="st"> </span>i
+        gen1[[k]]<span class="op">$</span>gen &lt;-<span class="st"> </span><span class="dv">1</span>
+      }
+    }
+  }
+}</code></pre></div>
+<p>We continue so on: we invert the obtained generalized circles with respect to the starting circles.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># generation 2</span>
+n2 &lt;-<span class="st"> </span>n0<span class="op">*</span>n1<span class="op">-</span>n1
+gen2 &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;list&quot;</span>, n2)
+k &lt;-<span class="st"> </span><span class="dv">0</span>
+<span class="cf">while</span>(k <span class="op">&lt;</span><span class="st"> </span>n2){
+  <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>n1){
+    <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>n0){
+      <span class="cf">if</span>(gen1[[j]]<span class="op">$</span>base <span class="op">!=</span><span class="st"> </span>i){
+        k &lt;-<span class="st"> </span>k<span class="op">+</span><span class="dv">1</span>
+        gen2[[k]] &lt;-<span class="st"> </span>
+<span class="st">          </span><span class="kw">iotaGcircle</span>(gen0[[i]]<span class="op">$</span>center, gen0[[i]]<span class="op">$</span>radius, gen1[[j]])
+        gen2[[k]]<span class="op">$</span>base &lt;-<span class="st"> </span>i
+        gen2[[k]]<span class="op">$</span>gen &lt;-<span class="st"> </span><span class="dv">2</span>
+      }
+    }
+  }
+}
+<span class="co"># generation 3</span>
+n3 &lt;-<span class="st"> </span>n0<span class="op">*</span>n2<span class="op">-</span>n2
+gen3 &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;list&quot;</span>, n3)
+k &lt;-<span class="st"> </span><span class="dv">0</span>
+<span class="cf">while</span>(k <span class="op">&lt;</span><span class="st"> </span>n3){
+  <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>n2){
+    <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>n0){
+      <span class="cf">if</span>(gen2[[j]]<span class="op">$</span>base <span class="op">!=</span><span class="st"> </span>i){
+        k &lt;-<span class="st"> </span>k<span class="op">+</span><span class="dv">1</span>
+        gen3[[k]] &lt;-<span class="st"> </span>
+<span class="st">          </span><span class="kw">iotaGcircle</span>(gen0[[i]]<span class="op">$</span>center, gen0[[i]]<span class="op">$</span>radius, gen2[[j]])
+        gen3[[k]]<span class="op">$</span>gen &lt;-<span class="st"> </span><span class="dv">3</span>
+      }
+    }
+  }
+}</code></pre></div>
+<p>Let’s put all the obtained generalized circles together:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gcircles &lt;-<span class="st"> </span><span class="kw">c</span>(gen0, gen1, gen2, gen3)
+<span class="kw">length</span>(gcircles)
+## [1] 425</code></pre></div>
+<p>There are 425 generalized circles, but some of them are duplicated. To remove the duplicates, we use the <code>uniqueWith</code> function below. This function takes as arguments an atomic vector or a list <code>v</code> and a function <code>f</code> of two arguments, two elements of <code>v</code>, and which returns <code>TRUE</code> or <code>FALSE</code>, according to whether the two elements are considered as duplicates.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">uniqueWith &lt;-<span class="st"> </span><span class="cf">function</span>(v, f){
+  size &lt;-<span class="st"> </span><span class="kw">length</span>(v)
+  <span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_len</span>(size<span class="op">-</span>1L)){
+    j &lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span>1L
+    <span class="cf">while</span>(j <span class="op">&lt;=</span><span class="st"> </span>size){
+      <span class="cf">if</span>(<span class="kw">f</span>(v[[j]],v[[i]])){
+        v &lt;-<span class="st"> </span>v[<span class="op">-</span>j]
+        size &lt;-<span class="st"> </span>size <span class="op">-</span><span class="st"> </span>1L
+      }<span class="cf">else</span>{
+        j &lt;-<span class="st"> </span>j <span class="op">+</span><span class="st"> </span>1L
+      }
+    }
+  }
+  v[1L<span class="op">:</span>size]
+}
+<span class="co"># examples ####</span>
+v &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">5</span>)
+<span class="kw">uniqueWith</span>(v, <span class="st">`</span><span class="dt">==</span><span class="st">`</span>)
+## [1] 1 2 3 4 5
+<span class="kw">uniqueWith</span>(v, <span class="cf">function</span>(x,y) (x<span class="op">-</span>y) <span class="op">%%</span><span class="st"> </span><span class="dv">3</span> <span class="op">==</span><span class="st"> </span><span class="dv">0</span>)
+## [1] 1 2 3
+v &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">a=</span><span class="st">&quot;you&quot;</span>, <span class="dt">b=</span><span class="st">&quot;are&quot;</span>, <span class="dt">c=</span><span class="st">&quot;great&quot;</span>)
+<span class="kw">uniqueWith</span>(v, <span class="cf">function</span>(x,y) <span class="kw">nchar</span>(x) <span class="op">==</span><span class="st"> </span><span class="kw">nchar</span>(y))
+## $a
+## [1] &quot;you&quot;
+## 
+## $c
+## [1] &quot;great&quot;</code></pre></div>
+<p>So let’s define the function <code>f</code> which identifies two equal generalized circles.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span><span class="cf">function</span>(gcircle1, gcircle2){
+  <span class="cf">if</span>(<span class="kw">attr</span>(gcircle1, <span class="st">&quot;type&quot;</span>) <span class="op">==</span><span class="st"> </span><span class="kw">attr</span>(gcircle2, <span class="st">&quot;type&quot;</span>)){
+    <span class="cf">if</span>(<span class="kw">attr</span>(gcircle1, <span class="st">&quot;type&quot;</span>) <span class="op">==</span><span class="st"> &quot;circle&quot;</span>){
+      <span class="kw">Mod</span>(gcircle1<span class="op">$</span>center<span class="op">-</span>gcircle2<span class="op">$</span>center) <span class="op">&lt;</span><span class="st"> </span><span class="fl">1e-5</span> <span class="op">&amp;&amp;</span><span class="st"> </span>
+<span class="st">        </span><span class="kw">abs</span>(gcircle1<span class="op">$</span>radius<span class="op">-</span>gcircle2<span class="op">$</span>radius) <span class="op">&lt;</span><span class="st"> </span><span class="fl">1e-5</span>
+    }<span class="cf">else</span>{
+      <span class="kw">abs</span>(<span class="kw">cos</span>(gcircle1<span class="op">$</span>theta)<span class="op">-</span><span class="kw">cos</span>(gcircle2<span class="op">$</span>theta)) <span class="op">&lt;</span><span class="st"> </span><span class="fl">1e-5</span> <span class="op">&amp;&amp;</span>
+<span class="st">        </span><span class="kw">abs</span>(<span class="kw">sin</span>(gcircle1<span class="op">$</span>theta)<span class="op">-</span><span class="kw">sin</span>(gcircle2<span class="op">$</span>theta)) <span class="op">&lt;</span><span class="st"> </span><span class="fl">1e-5</span> <span class="op">&amp;&amp;</span>
+<span class="st">        </span><span class="kw">abs</span>(gcircle1<span class="op">$</span>offset<span class="op">-</span>gcircle2<span class="op">$</span>offset) <span class="op">&lt;</span><span class="st"> </span><span class="fl">1e-5</span>
+    }
+  }<span class="cf">else</span>{
+    <span class="ot">FALSE</span>
+  }
+}</code></pre></div>
+<p>And now, let’s remove the duplicates:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gcircles &lt;-<span class="st"> </span><span class="kw">uniqueWith</span>(gcircles, f)
+<span class="kw">length</span>(gcircles)
+## [1] 161</code></pre></div>
+<p>Now we plot the generalized circles, with a color indicating the generation.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">draw &lt;-<span class="st"> </span><span class="cf">function</span>(gcircle, <span class="dt">colors=</span><span class="kw">rainbow</span>(<span class="dv">4</span>), ...){
+  <span class="kw">drawGcircle</span>(gcircle, <span class="dt">color =</span> colors[<span class="dv">1</span><span class="op">+</span>gcircle<span class="op">$</span>gen], ...)
+}
+<span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>), <span class="dt">bg =</span> <span class="st">&quot;black&quot;</span>)
+<span class="kw">plot</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dt">type=</span><span class="st">&quot;n&quot;</span>, <span class="dt">xlim=</span><span class="kw">c</span>(<span class="op">-</span><span class="fl">2.3</span>,<span class="fl">2.3</span>), <span class="dt">ylim=</span><span class="kw">c</span>(<span class="op">-</span><span class="fl">2.3</span>,<span class="fl">2.3</span>),  
+     <span class="dt">asp=</span><span class="dv">1</span>, <span class="dt">axes=</span><span class="ot">FALSE</span>, <span class="dt">xlab=</span><span class="ot">NA</span>, <span class="dt">ylab=</span><span class="ot">NA</span>)
+<span class="kw">invisible</span>(<span class="kw">lapply</span>(gcircles, draw, <span class="dt">lwd=</span><span class="dv">2</span>))</code></pre></div>
+<div class="figure">
+<img src="./figures/Inversions-picture-1.png" />
+
+</div>
 
     </div>
 
