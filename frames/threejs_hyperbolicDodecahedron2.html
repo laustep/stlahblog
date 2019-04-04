@@ -1,0 +1,354 @@
+<html>
+
+<head>
+  <title>Hyperbolic dodecahedron</title>
+  <style>
+    canvas {
+      width: 100%;
+      height: 100%
+    }
+  </style>
+</head>
+
+<body>
+  <script src="../libraries/three.min.js"></script>
+  <script src="../libraries/jquery.min.js"></script>
+  <script src="../libraries/dat.gui.min.js"></script>
+
+  <script> // gyromidpoint -----------------------------------------------------
+    function gamma(M, s) {
+      return 1 / Math.sqrt(1 - M.lengthSq() / s / s);
+    }
+    function beta(M, s) {
+      return 1 / Math.sqrt(1 + M.lengthSq() / s / s);
+    }
+    function gyromidpointE(A, B, s) {
+      var gammaA = gamma(A, s);
+      var gammaB = gamma(B, s);
+      var gA = A.clone().multiplyScalar(gammaA);
+      var gB = B.clone().multiplyScalar(gammaB);
+      return gA.add(gB).divideScalar(gammaA + gammaB);
+    }
+    function phiEU(A, s) {
+      var gammaA = gamma(A, s);
+      return A.clone().multiplyScalar(gammaA);
+    }
+    function phiUE(A, s) {
+      var betaA = beta(A, s);
+      return A.clone().multiplyScalar(betaA);
+    }
+    function gyromidpointU(A, B, s) {
+      return phiEU(gyromidpointE(phiUE(A, s), phiUE(B, s), s), s);
+    }
+  </script>
+
+  <script> // function making the triangles ------------------------------------
+    function splitTriangle1(triangle, s) {
+      var mab = gyromidpointU(triangle[0], triangle[1], s);
+      var mac = gyromidpointU(triangle[0], triangle[2], s);
+      var mbc = gyromidpointU(triangle[1], triangle[2], s);
+      return [
+        [triangle[0], mab, mac],
+        [triangle[1], mbc, mab],
+        [triangle[2], mac, mbc],
+        [mab, mbc, mac]
+      ];
+    }
+    function abind(array) {
+      return [].concat.apply([], array);
+    }
+    function splitTriangle(triangle, s, n) {
+      var split = function (trngl) {
+        return splitTriangle1(trngl, s);
+      };
+      var triangles = split(triangle);
+      for (var i = 0; i < n - 1; i++) {
+        triangles = abind(triangles.map(split));
+      }
+      return triangles;
+    }
+  </script>
+
+  <script> // gyrosegment ------------------------------------------------------
+    function gyroadd(X, Y, s) {
+      var bX = beta(X, s);
+      var bY = beta(Y, s);
+      var k = 1 + bX / (1 + bX) * (X.dot(Y)) / s / s + (1 - bY) / bY;
+      var kX = X.clone().multiplyScalar(k);
+      return kX.add(Y);
+    }
+    function gyroscalar(r, X, s) {
+      var Xnorm = X.length();
+      var k = s * Math.sinh(r * Math.asinh(Xnorm / s)) / Xnorm;
+      return X.clone().multiplyScalar(k);
+    }
+    function gyrovector(A, B, s) {
+      return gyroadd(A.clone().negate(), B, s);
+    }
+    function gyroABt(A, B, t, s) {
+      return gyroadd(A, gyroscalar(t, gyrovector(A, B, s), s), s);
+    }
+    function gyrosegment(A, B, n, s) {
+      var out = [];
+      for (var i = 0; i <= n; i++) {
+        out.push(gyroABt(A, B, i / n, s));
+      }
+      return out;
+    }
+  </script>
+
+  <script> // vertices and faces  ----------------------------------------------
+    var phi = (1 + Math.sqrt(5)) / 2;
+    var a = 1 / Math.sqrt(3);
+    var b = a / phi;
+    var c = a * phi;
+    var vertices =
+      [[a, a, a],
+      [a, a, -a],
+      [a, -a, a],
+      [-a, -a, a],
+      [-a, a, -a],
+      [-a, a, a],
+      [0, b, -c],
+      [0, -b, -c],
+      [0, -b, c],
+      [c, 0, -b],
+      [-c, 0, -b],
+      [-c, 0, b],
+      [b, c, 0],
+      [b, -c, 0],
+      [-b, -c, 0],
+      [-b, c, 0],
+      [0, b, c],
+      [a, -a, -a],
+      [c, 0, b],
+      [-a, -a, -a]];
+    var faces =
+      [
+        [13, 2, 3],
+        [3, 14, 13],
+        [3, 2, 8],
+        [17, 1, 9],
+        [6, 1, 17],
+        [17, 7, 6],
+        [6, 7, 19],
+        [19, 4, 6],
+        [10, 4, 19],
+        [13, 14, 19],
+        [19, 17, 13],
+        [7, 17, 19],
+        [15, 1, 6],
+        [12, 1, 15],
+        [6, 4, 15],
+        [15, 0, 12],
+        [15, 16, 0],
+        [5, 16, 15],
+        [18, 1, 12],
+        [12, 0, 18],
+        [9, 1, 18],
+        [0, 16, 18],
+        [8, 2, 18],
+        [18, 16, 8],
+        [18, 2, 13],
+        [18, 17, 9],
+        [13, 17, 18],
+        [8, 16, 11],
+        [11, 16, 5],
+        [11, 3, 8],
+        [14, 3, 11],
+        [11, 19, 14],
+        [10, 19, 11],
+        [11, 4, 10],
+        [5, 15, 11],
+        [11, 15, 4]
+      ];
+    var edges = 
+    	[
+      	[ 13, 2 ],
+        [ 3, 14 ],
+        [ 14, 13 ],
+        [ 3, 8 ],
+        [ 2, 8 ],
+        [ 17, 9 ],
+        [ 1, 9 ],
+        [ 6, 1 ],
+        [ 17, 7 ],
+        [ 7, 6 ],
+        [ 7, 19 ],
+        [ 4, 6 ],
+        [ 10, 4 ],
+        [ 10, 19 ],
+        [ 14, 19 ],
+        [ 17, 13 ],
+        [ 12, 1 ],
+        [ 12, 15 ],
+        [ 4, 15 ],
+        [ 0, 12 ],
+        [ 16, 0 ],
+        [ 5, 16 ],
+        [ 5, 15 ],
+        [ 0, 18 ],
+        [ 9, 18 ],
+        [ 2, 18 ],
+        [ 16, 8 ],
+        [ 11, 5 ],
+        [ 11, 3 ],
+        [ 10, 11 ]
+	    ];
+  </script>
+
+  <script> // dodecahedron -----------------------------------------------------
+    var s = 0.3;
+    var Geom = new THREE.Geometry();
+    for (var j = 0; j < faces.length; j++) {
+      var idx = faces[j];
+      var face = [
+        vertices[idx[0]],
+        vertices[idx[1]],
+        vertices[idx[2]]
+      ].map(function (pt) {
+        return new THREE.Vector3().fromArray(pt);
+      });
+      var triangles = splitTriangle(face, s, 4);
+      var geom = new THREE.Geometry();
+      var faceIndex = 0;
+      for (var i = 0; i < triangles.length; i++) {
+        var triangle = triangles[i];
+        geom.vertices.push(triangle[0], triangle[1], triangle[2]);
+        geom.faces.push(new THREE.Face3(
+          faceIndex,
+          faceIndex + 1,
+          faceIndex + 2,
+          [
+            triangle[0],
+            triangle[1],
+            triangle[2]
+          ]
+        ));
+        faceIndex += 3;
+      }
+      Geom.mergeMesh(new THREE.Mesh(geom));
+    }
+    Geom.mergeVertices();
+    var dodecahedron = new THREE.Mesh(
+      Geom,
+      new THREE.MeshNormalMaterial() 
+    );
+  </script>
+
+  <script> // edges ------------------------------------------------------------
+    var n = 50;
+    var material = new THREE.MeshLambertMaterial({ color: 0x008000 });
+    var Geom = new THREE.Geometry();
+    for (var j = 0; j < edges.length; j++) {
+      var idx = edges[j];
+      var A = new THREE.Vector3().fromArray(vertices[idx[0]]);
+      var B = new THREE.Vector3().fromArray(vertices[idx[1]]);
+      var AB = new THREE.CatmullRomCurve3(gyrosegment(A, B, n, s));
+      var geom = new THREE.TubeGeometry(AB, 20, 0.02, 8, false);
+      Geom.mergeMesh(new THREE.Mesh(geom));
+    }
+    var Edges = new THREE.Mesh(Geom, material);
+  </script>
+
+  <script> // vertices ---------------------------------------------------------
+    var Geom = new THREE.Geometry();
+    for (var j = 0; j < vertices.length; j++) {
+      var vx = vertices[j];
+      var geom = new THREE.SphereGeometry(0.03, 8, 8);
+      geom.translate(vx[0], vx[1], vx[2]);
+      Geom.mergeMesh(new THREE.Mesh(geom));
+    }
+    var Vertices = new THREE.Mesh(Geom, material);
+  </script>
+  
+  <script> // dat.gui controls -----------------------------------------------
+    var z0 = 2.1;
+    var dgcontrols = new function () {
+      this.rotationSpeed = 0.001;
+      this.cameraz = z0;
+    }
+    var gui = new dat.GUI({ autoplace: false, width: 300 });
+    gui.add(dgcontrols, 'cameraz').min(2).max(10).step(0.1)
+      .name("Camera position");
+    gui.add(dgcontrols, 'rotationSpeed').min(0).max(0.005)
+      .name("Rotation speed");
+  </script>
+
+  <script> // three.js scene -------------------------------------------------
+    var scene = new THREE.Scene();
+    var ambientLight = new THREE.AmbientLight(0xffffff, 1);
+    scene.add(ambientLight);
+    var aspect = window.innerWidth / window.innerHeight;
+    var camera = new THREE.PerspectiveCamera(75, aspect, 1, 10000);
+    var pointLight = new THREE.PointLight(0xffffff, 0.8);
+    camera.add(pointLight);
+    camera.position.z = z0;
+    scene.add(camera);
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+    var object = new THREE.Object3D();
+    object.add(dodecahedron);
+    object.add(Edges);
+    object.add(Vertices);
+    scene.add(object);
+
+    window.requestAnimFrame = (function () {
+      return window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        function (callback) {
+          window.setTimeout(callback, 1000 / 60);
+        };
+    })();
+
+    function render() {
+      object.rotation.x += dgcontrols.rotationSpeed;
+      object.rotation.y += dgcontrols.rotationSpeed;
+      camera.position.z = dgcontrols.cameraz;
+      renderer.render(scene, camera);
+      requestAnimFrame(render);
+    }
+  </script>
+
+  <script> // dragging -------------------------------------------------------
+    var isDragging = false;
+    var previousMousePosition = { x: 0, y: 0 };
+
+    $(renderer.domElement).on('mousedown', function (e) {
+      isDragging = true;
+    }).on('mousemove', function (e) {
+      var deltaMove = {
+        x: e.offsetX - previousMousePosition.x,
+        y: e.offsetY - previousMousePosition.y
+      };
+      if (isDragging) {
+        var deltaRotationQuaternion = new THREE.Quaternion()
+          .setFromEuler(new THREE.Euler(
+            Math.PI / 180 * (deltaMove.y * .5),
+            Math.PI / 180 * (deltaMove.x * .5),
+            0,
+            'XYZ'
+          ));
+        object.quaternion.multiplyQuaternions(deltaRotationQuaternion,
+          object.quaternion);
+      }
+      previousMousePosition = {
+        x: e.offsetX,
+        y: e.offsetY
+      };
+    });
+
+    $(document).on('mouseup', function (e) {
+      isDragging = false;
+    });
+  </script>
+
+  <script> // render ---------------------------------------------------------
+    render();
+  </script>
+
+</body>
+
+</html>
