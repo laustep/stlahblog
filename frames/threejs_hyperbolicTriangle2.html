@@ -1,0 +1,251 @@
+<html>
+
+<head>
+  <title>Hyperbolic triangle</title>
+  <style>
+    canvas {
+      width: 100%;
+      height: 100%
+    }
+  </style>
+</head>
+
+<body>
+  <script src="../libraries/three.min.js"></script>
+  <script src="../libraries/jquery.min.js"></script>
+  <script src="../libraries/dat.gui.min.js"></script>
+
+  <script> // gyromidpoint -----------------------------------------------------
+    function gamma(M, s) {
+      return 1 / Math.sqrt(1 - M.lengthSq()/s/s);
+    }
+    function beta(M, s) {
+      return 1 / Math.sqrt(1 + M.lengthSq() / s / s);
+    }
+    function gyromidpointE(A, B, s){
+      var gammaA = gamma(A, s);
+      var gammaB = gamma(B, s);
+      var gA = A.clone().multiplyScalar(gammaA);
+      var gB = B.clone().multiplyScalar(gammaB);
+      return gA.add(gB).divideScalar(gammaA + gammaB);
+    }
+    function phiEU(A, s) {
+      var gammaA = gamma(A, s);
+      return A.clone().multiplyScalar(gammaA);
+    }
+    function phiUE(A, s) {
+      var betaA = beta(A, s);
+      return A.clone().multiplyScalar(betaA);
+    }
+    function gyromidpointU(A, B, s) {
+      return phiEU(gyromidpointE(phiUE(A, s), phiUE(B, s), s) ,s);
+    }
+  </script>
+
+  <script> // gyrosegment ------------------------------------------------------
+  function gyroadd(X, Y, s) {
+      var bX = beta(X, s);
+      var bY = beta(Y, s);
+      var k = 1 + bX / (1 + bX) * (X.dot(Y)) / s / s + (1 - bY) / bY;
+      var kX = X.clone().multiplyScalar(k);
+      return kX.add(Y);
+    }
+    function gyroscalar(r, X, s) {
+      var Xnorm = X.length();
+      var k = s * Math.sinh(r * Math.asinh(Xnorm / s)) / Xnorm;
+      return X.clone().multiplyScalar(k);
+    }
+    function gyrovector(A, B, s) {
+      return gyroadd(A.clone().negate(), B, s);
+    }
+    function gyroABt(A, B, t, s) {
+      return gyroadd(A, gyroscalar(t, gyrovector(A, B, s), s), s);
+    }
+    function gyrosegment(A, B, n, s) {
+      var out = [];
+      for (var i = 0; i <= n; i++) {
+        out.push(gyroABt(A, B, i / n, s));
+      }
+      return out;
+    }
+  </script>
+
+  <script> // function making the triangles ------------------------------------
+    function splitTriangle1(triangle, s) {
+      var mab = gyromidpointU(triangle[0], triangle[1], s);
+      var mac = gyromidpointU(triangle[0], triangle[2], s);
+      var mbc = gyromidpointU(triangle[1], triangle[2], s);
+      return [
+        [triangle[0], mab, mac],
+        [triangle[1], mbc, mab],
+        [triangle[2], mac, mbc],
+        [mab, mbc, mac]
+      ];
+    }
+    function abind(array) {
+      return [].concat.apply([], array);
+    }
+    function splitTriangle(triangle, s, n) {
+      var split = function(trngl){
+        return splitTriangle1(trngl, s);
+      };
+      var triangles = split(triangle);
+      for (var i = 0; i < n - 1; i++) {
+        triangles = abind(triangles.map(split));
+      }
+      return triangles;
+    }
+  </script>
+
+  <script>
+    var A = new THREE.Vector3(1, 0, 0);
+    var B = new THREE.Vector3(0, 1, 0);
+    var C = new THREE.Vector3(0, 0, 1);
+
+    var s = 0.5; 
+
+    // triangle 
+    var triangle = [A, B, C];
+    var triangles = splitTriangle(triangle, s, 4);
+    var geom = new THREE.Geometry();
+    var faceIndex = 0;
+    for (var i = 0; i < triangles.length; i++) {
+      var triangle = triangles[i];
+      geom.vertices.push(triangle[0], triangle[1], triangle[2]);
+      geom.faces.push(new THREE.Face3(
+        faceIndex,
+        faceIndex + 1,
+        faceIndex + 2,
+        [
+          triangle[0],
+          triangle[1],
+          triangle[2]
+        ] 
+      ));
+      faceIndex += 3;
+    }
+    geom.mergeVertices();
+    var htriangle = new THREE.Mesh(
+      geom,
+      new THREE.MeshNormalMaterial({ side: THREE.DoubleSide })
+    );
+
+    // segments 
+    var n = 50;
+    var segmentAB = new THREE.CatmullRomCurve3(gyrosegment(A, B, n, s));
+    var geometry = new THREE.TubeGeometry(segmentAB, 20, 0.02, 8, false);
+    var material = new THREE.MeshLambertMaterial({ color: 0x008000 });
+    var AB = new THREE.Mesh(geometry, material);
+    var segmentAC = new THREE.CatmullRomCurve3(gyrosegment(A, C, n, s));
+    var geometry = new THREE.TubeGeometry(segmentAC, 20, 0.02, 8, false);
+    var AC = new THREE.Mesh(geometry, material);
+    var segmentBC = new THREE.CatmullRomCurve3(gyrosegment(B, C, n, s));
+    var geometry = new THREE.TubeGeometry(segmentBC, 20, 0.02, 8, false);
+    var BC = new THREE.Mesh(geometry, material);
+
+    // vertices 
+    var geom = new THREE.SphereGeometry(0.03, 8, 8);
+    geom.translate(A.x, A.y, A.z);
+    var vxA = new THREE.Mesh(geom, material);
+    var geom = new THREE.SphereGeometry(0.03, 8, 8);
+    geom.translate(B.x, B.y, B.z);
+    var vxB = new THREE.Mesh(geom, material);
+    var geom = new THREE.SphereGeometry(0.03, 8, 8);
+    geom.translate(C.x, C.y, C.z);
+    var vxC = new THREE.Mesh(geom, material);
+  </script>
+
+  <script> // dat.gui controls -----------------------------------------------
+    var z0 = 2.1;
+    var dgcontrols = new function () {
+      this.rotationSpeed = 0.001;
+      this.cameraz = z0;
+    }
+    var gui = new dat.GUI({ autoplace: false, width: 300 });
+    gui.add(dgcontrols, 'cameraz').min(2).max(10).step(0.1)
+      .name("Camera position");
+    gui.add(dgcontrols, 'rotationSpeed').min(0).max(0.005)
+      .name("Rotation speed");
+  </script>
+
+  <script> // three.js scene -------------------------------------------------
+    var scene = new THREE.Scene();
+    var ambientLight = new THREE.AmbientLight(0xffffff, 1);
+    scene.add(ambientLight);
+    var aspect = window.innerWidth / window.innerHeight;
+    var camera = new THREE.PerspectiveCamera(75, aspect, 1, 10000);
+    var pointLight = new THREE.PointLight(0xffffff, 0.8);
+    camera.add(pointLight);
+    camera.position.z = z0;
+    scene.add(camera);
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+    var object = new THREE.Object3D();
+    object.add(htriangle);
+    object.add(AB);
+    object.add(AC);
+    object.add(BC);
+    object.add(vxA);
+    object.add(vxB);
+    object.add(vxC);
+    scene.add(object);
+
+    window.requestAnimFrame = (function () {
+      return window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        function (callback) {
+          window.setTimeout(callback, 1000 / 60);
+        };
+    })();
+
+    function render() {
+      object.rotation.x += dgcontrols.rotationSpeed;
+      object.rotation.y += dgcontrols.rotationSpeed;
+      camera.position.z = dgcontrols.cameraz;
+      renderer.render(scene, camera);
+      requestAnimFrame(render);
+    }
+  </script>
+
+  <script> // dragging -------------------------------------------------------
+    var isDragging = false;
+    var previousMousePosition = { x: 0, y: 0 };
+
+    $(renderer.domElement).on('mousedown', function (e) {
+      isDragging = true;
+    }).on('mousemove', function (e) {
+      var deltaMove = {
+        x: e.offsetX - previousMousePosition.x,
+        y: e.offsetY - previousMousePosition.y
+      };
+      if (isDragging) {
+        var deltaRotationQuaternion = new THREE.Quaternion()
+          .setFromEuler(new THREE.Euler(
+            Math.PI / 180 * (deltaMove.y * .5),
+            Math.PI / 180 * (deltaMove.x * .5),
+            0,
+            'XYZ'
+          ));
+        object.quaternion.multiplyQuaternions(deltaRotationQuaternion,
+          object.quaternion);
+      }
+      previousMousePosition = {
+        x: e.offsetX,
+        y: e.offsetY
+      };
+    });
+
+    $(document).on('mouseup', function (e) {
+      isDragging = false;
+    });
+  </script>
+
+  <script> // render ---------------------------------------------------------
+    render();
+  </script>
+
+</body>
+
+</html>
