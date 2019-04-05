@@ -1,0 +1,634 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Drawing hyperbolic polyhedra</title>
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/pandoc-solarized.css" />  
+  <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+</head>
+
+<body>
+  <!-- Sidebar. -->
+  <div class="sidebar">
+    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+      <a href="https://www.r-bloggers.com/">
+        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+      </a>
+      <br />
+      <a href="http://t-redactyl.io/">
+        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
+      </a>
+      <a href="http://timelyportfolio.blogspot.be/">
+        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
+      </a>
+      <br />
+      <a href="https://antoineguillot.wordpress.com/blog/">
+        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+      </a>
+      <br />
+      <a href="https://fronkonstin.com/">
+        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="header">
+      <div id="logo" style="position:absolute;">
+        <a href="../">
+          <img src="../images/stla.jpg" alt="stla" width="100px" />
+        </a>
+      </div>
+      <div id="navigation" style="margin-top:50px;">
+        <a href="../">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../archive.html">Archive</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Drawing hyperbolic polyhedra</h1> <div class="info">
+    Posted on April  5, 2019
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="../tags/R.html">R</a>, <a href="../tags/maths.html">maths</a>, <a href="../tags/geometry.html">geometry</a>, <a href="../tags/graphics.html">graphics</a>, <a href="../tags/rgl.html">rgl</a>, <a href="../tags/asymptote.html">asymptote</a>, <a href="../tags/javascript.html">javascript</a>
+    
+</div>
+
+<p>A. A. Ungar has developed the concept of <em>gyrovector space</em>. His theory provides a (gyro)vector approach to hyperbolic geometry.</p>
+<p>Ungar deeply studied three examples of gyrovector spaces; they correspond to three models of hyperbolic geometry: the Beltrami model, the Poincaré ball model, and the hyperboloid model.</p>
+<p>In this blog post, I will consider the gyrovector approach to the hyperboloid model. We will see how it makes easy to draw some hyperbolic polyhedra.</p>
+<h2 id="gyrovector-space">Gyrovector space</h2>
+<p>A <em>point</em> is an element of <span class="math inline">\(\mathbb{R}^n\)</span>. Throughout, <span class="math inline">\(s\)</span> is a fixed positive number.</p>
+<p>Shortly speaking, <span class="math inline">\(\mathbb{R}^n\)</span> is a <em>gyrovector space</em> when it is equipped with a <em>gyroaddition</em> and a <em>scalar gyromultiplication</em>.</p>
+<h3 id="gyroaddition">Gyroaddition</h3>
+<p>In order to define the gyroaddition of two points, we introduce the <em>beta factor</em> of a point <span class="math inline">\(A\)</span>, defined by <span class="math display">\[
+\beta_A = \dfrac{1}{\sqrt{1 + \dfrac{{\Vert A \Vert}^2}{s^2}}}.
+\]</span></p>
+<p>The <em>gyroaddition</em> of two points <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> is then defined by <span class="math display">\[
+A \oplus B = 
+\left(1 + \frac{\beta_A}{1+\beta_A}\frac{A\cdot B}{s^2} 
++ \frac{1-\beta_B}{\beta_B} \right) A + B.
+\]</span> Later, we will resort to the (non-obvious) property <span class="math display">\[
+(\star)\qquad -A \oplus (A \oplus B) = B.
+\]</span></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># gyroaddition ####</span>
+dotprod &lt;-<span class="st"> </span><span class="cf">function</span>(x, <span class="dt">y=</span><span class="ot">NULL</span>){
+  <span class="kw">c</span>(<span class="kw">crossprod</span>(x, y))
+}
+betaF &lt;-<span class="st"> </span><span class="cf">function</span>(A, <span class="dt">s=</span><span class="dv">1</span>) <span class="dv">1</span><span class="op">/</span><span class="kw">sqrt</span>(<span class="dv">1</span><span class="op">+</span><span class="kw">dotprod</span>(A)<span class="op">/</span>s<span class="op">^</span><span class="dv">2</span>)
+gyroadd &lt;-<span class="st"> </span><span class="cf">function</span>(A, B, <span class="dt">s=</span><span class="dv">1</span>){
+  betaA &lt;-<span class="st"> </span><span class="kw">betaF</span>(A, s); betaB &lt;-<span class="st"> </span><span class="kw">betaF</span>(B, s)
+  (<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>betaA<span class="op">/</span>(<span class="dv">1</span><span class="op">+</span>betaA)<span class="op">*</span><span class="kw">dotprod</span>(A,B)<span class="op">/</span>s<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>(<span class="dv">1</span><span class="op">-</span>betaB)<span class="op">/</span>betaB) <span class="op">*</span><span class="st"> </span>A <span class="op">+</span><span class="st"> </span>B
+}</code></pre></div>
+<h3 id="scalar-gyromultiplication">Scalar gyromultiplication</h3>
+<p>For <span class="math inline">\(r \in \mathbb{R}\)</span>, the <em>scalar gyromultiplication</em> of a point <span class="math inline">\(A\)</span> by <span class="math inline">\(r\)</span> is defined by<br />
+<span class="math display">\[
+r \otimes A = 
+\frac{s}{\Vert A \Vert} 
+\sinh\left(r \sinh^{-1}\left(\frac{\Vert A \Vert}{s}\right)\right) A. 
+\]</span></p>
+<p>It is easy to see that <span class="math inline">\(0 \otimes A = \mathbf{0}\)</span> and <span class="math inline">\(1 \otimes A = A\)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># scalar gyromultiplication ####</span>
+gyroscalar &lt;-<span class="st"> </span><span class="cf">function</span>(r, A, <span class="dt">s=</span><span class="dv">1</span>){
+  Anorm &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">dotprod</span>(A))
+  s<span class="op">/</span>Anorm <span class="op">*</span><span class="st"> </span><span class="kw">sinh</span>(r<span class="op">*</span><span class="kw">asinh</span>(Anorm<span class="op">/</span>s)) <span class="op">*</span><span class="st"> </span>A
+}</code></pre></div>
+<h3 id="gyroline-gyrosegment-and-gyromidpoint">Gyroline, gyrosegment and gyromidpoint</h3>
+<p>In order to define a gyroline and the gyrosegment joining two points, we introduce the notation <span class="math display">\[
+\overset{\oplus\longrightarrow}{AB} = (-A) \oplus B.
+\]</span></p>
+<p>The <em>gyroline</em> passing through <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> is the set of all points having form <span class="math display">\[
+A \oplus \Bigl(t \otimes \overset{\oplus\longrightarrow}{AB}\Bigr)
+\]</span> for some <span class="math inline">\(t \in \mathbb{R}\)</span>.</p>
+<p>Observe that the point <span class="math inline">\(A \oplus \Bigl(t \otimes \overset{\oplus\longrightarrow}{AB}\Bigr)\)</span> equals <span class="math inline">\(A\)</span> when <span class="math inline">\(t=0\)</span> (easy) and equals <span class="math inline">\(B\)</span> when <span class="math inline">\(t=1\)</span> (that stems from property <span class="math inline">\((\star)\)</span>).</p>
+<p>The <em>gyrosegment</em> that joins <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> is the set of such points for <span class="math inline">\(t \in [0,1]\)</span>: <span class="math display">\[
+\left\{ A \oplus \Bigl(t \otimes \overset{\oplus\longrightarrow}{AB}\Bigr) 
+\Bigm| 0 \leq t \leq 1\right\}.
+\]</span></p>
+<p>The <em>gyromidpoint</em> of <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> is the point of the gyrosegment joining <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> corresponding to <span class="math inline">\(t = \frac12\)</span>: <span class="math display">\[
+A \oplus \left(\frac{1}{2} \otimes \overset{\oplus\longrightarrow}{AB}\right).
+\]</span></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># gyrosegment ####</span>
+gyroABt &lt;-<span class="st"> </span><span class="cf">function</span>(A, B, t, <span class="dt">s=</span><span class="dv">1</span>){
+  <span class="kw">gyroadd</span>(A, <span class="kw">gyroscalar</span>(t, <span class="kw">gyroadd</span>(<span class="op">-</span>A, B, s), s), s)
+}
+gyromidpoint &lt;-<span class="st"> </span><span class="cf">function</span>(A, B, <span class="dt">s=</span><span class="dv">1</span>){
+  <span class="kw">gyroABt</span>(A, B, <span class="fl">0.5</span>, s)
+}
+gyrosegment &lt;-<span class="st"> </span><span class="cf">function</span>(A, B, <span class="dt">s=</span><span class="dv">1</span>, <span class="dt">n=</span><span class="dv">50</span>){
+  <span class="kw">t</span>(<span class="kw">sapply</span>(<span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">length.out =</span> n), <span class="cf">function</span>(t){
+    <span class="kw">gyroABt</span>(A, B, t, s)
+  }))
+}</code></pre></div>
+<p>Let’s plot a two-dimensional gyrosegment.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">A &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>); B &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>)
+<span class="kw">plot</span>(<span class="kw">rbind</span>(A,B), <span class="dt">type =</span> <span class="st">&quot;p&quot;</span>, <span class="dt">pch =</span> <span class="dv">19</span>, <span class="dt">xlab =</span> <span class="ot">NA</span>, <span class="dt">ylab =</span> <span class="ot">NA</span>, 
+     <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">2</span>), <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">2</span>))
+s &lt;-<span class="st"> </span><span class="fl">0.2</span>
+AB &lt;-<span class="st"> </span><span class="kw">gyrosegment</span>(A, B, s)
+<span class="kw">lines</span>(AB)
+<span class="kw">text</span>(<span class="kw">t</span>(A), <span class="kw">expression</span>(<span class="kw">italic</span>(A)), <span class="dt">pos=</span><span class="dv">1</span>)
+<span class="kw">text</span>(<span class="kw">t</span>(B), <span class="kw">expression</span>(<span class="kw">italic</span>(B)), <span class="dt">pos=</span><span class="dv">3</span>)
+<span class="co"># gyromidpoint</span>
+<span class="kw">points</span>(<span class="kw">t</span>(<span class="kw">gyromidpoint</span>(A, B, s)), <span class="dt">pch =</span> <span class="dv">19</span>, <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>)
+<span class="co"># asymptotes</span>
+<span class="kw">lines</span>(<span class="kw">rbind</span>(<span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>), <span class="kw">gyroABt</span>(A, B, <span class="dt">t=</span><span class="op">-</span><span class="dv">20</span>, s)), <span class="dt">lty=</span><span class="st">&quot;dashed&quot;</span>)
+<span class="kw">lines</span>(<span class="kw">rbind</span>(<span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>), <span class="kw">gyroABt</span>(A, B, <span class="dt">t=</span><span class="dv">20</span>, s)), <span class="dt">lty=</span><span class="st">&quot;dashed&quot;</span>)</code></pre></div>
+<div class="figure">
+<img src="./figures/hyperbolicPolyhedra-gyrosegment2d-1.png" />
+
+</div>
+<p>This is a part of a hyperbola whose asymptotes meet at the origin.</p>
+<h2 id="hyperbolic-triangle">Hyperbolic triangle</h2>
+<p>Thanks to the gyrosegments, we can easily plot the edges of a hyperbolic triangle.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(rgl)
+A &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>); B &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>); C &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>)
+s &lt;-<span class="st"> </span><span class="fl">0.3</span>
+AB &lt;-<span class="st"> </span><span class="kw">gyrosegment</span>(A, B, s)
+AC &lt;-<span class="st"> </span><span class="kw">gyrosegment</span>(A, C, s)
+BC &lt;-<span class="st"> </span><span class="kw">gyrosegment</span>(B, C, s)
+<span class="kw">view3d</span>(<span class="dv">30</span>, <span class="dv">30</span>, <span class="dt">zoom =</span> <span class="fl">0.75</span>)
+<span class="kw">lines3d</span>(AB, <span class="dt">lwd=</span><span class="dv">3</span>); <span class="kw">lines3d</span>(AC, <span class="dt">lwd=</span><span class="dv">3</span>); <span class="kw">lines3d</span>(BC, <span class="dt">lwd=</span><span class="dv">3</span>)</code></pre></div>
+<div class="figure">
+<img src="./figures/hyperbolicPolyhedra-htriangle1-1.png" />
+
+</div>
+<p>We can draw a prettier picture with the help of the <code>cylinder3d</code> function of <code>rgl</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">view3d</span>(<span class="dv">30</span>, <span class="dv">30</span>, <span class="dt">zoom =</span> <span class="fl">0.75</span>)
+<span class="co"># plot vertices</span>
+<span class="kw">spheres3d</span>(<span class="kw">rbind</span>(A,B,C), <span class="dt">radius =</span> <span class="fl">0.03</span>, <span class="dt">color =</span> <span class="st">&quot;yellow&quot;</span>)
+<span class="co"># plot edges</span>
+<span class="kw">shade3d</span>(
+  <span class="kw">cylinder3d</span>(AB, <span class="dt">radius =</span> <span class="fl">0.015</span>, <span class="dt">sides =</span> <span class="dv">20</span>), <span class="dt">color =</span> <span class="st">&quot;yellow&quot;</span>)
+<span class="kw">shade3d</span>(
+  <span class="kw">cylinder3d</span>(AC, <span class="dt">radius =</span> <span class="fl">0.015</span>, <span class="dt">sides =</span> <span class="dv">20</span>), <span class="dt">color =</span> <span class="st">&quot;yellow&quot;</span>)
+<span class="kw">shade3d</span>(
+  <span class="kw">cylinder3d</span>(BC, <span class="dt">radius =</span> <span class="fl">0.015</span>, <span class="dt">sides =</span> <span class="dv">20</span>), <span class="dt">color =</span> <span class="st">&quot;yellow&quot;</span>)</code></pre></div>
+<div class="figure">
+<img src="./figures/hyperbolicPolyhedra-htriangle2-1.png" />
+
+</div>
+<p>Now, how to fill the hyperbolic triangle with a color? We will do so by constructing a triangular mesh of the hyperbolic triangle.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># a subdivision step</span>
+gyrosubdiv0 &lt;-<span class="st"> </span><span class="cf">function</span>(A1, A2, A3, <span class="dt">s=</span><span class="dv">1</span>){
+  M12 &lt;-<span class="st"> </span><span class="kw">gyromidpoint</span>(A1, A2, s)
+  M13 &lt;-<span class="st"> </span><span class="kw">gyromidpoint</span>(A1, A3, s)
+  M23 &lt;-<span class="st"> </span><span class="kw">gyromidpoint</span>(A2, A3, s)
+  <span class="kw">list</span>(
+    <span class="kw">list</span>(A1, M12, M13),
+    <span class="kw">list</span>(A2, M23, M12),
+    <span class="kw">list</span>(A3, M13, M23),
+    <span class="kw">list</span>(M12, M13, M23)
+  )
+}
+<span class="co"># iterate the subdivision, and return a &quot;mesh3d&quot; object</span>
+gyrosubdiv &lt;-<span class="st"> </span><span class="cf">function</span>(A1, A2, A3, <span class="dt">s=</span><span class="dv">1</span>, <span class="dt">depth=</span><span class="dv">5</span>){
+  subd &lt;-<span class="st"> </span><span class="kw">gyrosubdiv0</span>(A1, A2, A3, s)
+  <span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_len</span>(depth<span class="op">-</span><span class="dv">1</span>)){
+    subd &lt;-<span class="st"> </span>purrr<span class="op">::</span><span class="kw">flatten</span>(<span class="kw">lapply</span>(subd, <span class="cf">function</span>(triplet){
+      <span class="kw">gyrosubdiv0</span>(triplet[[<span class="dv">1</span>]], triplet[[<span class="dv">2</span>]], triplet[[<span class="dv">3</span>]], s)
+    }))
+  }
+  vertices &lt;-<span class="st"> </span>
+<span class="st">    </span><span class="kw">do.call</span>(cbind, <span class="kw">lapply</span>(subd, <span class="cf">function</span>(triplet) <span class="kw">do.call</span>(cbind, triplet)))
+  indices &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(vertices), <span class="dt">nrow =</span> <span class="dv">3</span>)
+  <span class="kw">tmesh3d</span>(
+    <span class="dt">vertices =</span> vertices,
+    <span class="dt">indices =</span> indices,
+    <span class="dt">homogeneous =</span> <span class="ot">FALSE</span>
+  )
+}</code></pre></div>
+<p>Here is the mesh at the first iteration:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mesh &lt;-<span class="st"> </span><span class="kw">gyrosubdiv</span>(A, B, C, s, <span class="dt">depth =</span> <span class="dv">1</span>)
+<span class="kw">view3d</span>(<span class="dv">30</span>, <span class="dv">30</span>, <span class="dt">zoom =</span> <span class="fl">0.75</span>)
+<span class="kw">wire3d</span>(mesh, <span class="dt">lwd =</span> <span class="dv">3</span>, <span class="dt">specular =</span> <span class="st">&quot;black&quot;</span>)</code></pre></div>
+<div class="figure">
+<img src="./figures/hyperbolicPolyhedra-wire1-1.png" />
+
+</div>
+<p>At the second iteration:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mesh &lt;-<span class="st"> </span><span class="kw">gyrosubdiv</span>(A, B, C, s, <span class="dt">depth =</span> <span class="dv">2</span>)
+<span class="kw">view3d</span>(<span class="dv">30</span>, <span class="dv">30</span>, <span class="dt">zoom =</span> <span class="fl">0.75</span>)
+<span class="kw">wire3d</span>(mesh, <span class="dt">lwd =</span> <span class="dv">3</span>, <span class="dt">specular =</span> <span class="st">&quot;black&quot;</span>)</code></pre></div>
+<div class="figure">
+<img src="./figures/hyperbolicPolyhedra-wire2-1.png" />
+
+</div>
+<p>Now let’s plot the shaded triangle:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mesh &lt;-<span class="st"> </span><span class="kw">gyrosubdiv</span>(A, B, C, s, <span class="dt">depth =</span> <span class="dv">6</span>)
+<span class="kw">view3d</span>(<span class="dv">30</span>, <span class="dv">30</span>, <span class="dt">zoom =</span> <span class="fl">0.75</span>)
+<span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">&quot;navy&quot;</span>, <span class="dt">specular =</span> <span class="st">&quot;cyan&quot;</span>)</code></pre></div>
+<div class="figure">
+<img src="./figures/hyperbolicPolyhedra-shadedTriangle-1.png" />
+
+</div>
+<h2 id="icosahedron">Icosahedron</h2>
+<p>An icosahedron is made of twenty triangular faces. So we have everything needed to plot an icosahedron.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">icosahedron &lt;-<span class="st"> </span><span class="kw">icosahedron3d</span>()
+vertices &lt;-<span class="st"> </span><span class="kw">t</span>(icosahedron<span class="op">$</span>vb[<span class="op">-</span><span class="dv">4</span>,])
+edges &lt;-<span class="st"> </span>Rvcg<span class="op">::</span><span class="kw">vcgGetEdge</span>(icosahedron)
+faces &lt;-<span class="st"> </span><span class="kw">t</span>(icosahedron<span class="op">$</span>it)
+s &lt;-<span class="st"> </span><span class="fl">0.5</span>
+<span class="co"># plot icosahedron ####</span>
+<span class="kw">view3d</span>(<span class="dv">30</span>, <span class="dv">30</span>, <span class="dt">zoom =</span> <span class="fl">0.7</span>)
+<span class="co"># plot vertices</span>
+<span class="kw">spheres3d</span>(vertices, <span class="dt">radius =</span> <span class="fl">0.05</span>, <span class="dt">color =</span> <span class="st">&quot;yellow&quot;</span>)
+<span class="co"># plot edges</span>
+<span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(edges)){
+  A &lt;-<span class="st"> </span>vertices[edges[i,<span class="st">&quot;vert1&quot;</span>],]
+  B &lt;-<span class="st"> </span>vertices[edges[i,<span class="st">&quot;vert2&quot;</span>],]
+  AB &lt;-<span class="st"> </span><span class="kw">gyrosegment</span>(A, B, s)
+  <span class="kw">shade3d</span>(
+    <span class="kw">cylinder3d</span>(AB, <span class="dt">radius =</span> <span class="fl">0.03</span>, <span class="dt">sides =</span> <span class="dv">20</span>), <span class="dt">color =</span> <span class="st">&quot;yellow&quot;</span>)
+}
+<span class="co"># plot faces</span>
+<span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(faces)){
+  idx &lt;-<span class="st"> </span>faces[i,]
+  A &lt;-<span class="st"> </span>vertices[idx[<span class="dv">1</span>],]
+  B &lt;-<span class="st"> </span>vertices[idx[<span class="dv">2</span>],]
+  C &lt;-<span class="st"> </span>vertices[idx[<span class="dv">3</span>],]
+  mesh &lt;-<span class="st"> </span><span class="kw">gyrosubdiv</span>(A, B, C, <span class="dt">s =</span> s, <span class="dt">depth =</span> <span class="dv">6</span>)
+  <span class="kw">shade3d</span>(<span class="kw">addNormals</span>(mesh), <span class="dt">color =</span> <span class="st">&quot;navy&quot;</span>)
+}</code></pre></div>
+<div class="figure">
+<img src="./figures/hyperbolicPolyhedra-icosahedron-1.png" />
+
+</div>
+<h2 id="triangular-orthobicopula">Triangular orthobicopula</h2>
+<p>To plot the icosahedron, we had at our disposal its vertices, its edges, and its faces, which are triangular.</p>
+<p>Now consider the <a href="http://eusebeia.dyndns.org/4d/J27">triangular orthobicopula</a>. We only have the coordinates of its vertices, and not all its faces are triangular. So, how to plot it?</p>
+<p>Since this is a convex polyhedron, we can use the <code>cxhull</code> package to get its edges and its faces. We use the option <code>triangulate = TRUE</code> to get a triangulation of the faces.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vertices &lt;-<span class="st"> </span><span class="kw">rbind</span>(
+  <span class="kw">c</span>(<span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span><span class="op">/</span><span class="kw">sqrt</span>(<span class="dv">3</span>), <span class="kw">sqrt</span>(<span class="dv">8</span><span class="op">/</span><span class="dv">3</span>)),
+  <span class="kw">c</span>(<span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span><span class="op">/</span><span class="kw">sqrt</span>(<span class="dv">3</span>), <span class="op">-</span><span class="kw">sqrt</span>(<span class="dv">8</span><span class="op">/</span><span class="dv">3</span>)),
+  <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span><span class="op">/</span><span class="kw">sqrt</span>(<span class="dv">3</span>), <span class="kw">sqrt</span>(<span class="dv">8</span><span class="op">/</span><span class="dv">3</span>)),
+  <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span><span class="op">/</span><span class="kw">sqrt</span>(<span class="dv">3</span>), <span class="op">-</span><span class="kw">sqrt</span>(<span class="dv">8</span><span class="op">/</span><span class="dv">3</span>)),
+  <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">/</span><span class="kw">sqrt</span>(<span class="dv">3</span>), <span class="kw">sqrt</span>(<span class="dv">8</span><span class="op">/</span><span class="dv">3</span>)),
+  <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">/</span><span class="kw">sqrt</span>(<span class="dv">3</span>), <span class="op">-</span><span class="kw">sqrt</span>(<span class="dv">8</span><span class="op">/</span><span class="dv">3</span>)),
+  <span class="kw">c</span>(<span class="dv">1</span>, <span class="kw">sqrt</span>(<span class="dv">3</span>), <span class="dv">0</span>),
+  <span class="kw">c</span>(<span class="dv">1</span>, <span class="op">-</span><span class="kw">sqrt</span>(<span class="dv">3</span>), <span class="dv">0</span>),
+  <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="kw">sqrt</span>(<span class="dv">3</span>), <span class="dv">0</span>),
+  <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="op">-</span><span class="kw">sqrt</span>(<span class="dv">3</span>), <span class="dv">0</span>),
+  <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">0</span>, <span class="dv">0</span>),
+  <span class="kw">c</span>(<span class="op">-</span><span class="dv">2</span>, <span class="dv">0</span>, <span class="dv">0</span>)
+)
+<span class="co"># faces </span>
+<span class="kw">library</span>(cxhull)
+hull &lt;-<span class="st"> </span><span class="kw">cxhull</span>(vertices, <span class="dt">triangulate =</span> <span class="ot">TRUE</span>)
+faces &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">sapply</span>(hull<span class="op">$</span>facets, <span class="st">`</span><span class="dt">[[</span><span class="st">`</span>, <span class="st">&quot;vertices&quot;</span>))
+<span class="co"># edges</span>
+hull &lt;-<span class="st"> </span><span class="kw">cxhull</span>(vertices, <span class="dt">triangulate =</span> <span class="ot">FALSE</span>)
+edges &lt;-<span class="st"> </span>hull<span class="op">$</span>edges</code></pre></div>
+<p>And now we can proceed as before:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">s &lt;-<span class="st"> </span><span class="fl">0.5</span>
+<span class="kw">view3d</span>(<span class="dv">30</span>, <span class="dv">30</span>, <span class="dt">zoom =</span> <span class="fl">0.7</span>)
+<span class="co"># plot vertices</span>
+<span class="kw">spheres3d</span>(vertices, <span class="dt">radius =</span> <span class="fl">0.05</span>, <span class="dt">color =</span> <span class="st">&quot;yellow&quot;</span>)
+<span class="co"># plot edges</span>
+<span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(edges)){
+  A &lt;-<span class="st"> </span>vertices[edges[i,<span class="dv">1</span>],]
+  B &lt;-<span class="st"> </span>vertices[edges[i,<span class="dv">2</span>],]
+  AB &lt;-<span class="st"> </span><span class="kw">gyrosegment</span>(A, B, s)
+  <span class="kw">shade3d</span>(
+    <span class="kw">cylinder3d</span>(AB, <span class="dt">radius =</span> <span class="fl">0.03</span>, <span class="dt">sides =</span> <span class="dv">20</span>), <span class="dt">color =</span> <span class="st">&quot;yellow&quot;</span>)
+}
+<span class="co"># plot faces</span>
+<span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(faces)){
+  idx &lt;-<span class="st"> </span>faces[i,]
+  A &lt;-<span class="st"> </span>vertices[idx[<span class="dv">1</span>],]
+  B &lt;-<span class="st"> </span>vertices[idx[<span class="dv">2</span>],]
+  C &lt;-<span class="st"> </span>vertices[idx[<span class="dv">3</span>],]
+  mesh &lt;-<span class="st"> </span><span class="kw">gyrosubdiv</span>(A, B, C, <span class="dt">s =</span> s, <span class="dt">depth =</span> <span class="dv">6</span>)
+  <span class="kw">shade3d</span>(<span class="kw">addNormals</span>(mesh), <span class="dt">color =</span> <span class="st">&quot;navy&quot;</span>)
+}</code></pre></div>
+<div class="figure">
+<img src="./figures/hyperbolicPolyhedra-triangularbicopula-1.png" />
+
+</div>
+<h2 id="asymptote-hyperbolic-dodecahedron">Asymptote hyperbolic dodecahedron</h2>
+<p>Below is an Asymptote code which draws a hyperbolic dodecahedron. The gyromidpoint is calculated differently, in a way that does not resort to the scalar gyromultiplication.</p>
+<div class="sourceCode"><pre class="sourceCode c"><code class="sourceCode c">settings.render = <span class="dv">4</span>;
+settings.outformat = <span class="st">&quot;pdf&quot;</span>;
+
+<span class="co">// modules -----------------------------------------------------------</span>
+import three;
+import tube;
+
+<span class="co">// scene -------------------------------------------------------------</span>
+size(10cm);
+currentprojection = orthographic(<span class="dv">20</span>, <span class="dv">10</span>, -<span class="dv">2</span>);
+viewportmargin = (<span class="dv">10</span>,<span class="dv">10</span>);
+currentlight = (<span class="dv">1000</span>,<span class="dv">500</span>,<span class="dv">100</span>);
+
+<span class="co">// gyromidpoint ------------------------------------------------------</span>
+real gamma(triple M, real s){
+    <span class="cf">return</span> <span class="dv">1</span> / sqrt(<span class="dv">1</span> - dot(M,M)/s/s);
+}
+
+real beta(triple M, real s){
+    <span class="cf">return</span> <span class="dv">1</span> / sqrt(<span class="dv">1</span> + dot(M,M)/s/s);
+}
+
+triple phiEU(triple M, real s){
+    <span class="cf">return</span> gamma(M,s)*M;
+}
+
+triple phiUE(triple M, real s){
+    <span class="cf">return</span> beta(M,s)*M;
+}
+
+triple gyromidpointE(triple A, triple B, real s){
+    real gammaA = gamma(A,s);
+    real gammaB = gamma(B,s);
+    <span class="cf">return</span> (gammaA*A + gammaB*B)/(gammaA + gammaB); 
+}
+
+triple gyromidpointU(triple A, triple B, real s){
+    <span class="cf">return</span> phiEU(gyromidpointE(phiUE(A,s), phiUE(B,s), s), s);
+}
+
+<span class="co">// mesh maker --------------------------------------------------------</span>
+triple[][] subdiv0(triple[] triangle, real s){
+    triple m01 = gyromidpointU(triangle[<span class="dv">0</span>], triangle[<span class="dv">1</span>], s);
+    triple m02 = gyromidpointU(triangle[<span class="dv">0</span>], triangle[<span class="dv">2</span>], s);
+    triple m12 = gyromidpointU(triangle[<span class="dv">1</span>], triangle[<span class="dv">2</span>], s);
+    <span class="cf">return</span> new triple[][] {
+        {triangle[<span class="dv">0</span>], m01, m02}, 
+        {triangle[<span class="dv">1</span>], m12, m01}, 
+        {triangle[<span class="dv">2</span>], m02, m12}, 
+        {m01, m12, m02}
+    };
+}
+
+triple[][] subdiv(<span class="dt">int</span> n, triple[] triangle, real s){
+  <span class="cf">if</span>(n==<span class="dv">1</span>){
+    <span class="cf">return</span> subdiv0(triangle, s);
+  }
+  triple[][] triangles = subdiv(n-<span class="dv">1</span>, triangle, s);
+  triple[][] out = new triple[<span class="dv">0</span>][<span class="dv">3</span>];
+  <span class="cf">for</span>(<span class="dt">int</span> i=<span class="dv">0</span>; i&lt;<span class="dv">4</span>^(n-<span class="dv">1</span>); ++i){
+    triple[] trgl = triangles[i];
+    out.append(subdiv0(trgl, s));
+  }
+  <span class="cf">return</span> out;
+}
+
+<span class="kw">struct</span> Mesh {
+    triple[] vertices;
+    <span class="dt">int</span>[][] indices;
+}
+
+Mesh htriangle(<span class="dt">int</span> n, triple[] triangle, real s){
+    triple[][] triangles = subdiv(n, triangle, s);
+    triple[] vertices;
+    <span class="dt">int</span>[][] indices;
+    <span class="dt">int</span> faceIndex = <span class="dv">0</span>;
+    <span class="cf">for</span>(<span class="dt">int</span> i=<span class="dv">0</span>; i&lt;triangles.length; ++i){
+        var triangle = triangles[i];
+        vertices.push(triangle[<span class="dv">0</span>]);
+        vertices.push(triangle[<span class="dv">1</span>]);
+        vertices.push(triangle[<span class="dv">2</span>]);
+        <span class="dt">int</span>[] x = {faceIndex, faceIndex+<span class="dv">1</span>, faceIndex+<span class="dv">2</span>};
+        indices.push(x);
+        faceIndex += <span class="dv">3</span>;
+    }
+    Mesh out;
+    out.vertices = vertices;
+    out.indices = indices;
+    <span class="cf">return</span> out;
+}
+
+<span class="co">// gyrosegment -------------------------------------------------------</span>
+triple gyroadd(triple A, triple B, real s){
+    real betaA = beta(A,s);
+    real betaB = beta(B,s);
+    <span class="cf">return</span> A + B + (betaA/(<span class="dv">1</span>+betaA)*dot(A,B)/s/s + (<span class="dv">1</span>-betaB)/betaB)*A; 
+}
+
+triple gyroscalar(real r, triple X, real s){
+    real Xnorm = length(X);
+    <span class="cf">return</span> s*sinh(r*asinh(Xnorm/s)) * X/Xnorm;
+}
+
+triple gyroABt(triple A, triple B, real t, real s){
+    <span class="cf">return</span> gyroadd(A, gyroscalar(t, gyroadd(-A, B, s=s), s=s), s=s);
+}
+
+path3 gyrosegment(triple A, triple B, real s, <span class="dt">int</span> n){
+    path3 out;
+    <span class="cf">for</span>(<span class="dt">int</span> i = <span class="dv">0</span>; i &lt;= n; ++i){
+        out = out -- gyroABt(A, B, i/n, s);
+    }
+    <span class="cf">return</span> out;
+}
+
+<span class="co">// dodecahedron vertices ---------------------------------------------</span>
+real phi = (<span class="dv">1</span> + sqrt(<span class="dv">5</span>)) / <span class="dv">2</span>;
+real a = <span class="dv">1</span> / sqrt(<span class="dv">3</span>);
+real b = a / phi;
+real c = a * phi;
+triple[] vertices = 
+    {(a, a, a),
+    (a, a, -a),
+    (a, -a, a),
+    (-a, -a, a),
+    (-a, a, -a),
+    (-a, a, a),
+    (<span class="dv">0</span>, b, -c),
+    (<span class="dv">0</span>, -b, -c),
+    (<span class="dv">0</span>, -b, c),
+    (c, <span class="dv">0</span>, -b),
+    (-c, <span class="dv">0</span>, -b),
+    (-c, <span class="dv">0</span>, b),
+    (b, c, <span class="dv">0</span>),
+    (b, -c, <span class="dv">0</span>),
+    (-b, -c, <span class="dv">0</span>),
+    (-b, c, <span class="dv">0</span>),
+    (<span class="dv">0</span>, b, c),
+    (a, -a, -a),
+    (c, <span class="dv">0</span>, b),
+    (-a, -a, -a)};
+    
+<span class="co">// dodecahedron faces ------------------------------------------------</span>
+<span class="dt">int</span>[][] faces = 
+    {
+        {<span class="dv">13</span>, <span class="dv">2</span>, <span class="dv">3</span>},
+        {<span class="dv">3</span>, <span class="dv">14</span>, <span class="dv">13</span>},
+        {<span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">8</span>},
+        {<span class="dv">17</span>, <span class="dv">1</span>, <span class="dv">9</span>},
+        {<span class="dv">6</span>, <span class="dv">1</span>, <span class="dv">17</span>},
+        {<span class="dv">17</span>, <span class="dv">7</span>, <span class="dv">6</span>},
+        {<span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">19</span>},
+        {<span class="dv">19</span>, <span class="dv">4</span>, <span class="dv">6</span>},
+        {<span class="dv">10</span>, <span class="dv">4</span>, <span class="dv">19</span>},
+        {<span class="dv">13</span>, <span class="dv">14</span>, <span class="dv">19</span>},
+        {<span class="dv">19</span>, <span class="dv">17</span>, <span class="dv">13</span>},
+        {<span class="dv">7</span>, <span class="dv">17</span>, <span class="dv">19</span>},
+        {<span class="dv">15</span>, <span class="dv">1</span>, <span class="dv">6</span>},
+        {<span class="dv">12</span>, <span class="dv">1</span>, <span class="dv">15</span>},
+        {<span class="dv">6</span>, <span class="dv">4</span>, <span class="dv">15</span>},
+        {<span class="dv">15</span>, <span class="dv">0</span>, <span class="dv">12</span>},
+        {<span class="dv">15</span>, <span class="dv">16</span>, <span class="dv">0</span>},
+        {<span class="dv">5</span>, <span class="dv">16</span>, <span class="dv">15</span>},
+        {<span class="dv">18</span>, <span class="dv">1</span>, <span class="dv">12</span>},
+        {<span class="dv">12</span>, <span class="dv">0</span>, <span class="dv">18</span>},
+        {<span class="dv">9</span>, <span class="dv">1</span>, <span class="dv">18</span>},
+        {<span class="dv">0</span>, <span class="dv">16</span>, <span class="dv">18</span>},
+        {<span class="dv">8</span>, <span class="dv">2</span>, <span class="dv">18</span>},
+        {<span class="dv">18</span>, <span class="dv">16</span>, <span class="dv">8</span>},
+        {<span class="dv">18</span>, <span class="dv">2</span>, <span class="dv">13</span>},
+        {<span class="dv">18</span>, <span class="dv">17</span>, <span class="dv">9</span>},
+        {<span class="dv">13</span>, <span class="dv">17</span>, <span class="dv">18</span>},
+        {<span class="dv">8</span>, <span class="dv">16</span>, <span class="dv">11</span>},
+        {<span class="dv">11</span>, <span class="dv">16</span>, <span class="dv">5</span>},
+        {<span class="dv">11</span>, <span class="dv">3</span>, <span class="dv">8</span>},
+        {<span class="dv">14</span>, <span class="dv">3</span>, <span class="dv">11</span>},
+        {<span class="dv">11</span>, <span class="dv">19</span>, <span class="dv">14</span>},
+        {<span class="dv">10</span>, <span class="dv">19</span>, <span class="dv">11</span>},
+        {<span class="dv">11</span>, <span class="dv">4</span>, <span class="dv">10</span>},
+        {<span class="dv">5</span>, <span class="dv">15</span>, <span class="dv">11</span>},
+        {<span class="dv">11</span>, <span class="dv">15</span>, <span class="dv">4</span>}
+    };
+
+<span class="co">// dodecahedron edges ------------------------------------------------</span>
+<span class="dt">int</span>[][] edges = 
+    {
+     {<span class="dv">13</span>, <span class="dv">2</span>},
+     {<span class="dv">3</span>, <span class="dv">14</span>},
+     {<span class="dv">14</span>, <span class="dv">13</span>},
+     {<span class="dv">3</span>, <span class="dv">8</span>},
+     {<span class="dv">2</span>, <span class="dv">8</span>},
+     {<span class="dv">17</span>, <span class="dv">9</span>},
+     {<span class="dv">1</span>, <span class="dv">9</span>},
+     {<span class="dv">6</span>, <span class="dv">1</span>},
+     {<span class="dv">17</span>, <span class="dv">7</span>},
+     {<span class="dv">7</span>, <span class="dv">6</span>},
+     {<span class="dv">7</span>, <span class="dv">19</span>},
+     {<span class="dv">4</span>, <span class="dv">6</span>},
+     {<span class="dv">10</span>, <span class="dv">4</span>},
+     {<span class="dv">10</span>, <span class="dv">19</span>},
+     {<span class="dv">14</span>, <span class="dv">19</span>},
+     {<span class="dv">17</span>, <span class="dv">13</span>},
+     {<span class="dv">12</span>, <span class="dv">1</span>},
+     {<span class="dv">12</span>, <span class="dv">15</span>},
+     {<span class="dv">4</span>, <span class="dv">15</span>},
+     {<span class="dv">0</span>, <span class="dv">12</span>},
+     {<span class="dv">16</span>, <span class="dv">0</span>},
+     {<span class="dv">5</span>, <span class="dv">16</span>},
+     {<span class="dv">5</span>, <span class="dv">15</span>},
+     {<span class="dv">0</span>, <span class="dv">18</span>},
+     {<span class="dv">9</span>, <span class="dv">18</span>},
+     {<span class="dv">2</span>, <span class="dv">18</span>},
+     {<span class="dv">16</span>, <span class="dv">8</span>},
+     {<span class="dv">11</span>, <span class="dv">5</span>},
+     {<span class="dv">11</span>, <span class="dv">3</span>},
+     {<span class="dv">10</span>, <span class="dv">11</span>}
+    };
+
+<span class="co">// plot --------------------------------------------------------------</span>
+real s = <span class="fl">0.3</span>;
+<span class="cf">for</span>(<span class="dt">int</span> i=<span class="dv">0</span>; i&lt;faces.length; ++i){
+    <span class="dt">int</span>[] idx = faces[i];
+    triple[] triangle = {vertices[idx[<span class="dv">0</span>]],vertices[idx[<span class="dv">1</span>]],vertices[idx[<span class="dv">2</span>]]};
+    Mesh mesh = htriangle(<span class="dv">6</span>, triangle, s);
+    draw(mesh.vertices, mesh.indices, m=rgb(<span class="st">&quot;000080ff&quot;</span>));
+}
+
+<span class="cf">for</span>(<span class="dt">int</span> i=<span class="dv">0</span>; i&lt;edges.length; ++i){
+    triple A = vertices[edges[i][<span class="dv">0</span>]];
+    triple B = vertices[edges[i][<span class="dv">1</span>]];
+    path3 AB = gyrosegment(A, B, s, <span class="dv">50</span>);
+    draw(tube(AB, scale(<span class="fl">0.02</span>)*unitcircle), yellow);
+}
+
+<span class="cf">for</span>(<span class="dt">int</span> i=<span class="dv">0</span>; i&lt;vertices.length; ++i){
+    draw(shift(vertices[i])*scale3(<span class="fl">0.03</span>)*unitsphere, yellow);
+}</code></pre></div>
+<div class="figure">
+<img src="figures/hyperbolicDodecahedra-asy.png" />
+
+</div>
+<h2 id="three.js-hyperbolic-dodecahedron">three.js hyperbolic dodecahedron</h2>
+<p>Here is a hyperbolic dodecahedron plotted with <code>three.js</code>:</p>
+<iframe src="../frames/threejs_hyperbolicDodecahedron2.html" width="100%" height="500px" scrolling="no" frameborder="0">
+</iframe>
+<h2 id="reference">Reference</h2>
+<ul>
+<li>A. A. Ungar. <em>Analytic Hyperbolic Geometry: Mathematical Foundations And Applications</em>. World Scientific Pub Co Inc, 2005.</li>
+</ul>
+
+    </div>
+
+
+    <div id="footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </div>
+
+  </div>
+
+  <div id="disqus_thread"></div>
+  <div class="pagination">
+    <ul>
+      <li>
+        <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+      </li>
+    </ul>
+  </div>
+</body>
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+<!-- Google Prettify -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+<script>
+  var pres = document.getElementsByTagName("pre");
+  for (var i = 0; i < pres.length; ++i) {
+    
+    pres[i].className = pres[i].className + " prettyprint linenums";
+    
+  }
+  prettyPrint();
+</script> 
+
+</html>
