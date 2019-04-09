@@ -198,14 +198,15 @@ A \oplus \left(\frac{1}{2} \otimes \overset{\oplus\longrightarrow}{AB}\right).
 <a class="sourceLine" id="cb7-19" title="19">    }))</a>
 <a class="sourceLine" id="cb7-20" title="20">  }</a>
 <a class="sourceLine" id="cb7-21" title="21">  vertices &lt;-<span class="st"> </span></a>
-<a class="sourceLine" id="cb7-22" title="22"><span class="st">    </span><span class="kw">do.call</span>(cbind, <span class="kw">lapply</span>(subd, <span class="cf">function</span>(triplet) <span class="kw">do.call</span>(cbind, triplet)))</a>
-<a class="sourceLine" id="cb7-23" title="23">  indices &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(vertices), <span class="dt">nrow =</span> <span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb7-24" title="24">  <span class="kw">tmesh3d</span>(</a>
-<a class="sourceLine" id="cb7-25" title="25">    <span class="dt">vertices =</span> vertices,</a>
-<a class="sourceLine" id="cb7-26" title="26">    <span class="dt">indices =</span> indices,</a>
-<a class="sourceLine" id="cb7-27" title="27">    <span class="dt">homogeneous =</span> <span class="ot">FALSE</span></a>
-<a class="sourceLine" id="cb7-28" title="28">  )</a>
-<a class="sourceLine" id="cb7-29" title="29">}</a></code></pre></div>
+<a class="sourceLine" id="cb7-22" title="22"><span class="st">    </span><span class="kw">do.call</span>(cbind, </a>
+<a class="sourceLine" id="cb7-23" title="23">            <span class="kw">lapply</span>(subd, <span class="cf">function</span>(triplet) <span class="kw">do.call</span>(cbind, triplet)))</a>
+<a class="sourceLine" id="cb7-24" title="24">  indices &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(vertices), <span class="dt">nrow =</span> <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb7-25" title="25">  <span class="kw">tmesh3d</span>(</a>
+<a class="sourceLine" id="cb7-26" title="26">    <span class="dt">vertices =</span> vertices,</a>
+<a class="sourceLine" id="cb7-27" title="27">    <span class="dt">indices =</span> indices,</a>
+<a class="sourceLine" id="cb7-28" title="28">    <span class="dt">homogeneous =</span> <span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb7-29" title="29">  )</a>
+<a class="sourceLine" id="cb7-30" title="30">}</a></code></pre></div>
 <p>Here is the mesh at the first iteration:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">mesh &lt;-<span class="st"> </span><span class="kw">gyrosubdiv</span>(A, B, C, s, <span class="dt">depth =</span> <span class="dv">1</span>)</a>
 <a class="sourceLine" id="cb8-2" title="2"><span class="kw">view3d</span>(<span class="dv">30</span>, <span class="dv">30</span>, <span class="dt">zoom =</span> <span class="fl">0.75</span>)</a>
@@ -788,6 +789,40 @@ A \oplus \left(\frac{1}{2} \otimes \overset{\oplus\longrightarrow}{AB}\right).
 <a class="sourceLine" id="cb15-242" title="242">    <span class="kw">rotate</span> &lt;-<span class="fl">60</span>,<span class="fl">0</span>,<span class="fl">0</span>&gt;</a>
 <a class="sourceLine" id="cb15-243" title="243">}</a></code></pre></div>
 <p><img src="figures/hyperbolicPolyhedra-povray.png" /></p>
+<h2 id="update-2019-04-09">Update 2019-04-09</h2>
+<p>I’ve realized that the <code>addNormals</code> function of the <code>rgl</code> package is not appropriate when there are duplicated vertices in the mesh (it adds different normals to the duplicated vertices). And there are (a lot of) duplicated vertices in the mesh created by the <code>gyrosubdiv</code> function.</p>
+<p>To remove the duplicated vertices, one can use the <code>vcgClean</code> function of the <code>Rvcg</code> package (which also adds the normals). Observe the difference:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1">idx &lt;-<span class="st"> </span>faces[<span class="dv">1</span>,]</a>
+<a class="sourceLine" id="cb16-2" title="2">A &lt;-<span class="st"> </span>vertices[idx[<span class="dv">1</span>],]</a>
+<a class="sourceLine" id="cb16-3" title="3">B &lt;-<span class="st"> </span>vertices[idx[<span class="dv">2</span>],]</a>
+<a class="sourceLine" id="cb16-4" title="4">C &lt;-<span class="st"> </span>vertices[idx[<span class="dv">3</span>],]</a>
+<a class="sourceLine" id="cb16-5" title="5">mesh &lt;-<span class="st"> </span><span class="kw">gyrosubdiv</span>(A, B, C, <span class="dt">s =</span> s, <span class="dt">depth =</span> <span class="dv">4</span>)</a>
+<a class="sourceLine" id="cb16-6" title="6"><span class="kw">view3d</span>(<span class="dv">30</span>, <span class="dv">30</span>, <span class="dt">zoom =</span> <span class="fl">0.9</span>)</a>
+<a class="sourceLine" id="cb16-7" title="7"><span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">&quot;navy&quot;</span>)</a></code></pre></div>
+<p><img src="./figures/hyperbolicPolyhedra-triangle-dupVertices-1.png" /></p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1">mesh &lt;-<span class="st"> </span>Rvcg<span class="op">::</span><span class="kw">vcgClean</span>(mesh, <span class="dt">sel =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">7</span>), <span class="dt">silent =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb17-2" title="2"><span class="kw">view3d</span>(<span class="dv">30</span>, <span class="dv">30</span>, <span class="dt">zoom =</span> <span class="fl">0.9</span>)</a>
+<a class="sourceLine" id="cb17-3" title="3"><span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">&quot;navy&quot;</span>)</a></code></pre></div>
+<p><img src="./figures/hyperbolicPolyhedra-triangle-undupVertices-1.png" /></p>
+<p>So a better <code>gyrosubdiv</code> function is:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1">gyrosubdiv &lt;-<span class="st"> </span><span class="cf">function</span>(A1, A2, A3, <span class="dt">s=</span><span class="dv">1</span>, <span class="dt">depth=</span><span class="dv">5</span>){</a>
+<a class="sourceLine" id="cb18-2" title="2">  subd &lt;-<span class="st"> </span><span class="kw">gyrosubdiv0</span>(A1, A2, A3, s)</a>
+<a class="sourceLine" id="cb18-3" title="3">  <span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_len</span>(depth<span class="dv">-1</span>)){</a>
+<a class="sourceLine" id="cb18-4" title="4">    subd &lt;-<span class="st"> </span>purrr<span class="op">::</span><span class="kw">flatten</span>(<span class="kw">lapply</span>(subd, <span class="cf">function</span>(triplet){</a>
+<a class="sourceLine" id="cb18-5" title="5">      <span class="kw">gyrosubdiv0</span>(triplet[[<span class="dv">1</span>]], triplet[[<span class="dv">2</span>]], triplet[[<span class="dv">3</span>]], s)</a>
+<a class="sourceLine" id="cb18-6" title="6">    }))</a>
+<a class="sourceLine" id="cb18-7" title="7">  }</a>
+<a class="sourceLine" id="cb18-8" title="8">  vertices &lt;-<span class="st"> </span></a>
+<a class="sourceLine" id="cb18-9" title="9"><span class="st">    </span><span class="kw">do.call</span>(cbind, </a>
+<a class="sourceLine" id="cb18-10" title="10">            <span class="kw">lapply</span>(subd, <span class="cf">function</span>(triplet) <span class="kw">do.call</span>(cbind, triplet)))</a>
+<a class="sourceLine" id="cb18-11" title="11">  indices &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(vertices), <span class="dt">nrow =</span> <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb18-12" title="12">  mesh &lt;-<span class="st"> </span><span class="kw">tmesh3d</span>(</a>
+<a class="sourceLine" id="cb18-13" title="13">    <span class="dt">vertices =</span> vertices,</a>
+<a class="sourceLine" id="cb18-14" title="14">    <span class="dt">indices =</span> indices,</a>
+<a class="sourceLine" id="cb18-15" title="15">    <span class="dt">homogeneous =</span> <span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb18-16" title="16">  )</a>
+<a class="sourceLine" id="cb18-17" title="17">  Rvcg<span class="op">::</span><span class="kw">vcgClean</span>(mesh, <span class="dt">sel =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">7</span>), <span class="dt">silent =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb18-18" title="18">}</a></code></pre></div>
 <h2 id="reference">Reference</h2>
 <ul>
 <li>A. A. Ungar. <em>Analytic Hyperbolic Geometry: Mathematical Foundations And Applications</em>. World Scientific Pub Co Inc, 2005.</li>
