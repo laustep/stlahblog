@@ -15,6 +15,16 @@
     }
   </style>
 
+  <style>
+    .busy {
+      position: fixed;
+      z-index: 1000;
+      top: calc(50% - 128px);
+      left: calc(50% - 128px);
+      text-align: center;
+    }
+  </style>
+
   <script src="../libraries/jquery.min.js"></script>
   <script src="../libraries/three_r103.min.js"></script>
   <script src="../libraries/PLYLoader.js"></script>
@@ -23,6 +33,10 @@
 </head>
 
 <body>
+
+  <div class="busy">
+    <img src="./spinners/comet-spinner.gif" />
+  </div>
 
   <canvas id="c"></canvas>
 
@@ -90,6 +104,7 @@
       var geom = geometry.center(); 
       mesh = new THREE.Mesh(geom, material);
       scene.add(mesh);
+      $(".busy").hide();
 
     }, undefined, function (error) {
 
