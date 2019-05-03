@@ -230,6 +230,8 @@
       Geom.mergeMesh(new THREE.Mesh(geom));
     }
     Geom.mergeVertices();
+//    Geom.computeFaceNormals();
+//    Geom.computeVertexNormals();
     var dodecahedron = new THREE.Mesh(
       Geom,
       new THREE.MeshNormalMaterial() 
