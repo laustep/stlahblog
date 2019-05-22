@@ -2259,9 +2259,9 @@ function marchingCubes(f, level, xmin, xmax, ymin, ymax, zmin, zmax,
     var rangez = zmax - zmin;
     for (var i = 0; i < nrows; i++) {
       var vertex = triangles[i];
-      vertex[0] = xmin + rangex * vertex[0] / (nx + 1);
-      vertex[1] = ymin + rangey * vertex[1] / (ny + 1);
-      vertex[2] = zmin + rangez * vertex[2] / (nz + 1);
+      vertex[0] = xmin + rangex * (vertex[0]-1) / (nx - 1);
+      vertex[1] = ymin + rangey * (vertex[1]-1) / (ny - 1);
+      vertex[2] = zmin + rangez * (vertex[2]-1) / (nz - 1);
       triangles[i] = vertex;
     }
   }
