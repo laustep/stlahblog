@@ -227,7 +227,7 @@
 <a class="sourceLine" id="cb3-49" title="49"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
 <p><img src="figures/DTcallback_editHeaders.png" /></p>
 <h1 id="child-tables">Child tables</h1>
-<p>This callback allows to display child tables in the table. The indices of the selected rows of the child tables are sent to the shiny server.</p>
+<p>This callback allows to display child tables in the table. The indices of the selected rows of the child tables are sent to the Shiny server.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="kw">library</span>(shiny)</a>
 <a class="sourceLine" id="cb4-2" title="2"><span class="kw">library</span>(DT)</a>
 <a class="sourceLine" id="cb4-3" title="3"><span class="kw">library</span>(jsonlite)</a>
@@ -296,51 +296,51 @@
 <a class="sourceLine" id="cb4-66" title="66">  <span class="st">&quot;&quot;</span>,</a>
 <a class="sourceLine" id="cb4-67" title="67">  <span class="st">&quot;// row callback to style the rows background colors of the child tables&quot;</span>,</a>
 <a class="sourceLine" id="cb4-68" title="68">  <span class="st">&quot;var rowCallback = function(row, dat, displayNum, index){&quot;</span>,</a>
-<a class="sourceLine" id="cb4-69" title="69">  <span class="st">&quot;  $(row).addClass('childrow');&quot;</span>,</a>
-<a class="sourceLine" id="cb4-70" title="70">  <span class="st">&quot;  if($(row).hasClass('odd')){&quot;</span>,</a>
-<a class="sourceLine" id="cb4-71" title="71">  <span class="st">&quot;    $(row).css('background-color', 'papayawhip');&quot;</span>,</a>
-<a class="sourceLine" id="cb4-72" title="72">  <span class="st">&quot;    $(row).hover(function(){&quot;</span>,</a>
-<a class="sourceLine" id="cb4-73" title="73">  <span class="st">&quot;      $(this).css('background-color', '#E6FF99');&quot;</span>,</a>
-<a class="sourceLine" id="cb4-74" title="74">  <span class="st">&quot;    }, function() {&quot;</span>,</a>
-<a class="sourceLine" id="cb4-75" title="75">  <span class="st">&quot;      $(this).css('background-color', 'papayawhip');&quot;</span>,</a>
-<a class="sourceLine" id="cb4-76" title="76">  <span class="st">&quot;    });&quot;</span>,</a>
-<a class="sourceLine" id="cb4-77" title="77">  <span class="st">&quot;  } else {&quot;</span>,</a>
-<a class="sourceLine" id="cb4-78" title="78">  <span class="st">&quot;    $(row).css('background-color', 'lemonchiffon');&quot;</span>,</a>
-<a class="sourceLine" id="cb4-79" title="79">  <span class="st">&quot;    $(row).hover(function(){&quot;</span>,</a>
-<a class="sourceLine" id="cb4-80" title="80">  <span class="st">&quot;      $(this).css('background-color', '#DDFF75');&quot;</span>,</a>
-<a class="sourceLine" id="cb4-81" title="81">  <span class="st">&quot;    }, function() {&quot;</span>,</a>
-<a class="sourceLine" id="cb4-82" title="82">  <span class="st">&quot;      $(this).css('background-color', 'lemonchiffon');&quot;</span>,</a>
-<a class="sourceLine" id="cb4-83" title="83">  <span class="st">&quot;    });&quot;</span>,</a>
-<a class="sourceLine" id="cb4-84" title="84">  <span class="st">&quot;  }&quot;</span>,</a>
-<a class="sourceLine" id="cb4-85" title="85">  <span class="st">&quot;};&quot;</span>,</a>
-<a class="sourceLine" id="cb4-86" title="86">  <span class="st">&quot;&quot;</span>,</a>
-<a class="sourceLine" id="cb4-87" title="87">  <span class="st">&quot;// header callback to style the header of the child tables&quot;</span>,</a>
-<a class="sourceLine" id="cb4-88" title="88">  <span class="st">&quot;var headerCallback = function(thead, data, start, end, display){&quot;</span>,</a>
-<a class="sourceLine" id="cb4-89" title="89">  <span class="st">&quot;  $('th', thead).css({&quot;</span>,</a>
-<a class="sourceLine" id="cb4-90" title="90">  <span class="st">&quot;    'border-top': '3px solid indigo',&quot;</span>, </a>
-<a class="sourceLine" id="cb4-91" title="91">  <span class="st">&quot;    'color': 'indigo',&quot;</span>,</a>
-<a class="sourceLine" id="cb4-92" title="92">  <span class="st">&quot;    'background-color': '#fadadd'&quot;</span>,</a>
-<a class="sourceLine" id="cb4-93" title="93">  <span class="st">&quot;  });&quot;</span>,</a>
-<a class="sourceLine" id="cb4-94" title="94">  <span class="st">&quot;};&quot;</span>,</a>
-<a class="sourceLine" id="cb4-95" title="95">  <span class="st">&quot;&quot;</span>,</a>
-<a class="sourceLine" id="cb4-96" title="96">  <span class="st">&quot;// make the child table&quot;</span>,</a>
-<a class="sourceLine" id="cb4-97" title="97">  <span class="st">&quot;var format_datatable = function(d, childId){&quot;</span>,</a>
-<a class="sourceLine" id="cb4-98" title="98">  <span class="st">&quot;  var dataset = [];&quot;</span>,</a>
-<a class="sourceLine" id="cb4-99" title="99">  <span class="st">&quot;  var n = d.length - 1;&quot;</span>,</a>
-<a class="sourceLine" id="cb4-100" title="100">  <span class="st">&quot;  for(var i = 0; i &lt; d[n].length; i++){&quot;</span>,</a>
-<a class="sourceLine" id="cb4-101" title="101">  <span class="st">&quot;    var datarow = $.map(d[n][i], function(value, index){&quot;</span>,</a>
-<a class="sourceLine" id="cb4-102" title="102">  <span class="st">&quot;      return [value];&quot;</span>,</a>
-<a class="sourceLine" id="cb4-103" title="103">  <span class="st">&quot;    });&quot;</span>,</a>
-<a class="sourceLine" id="cb4-104" title="104">  <span class="st">&quot;    dataset.push(datarow);&quot;</span>,</a>
-<a class="sourceLine" id="cb4-105" title="105">  <span class="st">&quot;  }&quot;</span>,</a>
-<a class="sourceLine" id="cb4-106" title="106">  <span class="st">&quot;  var id = 'table#' + childId;&quot;</span>,</a>
-<a class="sourceLine" id="cb4-107" title="107">  <span class="st">&quot;  var subtable = $(id).DataTable({&quot;</span>,</a>
-<a class="sourceLine" id="cb4-108" title="108">  <span class="st">&quot;             'data': dataset,&quot;</span>,</a>
-<a class="sourceLine" id="cb4-109" title="109">  <span class="st">&quot;             'autoWidth': true,&quot;</span>,</a>
-<a class="sourceLine" id="cb4-110" title="110">  <span class="st">&quot;             'deferRender': true,&quot;</span>,</a>
-<a class="sourceLine" id="cb4-111" title="111">  <span class="st">&quot;             'info': false,&quot;</span>,</a>
-<a class="sourceLine" id="cb4-112" title="112">  <span class="st">&quot;             'lengthChange': false,&quot;</span>,</a>
-<a class="sourceLine" id="cb4-113" title="113">  <span class="st">&quot;             'ordering': d[n].length &gt; 1,&quot;</span>,</a>
+<a class="sourceLine" id="cb4-69" title="69">  <span class="st">&quot;  if($(row).hasClass('odd')){&quot;</span>,</a>
+<a class="sourceLine" id="cb4-70" title="70">  <span class="st">&quot;    $(row).css('background-color', 'papayawhip');&quot;</span>,</a>
+<a class="sourceLine" id="cb4-71" title="71">  <span class="st">&quot;    $(row).hover(function(){&quot;</span>,</a>
+<a class="sourceLine" id="cb4-72" title="72">  <span class="st">&quot;      $(this).css('background-color', '#E6FF99');&quot;</span>,</a>
+<a class="sourceLine" id="cb4-73" title="73">  <span class="st">&quot;    }, function() {&quot;</span>,</a>
+<a class="sourceLine" id="cb4-74" title="74">  <span class="st">&quot;      $(this).css('background-color', 'papayawhip');&quot;</span>,</a>
+<a class="sourceLine" id="cb4-75" title="75">  <span class="st">&quot;    });&quot;</span>,</a>
+<a class="sourceLine" id="cb4-76" title="76">  <span class="st">&quot;  } else {&quot;</span>,</a>
+<a class="sourceLine" id="cb4-77" title="77">  <span class="st">&quot;    $(row).css('background-color', 'lemonchiffon');&quot;</span>,</a>
+<a class="sourceLine" id="cb4-78" title="78">  <span class="st">&quot;    $(row).hover(function(){&quot;</span>,</a>
+<a class="sourceLine" id="cb4-79" title="79">  <span class="st">&quot;      $(this).css('background-color', '#DDFF75');&quot;</span>,</a>
+<a class="sourceLine" id="cb4-80" title="80">  <span class="st">&quot;    }, function() {&quot;</span>,</a>
+<a class="sourceLine" id="cb4-81" title="81">  <span class="st">&quot;      $(this).css('background-color', 'lemonchiffon');&quot;</span>,</a>
+<a class="sourceLine" id="cb4-82" title="82">  <span class="st">&quot;    });&quot;</span>,</a>
+<a class="sourceLine" id="cb4-83" title="83">  <span class="st">&quot;  }&quot;</span>,</a>
+<a class="sourceLine" id="cb4-84" title="84">  <span class="st">&quot;};&quot;</span>,</a>
+<a class="sourceLine" id="cb4-85" title="85">  <span class="st">&quot;&quot;</span>,</a>
+<a class="sourceLine" id="cb4-86" title="86">  <span class="st">&quot;// header callback to style the header of the child tables&quot;</span>,</a>
+<a class="sourceLine" id="cb4-87" title="87">  <span class="st">&quot;var headerCallback = function(thead, data, start, end, display){&quot;</span>,</a>
+<a class="sourceLine" id="cb4-88" title="88">  <span class="st">&quot;  $('th', thead).css({&quot;</span>,</a>
+<a class="sourceLine" id="cb4-89" title="89">  <span class="st">&quot;    'border-top': '3px solid indigo',&quot;</span>, </a>
+<a class="sourceLine" id="cb4-90" title="90">  <span class="st">&quot;    'color': 'indigo',&quot;</span>,</a>
+<a class="sourceLine" id="cb4-91" title="91">  <span class="st">&quot;    'background-color': '#fadadd'&quot;</span>,</a>
+<a class="sourceLine" id="cb4-92" title="92">  <span class="st">&quot;  });&quot;</span>,</a>
+<a class="sourceLine" id="cb4-93" title="93">  <span class="st">&quot;};&quot;</span>,</a>
+<a class="sourceLine" id="cb4-94" title="94">  <span class="st">&quot;&quot;</span>,</a>
+<a class="sourceLine" id="cb4-95" title="95">  <span class="st">&quot;// make the child table&quot;</span>,</a>
+<a class="sourceLine" id="cb4-96" title="96">  <span class="st">&quot;var format_datatable = function(d, childId){&quot;</span>,</a>
+<a class="sourceLine" id="cb4-97" title="97">  <span class="st">&quot;  var dataset = [];&quot;</span>,</a>
+<a class="sourceLine" id="cb4-98" title="98">  <span class="st">&quot;  var n = d.length - 1;&quot;</span>,</a>
+<a class="sourceLine" id="cb4-99" title="99">  <span class="st">&quot;  for(var i = 0; i &lt; d[n].length; i++){&quot;</span>,</a>
+<a class="sourceLine" id="cb4-100" title="100">  <span class="st">&quot;    var datarow = $.map(d[n][i], function(value, index){&quot;</span>,</a>
+<a class="sourceLine" id="cb4-101" title="101">  <span class="st">&quot;      return [value];&quot;</span>,</a>
+<a class="sourceLine" id="cb4-102" title="102">  <span class="st">&quot;    });&quot;</span>,</a>
+<a class="sourceLine" id="cb4-103" title="103">  <span class="st">&quot;    dataset.push(datarow);&quot;</span>,</a>
+<a class="sourceLine" id="cb4-104" title="104">  <span class="st">&quot;  }&quot;</span>,</a>
+<a class="sourceLine" id="cb4-105" title="105">  <span class="st">&quot;  var id = 'table#' + childId;&quot;</span>,</a>
+<a class="sourceLine" id="cb4-106" title="106">  <span class="st">&quot;  var subtable = $(id).DataTable({&quot;</span>,</a>
+<a class="sourceLine" id="cb4-107" title="107">  <span class="st">&quot;             'data': dataset,&quot;</span>,</a>
+<a class="sourceLine" id="cb4-108" title="108">  <span class="st">&quot;             'autoWidth': true,&quot;</span>,</a>
+<a class="sourceLine" id="cb4-109" title="109">  <span class="st">&quot;             'deferRender': true,&quot;</span>,</a>
+<a class="sourceLine" id="cb4-110" title="110">  <span class="st">&quot;             'info': false,&quot;</span>,</a>
+<a class="sourceLine" id="cb4-111" title="111">  <span class="st">&quot;             'lengthChange': false,&quot;</span>,</a>
+<a class="sourceLine" id="cb4-112" title="112">  <span class="st">&quot;             'ordering': d[n].length &gt; 1,&quot;</span>,</a>
+<a class="sourceLine" id="cb4-113" title="113">  <span class="st">&quot;             'order': [],&quot;</span>,</a>
 <a class="sourceLine" id="cb4-114" title="114">  <span class="st">&quot;             'paging': false,&quot;</span>,</a>
 <a class="sourceLine" id="cb4-115" title="115">  <span class="st">&quot;             'scrollX': false,&quot;</span>,</a>
 <a class="sourceLine" id="cb4-116" title="116">  <span class="st">&quot;             'scrollY': false,&quot;</span>,</a>
