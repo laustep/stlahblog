@@ -1,0 +1,553 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Drawing a duoprism</title>
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/pandoc-solarized.css" />  
+  <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+</head>
+
+<body>
+  <!-- Sidebar. -->
+  <div class="sidebar">
+    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+      <a href="https://www.r-bloggers.com/">
+        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+      </a>
+      <br />
+      <a href="http://t-redactyl.io/">
+        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
+      </a>
+      <a href="http://timelyportfolio.blogspot.be/">
+        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
+      </a>
+      <br />
+      <a href="https://antoineguillot.wordpress.com/blog/">
+        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+      </a>
+      <br />
+      <a href="https://fronkonstin.com/">
+        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="header">
+      <div id="logo" style="position:absolute;">
+        <a href="../">
+          <img src="../images/stla.jpg" alt="stla" width="100px" />
+        </a>
+      </div>
+      <div id="navigation" style="margin-top:50px;">
+        <a href="../">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../archive.html">Archive</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Drawing a duoprism</h1> <div class="info">
+    Posted on July  8, 2019
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="../tags/R.html">R</a>, <a href="../tags/maths.html">maths</a>, <a href="../tags/geometry.html">geometry</a>, <a href="../tags/graphics.html">graphics</a>, <a href="../tags/rgl.html">rgl</a>, <a href="../tags/asymptote.html">asymptote</a>, <a href="../tags/povray.html">povray</a>
+    
+</div>
+
+<p>In geometry of 4 dimensions, a <em>duoprism</em> is a polytope resulting from the Cartesian product of two polygons. We show how to draw a duoprism using R, Asymptote and POV-Ray, when the two polygons are regular.</p>
+<h1 id="drawing-a-duoprism-with-r">Drawing a duoprism with R</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">A &lt;-<span class="st"> </span><span class="dv">15</span></a>
+<a class="sourceLine" id="cb1-2" title="2">B &lt;-<span class="st"> </span><span class="dv">23</span></a>
+<a class="sourceLine" id="cb1-3" title="3"></a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="co"># construction of the vertices</span></a>
+<a class="sourceLine" id="cb1-5" title="5">vertices &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="ot">NA_real_</span>, <span class="dt">dim =</span> <span class="kw">c</span>(A,B,<span class="dv">4</span>))</a>
+<a class="sourceLine" id="cb1-6" title="6"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>A){</a>
+<a class="sourceLine" id="cb1-7" title="7">  v1 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">cos</span>(i<span class="op">/</span>A<span class="op">*</span><span class="dv">2</span><span class="op">*</span>pi), <span class="kw">sin</span>(i<span class="op">/</span>A<span class="op">*</span><span class="dv">2</span><span class="op">*</span>pi))</a>
+<a class="sourceLine" id="cb1-8" title="8">  <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>B){</a>
+<a class="sourceLine" id="cb1-9" title="9">    v2 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">cos</span>(j<span class="op">/</span>B<span class="op">*</span><span class="dv">2</span><span class="op">*</span>pi), <span class="kw">sin</span>(j<span class="op">/</span>B<span class="op">*</span><span class="dv">2</span><span class="op">*</span>pi))</a>
+<a class="sourceLine" id="cb1-10" title="10">    vertices[i,j,] &lt;-<span class="st"> </span><span class="kw">c</span>(v1,v2)</a>
+<a class="sourceLine" id="cb1-11" title="11">  }</a>
+<a class="sourceLine" id="cb1-12" title="12">}</a>
+<a class="sourceLine" id="cb1-13" title="13"></a>
+<a class="sourceLine" id="cb1-14" title="14"><span class="co"># construction of the edges</span></a>
+<a class="sourceLine" id="cb1-15" title="15">edges &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="ot">NA_integer_</span>, <span class="dt">dim =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span><span class="op">*</span>A<span class="op">*</span>B))</a>
+<a class="sourceLine" id="cb1-16" title="16">dominates &lt;-<span class="st"> </span><span class="cf">function</span>(c1, c2){</a>
+<a class="sourceLine" id="cb1-17" title="17">  c2[<span class="dv">1</span>]<span class="op">&gt;</span>c1[<span class="dv">1</span>] <span class="op">||</span><span class="st"> </span>(c2[<span class="dv">1</span>]<span class="op">==</span>c1[<span class="dv">1</span>] <span class="op">&amp;&amp;</span><span class="st"> </span>c2[<span class="dv">2</span>]<span class="op">&gt;</span>c1[<span class="dv">2</span>])</a>
+<a class="sourceLine" id="cb1-18" title="18">}</a>
+<a class="sourceLine" id="cb1-19" title="19">counter &lt;-<span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb1-20" title="20"><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_len</span>(A)<span class="op">-</span>1L){</a>
+<a class="sourceLine" id="cb1-21" title="21">  <span class="cf">for</span>(j <span class="cf">in</span> <span class="kw">seq_len</span>(B)<span class="op">-</span>1L){</a>
+<a class="sourceLine" id="cb1-22" title="22">    c1 &lt;-<span class="st"> </span><span class="kw">c</span>(i,j)</a>
+<a class="sourceLine" id="cb1-23" title="23">    candidate &lt;-<span class="st"> </span><span class="kw">c</span>(i, (j<span class="dv">-1</span>)<span class="op">%%</span>B)</a>
+<a class="sourceLine" id="cb1-24" title="24">    <span class="cf">if</span>(<span class="kw">dominates</span>(c1, candidate)){</a>
+<a class="sourceLine" id="cb1-25" title="25">      edges[,,counter] &lt;-<span class="st"> </span><span class="kw">cbind</span>(c1, candidate) <span class="op">+</span><span class="st"> </span>1L</a>
+<a class="sourceLine" id="cb1-26" title="26">      counter &lt;-<span class="st"> </span>counter <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb1-27" title="27">    }</a>
+<a class="sourceLine" id="cb1-28" title="28">    candidate &lt;-<span class="st"> </span><span class="kw">c</span>(i, (j<span class="op">+</span><span class="dv">1</span>)<span class="op">%%</span>B)</a>
+<a class="sourceLine" id="cb1-29" title="29">    <span class="cf">if</span>(<span class="kw">dominates</span>(c1, candidate)){</a>
+<a class="sourceLine" id="cb1-30" title="30">      edges[,,counter] &lt;-<span class="st"> </span><span class="kw">cbind</span>(c1, candidate) <span class="op">+</span><span class="st"> </span>1L</a>
+<a class="sourceLine" id="cb1-31" title="31">      counter &lt;-<span class="st"> </span>counter <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb1-32" title="32">    }</a>
+<a class="sourceLine" id="cb1-33" title="33">    candidate &lt;-<span class="st"> </span><span class="kw">c</span>((i<span class="dv">-1</span>)<span class="op">%%</span>A, j)</a>
+<a class="sourceLine" id="cb1-34" title="34">    <span class="cf">if</span>(<span class="kw">dominates</span>(c1, candidate)){</a>
+<a class="sourceLine" id="cb1-35" title="35">      edges[,,counter] &lt;-<span class="st"> </span><span class="kw">cbind</span>(c1, candidate) <span class="op">+</span><span class="st"> </span>1L</a>
+<a class="sourceLine" id="cb1-36" title="36">      counter &lt;-<span class="st"> </span>counter <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb1-37" title="37">    }</a>
+<a class="sourceLine" id="cb1-38" title="38">    candidate &lt;-<span class="st"> </span><span class="kw">c</span>((i<span class="op">+</span><span class="dv">1</span>)<span class="op">%%</span>A, j)</a>
+<a class="sourceLine" id="cb1-39" title="39">    <span class="cf">if</span>(<span class="kw">dominates</span>(c1, candidate)){</a>
+<a class="sourceLine" id="cb1-40" title="40">      edges[,,counter] &lt;-<span class="st"> </span><span class="kw">cbind</span>(c1, candidate) <span class="op">+</span><span class="st"> </span>1L</a>
+<a class="sourceLine" id="cb1-41" title="41">      counter &lt;-<span class="st"> </span>counter <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb1-42" title="42">    }</a>
+<a class="sourceLine" id="cb1-43" title="43">  }</a>
+<a class="sourceLine" id="cb1-44" title="44">}</a>
+<a class="sourceLine" id="cb1-45" title="45"></a>
+<a class="sourceLine" id="cb1-46" title="46"><span class="co"># stereographic projection</span></a>
+<a class="sourceLine" id="cb1-47" title="47">stereog &lt;-<span class="st"> </span><span class="cf">function</span>(v){</a>
+<a class="sourceLine" id="cb1-48" title="48">  v[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>] <span class="op">/</span><span class="st"> </span>(<span class="kw">sqrt</span>(<span class="dv">2</span>) <span class="op">-</span><span class="st"> </span>v[<span class="dv">4</span>])</a>
+<a class="sourceLine" id="cb1-49" title="49">}</a>
+<a class="sourceLine" id="cb1-50" title="50"></a>
+<a class="sourceLine" id="cb1-51" title="51"><span class="co"># projected vertices</span></a>
+<a class="sourceLine" id="cb1-52" title="52">vs &lt;-<span class="st"> </span><span class="kw">apply</span>(vertices, <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), stereog)</a>
+<a class="sourceLine" id="cb1-53" title="53"></a>
+<a class="sourceLine" id="cb1-54" title="54"><span class="co"># plot</span></a>
+<a class="sourceLine" id="cb1-55" title="55"><span class="kw">library</span>(rgl)</a>
+<a class="sourceLine" id="cb1-56" title="56"><span class="co">## plot the edges</span></a>
+<a class="sourceLine" id="cb1-57" title="57"><span class="cf">for</span>(k <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>(<span class="dv">2</span><span class="op">*</span>A<span class="op">*</span>B)){</a>
+<a class="sourceLine" id="cb1-58" title="58">  p1 &lt;-<span class="st"> </span>vs[, edges[1L,1L,k], edges[2L,1L,k]]</a>
+<a class="sourceLine" id="cb1-59" title="59">  p2 &lt;-<span class="st"> </span>vs[, edges[1L,2L,k], edges[2L,2L,k]]</a>
+<a class="sourceLine" id="cb1-60" title="60">  <span class="kw">shade3d</span>(<span class="kw">cylinder3d</span>(<span class="kw">rbind</span>(p1,p2), <span class="dt">radius =</span> <span class="fl">0.03</span>, <span class="dt">sides =</span> <span class="dv">30</span>), </a>
+<a class="sourceLine" id="cb1-61" title="61">          <span class="dt">color =</span> <span class="st">&quot;gold&quot;</span>)</a>
+<a class="sourceLine" id="cb1-62" title="62">}</a>
+<a class="sourceLine" id="cb1-63" title="63"><span class="co">## plot the vertices</span></a>
+<a class="sourceLine" id="cb1-64" title="64"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>A){</a>
+<a class="sourceLine" id="cb1-65" title="65">  <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>B){</a>
+<a class="sourceLine" id="cb1-66" title="66">    <span class="kw">spheres3d</span>(vs[,i,j], <span class="dt">radius =</span> <span class="fl">0.05</span>, <span class="dt">color =</span> <span class="st">&quot;gold2&quot;</span>)</a>
+<a class="sourceLine" id="cb1-67" title="67">  }</a>
+<a class="sourceLine" id="cb1-68" title="68">}</a></code></pre></div>
+<p><img src="figures/Duoprism_R.png" /></p>
+<h1 id="drawing-a-duoprism-with-asymptote">Drawing a duoprism with Asymptote</h1>
+<div class="sourceCode" id="cb2"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb2-1" title="1">settings.render = <span class="dv">4</span>;</a>
+<a class="sourceLine" id="cb2-2" title="2">settings.outformat = <span class="st">&quot;pdf&quot;</span>;</a>
+<a class="sourceLine" id="cb2-3" title="3">import solids;</a>
+<a class="sourceLine" id="cb2-4" title="4">import tube;</a>
+<a class="sourceLine" id="cb2-5" title="5">size(<span class="dv">200</span>,<span class="dv">0</span>);</a>
+<a class="sourceLine" id="cb2-6" title="6"></a>
+<a class="sourceLine" id="cb2-7" title="7">currentprojection=orthographic(<span class="dv">4</span>,<span class="dv">4</span>,<span class="dv">4</span>);</a>
+<a class="sourceLine" id="cb2-8" title="8">currentlight = light(gray(<span class="fl">0.85</span>), ambient=black, specularfactor=<span class="dv">3</span>,</a>
+<a class="sourceLine" id="cb2-9" title="9">                     (<span class="dv">100</span>,<span class="dv">100</span>,<span class="dv">100</span>), specular=gray(<span class="fl">0.9</span>), viewport=<span class="kw">false</span>);</a>
+<a class="sourceLine" id="cb2-10" title="10">currentlight.background = rgb(<span class="st">&quot;363940ff&quot;</span>);</a>
+<a class="sourceLine" id="cb2-11" title="11"></a>
+<a class="sourceLine" id="cb2-12" title="12"><span class="co">// lexicographic order ---------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb2-13" title="13"><span class="dt">bool</span> dominates(<span class="dt">int</span>[] e1, <span class="dt">int</span>[] e2){</a>
+<a class="sourceLine" id="cb2-14" title="14">    <span class="cf">return</span> e2[<span class="dv">0</span>]&gt;e1[<span class="dv">0</span>] || (e2[<span class="dv">0</span>]==e1[<span class="dv">0</span>] &amp;&amp; e2[<span class="dv">1</span>]&gt;e1[<span class="dv">1</span>]);</a>
+<a class="sourceLine" id="cb2-15" title="15">}</a>
+<a class="sourceLine" id="cb2-16" title="16"></a>
+<a class="sourceLine" id="cb2-17" title="17"><span class="co">// vertices --------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb2-18" title="18"><span class="dt">int</span> A = <span class="dv">30</span>;</a>
+<a class="sourceLine" id="cb2-19" title="19"><span class="dt">int</span> B = <span class="dv">4</span>;</a>
+<a class="sourceLine" id="cb2-20" title="20">real[][] poly1 = <span class="kw">new</span> real[A][<span class="dv">2</span>];</a>
+<a class="sourceLine" id="cb2-21" title="21"><span class="cf">for</span>(<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; A; ++i){</a>
+<a class="sourceLine" id="cb2-22" title="22">    poly1[i][<span class="dv">0</span>] = cos(i/A*<span class="dv">2</span><span class="er">pi</span>);</a>
+<a class="sourceLine" id="cb2-23" title="23">    poly1[i][<span class="dv">1</span>] = sin(i/A*<span class="dv">2</span><span class="er">pi</span>);</a>
+<a class="sourceLine" id="cb2-24" title="24">}</a>
+<a class="sourceLine" id="cb2-25" title="25">real[][] poly2 = <span class="kw">new</span> real[B][<span class="dv">2</span>];</a>
+<a class="sourceLine" id="cb2-26" title="26"><span class="cf">for</span>(<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; B; ++i){</a>
+<a class="sourceLine" id="cb2-27" title="27">    poly2[i][<span class="dv">0</span>] = cos(i/B*<span class="dv">2</span><span class="er">pi</span>);</a>
+<a class="sourceLine" id="cb2-28" title="28">    poly2[i][<span class="dv">1</span>] = sin(i/B*<span class="dv">2</span><span class="er">pi</span>);</a>
+<a class="sourceLine" id="cb2-29" title="29">}</a>
+<a class="sourceLine" id="cb2-30" title="30">real[][][] vertices = <span class="kw">new</span> real[A][B][<span class="dv">4</span>];</a>
+<a class="sourceLine" id="cb2-31" title="31"><span class="cf">for</span>(<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; A; ++i){</a>
+<a class="sourceLine" id="cb2-32" title="32">    <span class="cf">for</span>(<span class="dt">int</span> j = <span class="dv">0</span>; j &lt; B; ++j){</a>
+<a class="sourceLine" id="cb2-33" title="33">        vertices[i][j] = concat(poly1[i],poly2[j]);</a>
+<a class="sourceLine" id="cb2-34" title="34">    }</a>
+<a class="sourceLine" id="cb2-35" title="35">}</a>
+<a class="sourceLine" id="cb2-36" title="36"></a>
+<a class="sourceLine" id="cb2-37" title="37"><span class="co">// edges -----------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb2-38" title="38"><span class="dt">int</span>[][][] edges;</a>
+<a class="sourceLine" id="cb2-39" title="39"><span class="cf">for</span>(<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; A; ++i){</a>
+<a class="sourceLine" id="cb2-40" title="40">    <span class="cf">for</span>(<span class="dt">int</span> j = <span class="dv">0</span>; j &lt; B; ++j){</a>
+<a class="sourceLine" id="cb2-41" title="41">        <span class="dt">int</span>[] e = {i,j};</a>
+<a class="sourceLine" id="cb2-42" title="42">        <span class="dt">int</span>[] candidate = {i,(j-<span class="dv">1</span>)%B};</a>
+<a class="sourceLine" id="cb2-43" title="43">        <span class="cf">if</span>(dominates(e,candidate)){</a>
+<a class="sourceLine" id="cb2-44" title="44">            <span class="dt">int</span>[][] edge = {e,candidate}; </a>
+<a class="sourceLine" id="cb2-45" title="45">            edges.push(edge);</a>
+<a class="sourceLine" id="cb2-46" title="46">        }</a>
+<a class="sourceLine" id="cb2-47" title="47">        <span class="dt">int</span>[] candidate = {i,(j+<span class="dv">1</span>)%B};</a>
+<a class="sourceLine" id="cb2-48" title="48">        <span class="cf">if</span>(dominates(e,candidate)){</a>
+<a class="sourceLine" id="cb2-49" title="49">            <span class="dt">int</span>[][] edge = {e,candidate}; </a>
+<a class="sourceLine" id="cb2-50" title="50">            edges.push(edge);</a>
+<a class="sourceLine" id="cb2-51" title="51">        }</a>
+<a class="sourceLine" id="cb2-52" title="52">        <span class="dt">int</span>[] candidate = {(i-<span class="dv">1</span>)%A,j};</a>
+<a class="sourceLine" id="cb2-53" title="53">        <span class="cf">if</span>(dominates(e,candidate)){</a>
+<a class="sourceLine" id="cb2-54" title="54">            <span class="dt">int</span>[][] edge = {e,candidate}; </a>
+<a class="sourceLine" id="cb2-55" title="55">            edges.push(edge);</a>
+<a class="sourceLine" id="cb2-56" title="56">        }</a>
+<a class="sourceLine" id="cb2-57" title="57">        <span class="dt">int</span>[] candidate = {(i+<span class="dv">1</span>)%A,j};</a>
+<a class="sourceLine" id="cb2-58" title="58">        <span class="cf">if</span>(dominates(e,candidate)){</a>
+<a class="sourceLine" id="cb2-59" title="59">            <span class="dt">int</span>[][] edge = {e,candidate}; </a>
+<a class="sourceLine" id="cb2-60" title="60">            edges.push(edge);</a>
+<a class="sourceLine" id="cb2-61" title="61">        }</a>
+<a class="sourceLine" id="cb2-62" title="62">    }</a>
+<a class="sourceLine" id="cb2-63" title="63">}</a>
+<a class="sourceLine" id="cb2-64" title="64"></a>
+<a class="sourceLine" id="cb2-65" title="65"><span class="co">// stereographic projection ----------------------------------------------------</span></a>
+<a class="sourceLine" id="cb2-66" title="66">triple stereog(real[] x, real r){</a>
+<a class="sourceLine" id="cb2-67" title="67">  <span class="cf">return</span> (x[<span class="dv">0</span>],x[<span class="dv">1</span>],x[<span class="dv">2</span>])/(r-x[<span class="dv">3</span>]);</a>
+<a class="sourceLine" id="cb2-68" title="68">}</a>
+<a class="sourceLine" id="cb2-69" title="69"></a>
+<a class="sourceLine" id="cb2-70" title="70"><span class="co">// projected vertices ----------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb2-71" title="71">triple[][] vs = <span class="kw">new</span> triple[A][B];</a>
+<a class="sourceLine" id="cb2-72" title="72"><span class="cf">for</span>(<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; A; ++i){</a>
+<a class="sourceLine" id="cb2-73" title="73">    <span class="cf">for</span>(<span class="dt">int</span> j = <span class="dv">0</span>; j &lt; B; ++j){</a>
+<a class="sourceLine" id="cb2-74" title="74">        vs[i][j] = stereog(vertices[i][j], sqrt(<span class="dv">2</span>));</a>
+<a class="sourceLine" id="cb2-75" title="75">    }</a>
+<a class="sourceLine" id="cb2-76" title="76">}</a>
+<a class="sourceLine" id="cb2-77" title="77"></a>
+<a class="sourceLine" id="cb2-78" title="78"><span class="co">// draw the duoprism -----------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb2-79" title="79"><span class="co">// draw edges</span></a>
+<a class="sourceLine" id="cb2-80" title="80"><span class="cf">for</span>(<span class="dt">int</span> k = <span class="dv">0</span>; k &lt; edges.length; ++k){</a>
+<a class="sourceLine" id="cb2-81" title="81">    path3 p = </a>
+<a class="sourceLine" id="cb2-82" title="82">      vs[edges[k][<span class="dv">0</span>][<span class="dv">0</span>]][edges[k][<span class="dv">0</span>][<span class="dv">1</span>]]..vs[edges[k][<span class="dv">1</span>][<span class="dv">0</span>]][edges[k][<span class="dv">1</span>][<span class="dv">1</span>]];</a>
+<a class="sourceLine" id="cb2-83" title="83">    draw(tube(p, scale(<span class="fl">0.05</span>)*unitcircle), </a>
+<a class="sourceLine" id="cb2-84" title="84">            material(rgb(<span class="dv">255</span>,<span class="dv">215</span>,<span class="dv">0</span>), emissivepen=gray(<span class="fl">0.1</span>)));</a>
+<a class="sourceLine" id="cb2-85" title="85">}</a>
+<a class="sourceLine" id="cb2-86" title="86"><span class="co">// draw vertices</span></a>
+<a class="sourceLine" id="cb2-87" title="87"><span class="cf">for</span>(<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; A; ++i){</a>
+<a class="sourceLine" id="cb2-88" title="88">    <span class="cf">for</span>(<span class="dt">int</span> j = <span class="dv">0</span>; j &lt; B; ++j){</a>
+<a class="sourceLine" id="cb2-89" title="89">        draw(shift(vs[i][j])*scale3(<span class="fl">0.1</span>)*unitsphere, rgb(<span class="dv">255</span>,<span class="dv">215</span>,<span class="dv">0</span>));</a>
+<a class="sourceLine" id="cb2-90" title="90">    }</a>
+<a class="sourceLine" id="cb2-91" title="91">}</a></code></pre></div>
+<p><img src="figures/Duoprism_Asy.png" /></p>
+<h1 id="drawing-a-duoprism-with-pov-ray">Drawing a duoprism with POV-Ray</h1>
+<div class="sourceCode" id="cb3"><pre class="sourceCode povray"><code class="sourceCode povray"><a class="sourceLine" id="cb3-1" title="1"><span class="ot">#version</span> <span class="fl">3.7</span>;</a>
+<a class="sourceLine" id="cb3-2" title="2"></a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="kw">global_settings</span> { <span class="kw">assumed_gamma</span> <span class="fl">1</span> } </a>
+<a class="sourceLine" id="cb3-4" title="4"></a>
+<a class="sourceLine" id="cb3-5" title="5"><span class="ot">#include</span> <span class="st">&quot;colors.inc&quot;</span></a>
+<a class="sourceLine" id="cb3-6" title="6"><span class="ot">#include</span> <span class="st">&quot;textures.inc&quot;</span></a>
+<a class="sourceLine" id="cb3-7" title="7"></a>
+<a class="sourceLine" id="cb3-8" title="8"><span class="co">// camera ----------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb3-9" title="9"><span class="kw">camera</span> {</a>
+<a class="sourceLine" id="cb3-10" title="10">    <span class="kw">location</span> &lt;<span class="fl">0</span>, <span class="fl">0</span>,-<span class="fl">10</span>&gt;</a>
+<a class="sourceLine" id="cb3-11" title="11">    <span class="kw">look_at</span> <span class="fl">0</span></a>
+<a class="sourceLine" id="cb3-12" title="12">    <span class="kw">angle</span> <span class="fl">45</span></a>
+<a class="sourceLine" id="cb3-13" title="13">}</a>
+<a class="sourceLine" id="cb3-14" title="14"></a>
+<a class="sourceLine" id="cb3-15" title="15"><span class="co">// light sources ---------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb3-16" title="16"><span class="kw">light_source</span> { &lt;<span class="fl">0</span>,<span class="fl">0</span>,-<span class="fl">100</span>&gt; White <span class="kw">shadowless</span>} </a>
+<a class="sourceLine" id="cb3-17" title="17"><span class="kw">light_source</span> { &lt;<span class="fl">100</span>,<span class="fl">0</span>,-<span class="fl">100</span>&gt; White <span class="kw">shadowless</span>} </a>
+<a class="sourceLine" id="cb3-18" title="18"></a>
+<a class="sourceLine" id="cb3-19" title="19"><span class="co">// moon ------------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb3-20" title="20"><span class="kw">light_source</span>{ </a>
+<a class="sourceLine" id="cb3-21" title="21">    &lt;-<span class="fl">1000</span>, <span class="fl">800</span>, <span class="fl">3000</span>&gt; </a>
+<a class="sourceLine" id="cb3-22" title="22">    <span class="kw">color</span> White</a>
+<a class="sourceLine" id="cb3-23" title="23">    <span class="kw">shadowless</span></a>
+<a class="sourceLine" id="cb3-24" title="24">    <span class="kw">looks_like</span>{ </a>
+<a class="sourceLine" id="cb3-25" title="25">        <span class="kw">sphere</span>{ </a>
+<a class="sourceLine" id="cb3-26" title="26">            &lt;<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0</span>&gt;,<span class="fl">300</span> </a>
+<a class="sourceLine" id="cb3-27" title="27">            <span class="kw">texture</span> { </a>
+<a class="sourceLine" id="cb3-28" title="28">                <span class="kw">pigment</span> { </a>
+<a class="sourceLine" id="cb3-29" title="29">                    <span class="kw">color</span> White </a>
+<a class="sourceLine" id="cb3-30" title="30">                }</a>
+<a class="sourceLine" id="cb3-31" title="31">                <span class="kw">normal</span> { </a>
+<a class="sourceLine" id="cb3-32" title="32">                    <span class="kw">bumps</span> <span class="fl">0.5</span></a>
+<a class="sourceLine" id="cb3-33" title="33">                    <span class="kw">scale</span> <span class="fl">50</span></a>
+<a class="sourceLine" id="cb3-34" title="34">                }</a>
+<a class="sourceLine" id="cb3-35" title="35">                <span class="kw">finish</span> { </a>
+<a class="sourceLine" id="cb3-36" title="36">                    <span class="kw">emission</span> <span class="fl">0.8</span>   </a>
+<a class="sourceLine" id="cb3-37" title="37">                    <span class="kw">diffuse</span> <span class="fl">0.2</span></a>
+<a class="sourceLine" id="cb3-38" title="38">                    <span class="kw">phong</span> <span class="fl">1</span></a>
+<a class="sourceLine" id="cb3-39" title="39">                }                                        </a>
+<a class="sourceLine" id="cb3-40" title="40">            } </a>
+<a class="sourceLine" id="cb3-41" title="41">        } </a>
+<a class="sourceLine" id="cb3-42" title="42">    } </a>
+<a class="sourceLine" id="cb3-43" title="43">} </a>
+<a class="sourceLine" id="cb3-44" title="44"></a>
+<a class="sourceLine" id="cb3-45" title="45"><span class="co">// sky -------------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb3-46" title="46"><span class="kw">plane</span> { </a>
+<a class="sourceLine" id="cb3-47" title="47">    &lt;<span class="fl">0</span>,<span class="fl">1</span>,<span class="fl">0</span>&gt;,<span class="fl">1</span> <span class="kw">hollow</span>  </a>
+<a class="sourceLine" id="cb3-48" title="48">    <span class="kw">texture</span> { </a>
+<a class="sourceLine" id="cb3-49" title="49">        <span class="kw">pigment</span> { </a>
+<a class="sourceLine" id="cb3-50" title="50">            <span class="kw">color</span> <span class="kw">rgb</span> &lt;<span class="fl">0.01</span>, <span class="fl">0.01</span>, <span class="fl">0.2</span>&gt; </a>
+<a class="sourceLine" id="cb3-51" title="51">        }</a>
+<a class="sourceLine" id="cb3-52" title="52">        <span class="kw">finish</span> { </a>
+<a class="sourceLine" id="cb3-53" title="53">            <span class="kw">emission</span> <span class="fl">0.5</span> </a>
+<a class="sourceLine" id="cb3-54" title="54">            <span class="kw">diffuse</span> <span class="fl">0.5</span> </a>
+<a class="sourceLine" id="cb3-55" title="55">        } </a>
+<a class="sourceLine" id="cb3-56" title="56">    }  </a>
+<a class="sourceLine" id="cb3-57" title="57">    <span class="kw">scale</span> <span class="fl">10000</span></a>
+<a class="sourceLine" id="cb3-58" title="58">}</a>
+<a class="sourceLine" id="cb3-59" title="59"></a>
+<a class="sourceLine" id="cb3-60" title="60"><span class="co">// the clouds ------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb3-61" title="61"><span class="kw">plane</span> { </a>
+<a class="sourceLine" id="cb3-62" title="62">    &lt;<span class="fl">0</span>,<span class="fl">1</span>,<span class="fl">0</span>&gt;,<span class="fl">1</span> <span class="kw">hollow</span>  </a>
+<a class="sourceLine" id="cb3-63" title="63">    <span class="kw">texture</span> { </a>
+<a class="sourceLine" id="cb3-64" title="64">        <span class="kw">pigment</span>{ </a>
+<a class="sourceLine" id="cb3-65" title="65">            <span class="kw">bozo</span> <span class="kw">turbulence</span> <span class="fl">1.3</span></a>
+<a class="sourceLine" id="cb3-66" title="66">            <span class="kw">color_map</span> { </a>
+<a class="sourceLine" id="cb3-67" title="67">                [<span class="fl">0.00</span> <span class="kw">rgb</span> &lt;<span class="fl">0.24</span>, <span class="fl">0.32</span>, <span class="fl">1.0</span>&gt;*<span class="fl">0.6</span>]</a>
+<a class="sourceLine" id="cb3-68" title="68">                [<span class="fl">0.75</span> <span class="kw">rgb</span> &lt;<span class="fl">0.24</span>, <span class="fl">0.32</span>, <span class="fl">1.0</span>&gt;*<span class="fl">0.6</span>]</a>
+<a class="sourceLine" id="cb3-69" title="69">                [<span class="fl">0.83</span> <span class="kw">rgb</span> &lt;<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>&gt;              ]</a>
+<a class="sourceLine" id="cb3-70" title="70">                [<span class="fl">0.95</span> <span class="kw">rgb</span> &lt;<span class="fl">0.25</span>,<span class="fl">0.25</span>,<span class="fl">0.25</span>&gt;     ]</a>
+<a class="sourceLine" id="cb3-71" title="71">                [<span class="fl">1.00</span> <span class="kw">rgb</span> &lt;<span class="fl">0.5</span>,<span class="fl">0.5</span>,<span class="fl">0.5</span>&gt;        ]</a>
+<a class="sourceLine" id="cb3-72" title="72">            }</a>
+<a class="sourceLine" id="cb3-73" title="73">            <span class="kw">scale</span> <span class="fl">2.5</span></a>
+<a class="sourceLine" id="cb3-74" title="74">            <span class="kw">translate</span> &lt;<span class="fl">0</span>,<span class="fl">1</span>,<span class="fl">0</span>&gt;</a>
+<a class="sourceLine" id="cb3-75" title="75">        }</a>
+<a class="sourceLine" id="cb3-76" title="76">        <span class="kw">finish</span> { </a>
+<a class="sourceLine" id="cb3-77" title="77">            <span class="kw">emission</span> <span class="fl">0.25</span> </a>
+<a class="sourceLine" id="cb3-78" title="78">            <span class="kw">diffuse</span> <span class="fl">0</span></a>
+<a class="sourceLine" id="cb3-79" title="79">        } </a>
+<a class="sourceLine" id="cb3-80" title="80">    }      </a>
+<a class="sourceLine" id="cb3-81" title="81">    <span class="kw">scale</span> <span class="fl">5000</span></a>
+<a class="sourceLine" id="cb3-82" title="82">}</a>
+<a class="sourceLine" id="cb3-83" title="83"></a>
+<a class="sourceLine" id="cb3-84" title="84"><span class="co">// fog on the ground -----------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb3-85" title="85"><span class="kw">fog</span> { </a>
+<a class="sourceLine" id="cb3-86" title="86">    <span class="kw">fog_type</span>   <span class="fl">2</span></a>
+<a class="sourceLine" id="cb3-87" title="87">    <span class="kw">distance</span>   <span class="fl">50</span></a>
+<a class="sourceLine" id="cb3-88" title="88">    <span class="kw">color</span>      Gray50  </a>
+<a class="sourceLine" id="cb3-89" title="89">    <span class="kw">fog_offset</span> <span class="fl">0.1</span></a>
+<a class="sourceLine" id="cb3-90" title="90">    <span class="kw">fog_alt</span>    <span class="fl">1.5</span></a>
+<a class="sourceLine" id="cb3-91" title="91">    <span class="kw">turbulence</span> <span class="fl">1.8</span></a>
+<a class="sourceLine" id="cb3-92" title="92">}</a>
+<a class="sourceLine" id="cb3-93" title="93"></a>
+<a class="sourceLine" id="cb3-94" title="94"><span class="co">// sea -------------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb3-95" title="95"><span class="kw">plane</span> { </a>
+<a class="sourceLine" id="cb3-96" title="96">    &lt;<span class="fl">0</span>,<span class="fl">1</span>,<span class="fl">0</span>&gt;, <span class="fl">-1</span> <span class="kw">hollow</span></a>
+<a class="sourceLine" id="cb3-97" title="97">    <span class="kw">texture</span>{</a>
+<a class="sourceLine" id="cb3-98" title="98">        <span class="kw">pigment</span>{</a>
+<a class="sourceLine" id="cb3-99" title="99">            <span class="kw">rgb</span> &lt;.<span class="fl">098</span>,.<span class="fl">098</span>,.<span class="fl">439</span>&gt;</a>
+<a class="sourceLine" id="cb3-100" title="100">        }</a>
+<a class="sourceLine" id="cb3-101" title="101">        <span class="kw">finish</span> {</a>
+<a class="sourceLine" id="cb3-102" title="102">            <span class="kw">ambient</span> <span class="fl">0.15</span></a>
+<a class="sourceLine" id="cb3-103" title="103">            <span class="kw">diffuse</span> <span class="fl">0.55</span></a>
+<a class="sourceLine" id="cb3-104" title="104">            <span class="kw">brilliance</span> <span class="fl">6.0</span></a>
+<a class="sourceLine" id="cb3-105" title="105">            <span class="kw">phong</span> <span class="fl">0.8</span></a>
+<a class="sourceLine" id="cb3-106" title="106">            <span class="kw">phong_size</span> <span class="fl">120</span></a>
+<a class="sourceLine" id="cb3-107" title="107">            <span class="kw">reflection</span> <span class="fl">0.2</span></a>
+<a class="sourceLine" id="cb3-108" title="108">        }</a>
+<a class="sourceLine" id="cb3-109" title="109">        <span class="kw">normal</span> { </a>
+<a class="sourceLine" id="cb3-110" title="110">            <span class="kw">bumps</span> <span class="fl">0.95</span></a>
+<a class="sourceLine" id="cb3-111" title="111">            <span class="kw">turbulence</span> <span class="fl">.05</span> </a>
+<a class="sourceLine" id="cb3-112" title="112">            <span class="kw">scale</span> &lt;<span class="fl">1</span>,<span class="fl">0.25</span>,<span class="fl">1</span>&gt; </a>
+<a class="sourceLine" id="cb3-113" title="113">        }</a>
+<a class="sourceLine" id="cb3-114" title="114">    }</a>
+<a class="sourceLine" id="cb3-115" title="115">}</a>
+<a class="sourceLine" id="cb3-116" title="116"></a>
+<a class="sourceLine" id="cb3-117" title="117"><span class="co">// vertices --------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb3-118" title="118"><span class="kw">#declare A </span>= <span class="fl">23</span>;</a>
+<a class="sourceLine" id="cb3-119" title="119"><span class="kw">#declare B </span>= <span class="fl">29</span>;</a>
+<a class="sourceLine" id="cb3-120" title="120"><span class="kw">#declare poly1 </span>= <span class="kw">array</span>[A];</a>
+<a class="sourceLine" id="cb3-121" title="121">#for(i,<span class="fl">0</span>,A<span class="fl">-1</span>)</a>
+<a class="sourceLine" id="cb3-122" title="122">    <span class="kw">#declare poly1</span>[i] = <span class="kw">array</span>[<span class="fl">2</span>] {<span class="kw">cos</span>(i/A*<span class="fl">2</span>*<span class="fl">pi</span>), <span class="kw">sin</span>(i/A*<span class="fl">2</span>*<span class="fl">pi</span>)};</a>
+<a class="sourceLine" id="cb3-123" title="123"><span class="ot">#end</span></a>
+<a class="sourceLine" id="cb3-124" title="124"><span class="kw">#declare poly2 </span>= <span class="kw">array</span>[B];</a>
+<a class="sourceLine" id="cb3-125" title="125">#for(i,<span class="fl">0</span>,B<span class="fl">-1</span>)</a>
+<a class="sourceLine" id="cb3-126" title="126">    <span class="kw">#declare poly2</span>[i] = <span class="kw">array</span>[<span class="fl">2</span>] {<span class="kw">cos</span>(i/B*<span class="fl">2</span>*<span class="fl">pi</span>), <span class="kw">sin</span>(i/B*<span class="fl">2</span>*<span class="fl">pi</span>)};</a>
+<a class="sourceLine" id="cb3-127" title="127"><span class="ot">#end</span></a>
+<a class="sourceLine" id="cb3-128" title="128"><span class="kw">#declare vertices </span>= <span class="kw">array</span>[A][B];</a>
+<a class="sourceLine" id="cb3-129" title="129">#for(i,<span class="fl">0</span>,A<span class="fl">-1</span>)</a>
+<a class="sourceLine" id="cb3-130" title="130">    #for(j,<span class="fl">0</span>,B<span class="fl">-1</span>)</a>
+<a class="sourceLine" id="cb3-131" title="131">        <span class="kw">#declare vertices</span>[i][j] = </a>
+<a class="sourceLine" id="cb3-132" title="132">            &lt; poly1[i][<span class="fl">0</span>], poly1[i][<span class="fl">1</span>], poly2[j][<span class="fl">0</span>], poly2[j][<span class="fl">1</span>] &gt;;</a>
+<a class="sourceLine" id="cb3-133" title="133">    <span class="ot">#end</span></a>
+<a class="sourceLine" id="cb3-134" title="134"><span class="ot">#end</span></a>
+<a class="sourceLine" id="cb3-135" title="135"></a>
+<a class="sourceLine" id="cb3-136" title="136"><span class="co">// edges -----------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb3-137" title="137"><span class="kw">#macro dominates</span>(e1,e2)</a>
+<a class="sourceLine" id="cb3-138" title="138">    (e2[<span class="fl">0</span>]&gt;e1[<span class="fl">0</span>]) | ((e2[<span class="fl">0</span>]=e1[<span class="fl">0</span>]) &amp; (e2[<span class="fl">1</span>]&gt;e1[<span class="fl">1</span>]))</a>
+<a class="sourceLine" id="cb3-139" title="139"><span class="ot">#end</span></a>
+<a class="sourceLine" id="cb3-140" title="140"><span class="kw">#declare nedges </span>= <span class="fl">2</span>*A*B;</a>
+<a class="sourceLine" id="cb3-141" title="141"><span class="kw">#declare edges </span>= <span class="kw">array</span>[nedges];</a>
+<a class="sourceLine" id="cb3-142" title="142"><span class="kw">#declare k</span>=<span class="fl">0</span>;</a>
+<a class="sourceLine" id="cb3-143" title="143">#for(i,<span class="fl">0</span>,A<span class="fl">-1</span>)</a>
+<a class="sourceLine" id="cb3-144" title="144">    #for(j,<span class="fl">0</span>,B<span class="fl">-1</span>)</a>
+<a class="sourceLine" id="cb3-145" title="145">        <span class="kw">#local e </span>= <span class="kw">array</span>[<span class="fl">2</span>] {i,j};</a>
+<a class="sourceLine" id="cb3-146" title="146">        <span class="kw">#local candidate </span>= <span class="kw">array</span>[<span class="fl">2</span>] {i,<span class="kw">mod</span>(<span class="kw">mod</span>(j<span class="fl">-1</span>,B)+B,B)};</a>
+<a class="sourceLine" id="cb3-147" title="147">        <span class="ot">#if</span>(dominates(e,candidate))</a>
+<a class="sourceLine" id="cb3-148" title="148">            <span class="kw">#local edge </span>= <span class="kw">array</span>[<span class="fl">2</span>] {e,candidate};</a>
+<a class="sourceLine" id="cb3-149" title="149">            <span class="kw">#declare edges</span>[k] = edge;</a>
+<a class="sourceLine" id="cb3-150" title="150">            <span class="kw">#declare k </span>= k+<span class="fl">1</span>;</a>
+<a class="sourceLine" id="cb3-151" title="151">        <span class="ot">#end</span></a>
+<a class="sourceLine" id="cb3-152" title="152">        <span class="kw">#local candidate </span>= <span class="kw">array</span>[<span class="fl">2</span>] {i,<span class="kw">mod</span>(<span class="kw">mod</span>(j+<span class="fl">1</span>,B)+B,B)};</a>
+<a class="sourceLine" id="cb3-153" title="153">        <span class="ot">#if</span>(dominates(e,candidate))</a>
+<a class="sourceLine" id="cb3-154" title="154">            <span class="kw">#local edge </span>= <span class="kw">array</span>[<span class="fl">2</span>] {e,candidate};</a>
+<a class="sourceLine" id="cb3-155" title="155">            <span class="kw">#declare edges</span>[k] = edge;</a>
+<a class="sourceLine" id="cb3-156" title="156">            <span class="kw">#declare k </span>= k+<span class="fl">1</span>;</a>
+<a class="sourceLine" id="cb3-157" title="157">        <span class="ot">#end</span></a>
+<a class="sourceLine" id="cb3-158" title="158">        <span class="kw">#local candidate </span>= <span class="kw">array</span>[<span class="fl">2</span>] {<span class="kw">mod</span>(<span class="kw">mod</span>(i<span class="fl">-1</span>,A)+A,A),j};</a>
+<a class="sourceLine" id="cb3-159" title="159">        <span class="ot">#if</span>(dominates(e,candidate))</a>
+<a class="sourceLine" id="cb3-160" title="160">            <span class="kw">#local edge </span>= <span class="kw">array</span>[<span class="fl">2</span>] {e,candidate};</a>
+<a class="sourceLine" id="cb3-161" title="161">            <span class="kw">#declare edges</span>[k] = edge;</a>
+<a class="sourceLine" id="cb3-162" title="162">            <span class="kw">#declare k </span>= k+<span class="fl">1</span>;</a>
+<a class="sourceLine" id="cb3-163" title="163">        <span class="ot">#end</span></a>
+<a class="sourceLine" id="cb3-164" title="164">        <span class="kw">#local candidate </span>= <span class="kw">array</span>[<span class="fl">2</span>] {<span class="kw">mod</span>(<span class="kw">mod</span>(i+<span class="fl">1</span>,A)+A,A),j};</a>
+<a class="sourceLine" id="cb3-165" title="165">        <span class="ot">#if</span>(dominates(e,candidate))</a>
+<a class="sourceLine" id="cb3-166" title="166">            <span class="kw">#local edge </span>= <span class="kw">array</span>[<span class="fl">2</span>] {e,candidate};</a>
+<a class="sourceLine" id="cb3-167" title="167">            <span class="kw">#declare edges</span>[k] = edge;</a>
+<a class="sourceLine" id="cb3-168" title="168">            <span class="kw">#declare k </span>= k+<span class="fl">1</span>;</a>
+<a class="sourceLine" id="cb3-169" title="169">        <span class="ot">#end</span></a>
+<a class="sourceLine" id="cb3-170" title="170">    <span class="ot">#end</span></a>
+<a class="sourceLine" id="cb3-171" title="171"><span class="ot">#end</span></a>
+<a class="sourceLine" id="cb3-172" title="172"></a>
+<a class="sourceLine" id="cb3-173" title="173"><span class="co">// macros ----------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb3-174" title="174"><span class="kw">#macro rotate4d</span>(theta,phi,xi,vec)</a>
+<a class="sourceLine" id="cb3-175" title="175">    <span class="kw">#local a </span>= <span class="kw">cos</span>(xi);</a>
+<a class="sourceLine" id="cb3-176" title="176">    <span class="kw">#local b </span>= <span class="kw">sin</span>(theta)*<span class="kw">cos</span>(phi)*<span class="kw">sin</span>(xi);</a>
+<a class="sourceLine" id="cb3-177" title="177">    <span class="kw">#local c </span>= <span class="kw">sin</span>(theta)*<span class="kw">sin</span>(phi)*<span class="kw">sin</span>(xi);</a>
+<a class="sourceLine" id="cb3-178" title="178">    <span class="kw">#local d </span>= <span class="kw">cos</span>(theta)*<span class="kw">sin</span>(xi);</a>
+<a class="sourceLine" id="cb3-179" title="179">    <span class="kw">#local p </span>= vec.<span class="kw">x</span>;</a>
+<a class="sourceLine" id="cb3-180" title="180">    <span class="kw">#local q </span>= vec.<span class="kw">y</span>;</a>
+<a class="sourceLine" id="cb3-181" title="181">    <span class="kw">#local r </span>= vec.<span class="kw">z</span>;</a>
+<a class="sourceLine" id="cb3-182" title="182">    <span class="kw">#local s </span>= vec.<span class="kw">t</span>;</a>
+<a class="sourceLine" id="cb3-183" title="183">    &lt; a*p - b*q - c*r - d*s</a>
+<a class="sourceLine" id="cb3-184" title="184">    , a*q + b*p + c*s - d*r</a>
+<a class="sourceLine" id="cb3-185" title="185">    , a*r - b*s + c*p + d*q</a>
+<a class="sourceLine" id="cb3-186" title="186">    , a*s + b*r - c*q + d*p &gt;</a>
+<a class="sourceLine" id="cb3-187" title="187"><span class="ot">#end</span></a>
+<a class="sourceLine" id="cb3-188" title="188"></a>
+<a class="sourceLine" id="cb3-189" title="189"><span class="kw">#macro StereographicProjection</span>(q) </a>
+<a class="sourceLine" id="cb3-190" title="190">    <span class="kw">acos</span>(q.<span class="kw">t</span>/<span class="kw">sqrt</span>(<span class="fl">2</span>))/<span class="kw">sqrt</span>(<span class="fl">2</span>-q.<span class="kw">t</span>*q.<span class="kw">t</span>) * &lt;q.<span class="kw">x</span>,q.<span class="kw">y</span>,q.<span class="kw">z</span>&gt;</a>
+<a class="sourceLine" id="cb3-191" title="191"><span class="ot">#end</span></a>
+<a class="sourceLine" id="cb3-192" title="192"></a>
+<a class="sourceLine" id="cb3-193" title="193"><span class="kw">#macro ProjectedVertices</span>(theta,phi,xi)</a>
+<a class="sourceLine" id="cb3-194" title="194">    <span class="kw">#local out </span>= <span class="kw">array</span>[A][B];</a>
+<a class="sourceLine" id="cb3-195" title="195">    #for(i,<span class="fl">0</span>,A<span class="fl">-1</span>)</a>
+<a class="sourceLine" id="cb3-196" title="196">        #for(j,<span class="fl">0</span>,B<span class="fl">-1</span>)</a>
+<a class="sourceLine" id="cb3-197" title="197">            <span class="kw">#local out</span>[i][j] = StereographicProjection(</a>
+<a class="sourceLine" id="cb3-198" title="198">                                 rotate4d(theta,phi,xi,vertices[i][j])</a>
+<a class="sourceLine" id="cb3-199" title="199">                               );</a>
+<a class="sourceLine" id="cb3-200" title="200">        <span class="ot">#end</span></a>
+<a class="sourceLine" id="cb3-201" title="201">    <span class="ot">#end</span></a>
+<a class="sourceLine" id="cb3-202" title="202">    out</a>
+<a class="sourceLine" id="cb3-203" title="203"><span class="ot">#end</span></a>
+<a class="sourceLine" id="cb3-204" title="204"></a>
+<a class="sourceLine" id="cb3-205" title="205"><span class="co">// texture ---------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb3-206" title="206"><span class="kw">#declare edgeTexture </span>= </a>
+<a class="sourceLine" id="cb3-207" title="207">    <span class="kw">texture</span> {</a>
+<a class="sourceLine" id="cb3-208" title="208">      New_Penny</a>
+<a class="sourceLine" id="cb3-209" title="209">      <span class="kw">finish</span> {</a>
+<a class="sourceLine" id="cb3-210" title="210">        <span class="kw">ambient</span> <span class="fl">0.01</span></a>
+<a class="sourceLine" id="cb3-211" title="211">        <span class="kw">diffuse</span> <span class="fl">2</span></a>
+<a class="sourceLine" id="cb3-212" title="212">        <span class="kw">reflection</span> <span class="fl">0</span></a>
+<a class="sourceLine" id="cb3-213" title="213">        <span class="kw">brilliance</span> <span class="fl">8</span></a>
+<a class="sourceLine" id="cb3-214" title="214">        <span class="kw">specular</span> <span class="fl">0.1</span></a>
+<a class="sourceLine" id="cb3-215" title="215">        <span class="kw">roughness</span> <span class="fl">0.1</span></a>
+<a class="sourceLine" id="cb3-216" title="216">      }</a>
+<a class="sourceLine" id="cb3-217" title="217">    };</a>
+<a class="sourceLine" id="cb3-218" title="218"></a>
+<a class="sourceLine" id="cb3-219" title="219"><span class="co">// draw an edge ----------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb3-220" title="220"><span class="kw">#macro Edge</span>(verts,pair1,pair2)</a>
+<a class="sourceLine" id="cb3-221" title="221">    <span class="kw">cylinder</span> { </a>
+<a class="sourceLine" id="cb3-222" title="222">        verts[pair1[<span class="fl">0</span>]][pair1[<span class="fl">1</span>]] verts[pair2[<span class="fl">0</span>]][pair2[<span class="fl">1</span>]], <span class="fl">0.05</span></a>
+<a class="sourceLine" id="cb3-223" title="223">        <span class="kw">texture</span> { edgeTexture }</a>
+<a class="sourceLine" id="cb3-224" title="224">    }</a>
+<a class="sourceLine" id="cb3-225" title="225"><span class="ot">#end</span></a>
+<a class="sourceLine" id="cb3-226" title="226"></a>
+<a class="sourceLine" id="cb3-227" title="227"><span class="co">// draw ------------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb3-228" title="228"><span class="kw">#declare vs </span>= ProjectedVertices(<span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">2</span>*<span class="kw">frame_number</span>*<span class="fl">pi</span>/<span class="fl">180</span>);</a>
+<a class="sourceLine" id="cb3-229" title="229"><span class="kw">object</span> {</a>
+<a class="sourceLine" id="cb3-230" title="230">    <span class="kw">union</span> {</a>
+<a class="sourceLine" id="cb3-231" title="231">        #for(i,<span class="fl">0</span>,nedges<span class="fl">-1</span>)</a>
+<a class="sourceLine" id="cb3-232" title="232">            Edge(vs,edges[i][<span class="fl">0</span>],edges[i][<span class="fl">1</span>])</a>
+<a class="sourceLine" id="cb3-233" title="233">        <span class="ot">#end</span></a>
+<a class="sourceLine" id="cb3-234" title="234">        #for(i,<span class="fl">0</span>,A<span class="fl">-1</span>)</a>
+<a class="sourceLine" id="cb3-235" title="235">            #for(j,<span class="fl">0</span>,B<span class="fl">-1</span>)</a>
+<a class="sourceLine" id="cb3-236" title="236">                <span class="kw">sphere</span> {</a>
+<a class="sourceLine" id="cb3-237" title="237">                    vs[i][j], <span class="fl">0.06</span></a>
+<a class="sourceLine" id="cb3-238" title="238">                    <span class="kw">texture</span> { edgeTexture }</a>
+<a class="sourceLine" id="cb3-239" title="239">                }</a>
+<a class="sourceLine" id="cb3-240" title="240">            <span class="ot">#end</span></a>
+<a class="sourceLine" id="cb3-241" title="241">        <span class="ot">#end</span>  </a>
+<a class="sourceLine" id="cb3-242" title="242">    }</a>
+<a class="sourceLine" id="cb3-243" title="243">    <span class="kw">scale</span> <span class="fl">0.5</span></a>
+<a class="sourceLine" id="cb3-244" title="244">    <span class="kw">rotate</span> &lt;<span class="fl">90</span>, <span class="fl">0</span>, <span class="fl">0</span>&gt;</a>
+<a class="sourceLine" id="cb3-245" title="245">    <span class="kw">translate</span> &lt;<span class="fl">0</span>, <span class="fl">0.5</span>, <span class="fl">-2</span>&gt;</a>
+<a class="sourceLine" id="cb3-246" title="246">}</a>
+<a class="sourceLine" id="cb3-247" title="247"></a>
+<a class="sourceLine" id="cb3-248" title="248"><span class="co">/* ini file</span></a>
+<a class="sourceLine" id="cb3-249" title="249"><span class="co">Input_File_Name = Duoprism.pov</span></a>
+<a class="sourceLine" id="cb3-250" title="250"><span class="co">Initial_Clock = 0</span></a>
+<a class="sourceLine" id="cb3-251" title="251"><span class="co">Final_Clock = 1</span></a>
+<a class="sourceLine" id="cb3-252" title="252"><span class="co">Initial_Frame = 0</span></a>
+<a class="sourceLine" id="cb3-253" title="253"><span class="co">Final_Frame = 179</span></a>
+<a class="sourceLine" id="cb3-254" title="254"><span class="co">Cyclic_Animation = on</span></a>
+<a class="sourceLine" id="cb3-255" title="255"><span class="co">*/</span></a></code></pre></div>
+<p><img src="figures/Duoprism_POVRAY.gif" /></p>
+
+    </div>
+
+
+    <div id="footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </div>
+
+  </div>
+
+  <div id="disqus_thread"></div>
+  <div class="pagination">
+    <ul>
+      <li>
+        <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+      </li>
+    </ul>
+  </div>
+</body>
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+<!-- Google Prettify -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+<script>
+  var pres = document.getElementsByTagName("pre");
+  for (var i = 0; i < pres.length; ++i) {
+    
+    pres[i].className = pres[i].className + " prettyprint linenums";
+    
+  }
+  prettyPrint();
+</script> 
+
+</html>
