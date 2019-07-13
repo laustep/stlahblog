@@ -1,0 +1,220 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - The chi-square approximation of Pearson's statistic</title>
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/pandoc-solarized.css" />  
+  <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+</head>
+
+<body>
+  <!-- Sidebar. -->
+  <div class="sidebar">
+    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+      <a href="https://www.r-bloggers.com/">
+        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+      </a>
+      <br />
+      <a href="http://t-redactyl.io/">
+        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
+      </a>
+      <a href="http://timelyportfolio.blogspot.be/">
+        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
+      </a>
+      <br />
+      <a href="https://antoineguillot.wordpress.com/blog/">
+        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+      </a>
+      <br />
+      <a href="https://fronkonstin.com/">
+        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="header">
+      <div id="logo" style="position:absolute;">
+        <a href="../">
+          <img src="../images/stla.jpg" alt="stla" width="100px" />
+        </a>
+      </div>
+      <div id="navigation" style="margin-top:50px;">
+        <a href="../">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../archive.html">Archive</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>The chi-square approximation of Pearson's statistic</h1> <div class="info">
+    Posted on July 12, 2019
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="../tags/maths.html">maths</a>, <a href="../tags/statistics.html">statistics</a>
+    
+</div>
+
+<p>Our goal is to derive the asymptotic distribution of Pearson’s statistic for goodness-of-fit testing. We follow the method given in David Williams’s book <em>Weighing the odds</em>, but we provide a bit more details.</p>
+<p>Let <span class="math inline">\(Y_1\)</span>, <span class="math inline">\(\ldots\)</span>, <span class="math inline">\(Y_n\)</span> be independent and identically distibuted random variables in <span class="math inline">\(\{1, \ldots, b\}\)</span> whose common distribution is given by <span class="math display">\[
+\Pr(Y_m = k) = p_k
+\]</span> with <span class="math inline">\(\sum_{k=1}^b p_k = 1\)</span>.</p>
+<p>Denoting by <span class="math inline">\(N_k\)</span> the number of <span class="math inline">\(Y_m\)</span> equal to <span class="math inline">\(k\)</span>, and setting <span class="math display">\[
+W_k = \frac{N_k - np_k}{\sqrt{np_k}},
+\]</span> the <em>Pearson statistic</em> is <span class="math inline">\(\sum_{k=1}^b W_k^2\)</span>. To derive its asymptotic distribution, we firstly derive the one of the random vector <span class="math inline">\({(W_1, \ldots, W_k)}'\)</span>.</p>
+<p>Define the random variables <span class="math display">\[
+X_k^{(m)} = \begin{cases}
+1 &amp; \text{if } Y_m = k \\
+0 &amp; \text{if } Y_m \neq k
+\end{cases},
+\]</span> so that <span class="math display">\[
+N_k = X_k^{(1)} + \cdots + X_k^{(n)}.
+\]</span></p>
+<p>For any <span class="math inline">\(m_1\)</span>, <span class="math inline">\(m_2\)</span>, the random vectors <span class="math inline">\((X_1^{(m_1)}, \ldots, X_b^{(m_1)})\)</span> and <span class="math inline">\((X_1^{(m_2)}, \ldots, X_b^{(m_2)})\)</span> have the same distribution. It is easy to see that <span class="math display">\[
+\mathbb{E}X_k^{(m)} = p_k, \quad
+\mathbb{E}X_k^{(m)}X_\ell^{(m)} = \begin{cases} 
+p_k &amp; \text{if } k = \ell \\
+0 &amp; \text{if } k \neq \ell
+\end{cases},
+\]</span> leading to <span class="math display">\[
+V_{k\ell} := \text{Cov}\bigl(X_k^{(m)},X_\ell^{(m)}\bigr) = \begin{cases}
+p_k(1-p_k) &amp; \text{if } k = \ell \\
+-p_k p_\ell &amp; \text{if } k \neq \ell
+\end{cases}.
+\]</span></p>
+<p>One can write <span class="math display">\[
+\begin{pmatrix}
+N_1 \\ \vdots \\ N_b
+\end{pmatrix} = 
+\begin{pmatrix}
+X_1^{(1)} \\ \vdots \\ X_b^{(1)}
+\end{pmatrix} 
++ \cdots +
+\begin{pmatrix}
+X_1^{(n)} \\ \vdots \\ X_b^{(n)}
+\end{pmatrix}.
+\]</span> and this is a sum of independent and identically distributed random vectors. Therefore we have, for large <span class="math inline">\(n\)</span>, <span class="math display">\[
+\begin{pmatrix}
+N_1 \\ \vdots \\ N_b
+\end{pmatrix} 
+\approx \mathcal{M}\mathcal{N}\left(\begin{pmatrix}
+n p_1 \\ \vdots \\ n p_b
+\end{pmatrix}, n V\right) 
+\]</span> by the multivariate central limit theorem.</p>
+<p>Recall that <span class="math display">\[
+W_k = \frac{N_k - np_k}{\sqrt{np_k}}.
+\]</span> Then one has <span class="math display">\[
+\begin{pmatrix}
+W_1 \\ \vdots \\ W_b
+\end{pmatrix} 
+\approx \mathcal{M}\mathcal{N}\left(\begin{pmatrix}
+0 \\ \vdots \\ 0
+\end{pmatrix}, C\right) 
+\]</span> where <span class="math display">\[
+C_{k\ell} = \begin{cases}
+1-p_k &amp; \text{if } k = \ell \\
+-\sqrt{p_k p_\ell} &amp; \text{if } k \neq \ell
+\end{cases}.
+\]</span></p>
+<p>Now we are going to derive the characteristic function of <span class="math inline">\(\mathcal{M}\mathcal{N}(\mathbf{0}, C)\)</span>.</p>
+<p>The covariance matrix <span class="math inline">\(C\)</span> is not a strictly positive definite matrix since <span class="math inline">\(\sum_{k=1}^b \sqrt{np_k} W_k = 0\)</span>. But let us firstly give an expression of <span class="math inline">\(\mathbb{E}\mathbf{e}^{-\alpha \sum_{k=1}^b W_k^2}\)</span> when <span class="math inline">\({(W_1, \ldots, W_b)}' \sim \mathcal{M}\mathcal{N}(\mathbf{0}, C)\)</span> in the case of a strictly positive definite covariance matrix <span class="math inline">\(C\)</span>. Then we will argue that this expression still holds for our <span class="math inline">\(C\)</span>. In the strictly positive case, by using the <em>pdf</em> of the multivariate normal distribuion, we get <span class="math display">\[\begin{align}
+\mathbb{E}\mathbf{e}^{-\alpha \sum_{k=1}^b W_k^2} &amp; = 
+\frac{1}{{(2\pi)}^\frac{b}{2}\sqrt{\det(C)}}
+\int_{\mathbb{R}^b} \mathbf{e}^{-\frac12\mathbf{w}' 
+(C^{-1} + 2 \alpha I)
+\mathbf{w}}\mathrm{d}\mathbf{w} \\ 
+&amp; = \frac{{\bigl(\det(C^{-1} + 2\alpha I)\bigr)}^{-\frac12}}{\sqrt{\det(C)}} \\ 
+&amp; = {\bigl(\det(I+2\alpha C)\bigr)}^{-\frac12}.
+\end{align}\]</span> Now, by a continuity argument, this equality holds when <span class="math inline">\(C\)</span> is non-negative definite. Let us detail this point. Let <span class="math inline">\(\mathbf{W} = {(W_1, \ldots, W_b)}' \sim \mathcal{M}\mathcal{N}(\mathbf{0}, C)\)</span> where <span class="math inline">\(C\)</span> is non-negative and not strictly positive. Let <span class="math inline">\(\mathbf{G} = {(G_1, \ldots, G_b)}'\)</span> be a standard normal distribution on <span class="math inline">\(\mathbb{R}^b\)</span> and let <span class="math inline">\(\epsilon &gt; 0\)</span>. Then <span class="math display">\[
+\mathbf{W} + \sqrt{\epsilon}\mathbf{G} \sim 
+\mathcal{M}\mathcal{N}(\mathbf{0}, C + \epsilon I),
+\]</span> and since <span class="math inline">\(C + \epsilon I\)</span> is strictly positive, we know by the previous result that <span class="math display">\[
+\mathbb{E}\mathbf{e}^{-\alpha \sum_{k=1}^b {(W_k + \sqrt{\epsilon}G_k)}^2} 
+= {\Bigl(\det\bigl(I+2\alpha (C+\sqrt{\epsilon}I)\bigr)\Bigr)}^{-\frac12},
+\]</span> and we get the announced result by letting <span class="math inline">\(\epsilon \to 0\)</span>.</p>
+<p>Thus we have to derive <span class="math inline">\(\det(I+2\alpha C)\)</span> now. Observe that <span class="math display">\[
+I-C = \mathbf{u} \mathbf{u}'
+\]</span> where <span class="math inline">\(\mathbf{u} = {\bigl(\sqrt{p_1}, \ldots, \sqrt{p_b}\bigr)}'\)</span>. Since <span class="math inline">\(\mathbf{u}' \mathbf{u} = 1\)</span>, <span class="math display">\[
+I-C = \mathbf{u} {\bigl(\mathbf{u}'\mathbf{u})}^{-1} \mathbf{u}'
+\]</span> is the matrix of the orthogonal projection on the line directed by <span class="math inline">\(\mathbf{u}\)</span>, therefore <span class="math inline">\(C\)</span> is the matrix of the orthogonal projection on <span class="math inline">\({[\mathbf{u}]}^\perp\)</span>.</p>
+<p>Thus <span class="math inline">\(C\)</span> has one eigenvalue <span class="math inline">\(0\)</span>, with associated eigenvector <span class="math inline">\(\mathbf{u}\)</span>, and <span class="math inline">\(b-1\)</span> eigenvalues equal to <span class="math inline">\(1\)</span>. Consequently, for every real number <span class="math inline">\(\alpha\)</span>, the matrix <span class="math inline">\(I + 2\alpha C\)</span> has one eigenvalue <span class="math inline">\(1\)</span> and <span class="math inline">\(b-1\)</span> others <span class="math inline">\(1+2\alpha\)</span>. Therefore <span class="math display">\[
+\det(I+2\alpha C) = {(1+2\alpha)}^{b-1}.
+\]</span> We finally get <span class="math display">\[
+\mathbb{E}\mathbf{e}^{-\alpha \sum_{k=1}^b W_k^2} 
+\approx {(1+2\alpha)}^{-\frac{b-1}{2}}, 
+\]</span> and we recognize the characteristic function of the <span class="math inline">\(\chi^2_{b-1}\)</span> distribution.</p>
+
+    </div>
+
+
+    <div id="footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </div>
+
+  </div>
+
+  <div id="disqus_thread"></div>
+  <div class="pagination">
+    <ul>
+      <li>
+        <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+      </li>
+    </ul>
+  </div>
+</body>
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+<!-- Google Prettify -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+<script>
+  var pres = document.getElementsByTagName("pre");
+  for (var i = 0; i < pres.length; ++i) {
+    
+    pres[i].className = pres[i].className + " prettyprint linenums";
+    
+  }
+  prettyPrint();
+</script> 
+
+</html>
