@@ -1,0 +1,444 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Adjusted Dunnett p-values</title>
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/pandoc-solarized.css" />  
+  <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+</head>
+
+<body>
+  <!-- Sidebar. -->
+  <div class="sidebar">
+    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+      <a href="https://www.r-bloggers.com/">
+        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+      </a>
+      <br />
+      <a href="http://t-redactyl.io/">
+        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
+      </a>
+      <a href="http://timelyportfolio.blogspot.be/">
+        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
+      </a>
+      <br />
+      <a href="https://antoineguillot.wordpress.com/blog/">
+        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+      </a>
+      <br />
+      <a href="https://fronkonstin.com/">
+        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="header">
+      <div id="logo" style="position:absolute;">
+        <a href="../">
+          <img src="../images/stla.jpg" alt="stla" width="100px" />
+        </a>
+      </div>
+      <div id="navigation" style="margin-top:50px;">
+        <a href="../">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../archive.html">Archive</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Adjusted Dunnett p-values</h1> <div class="info">
+    Posted on July 15, 2019
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="../tags/maths.html">maths</a>, <a href="../tags/statistics.html">statistics</a>, <a href="../tags/R.html">R</a>
+    
+</div>
+
+<p>Consider the ANOVA statistical model <span class="math display">\[
+y_{ij} = \gamma + \mu_i + \sigma\epsilon_{ij}, \quad 
+i = 0, 1, \ldots, m, \quad j = 1, \ldots, n_i
+\]</span> where <span class="math inline">\(\epsilon_{ij} \sim_{\textrm{iid}} \mathcal{N}(0,1)\)</span>.</p>
+<p>The number <span class="math inline">\(\gamma\)</span> is the overall mean and <span class="math inline">\(\mu_i\)</span> is the effect in group <span class="math inline">\(i\)</span>. Group <span class="math inline">\(0\)</span> is considered to be a control group, and we are interested in the <span class="math inline">\(m\)</span> hypotheses <span class="math display">\[
+H_{0i} = \{\mu_0 = \mu_i\} \quad \textit{vs} \quad H_{1i} = \{\mu_0 &gt; \mu_i\}.
+\]</span> Let <span class="math inline">\(H_0 = \bigcap_{i=1}^m H_{0i} = \{\mu_0=\mu_1=\cdots = \mu_m\}\)</span>.</p>
+<p>Consider the <span class="math inline">\(m\)</span> mean differences <span class="math display">\[
+\bar{y_i} - \bar{y_0} = 
+(\mu_i - \mu_0) + \sigma(\bar{\epsilon_i}-\bar{\epsilon_0})
+\]</span> for <span class="math inline">\(i = 1, \ldots, m\)</span>.</p>
+<p>Hereafter we assume the null hypothesis <span class="math inline">\(H_0\)</span> is fulfilled, therefore <span class="math inline">\(\bar{y_i} - \bar{y_0} = \sigma(\bar{\epsilon_i}-\bar{\epsilon_0})\)</span>.</p>
+<p>We will derive the covariances between the standardized mean differences. Let’s start by deriving the covariances between the <span class="math inline">\(\bar{\epsilon_i}-\bar{\epsilon_0}\)</span>.</p>
+<p>The <span class="math inline">\(\bar{\epsilon_i}\)</span> for <span class="math inline">\(i = 0, 1, \ldots, m\)</span> are independent and <span class="math inline">\(\bar{\epsilon_i} \sim \mathcal{N}\left(0, \frac{1}{n_i}\right)\)</span>. Consequently, for <span class="math inline">\(i = 1, \ldots, m\)</span>,<br />
+<span class="math display">\[
+\bar{\epsilon_i}-\bar{\epsilon_0} \sim 
+\mathcal{N}\left(0, \frac{1}{n_i} + \frac{1}{n_0}\right).
+\]</span> Now, let’s derive the covariance between the <span class="math inline">\(\bar{\epsilon_i}-\bar{\epsilon_0}\)</span>. One has <span class="math display">\[
+\begin{align*}
+\textrm{Cov}(\bar{\epsilon_i}-\bar{\epsilon_0}, \bar{\epsilon_j}-\bar{\epsilon_0}) 
+&amp; = 
+E\bigl((\bar{\epsilon_i}-\bar{\epsilon_0})(\bar{\epsilon_j}-\bar{\epsilon_0})\bigr)
+\\ &amp; =
+E(\bar{\epsilon_i}\bar{\epsilon_j}) + E(\bar{\epsilon_0}\bar{\epsilon_0}) 
+- E(\bar{\epsilon_i}\bar{\epsilon_0}) - E(\bar{\epsilon_j}\bar{\epsilon_0}).
+\end{align*}
+\]</span> For <span class="math inline">\(i\neq j\)</span>, each term is equal to <span class="math inline">\(0\)</span> except the second one: <span class="math display">\[
+E(\bar{\epsilon_0}\bar{\epsilon_0}) = \frac{1}{n_0}.
+\]</span> Thus <span class="math display">\[
+\textrm{Cov}(\bar{\epsilon_i}-\bar{\epsilon_0}, \bar{\epsilon_j}-\bar{\epsilon_0}) 
+= \frac{1}{n_0}
+\]</span> for every <span class="math inline">\(i,j \in \{1, \ldots, m\}\)</span>, when <span class="math inline">\(i \neq j\)</span>.</p>
+<p>Now, let’s introduce the standardized mean differences <span class="math display">\[
+\delta_i = 
+\frac{\bar{y_i} - \bar{y_0}}{\sigma\sqrt{\frac{1}{n_i} + \frac{1}{n_0}}} 
+\sim \mathcal{N}(0,1)
+\]</span> for <span class="math inline">\(i = 1, \ldots, m\)</span>. For <span class="math inline">\(i \neq j\)</span>, the covariances are <span class="math display">\[
+\begin{align*}
+\textrm{Cov}(\delta_i, \delta_j) &amp; = 
+\frac{1}{n_0}\frac{1}{\sqrt{\frac{1}{n_i} + \frac{1}{n_0}}}
+\frac{1}{\sqrt{\frac{1}{n_j} + \frac{1}{n_0}}} \\
+&amp; = \frac{1}{n_0}\sqrt{\frac{n_0n_i}{n_i+n_0}}
+\sqrt{\frac{n_0n_j}{n_j+n_0}} \\
+&amp; = \sqrt{\frac{n_i}{n_i+n_0}}\sqrt{\frac{n_j}{n_j+n_0}}.
+\end{align*}
+\]</span></p>
+<p>Now let’s introduce the statistics <span class="math display">\[
+t_i = \frac{\bar{y_i} - \bar{y_0}}{\hat\sigma\sqrt{\frac{1}{n_i} + \frac{1}{n_0}}} 
+= \frac{1}{u}\frac{\bar{y_i} - \bar{y_0}}{\sigma\sqrt{\frac{1}{n_i} + \frac{1}{n_0}}}
+\]</span> where <span class="math display">\[
+\hat\sigma^2 = \frac{\sum_{i=0}^m\sum_{j=1}^{n_i}{(y_{ij}-\bar{y}_i)^2}}{\nu}
+\]</span> with <span class="math inline">\(\nu = \sum_{i=0}^m n_i - (m+1)\)</span>, and where we have set <span class="math inline">\(u = \frac{\hat\sigma}{\sigma}\)</span>.</p>
+<p>It is known that <span class="math display">\[
+\nu u^2 = \nu\frac{{\hat{\sigma}}^2}{\sigma^2} \sim \chi^2_\nu.
+\]</span></p>
+<p>Denote by <span class="math inline">\(\mathbf{t}\)</span> the vector <span class="math inline">\({(t_1, \ldots, t_m)}'\)</span>. By the above, one has <span class="math display">\[
+(\mathbf{t} \mid u) \sim 
+\mathcal{M}\mathcal{N}(\mathbf{0}, \Sigma/u^2)
+\]</span> where <span class="math display">\[
+\Sigma_{ij} = \begin{cases}
+1 &amp; \text{if } i = j \\
+\sqrt{\frac{n_i}{n_i+n_0}}\sqrt{\frac{n_j}{n_j+n_0}} &amp; \text{if } i \neq j
+\end{cases}.
+\]</span></p>
+<p>Therefore, <span class="math inline">\(\mathbf{t}\)</span> follows the multivariate Student distribution with <span class="math inline">\(\nu\)</span> degrees of freedom and scale matrix <span class="math inline">\(\Sigma\)</span> (see the paper <em>A short review of multivariate <span class="math inline">\(t\)</span>-distribution</em> by Kibria &amp; Joarder).</p>
+<ul>
+<li>The <em>adjusted Dunnett <span class="math inline">\(p\)</span>-value</em> for <span class="math inline">\(H_{0i}\)</span> <em>vs</em> the “less” alternative hypothesis <span class="math inline">\(H_{1i}\)</span> is <span class="math display">\[
+p_i = \Pr\left(\min_{i \in\{1, \ldots m\}}t_i &lt; t_i^{\text{obs}}\right)
+\]</span></li>
+</ul>
+<p>where <span class="math inline">\(\Pr\)</span> is the probability under <span class="math inline">\(H_0\)</span>. One has <span class="math display">\[
+\begin{align*}
+\Pr\left(\min_{i \in\{1, \ldots m\}}t_i &lt; q\right) &amp; = 
+\Pr\left(-\min_{i \in\{1, \ldots m\}}t_i &gt; -q\right) \\ 
+&amp; = \Pr\left(\max_{i \in\{1, \ldots m\}}-t_i &gt; -q\right) \\
+&amp; = \Pr\left(\max_{i \in\{1, \ldots m\}}t_i &gt; -q\right),
+\end{align*}
+\]</span> the last equality stemming from the symmetry of the (centered) multivariate Student distribution.</p>
+<p>Let’s write a R function computing <span class="math inline">\(\Pr\left(\max_{i \in\{1, \ldots m\}}t_i \leq q \right)\)</span>.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">pDunnett &lt;-<span class="st"> </span><span class="cf">function</span>(q, n0, ni){</a>
+<a class="sourceLine" id="cb1-2" title="2">  <span class="cf">if</span>(q<span class="op">==</span><span class="ot">Inf</span>){</a>
+<a class="sourceLine" id="cb1-3" title="3">    <span class="kw">return</span>(<span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb1-4" title="4">  }</a>
+<a class="sourceLine" id="cb1-5" title="5">  <span class="cf">if</span>(q<span class="op">==-</span><span class="ot">Inf</span>){</a>
+<a class="sourceLine" id="cb1-6" title="6">    <span class="kw">return</span>(<span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb1-7" title="7">  }</a>
+<a class="sourceLine" id="cb1-8" title="8">  m &lt;-<span class="st"> </span><span class="kw">length</span>(ni) </a>
+<a class="sourceLine" id="cb1-9" title="9">  Sigma &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="ot">NA_real_</span>, <span class="dt">nrow=</span>m, <span class="dt">ncol=</span>m)</a>
+<a class="sourceLine" id="cb1-10" title="10">  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>(m<span class="dv">-1</span>)){</a>
+<a class="sourceLine" id="cb1-11" title="11">    <span class="cf">for</span>(j <span class="cf">in</span> (i<span class="op">+</span><span class="dv">1</span>)<span class="op">:</span>m){</a>
+<a class="sourceLine" id="cb1-12" title="12">      Sigma[i,j] &lt;-<span class="st"> </span><span class="kw">sqrt</span>(ni[i]<span class="op">*</span>ni[j]<span class="op">/</span>(n0<span class="op">+</span>ni[i])<span class="op">/</span>(n0<span class="op">+</span>ni[j]))</a>
+<a class="sourceLine" id="cb1-13" title="13">    }</a>
+<a class="sourceLine" id="cb1-14" title="14">  }</a>
+<a class="sourceLine" id="cb1-15" title="15">  Sigma[<span class="kw">lower.tri</span>(Sigma)] &lt;-<span class="st"> </span>Sigma[<span class="kw">upper.tri</span>(Sigma)]</a>
+<a class="sourceLine" id="cb1-16" title="16">  <span class="kw">diag</span>(Sigma) &lt;-<span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb1-17" title="17">  nu &lt;-<span class="st"> </span>n0 <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(ni) <span class="op">-</span><span class="st"> </span>m <span class="op">-</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb1-18" title="18">  mnormt<span class="op">::</span><span class="kw">pmt</span>(<span class="kw">rep</span>(q,m), <span class="dt">mean=</span><span class="kw">rep</span>(<span class="dv">0</span>,m), <span class="dt">S=</span>Sigma, <span class="dt">df=</span>nu, <span class="dt">maxpts=</span><span class="dv">2000</span><span class="op">*</span>m)</a>
+<a class="sourceLine" id="cb1-19" title="19">}</a></code></pre></div>
+<p>Now let’s try an example.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">data</span>(<span class="st">&quot;recovery&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;multcomp&quot;</span>)</a>
+<a class="sourceLine" id="cb2-2" title="2">recovery</a>
+<a class="sourceLine" id="cb2-3" title="3"><span class="co">##    blanket minutes</span></a>
+<a class="sourceLine" id="cb2-4" title="4"><span class="co">## 1       b0      15</span></a>
+<a class="sourceLine" id="cb2-5" title="5"><span class="co">## 2       b0      13</span></a>
+<a class="sourceLine" id="cb2-6" title="6"><span class="co">## 3       b0      12</span></a>
+<a class="sourceLine" id="cb2-7" title="7"><span class="co">## 4       b0      16</span></a>
+<a class="sourceLine" id="cb2-8" title="8"><span class="co">## 5       b0      16</span></a>
+<a class="sourceLine" id="cb2-9" title="9"><span class="co">## 6       b0      17</span></a>
+<a class="sourceLine" id="cb2-10" title="10"><span class="co">## 7       b0      13</span></a>
+<a class="sourceLine" id="cb2-11" title="11"><span class="co">## 8       b0      13</span></a>
+<a class="sourceLine" id="cb2-12" title="12"><span class="co">## 9       b0      16</span></a>
+<a class="sourceLine" id="cb2-13" title="13"><span class="co">## 10      b0      17</span></a>
+<a class="sourceLine" id="cb2-14" title="14"><span class="co">## 11      b0      17</span></a>
+<a class="sourceLine" id="cb2-15" title="15"><span class="co">## 12      b0      19</span></a>
+<a class="sourceLine" id="cb2-16" title="16"><span class="co">## 13      b0      17</span></a>
+<a class="sourceLine" id="cb2-17" title="17"><span class="co">## 14      b0      15</span></a>
+<a class="sourceLine" id="cb2-18" title="18"><span class="co">## 15      b0      13</span></a>
+<a class="sourceLine" id="cb2-19" title="19"><span class="co">## 16      b0      12</span></a>
+<a class="sourceLine" id="cb2-20" title="20"><span class="co">## 17      b0      16</span></a>
+<a class="sourceLine" id="cb2-21" title="21"><span class="co">## 18      b0      10</span></a>
+<a class="sourceLine" id="cb2-22" title="22"><span class="co">## 19      b0      17</span></a>
+<a class="sourceLine" id="cb2-23" title="23"><span class="co">## 20      b0      12</span></a>
+<a class="sourceLine" id="cb2-24" title="24"><span class="co">## 21      b1      13</span></a>
+<a class="sourceLine" id="cb2-25" title="25"><span class="co">## 22      b1      16</span></a>
+<a class="sourceLine" id="cb2-26" title="26"><span class="co">## 23      b1       9</span></a>
+<a class="sourceLine" id="cb2-27" title="27"><span class="co">## 24      b2       5</span></a>
+<a class="sourceLine" id="cb2-28" title="28"><span class="co">## 25      b2       8</span></a>
+<a class="sourceLine" id="cb2-29" title="29"><span class="co">## 26      b2       9</span></a>
+<a class="sourceLine" id="cb2-30" title="30"><span class="co">## 27      b3      14</span></a>
+<a class="sourceLine" id="cb2-31" title="31"><span class="co">## 28      b3      16</span></a>
+<a class="sourceLine" id="cb2-32" title="32"><span class="co">## 29      b3      16</span></a>
+<a class="sourceLine" id="cb2-33" title="33"><span class="co">## 30      b3      12</span></a>
+<a class="sourceLine" id="cb2-34" title="34"><span class="co">## 31      b3       7</span></a>
+<a class="sourceLine" id="cb2-35" title="35"><span class="co">## 32      b3      12</span></a>
+<a class="sourceLine" id="cb2-36" title="36"><span class="co">## 33      b3      13</span></a>
+<a class="sourceLine" id="cb2-37" title="37"><span class="co">## 34      b3      13</span></a>
+<a class="sourceLine" id="cb2-38" title="38"><span class="co">## 35      b3       9</span></a>
+<a class="sourceLine" id="cb2-39" title="39"><span class="co">## 36      b3      16</span></a>
+<a class="sourceLine" id="cb2-40" title="40"><span class="co">## 37      b3      13</span></a>
+<a class="sourceLine" id="cb2-41" title="41"><span class="co">## 38      b3      18</span></a>
+<a class="sourceLine" id="cb2-42" title="42"><span class="co">## 39      b3      13</span></a>
+<a class="sourceLine" id="cb2-43" title="43"><span class="co">## 40      b3      12</span></a>
+<a class="sourceLine" id="cb2-44" title="44"><span class="co">## 41      b3      13</span></a>
+<a class="sourceLine" id="cb2-45" title="45"><span class="co"># samples</span></a>
+<a class="sourceLine" id="cb2-46" title="46">ys &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">split</span>(recovery, recovery<span class="op">$</span>blanket), <span class="cf">function</span>(df){</a>
+<a class="sourceLine" id="cb2-47" title="47">  df<span class="op">$</span>minutes</a>
+<a class="sourceLine" id="cb2-48" title="48">})</a>
+<a class="sourceLine" id="cb2-49" title="49"><span class="co"># sample sizes</span></a>
+<a class="sourceLine" id="cb2-50" title="50">sizes &lt;-<span class="st"> </span><span class="kw">lengths</span>(ys)</a>
+<a class="sourceLine" id="cb2-51" title="51">ni &lt;-<span class="st"> </span>sizes[<span class="op">-</span><span class="dv">1</span>]</a>
+<a class="sourceLine" id="cb2-52" title="52"><span class="co"># degrees of freedom</span></a>
+<a class="sourceLine" id="cb2-53" title="53">nu &lt;-<span class="st"> </span><span class="kw">sum</span>(sizes) <span class="op">-</span><span class="st"> </span><span class="kw">length</span>(ni) <span class="op">-</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb2-54" title="54"><span class="co"># pooled variance estimate</span></a>
+<a class="sourceLine" id="cb2-55" title="55">s2 &lt;-<span class="st"> </span><span class="kw">sum</span>(<span class="kw">sapply</span>(ys, <span class="cf">function</span>(y){</a>
+<a class="sourceLine" id="cb2-56" title="56">  <span class="kw">sum</span>((y <span class="op">-</span><span class="st"> </span><span class="kw">mean</span>(y))<span class="op">^</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb2-57" title="57">})) <span class="op">/</span><span class="st"> </span>nu</a>
+<a class="sourceLine" id="cb2-58" title="58"><span class="co"># Student statistics</span></a>
+<a class="sourceLine" id="cb2-59" title="59">n0 &lt;-<span class="st"> </span>sizes[<span class="dv">1</span>]</a>
+<a class="sourceLine" id="cb2-60" title="60">y0bar &lt;-<span class="st"> </span><span class="kw">mean</span>(ys[[<span class="dv">1</span>]])</a>
+<a class="sourceLine" id="cb2-61" title="61">yi &lt;-<span class="st"> </span>ys[<span class="op">-</span><span class="dv">1</span>]</a>
+<a class="sourceLine" id="cb2-62" title="62">ti &lt;-<span class="st"> </span><span class="kw">sapply</span>(yi, <span class="cf">function</span>(y){</a>
+<a class="sourceLine" id="cb2-63" title="63">  (<span class="kw">mean</span>(y) <span class="op">-</span><span class="st"> </span>y0bar) <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="dv">1</span><span class="op">/</span><span class="kw">length</span>(y)<span class="op">+</span><span class="dv">1</span><span class="op">/</span>n0) <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(s2)</a>
+<a class="sourceLine" id="cb2-64" title="64">})</a>
+<a class="sourceLine" id="cb2-65" title="65"><span class="co"># adjusted p-values</span></a>
+<a class="sourceLine" id="cb2-66" title="66"><span class="kw">sapply</span>(ti, <span class="cf">function</span>(t) <span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="kw">pDunnett</span>(<span class="dt">q =</span> <span class="op">-</span>t, n0, ni))</a>
+<a class="sourceLine" id="cb2-67" title="67"><span class="co">##        b1.b0        b2.b0        b3.b0 </span></a>
+<a class="sourceLine" id="cb2-68" title="68"><span class="co">## 0.2411790515 0.0000585819 0.0924376838</span></a></code></pre></div>
+<p>Let’s compare with the <code>multcomp</code> package:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">fit &lt;-<span class="st"> </span><span class="kw">lm</span>(minutes <span class="op">~</span><span class="st"> </span>blanket, <span class="dt">data =</span> recovery)</a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="kw">library</span>(multcomp)</a>
+<a class="sourceLine" id="cb3-3" title="3">multcomps &lt;-<span class="st"> </span><span class="kw">glht</span>(fit, <span class="dt">linfct =</span> <span class="kw">mcp</span>(<span class="dt">blanket =</span> <span class="st">&quot;Dunnett&quot;</span>), </a>
+<a class="sourceLine" id="cb3-4" title="4">                  <span class="dt">alternative =</span> <span class="st">&quot;less&quot;</span>)</a>
+<a class="sourceLine" id="cb3-5" title="5"><span class="kw">summary</span>(multcomps)</a>
+<a class="sourceLine" id="cb3-6" title="6"><span class="co">## </span></a>
+<a class="sourceLine" id="cb3-7" title="7"><span class="co">##   Simultaneous Tests for General Linear Hypotheses</span></a>
+<a class="sourceLine" id="cb3-8" title="8"><span class="co">## </span></a>
+<a class="sourceLine" id="cb3-9" title="9"><span class="co">## Multiple Comparisons of Means: Dunnett Contrasts</span></a>
+<a class="sourceLine" id="cb3-10" title="10"><span class="co">## </span></a>
+<a class="sourceLine" id="cb3-11" title="11"><span class="co">## </span></a>
+<a class="sourceLine" id="cb3-12" title="12"><span class="co">## Fit: lm(formula = minutes ~ blanket, data = recovery)</span></a>
+<a class="sourceLine" id="cb3-13" title="13"><span class="co">## </span></a>
+<a class="sourceLine" id="cb3-14" title="14"><span class="co">## Linear Hypotheses:</span></a>
+<a class="sourceLine" id="cb3-15" title="15"><span class="co">##              Estimate Std. Error t value Pr(&lt;t)    </span></a>
+<a class="sourceLine" id="cb3-16" title="16"><span class="co">## b1 - b0 &gt;= 0  -2.1333     1.6038  -1.330 0.2411    </span></a>
+<a class="sourceLine" id="cb3-17" title="17"><span class="co">## b2 - b0 &gt;= 0  -7.4667     1.6038  -4.656 &lt;0.001 ***</span></a>
+<a class="sourceLine" id="cb3-18" title="18"><span class="co">## b3 - b0 &gt;= 0  -1.6667     0.8848  -1.884 0.0924 .  </span></a>
+<a class="sourceLine" id="cb3-19" title="19"><span class="co">## ---</span></a>
+<a class="sourceLine" id="cb3-20" title="20"><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></a>
+<a class="sourceLine" id="cb3-21" title="21"><span class="co">## (Adjusted p values reported -- single-step method)</span></a></code></pre></div>
+<ul>
+<li>The <em>adjusted Dunnett <span class="math inline">\(p\)</span>-value</em> for <span class="math inline">\(H_{0i}\)</span> <em>vs</em> the “greater” alternative hypothesis <span class="math inline">\(\{\mu_0 &lt; \mu_i\}\)</span> is <span class="math display">\[
+p_i = \Pr\left(\max_{i \in\{1, \ldots m\}}t_i &gt; t_i^{\text{obs}}\right).
+\]</span></li>
+</ul>
+<p>Let’s compare with <code>glht</code>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="kw">sapply</span>(ti, <span class="cf">function</span>(t) <span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="kw">pDunnett</span>(<span class="dt">q =</span> t, n0, ni))</a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="co">##     b1.b0     b2.b0     b3.b0 </span></a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="co">## 0.9958029 1.0000000 0.9995174</span></a>
+<a class="sourceLine" id="cb4-4" title="4">multcomps &lt;-<span class="st"> </span><span class="kw">glht</span>(fit, <span class="dt">linfct =</span> <span class="kw">mcp</span>(<span class="dt">blanket =</span> <span class="st">&quot;Dunnett&quot;</span>), </a>
+<a class="sourceLine" id="cb4-5" title="5">                  <span class="dt">alternative =</span> <span class="st">&quot;greater&quot;</span>)</a>
+<a class="sourceLine" id="cb4-6" title="6"><span class="kw">summary</span>(multcomps)</a>
+<a class="sourceLine" id="cb4-7" title="7"><span class="co">## </span></a>
+<a class="sourceLine" id="cb4-8" title="8"><span class="co">##   Simultaneous Tests for General Linear Hypotheses</span></a>
+<a class="sourceLine" id="cb4-9" title="9"><span class="co">## </span></a>
+<a class="sourceLine" id="cb4-10" title="10"><span class="co">## Multiple Comparisons of Means: Dunnett Contrasts</span></a>
+<a class="sourceLine" id="cb4-11" title="11"><span class="co">## </span></a>
+<a class="sourceLine" id="cb4-12" title="12"><span class="co">## </span></a>
+<a class="sourceLine" id="cb4-13" title="13"><span class="co">## Fit: lm(formula = minutes ~ blanket, data = recovery)</span></a>
+<a class="sourceLine" id="cb4-14" title="14"><span class="co">## </span></a>
+<a class="sourceLine" id="cb4-15" title="15"><span class="co">## Linear Hypotheses:</span></a>
+<a class="sourceLine" id="cb4-16" title="16"><span class="co">##              Estimate Std. Error t value Pr(&gt;t)</span></a>
+<a class="sourceLine" id="cb4-17" title="17"><span class="co">## b1 - b0 &lt;= 0  -2.1333     1.6038  -1.330  0.996</span></a>
+<a class="sourceLine" id="cb4-18" title="18"><span class="co">## b2 - b0 &lt;= 0  -7.4667     1.6038  -4.656  1.000</span></a>
+<a class="sourceLine" id="cb4-19" title="19"><span class="co">## b3 - b0 &lt;= 0  -1.6667     0.8848  -1.884  1.000</span></a>
+<a class="sourceLine" id="cb4-20" title="20"><span class="co">## (Adjusted p values reported -- single-step method)</span></a></code></pre></div>
+<ul>
+<li>The <em>adjusted Dunnett <span class="math inline">\(p\)</span>-value</em> for <span class="math inline">\(H_{0i}\)</span> <em>vs</em> the “two-sided” alternative hypothesis <span class="math inline">\(\{\mu_0 \neq \mu_i\}\)</span> is <span class="math display">\[
+p_i = \Pr\left(\max_{i \in\{1, \ldots m\}}|t_i| &gt; |t_i^{\text{obs}}|\right).
+\]</span></li>
+</ul>
+<p>Let’s write a R function computing <span class="math inline">\(\Pr\left(\max_{i \in\{1, \ldots m\}}|t_i| \leq q\right)\)</span>:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">pDunnett2 &lt;-<span class="st"> </span><span class="cf">function</span>(q, n0, ni){</a>
+<a class="sourceLine" id="cb5-2" title="2">  <span class="cf">if</span>(q <span class="op">==</span><span class="st"> </span><span class="ot">Inf</span>){</a>
+<a class="sourceLine" id="cb5-3" title="3">    <span class="kw">return</span>(<span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb5-4" title="4">  }</a>
+<a class="sourceLine" id="cb5-5" title="5">  <span class="cf">if</span>(q <span class="op">&lt;=</span><span class="st"> </span><span class="dv">0</span>){</a>
+<a class="sourceLine" id="cb5-6" title="6">    <span class="kw">return</span>(<span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb5-7" title="7">  }</a>
+<a class="sourceLine" id="cb5-8" title="8">  m &lt;-<span class="st"> </span><span class="kw">length</span>(ni) </a>
+<a class="sourceLine" id="cb5-9" title="9">  Sigma &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="ot">NA_real_</span>, <span class="dt">nrow=</span>m, <span class="dt">ncol=</span>m)</a>
+<a class="sourceLine" id="cb5-10" title="10">  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>(m<span class="dv">-1</span>)){</a>
+<a class="sourceLine" id="cb5-11" title="11">    <span class="cf">for</span>(j <span class="cf">in</span> (i<span class="op">+</span><span class="dv">1</span>)<span class="op">:</span>m){</a>
+<a class="sourceLine" id="cb5-12" title="12">      Sigma[i,j] &lt;-<span class="st"> </span><span class="kw">sqrt</span>(ni[i]<span class="op">*</span>ni[j]<span class="op">/</span>(n0<span class="op">+</span>ni[i])<span class="op">/</span>(n0<span class="op">+</span>ni[j]))</a>
+<a class="sourceLine" id="cb5-13" title="13">    }</a>
+<a class="sourceLine" id="cb5-14" title="14">  }</a>
+<a class="sourceLine" id="cb5-15" title="15">  Sigma[<span class="kw">lower.tri</span>(Sigma)] &lt;-<span class="st"> </span>Sigma[<span class="kw">upper.tri</span>(Sigma)]</a>
+<a class="sourceLine" id="cb5-16" title="16">  <span class="kw">diag</span>(Sigma) &lt;-<span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb5-17" title="17">  nu &lt;-<span class="st"> </span>n0 <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(ni) <span class="op">-</span><span class="st"> </span>m <span class="op">-</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb5-18" title="18">  mnormt<span class="op">::</span><span class="kw">sadmvt</span>(<span class="dt">lower=</span><span class="kw">rep</span>(<span class="op">-</span>q,m), <span class="dt">upper =</span> <span class="kw">rep</span>(q,m), <span class="dt">mean=</span><span class="kw">rep</span>(<span class="dv">0</span>,m), </a>
+<a class="sourceLine" id="cb5-19" title="19">                 <span class="dt">S=</span>Sigma, <span class="dt">df=</span>nu, <span class="dt">maxpts=</span><span class="dv">2000</span><span class="op">*</span>m)</a>
+<a class="sourceLine" id="cb5-20" title="20">}</a></code></pre></div>
+<p>Again, we get the same results as the ones of <code>glht</code>:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="kw">sapply</span>(ti, <span class="cf">function</span>(t) <span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="kw">pDunnett2</span>(<span class="dt">q =</span> <span class="kw">abs</span>(t), n0, ni))</a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="co">##        b1.b0        b2.b0        b3.b0 </span></a>
+<a class="sourceLine" id="cb6-3" title="3"><span class="co">## 0.4559168545 0.0001198394 0.1819800049</span></a>
+<a class="sourceLine" id="cb6-4" title="4">multcomps &lt;-<span class="st"> </span><span class="kw">glht</span>(fit, <span class="dt">linfct =</span> <span class="kw">mcp</span>(<span class="dt">blanket =</span> <span class="st">&quot;Dunnett&quot;</span>), </a>
+<a class="sourceLine" id="cb6-5" title="5">                  <span class="dt">alternative =</span> <span class="st">&quot;two.sided&quot;</span>)</a>
+<a class="sourceLine" id="cb6-6" title="6"><span class="kw">summary</span>(multcomps)</a>
+<a class="sourceLine" id="cb6-7" title="7"><span class="co">## </span></a>
+<a class="sourceLine" id="cb6-8" title="8"><span class="co">##   Simultaneous Tests for General Linear Hypotheses</span></a>
+<a class="sourceLine" id="cb6-9" title="9"><span class="co">## </span></a>
+<a class="sourceLine" id="cb6-10" title="10"><span class="co">## Multiple Comparisons of Means: Dunnett Contrasts</span></a>
+<a class="sourceLine" id="cb6-11" title="11"><span class="co">## </span></a>
+<a class="sourceLine" id="cb6-12" title="12"><span class="co">## </span></a>
+<a class="sourceLine" id="cb6-13" title="13"><span class="co">## Fit: lm(formula = minutes ~ blanket, data = recovery)</span></a>
+<a class="sourceLine" id="cb6-14" title="14"><span class="co">## </span></a>
+<a class="sourceLine" id="cb6-15" title="15"><span class="co">## Linear Hypotheses:</span></a>
+<a class="sourceLine" id="cb6-16" title="16"><span class="co">##              Estimate Std. Error t value Pr(&gt;|t|)    </span></a>
+<a class="sourceLine" id="cb6-17" title="17"><span class="co">## b1 - b0 == 0  -2.1333     1.6038  -1.330 0.455909    </span></a>
+<a class="sourceLine" id="cb6-18" title="18"><span class="co">## b2 - b0 == 0  -7.4667     1.6038  -4.656 0.000124 ***</span></a>
+<a class="sourceLine" id="cb6-19" title="19"><span class="co">## b3 - b0 == 0  -1.6667     0.8848  -1.884 0.181886    </span></a>
+<a class="sourceLine" id="cb6-20" title="20"><span class="co">## ---</span></a>
+<a class="sourceLine" id="cb6-21" title="21"><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></a>
+<a class="sourceLine" id="cb6-22" title="22"><span class="co">## (Adjusted p values reported -- single-step method)</span></a></code></pre></div>
+<p>One also gets these results with <code>DescTools::DunnettTest</code>:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="kw">library</span>(DescTools)</a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="kw">DunnettTest</span>(minutes <span class="op">~</span><span class="st"> </span>blanket, <span class="dt">data =</span> recovery)</a>
+<a class="sourceLine" id="cb7-3" title="3"><span class="co">## </span></a>
+<a class="sourceLine" id="cb7-4" title="4"><span class="co">##   Dunnett's test for comparing several treatments with a control :  </span></a>
+<a class="sourceLine" id="cb7-5" title="5"><span class="co">##     95% family-wise confidence level</span></a>
+<a class="sourceLine" id="cb7-6" title="6"><span class="co">## </span></a>
+<a class="sourceLine" id="cb7-7" title="7"><span class="co">## $b0</span></a>
+<a class="sourceLine" id="cb7-8" title="8"><span class="co">##            diff     lwr.ci     upr.ci    pval    </span></a>
+<a class="sourceLine" id="cb7-9" title="9"><span class="co">## b1-b0 -2.133333  -6.126872  1.8602056 0.45594    </span></a>
+<a class="sourceLine" id="cb7-10" title="10"><span class="co">## b2-b0 -7.466667 -11.460206 -3.4731277 0.00012 ***</span></a>
+<a class="sourceLine" id="cb7-11" title="11"><span class="co">## b3-b0 -1.666667  -3.869811  0.5364781 0.18192    </span></a>
+<a class="sourceLine" id="cb7-12" title="12"><span class="co">## </span></a>
+<a class="sourceLine" id="cb7-13" title="13"><span class="co">## ---</span></a>
+<a class="sourceLine" id="cb7-14" title="14"><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></a></code></pre></div>
+<ul>
+<li>The <em>adjusted confidence interval</em> of <span class="math inline">\(\mu_i - \mu_0\)</span> at the <span class="math inline">\((1-\alpha)\)</span>-level is <span class="math display">\[
+(\bar{y_i} - \bar{y_0}) \pm 
+q_{1-\frac{\alpha}{2}}\times\frac{\hat\sigma}{\sqrt{\frac{1}{n_i}+\frac{1}{n_0}}}
+\]</span></li>
+</ul>
+<p>where <span class="math inline">\(q_p\)</span> is the equicoordinate <span class="math inline">\(p\)</span>-quantile of <span class="math inline">\(\mathbf{t}\)</span>: <span class="math display">\[
+\Pr(t_1 \leq q_p, \ldots, t_m \leq q_p) = p.
+\]</span> Let’s use R to compute the family-wise <span class="math inline">\(95\%\)</span>-confidence intervals:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">m &lt;-<span class="st"> </span><span class="kw">length</span>(ni) </a>
+<a class="sourceLine" id="cb8-2" title="2">Sigma &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="ot">NA_real_</span>, <span class="dt">nrow=</span>m, <span class="dt">ncol=</span>m)</a>
+<a class="sourceLine" id="cb8-3" title="3"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>(m<span class="dv">-1</span>)){</a>
+<a class="sourceLine" id="cb8-4" title="4">  <span class="cf">for</span>(j <span class="cf">in</span> (i<span class="op">+</span><span class="dv">1</span>)<span class="op">:</span>m){</a>
+<a class="sourceLine" id="cb8-5" title="5">    Sigma[i,j] &lt;-<span class="st"> </span><span class="kw">sqrt</span>(ni[i]<span class="op">*</span>ni[j]<span class="op">/</span>(n0<span class="op">+</span>ni[i])<span class="op">/</span>(n0<span class="op">+</span>ni[j]))</a>
+<a class="sourceLine" id="cb8-6" title="6">  }</a>
+<a class="sourceLine" id="cb8-7" title="7">}</a>
+<a class="sourceLine" id="cb8-8" title="8">Sigma[<span class="kw">lower.tri</span>(Sigma)] &lt;-<span class="st"> </span>Sigma[<span class="kw">upper.tri</span>(Sigma)]</a>
+<a class="sourceLine" id="cb8-9" title="9"><span class="kw">diag</span>(Sigma) &lt;-<span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb8-10" title="10"><span class="co"># mean differences</span></a>
+<a class="sourceLine" id="cb8-11" title="11">meandiffs &lt;-<span class="st"> </span><span class="kw">sapply</span>(yi, mean) <span class="op">-</span><span class="st"> </span>y0bar</a>
+<a class="sourceLine" id="cb8-12" title="12"><span class="co"># standard errors</span></a>
+<a class="sourceLine" id="cb8-13" title="13">stderrs &lt;-<span class="st"> </span><span class="kw">sqrt</span>(s2) <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="dv">1</span><span class="op">/</span>ni <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span>n0)</a>
+<a class="sourceLine" id="cb8-14" title="14"><span class="co"># quantile</span></a>
+<a class="sourceLine" id="cb8-15" title="15">q &lt;-<span class="st"> </span>mvtnorm<span class="op">::</span><span class="kw">qmvt</span>((<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="fl">0.95</span>)<span class="op">/</span><span class="dv">2</span>), <span class="dt">df =</span> nu, </a>
+<a class="sourceLine" id="cb8-16" title="16">                   <span class="dt">sigma =</span> Sigma, <span class="dt">tail =</span> <span class="st">&quot;lower.tail&quot;</span>)<span class="op">$</span>quantile</a>
+<a class="sourceLine" id="cb8-17" title="17"><span class="co"># lower bounds</span></a>
+<a class="sourceLine" id="cb8-18" title="18">meandiffs <span class="op">-</span><span class="st"> </span>q <span class="op">*</span><span class="st"> </span>stderrs </a>
+<a class="sourceLine" id="cb8-19" title="19"><span class="co">##         b1         b2         b3 </span></a>
+<a class="sourceLine" id="cb8-20" title="20"><span class="co">##  -6.126240 -11.459573  -3.869463</span></a>
+<a class="sourceLine" id="cb8-21" title="21"><span class="co"># upper bounds</span></a>
+<a class="sourceLine" id="cb8-22" title="22">meandiffs <span class="op">+</span><span class="st"> </span>q <span class="op">*</span><span class="st"> </span>stderrs </a>
+<a class="sourceLine" id="cb8-23" title="23"><span class="co">##         b1         b2         b3 </span></a>
+<a class="sourceLine" id="cb8-24" title="24"><span class="co">##  1.8595735 -3.4737599  0.5361293</span></a></code></pre></div>
+
+    </div>
+
+
+    <div id="footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </div>
+
+  </div>
+
+  <div id="disqus_thread"></div>
+  <div class="pagination">
+    <ul>
+      <li>
+        <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+      </li>
+    </ul>
+  </div>
+</body>
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+<!-- Google Prettify -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+<script>
+  var pres = document.getElementsByTagName("pre");
+  for (var i = 0; i < pres.length; ++i) {
+    
+    pres[i].className = pres[i].className + " prettyprint linenums";
+    
+  }
+  prettyPrint();
+</script> 
+
+</html>
