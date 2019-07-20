@@ -1,0 +1,309 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Poisson-Beta, Gamma-Beta, and Poisson-Gamma-Beta distributions</title>
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/pandoc-solarized.css" />  
+  <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+</head>
+
+<body>
+  <!-- Sidebar. -->
+  <div class="sidebar">
+    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+      <a href="https://www.r-bloggers.com/">
+        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+      </a>
+      <br />
+      <a href="http://t-redactyl.io/">
+        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
+      </a>
+      <a href="http://timelyportfolio.blogspot.be/">
+        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
+      </a>
+      <br />
+      <a href="https://antoineguillot.wordpress.com/blog/">
+        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+      </a>
+      <br />
+      <a href="https://fronkonstin.com/">
+        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="header">
+      <div id="logo" style="position:absolute;">
+        <a href="../">
+          <img src="../images/stla.jpg" alt="stla" width="100px" />
+        </a>
+      </div>
+      <div id="navigation" style="margin-top:50px;">
+        <a href="../">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../archive.html">Archive</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Poisson-Beta, Gamma-Beta, and Poisson-Gamma-Beta distributions</h1> <div class="info">
+    Posted on July 19, 2019
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="../tags/maths.html">maths</a>, <a href="../tags/statistics.html">statistics</a>, <a href="../tags/R.html">R</a>, <a href="../tags/special-functions.html">special-functions</a>
+    
+</div>
+
+<h1 id="poisson-beta-distribution">Poisson-Beta distribution</h1>
+<p>The <em>Poisson-Beta distribution</em> with parameters <span class="math inline">\(a,b,\theta&gt;0\)</span> is defined as the distribution of a random variable <span class="math inline">\(N\)</span> such that <span class="math display">\[
+(N \mid U=u) \sim \mathcal{P}(\theta u), \quad U \sim \mathcal{B}(a,b).
+\]</span> It is easy to simulate:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">rPB &lt;-<span class="st"> </span><span class="cf">function</span>(n, a, b, <span class="dt">theta =</span> <span class="dv">1</span>){</a>
+<a class="sourceLine" id="cb1-2" title="2">  <span class="kw">stopifnot</span>(a<span class="op">&gt;</span><span class="dv">0</span>, b<span class="op">&gt;</span><span class="dv">0</span>, theta<span class="op">&gt;</span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb1-3" title="3">  <span class="kw">rpois</span>(n, theta <span class="op">*</span><span class="st"> </span><span class="kw">rbeta</span>(n, a, b))</a>
+<a class="sourceLine" id="cb1-4" title="4">}</a></code></pre></div>
+<p>Thanks to the first integral representation of the Kummer function <span class="math inline">\({}_1\!F_1\)</span> given <a href="http://functions.wolfram.com/HypergeometricFunctions/Hypergeometric1F1/07/01/01/">here</a>, its probability mass at <span class="math inline">\(x \in \mathbb{N}\)</span> is <span class="math display">\[
+\frac{\theta^x}{x!}\frac{B(a+x,b)}{B(a,b)}{}_1\!F_1(a+x, a+b+x; -\theta).
+\]</span> The Kummer function <span class="math inline">\({}_1\!F_1\)</span> is available in the R package <code>gsl</code>. Here is a R implementation of the probabiity mass function of <span class="math inline">\(\mathcal{P}\mathcal{B}(a,b,\theta)\)</span>, vectorized in <code>x</code>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">library</span>(gsl)</a>
+<a class="sourceLine" id="cb2-2" title="2">dPB &lt;-<span class="st"> </span><span class="cf">function</span>(x, a, b, <span class="dt">theta =</span> <span class="dv">1</span>){</a>
+<a class="sourceLine" id="cb2-3" title="3">  <span class="kw">stopifnot</span>(a<span class="op">&gt;</span><span class="dv">0</span>, b<span class="op">&gt;</span><span class="dv">0</span>, theta<span class="op">&gt;</span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb2-4" title="4">  out &lt;-<span class="st"> </span><span class="kw">numeric</span>(<span class="kw">length</span>(x))</a>
+<a class="sourceLine" id="cb2-5" title="5">  positive &lt;-<span class="st"> </span>x <span class="op">&gt;=</span><span class="st"> </span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb2-6" title="6">  x &lt;-<span class="st"> </span>x[positive]</a>
+<a class="sourceLine" id="cb2-7" title="7">  logC &lt;-<span class="st"> </span><span class="kw">lbeta</span>(a<span class="op">+</span>x,b) <span class="op">-</span><span class="st"> </span><span class="kw">lbeta</span>(a,b) <span class="op">-</span><span class="st"> </span><span class="kw">lfactorial</span>(x) <span class="op">+</span><span class="st"> </span>x<span class="op">*</span><span class="kw">log</span>(theta)</a>
+<a class="sourceLine" id="cb2-8" title="8">  H &lt;-<span class="st"> </span><span class="kw">hyperg_1F1</span>(a<span class="op">+</span>x, a<span class="op">+</span>b<span class="op">+</span>x, <span class="op">-</span>theta)</a>
+<a class="sourceLine" id="cb2-9" title="9">  out[positive] &lt;-<span class="st"> </span><span class="kw">exp</span>(logC)<span class="op">*</span>H</a>
+<a class="sourceLine" id="cb2-10" title="10">  out</a>
+<a class="sourceLine" id="cb2-11" title="11">}</a></code></pre></div>
+<p>Let’s check:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">a &lt;-<span class="st"> </span><span class="dv">10</span>; b &lt;-<span class="st"> </span><span class="dv">5</span>; theta &lt;-<span class="st"> </span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb3-2" title="2">nsims &lt;-<span class="st"> </span><span class="dv">200000</span></a>
+<a class="sourceLine" id="cb3-3" title="3">sims &lt;-<span class="st"> </span><span class="kw">rPB</span>(nsims, a, b, theta)</a>
+<a class="sourceLine" id="cb3-4" title="4"><span class="kw">sum</span>(sims <span class="op">&lt;=</span><span class="st"> </span><span class="dv">3</span>) <span class="op">/</span><span class="st"> </span>nsims</a>
+<a class="sourceLine" id="cb3-5" title="5"><span class="co">## [1] 0.95017</span></a>
+<a class="sourceLine" id="cb3-6" title="6"><span class="kw">sum</span>(<span class="kw">dPB</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">3</span>, a, b, theta))</a>
+<a class="sourceLine" id="cb3-7" title="7"><span class="co">## [1] 0.9499529</span></a></code></pre></div>
+<h1 id="gamma-beta-distribution">Gamma-Beta distribution</h1>
+<p>The <em>Gamma-Beta distribution</em> with parameters <span class="math inline">\(\nu, a, b, \theta &gt; 0\)</span> is defined as the distribution of a random variable <span class="math inline">\(X\)</span> such that <span class="math display">\[
+(X \mid U=u) \sim \mathcal{G}(\nu, \theta u), 
+\quad U \sim \mathcal{B}(a,b),
+\]</span> where the second parameter of the Gamma distribution <span class="math inline">\(\mathcal{G}\)</span> is its <em>rate</em> parameter, not the <em>scale</em> parameter.</p>
+<p>Let’s write a sampler for this distribution:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">rGB &lt;-<span class="st"> </span><span class="cf">function</span>(n, nu, a, b, <span class="dt">theta=</span><span class="dv">1</span>){</a>
+<a class="sourceLine" id="cb4-2" title="2">  <span class="kw">stopifnot</span>(nu<span class="op">&gt;</span><span class="dv">0</span>, a<span class="op">&gt;</span><span class="dv">0</span>, b<span class="op">&gt;</span><span class="dv">0</span>, theta<span class="op">&gt;</span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb4-3" title="3">  <span class="kw">rgamma</span>(n, <span class="dt">shape =</span> nu, <span class="dt">rate =</span> theta<span class="op">*</span><span class="kw">rbeta</span>(n, a, b)) </a>
+<a class="sourceLine" id="cb4-4" title="4">}</a></code></pre></div>
+<p>Equivalently, the <span class="math inline">\(\mathcal{G}{B}(\nu,a,b,\theta)\)</span> distribution is the distribution of the quotient <span class="math inline">\(Y/U\)</span> where <span class="math inline">\(Y \sim \mathcal{G}(\nu,\theta)\)</span> is independent of <span class="math inline">\(U \sim \mathcal{B}(a,b)\)</span>. Thus this is also the distribution of <span class="math inline">\(\frac{Y/U}{\theta}\)</span> where <span class="math inline">\(Y \sim \mathcal{G}(\nu,1)\)</span> is independent of <span class="math inline">\(U \sim \mathcal{B}(a,b)\)</span>, and then this is a scaled <em>confluent hypergeometric function kind one distribution</em> (the distribution of <span class="math inline">\(Y/U\)</span>; as far as I know, this name firstly occurs in the book <em>Matrix variate distributions</em> by Gupta and Nagar, who studied the matrix-valued confluent hypergeometric function kind one distribution).</p>
+<p>The density function of <span class="math inline">\(\mathcal{G}{B}(\nu,a,b,\theta)\)</span> at <span class="math inline">\(x \geqslant 0\)</span> is, thanks to <a href="https://en.wikipedia.org/wiki/Confluent_hypergeometric_function#Integral_representations">this integral representation</a> of the Kummer function <span class="math inline">\({}_1\!F_1\)</span>, <span class="math display">\[
+\theta^\nu \frac{\Gamma(a+b)}{B(a,\nu)\Gamma(a+b+\nu)}x^{\nu-1}
+{}_1\!F_1(a+\nu, a+b+\nu; -\theta x).
+\]</span></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">dGB &lt;-<span class="st"> </span><span class="cf">function</span>(x, nu, a, b, theta){</a>
+<a class="sourceLine" id="cb5-2" title="2">  <span class="kw">stopifnot</span>(nu<span class="op">&gt;</span><span class="dv">0</span>, a<span class="op">&gt;</span><span class="dv">0</span>, b<span class="op">&gt;</span><span class="dv">0</span>, theta<span class="op">&gt;</span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb5-3" title="3">  out &lt;-<span class="st"> </span><span class="kw">numeric</span>(<span class="kw">length</span>(x))</a>
+<a class="sourceLine" id="cb5-4" title="4">  positive &lt;-<span class="st"> </span>x <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb5-5" title="5">  x &lt;-<span class="st"> </span>x[positive]</a>
+<a class="sourceLine" id="cb5-6" title="6">  d &lt;-<span class="st"> </span><span class="kw">exp</span>(<span class="kw">lgamma</span>(a<span class="op">+</span>b)<span class="op">-</span><span class="kw">lbeta</span>(a,nu)<span class="op">-</span><span class="kw">lgamma</span>(a<span class="op">+</span>b<span class="op">+</span>nu)<span class="op">+</span>(nu<span class="dv">-1</span>)<span class="op">*</span><span class="kw">log</span>(x)<span class="op">+</span>nu<span class="op">*</span><span class="kw">log</span>(theta))<span class="op">*</span></a>
+<a class="sourceLine" id="cb5-7" title="7"><span class="st">    </span><span class="kw">hyperg_1F1</span>(a<span class="op">+</span>nu, a<span class="op">+</span>b<span class="op">+</span>nu, <span class="op">-</span>x<span class="op">*</span>theta)</a>
+<a class="sourceLine" id="cb5-8" title="8">  out[positive] &lt;-<span class="st"> </span>d</a>
+<a class="sourceLine" id="cb5-9" title="9">  out</a>
+<a class="sourceLine" id="cb5-10" title="10">}</a></code></pre></div>
+<p>Let’s check:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">nu &lt;-<span class="st"> </span><span class="dv">5</span></a>
+<a class="sourceLine" id="cb6-2" title="2">sims &lt;-<span class="st"> </span><span class="kw">rGB</span>(nsims, nu, a, b, theta)</a>
+<a class="sourceLine" id="cb6-3" title="3"><span class="kw">plot</span>(<span class="kw">density</span>(sims, <span class="dt">from =</span> <span class="dv">0</span>, <span class="dt">to =</span> <span class="kw">quantile</span>(sims, <span class="fl">0.99</span>)))</a>
+<a class="sourceLine" id="cb6-4" title="4"><span class="kw">curve</span>(<span class="kw">dGB</span>(x, nu, a, b, theta), <span class="dt">add =</span> <span class="ot">TRUE</span>, </a>
+<a class="sourceLine" id="cb6-5" title="5">      <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>, <span class="dt">lwd =</span> <span class="dv">2</span>, <span class="dt">lty =</span> <span class="st">&quot;dashed&quot;</span>)</a></code></pre></div>
+<p><img src="figures/PGGBPGB-unnamed-chunk-6-1.png" /></p>
+<p>Now, let’s derive the cumulative distribution function of <span class="math inline">\(\mathcal{G}\mathcal{B}(\nu, a, b, \theta)\)</span>. We have to derive the integral <span class="math display">\[
+I = \int_0^q x^{\nu-1}
+{}_1\!F_1(a+\nu, a+b+\nu; -\theta x) \, \mathrm{d}x.
+\]</span> It is <a href="http://functions.wolfram.com/HypergeometricFunctions/Hypergeometric1F1/21/01/02/01/">known</a> that <span class="math display">\[
+\int_0^q x^{\nu-1} {}_1\!F_1(a, b; cx) \,\mathrm{d}x = 
+\frac{q^\nu}{\nu} {}_2\!F_2(a, \nu; b, \nu+1; cq).
+\]</span> Therefore, <span class="math display">\[
+I = \frac{q^\nu}{\nu} {}_2\!F_2(a+\nu, \nu; a+b+\nu, \nu+1; -\theta q).
+\]</span></p>
+<p>There is no solid implementation of the generalized hypergeometric function <span class="math inline">\({}_2\!F_2\)</span> in R. To evaluate it, we use its <a href="http://functions.wolfram.com/HypergeometricFunctions/Hypergeometric2F2/07/03/">double integral representation</a> <span class="math display">\[
+{}_2\!F_2(a_1, a_2; b_1, b_2; z) = 
+\frac{\Gamma(b_1)}{\Gamma(a_1)\Gamma(b_1-a_1)} 
+\frac{\Gamma(b_2)}{\Gamma(a_2)\Gamma(b_2-a_2)} 
+\times ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{}\\
+\int_0^1\int_0^1 
+u^{a_1-1}(1-u)^{b_1-a_1-1} v^{a_2-1}(1-v)^{b_2-a_2-1}
+\exp(zuv)\,\mathrm{d}u\mathrm{d}v, 
+\]</span> valid for <span class="math inline">\(b_1&gt;a_1&gt;0\)</span> and <span class="math inline">\(b_2&gt;a_2&gt;0\)</span>.</p>
+<p>Thus, <span class="math display">\[
+I = \frac{q^\nu}{\nu}
+\frac{\Gamma(a+b+\nu)}{\Gamma(a+\nu)\Gamma(b)} 
+\frac{\Gamma(\nu+1)}{\Gamma(\nu)\Gamma(1)} 
+\times ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{}\\
+\int_0^1\int_0^1 
+u^{a+\nu-1}(1-u)^{b-1} v^{\nu-1}
+\exp(-\theta quv)\,\mathrm{d}u\mathrm{d}v.
+\]</span> We get <span class="math display">\[
+\Pr(X \leq q) = C \times \int_0^1\int_0^1 
+u^{a+\nu-1}(1-u)^{b-1} v^{\nu-1}
+\exp(-\theta quv)\,\mathrm{d}u\mathrm{d}v
+\]</span> where <span class="math display">\[
+C = (\theta q)^\nu \frac{\Gamma(a+b)}{B(a,\nu)\Gamma(a+\nu)\Gamma(b)} =
+ \frac{(\theta q)^\nu}{B(a,b)\Gamma(\nu)}.
+\]</span></p>
+<p>We implement this double integral with the <code>cubature</code> package:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="kw">library</span>(cubature)</a>
+<a class="sourceLine" id="cb7-2" title="2">pGBintegrand &lt;-<span class="st"> </span><span class="cf">function</span>(uv, theta, q){</a>
+<a class="sourceLine" id="cb7-3" title="3">  u &lt;-<span class="st"> </span>uv[<span class="dv">1</span>]; v &lt;-<span class="st"> </span>uv[<span class="dv">2</span>]</a>
+<a class="sourceLine" id="cb7-4" title="4">  u<span class="op">^</span>(a<span class="op">+</span>nu<span class="dv">-1</span>)<span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>u)<span class="op">^</span>(b<span class="dv">-1</span>)<span class="op">*</span>v<span class="op">^</span>(nu<span class="dv">-1</span>)<span class="op">*</span><span class="kw">exp</span>(<span class="op">-</span>q<span class="op">*</span>u<span class="op">*</span>v<span class="op">*</span>theta)</a>
+<a class="sourceLine" id="cb7-5" title="5">}</a>
+<a class="sourceLine" id="cb7-6" title="6">pGB &lt;-<span class="st"> </span><span class="cf">function</span>(q, nu, a, b, <span class="dt">theta =</span> <span class="dv">1</span>){</a>
+<a class="sourceLine" id="cb7-7" title="7">  <span class="kw">stopifnot</span>(nu<span class="op">&gt;</span><span class="dv">0</span>, a<span class="op">&gt;</span><span class="dv">0</span>, b<span class="op">&gt;</span><span class="dv">0</span>, theta<span class="op">&gt;</span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb7-8" title="8">  <span class="cf">if</span>(q <span class="op">&lt;=</span><span class="st"> </span><span class="dv">0</span>) <span class="kw">return</span>(<span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb7-9" title="9">  <span class="cf">if</span>(q <span class="op">==</span><span class="st"> </span><span class="ot">Inf</span>) <span class="kw">return</span>(<span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb7-10" title="10">  integral_ &lt;-<span class="st"> </span></a>
+<a class="sourceLine" id="cb7-11" title="11"><span class="st">    </span><span class="kw">pcubature</span>(pGBintegrand, <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>), <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>), <span class="dt">theta =</span> theta, <span class="dt">q =</span> q)</a>
+<a class="sourceLine" id="cb7-12" title="12">  integral &lt;-<span class="st"> </span>integral_<span class="op">$</span>integral</a>
+<a class="sourceLine" id="cb7-13" title="13">  <span class="kw">exp</span>(nu<span class="op">*</span><span class="kw">log</span>(theta<span class="op">*</span>q) <span class="op">-</span><span class="st"> </span><span class="kw">lgamma</span>(nu) <span class="op">-</span><span class="st"> </span><span class="kw">lbeta</span>(a,b)) <span class="op">*</span><span class="st"> </span>integral</a>
+<a class="sourceLine" id="cb7-14" title="14">}</a>
+<a class="sourceLine" id="cb7-15" title="15"><span class="kw">pGB</span>(<span class="dv">3</span>, nu, a, b, theta)</a>
+<a class="sourceLine" id="cb7-16" title="16"><span class="co">## [1] 0.3726581</span></a>
+<a class="sourceLine" id="cb7-17" title="17"><span class="kw">sum</span>(sims <span class="op">&lt;</span><span class="st"> </span><span class="dv">3</span>)<span class="op">/</span>nsims</a>
+<a class="sourceLine" id="cb7-18" title="18"><span class="co">## [1] 0.37344</span></a></code></pre></div>
+<h1 id="poisson-gamma-beta-distribution">Poisson-Gamma-Beta distribution</h1>
+<p>The <em>Poisson-Gamma-Beta distribution</em> with parameters <span class="math inline">\(\nu,a,b,\theta&gt;0\)</span> is defined as the distribution of a random variable <span class="math inline">\(N\)</span> such that <span class="math display">\[
+(N \mid X=x) \sim \mathcal{P}(x), 
+\quad X \sim \mathcal{G}\mathcal{B}(\nu,a,b,\theta).
+\]</span> Equivalently, <span class="math display">\[
+(N \mid X=x) \sim \mathcal{P}\left(\frac{x}{\theta}\right), 
+\quad X \sim \mathcal{G}\mathcal{B}(\nu,a,b,1).
+\]</span> The sampler is easy to implement:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">rPGB &lt;-<span class="st"> </span><span class="cf">function</span>(n, nu, a, b, <span class="dt">theta =</span> <span class="dv">1</span>){</a>
+<a class="sourceLine" id="cb8-2" title="2">  <span class="kw">stopifnot</span>(nu<span class="op">&gt;</span><span class="dv">0</span>, a<span class="op">&gt;</span><span class="dv">0</span>, b<span class="op">&gt;</span><span class="dv">0</span>, theta<span class="op">&gt;</span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb8-3" title="3">  <span class="kw">rpois</span>(n, <span class="kw">rgamma</span>(n, <span class="dt">shape =</span> nu, <span class="dt">rate =</span> theta<span class="op">*</span><span class="kw">rbeta</span>(n, a, b)))</a>
+<a class="sourceLine" id="cb8-4" title="4">}</a></code></pre></div>
+<p>The probability mass of <span class="math inline">\(\mathcal{P}\mathcal{G}\mathcal{B}(\nu,a,b,\theta)\)</span> at <span class="math inline">\(k \in \mathbb{N}\)</span> is <span class="math display">\[
+\theta^\nu\frac{{(\nu)}_k}{k!}\frac{B(a+\nu,b)}{B(a,b)}
+{}_2\!F_1(a+\nu, \nu+k; a+b+\nu; -\theta),
+\]</span> which is derived from <a href="http://functions.wolfram.com/HypergeometricFunctions/Hypergeometric1F1/21/02/02/">this identity</a>.</p>
+<p>Let’s write a R implementation. The <code>gsl</code> package provides the function <code>hyperg_2F1</code> which evaluates the Gauss hypergeometric function <span class="math inline">\({}_2\!F_1\)</span>. It works flawlessly when the variable <span class="math inline">\(x\)</span> is in the interval <span class="math inline">\([0,1)\)</span>. When <span class="math inline">\(x&lt;0\)</span>, we can come down to the case <span class="math inline">\(x \in (0,1)\)</span> by the <a href="https://en.wikipedia.org/wiki/Hypergeometric_function#Fractional_linear_transformations">Pfaff transformation formula</a>. Our <code>Gauss2F1</code> function below is an implementation of this procedure.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">Gauss2F1 &lt;-<span class="st"> </span><span class="cf">function</span>(a,b,c,x){</a>
+<a class="sourceLine" id="cb9-2" title="2">  <span class="cf">if</span>(x<span class="op">&gt;=</span><span class="dv">0</span> <span class="op">&amp;&amp;</span><span class="st"> </span>x<span class="op">&lt;</span><span class="dv">1</span>){</a>
+<a class="sourceLine" id="cb9-3" title="3">    <span class="kw">hyperg_2F1</span>(a, b, c, x)</a>
+<a class="sourceLine" id="cb9-4" title="4">  }<span class="cf">else</span>{</a>
+<a class="sourceLine" id="cb9-5" title="5">    <span class="kw">hyperg_2F1</span>(c<span class="op">-</span>a, b, c, <span class="dv">1-1</span><span class="op">/</span>(<span class="dv">1</span><span class="op">-</span>x)) <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span><span class="op">-</span>x)<span class="op">^</span>b</a>
+<a class="sourceLine" id="cb9-6" title="6">  }</a>
+<a class="sourceLine" id="cb9-7" title="7">}</a>
+<a class="sourceLine" id="cb9-8" title="8">dPGB &lt;-<span class="st"> </span><span class="cf">function</span>(x, nu, a, b, <span class="dt">theta=</span><span class="dv">1</span>, <span class="dt">log.p =</span> <span class="ot">FALSE</span>){</a>
+<a class="sourceLine" id="cb9-9" title="9">  <span class="kw">stopifnot</span>(nu <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, a <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, b <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, theta <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb9-10" title="10">  out &lt;-<span class="st"> </span><span class="kw">numeric</span>(<span class="kw">length</span>(x))</a>
+<a class="sourceLine" id="cb9-11" title="11">  positive &lt;-<span class="st"> </span>x <span class="op">&gt;=</span><span class="st"> </span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb9-12" title="12">  x &lt;-<span class="st"> </span><span class="kw">as.integer</span>(x[positive])</a>
+<a class="sourceLine" id="cb9-13" title="13">  logC &lt;-<span class="st"> </span><span class="kw">lnpoch</span>(nu,x) <span class="op">-</span><span class="st"> </span><span class="kw">lfactorial</span>(x) <span class="op">-</span><span class="st"> </span><span class="kw">lbeta</span>(a,b) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb9-14" title="14"><span class="st">    </span><span class="kw">lbeta</span>(a<span class="op">+</span>nu,b) <span class="op">+</span><span class="st"> </span>nu<span class="op">*</span><span class="kw">log</span>(theta)</a>
+<a class="sourceLine" id="cb9-15" title="15">  H &lt;-<span class="st"> </span><span class="kw">Gauss2F1</span>(a<span class="op">+</span>nu, nu<span class="op">+</span>x, a<span class="op">+</span>b<span class="op">+</span>nu, <span class="op">-</span>theta)</a>
+<a class="sourceLine" id="cb9-16" title="16">  out[positive] &lt;-<span class="st"> </span><span class="cf">if</span>(log.p) logC <span class="op">+</span><span class="st"> </span><span class="kw">log</span>(H) <span class="cf">else</span> <span class="kw">exp</span>(logC) <span class="op">*</span><span class="st"> </span>H</a>
+<a class="sourceLine" id="cb9-17" title="17">  out</a>
+<a class="sourceLine" id="cb9-18" title="18">}</a></code></pre></div>
+<p>And let’s check:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">sims &lt;-<span class="st"> </span><span class="kw">rPGB</span>(nsims, nu, a, b, theta)</a>
+<a class="sourceLine" id="cb10-2" title="2"><span class="kw">sum</span>(sims <span class="op">&lt;=</span><span class="st"> </span><span class="dv">5</span>) <span class="op">/</span><span class="st"> </span>nsims</a>
+<a class="sourceLine" id="cb10-3" title="3"><span class="co">## [1] 0.76356</span></a>
+<a class="sourceLine" id="cb10-4" title="4"><span class="kw">sum</span>(<span class="kw">dPGB</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">5</span>, nu, a, b, theta))</a>
+<a class="sourceLine" id="cb10-5" title="5"><span class="co">## [1] 0.7643542</span></a></code></pre></div>
+<p>We can write a R function for the cumulative distribution more efficient than taking the sum of the probability masses:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">pPGB &lt;-<span class="st"> </span><span class="cf">function</span>(q, nu, a, b, theta, <span class="dt">lower.tail =</span> <span class="ot">TRUE</span>, <span class="dt">log.p =</span> <span class="ot">FALSE</span>){</a>
+<a class="sourceLine" id="cb11-2" title="2">  <span class="cf">if</span>(q <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>){</a>
+<a class="sourceLine" id="cb11-3" title="3">    p &lt;-<span class="st"> </span><span class="cf">if</span>(log.p) <span class="op">-</span><span class="ot">Inf</span> <span class="cf">else</span> <span class="dv">0</span></a>
+<a class="sourceLine" id="cb11-4" title="4">    <span class="kw">return</span>(<span class="cf">if</span>(lower.tail) p <span class="cf">else</span> <span class="dv">1</span><span class="op">-</span>p)</a>
+<a class="sourceLine" id="cb11-5" title="5">  }</a>
+<a class="sourceLine" id="cb11-6" title="6">  <span class="kw">stopifnot</span>(nu <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, a <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, b <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, theta <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb11-7" title="7">  n &lt;-<span class="st"> </span><span class="kw">c</span>(0L<span class="op">:</span><span class="kw">as.integer</span>(q))</a>
+<a class="sourceLine" id="cb11-8" title="8">  logC &lt;-<span class="st"> </span><span class="kw">lnpoch</span>(nu,n) <span class="op">-</span><span class="st"> </span><span class="kw">lfactorial</span>(n) <span class="op">-</span><span class="st"> </span><span class="kw">lbeta</span>(a,b) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb11-9" title="9"><span class="st">    </span><span class="kw">lbeta</span>(a<span class="op">+</span>nu,b) <span class="op">+</span><span class="st"> </span>nu<span class="op">*</span><span class="kw">log</span>(theta)</a>
+<a class="sourceLine" id="cb11-10" title="10">  H &lt;-<span class="st"> </span><span class="kw">Gauss2F1</span>(a<span class="op">+</span>nu, nu<span class="op">+</span>n, a<span class="op">+</span>b<span class="op">+</span>nu, <span class="op">-</span>theta)</a>
+<a class="sourceLine" id="cb11-11" title="11">  p &lt;-<span class="st"> </span><span class="kw">sum</span>(<span class="kw">exp</span>(logC)<span class="op">*</span>H)</a>
+<a class="sourceLine" id="cb11-12" title="12">  p &lt;-<span class="st"> </span><span class="cf">if</span>(lower.tail) p <span class="cf">else</span> <span class="dv">1</span><span class="op">-</span>p</a>
+<a class="sourceLine" id="cb11-13" title="13">  <span class="cf">if</span>(log.p){</a>
+<a class="sourceLine" id="cb11-14" title="14">    <span class="kw">log</span>(p)</a>
+<a class="sourceLine" id="cb11-15" title="15">  }<span class="cf">else</span>{</a>
+<a class="sourceLine" id="cb11-16" title="16">    p</a>
+<a class="sourceLine" id="cb11-17" title="17">  }</a>
+<a class="sourceLine" id="cb11-18" title="18">}</a>
+<a class="sourceLine" id="cb11-19" title="19"><span class="kw">pPGB</span>(<span class="dv">5</span>, nu, a, b, theta)</a>
+<a class="sourceLine" id="cb11-20" title="20"><span class="co">## [1] 0.7643542</span></a></code></pre></div>
+
+    </div>
+
+
+    <div id="footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </div>
+
+  </div>
+
+  <div id="disqus_thread"></div>
+  <div class="pagination">
+    <ul>
+      <li>
+        <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+      </li>
+    </ul>
+  </div>
+</body>
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+<!-- Google Prettify -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+<script>
+  var pres = document.getElementsByTagName("pre");
+  for (var i = 0; i < pres.length; ++i) {
+    
+    pres[i].className = pres[i].className + " prettyprint linenums";
+    
+  }
+  prettyPrint();
+</script> 
+
+</html>
