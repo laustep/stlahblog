@@ -98,7 +98,7 @@
 <a class="sourceLine" id="cb3-2" title="2">nsims &lt;-<span class="st"> </span><span class="dv">200000</span></a>
 <a class="sourceLine" id="cb3-3" title="3">sims &lt;-<span class="st"> </span><span class="kw">rPB</span>(nsims, a, b, theta)</a>
 <a class="sourceLine" id="cb3-4" title="4"><span class="kw">sum</span>(sims <span class="op">&lt;=</span><span class="st"> </span><span class="dv">3</span>) <span class="op">/</span><span class="st"> </span>nsims</a>
-<a class="sourceLine" id="cb3-5" title="5"><span class="co">## [1] 0.949975</span></a>
+<a class="sourceLine" id="cb3-5" title="5"><span class="co">## [1] 0.94941</span></a>
 <a class="sourceLine" id="cb3-6" title="6"><span class="kw">sum</span>(<span class="kw">dPB</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">3</span>, a, b, theta))</a>
 <a class="sourceLine" id="cb3-7" title="7"><span class="co">## [1] 0.9499529</span></a></code></pre></div>
 <h1 id="gamma-beta-distribution">Gamma-Beta distribution</h1>
@@ -117,26 +117,34 @@ CH_1(\nu, a+\nu, a+b+\nu, 1/\theta),
 \]</span> that is, <span class="math display">\[
 CH_1(\nu, \alpha, \beta, \theta) = 
 \mathcal{G}\mathcal{B}(\nu, \alpha-\nu, \beta-\alpha, 1/\theta).
-\]</span> However the <span class="math inline">\(CH_1\)</span> distribution is more general than the <span class="math inline">\(\mathcal{G}\mathcal{B}\)</span> distribution, because the above equality makes sense only for <span class="math inline">\(\beta &gt; \alpha\)</span>, whereas the constraints on the parameters of <span class="math inline">\(CH_1(\nu, \alpha, \beta, \theta)\)</span> are <span class="math inline">\(\nu&gt;0\)</span>, <span class="math inline">\(\alpha&gt;\nu\)</span>, <span class="math inline">\(\boxed{\beta &gt; \nu}\)</span> and <span class="math inline">\(\theta &gt; 0\)</span>. Thus the constraints on the parameters in <span class="math inline">\(CH_1(\nu, a+\nu, a+b+\nu, 1/\theta)\)</span> are <span class="math inline">\(\nu&gt;0\)</span>, <span class="math inline">\(a&gt;0\)</span>, <span class="math inline">\(\boxed{b&gt;-a}\)</span>, <span class="math inline">\(\theta &gt; 0\)</span>.</p>
+\]</span> The constraints on the parameters of <span class="math inline">\(CH_1(\nu, \alpha, \beta, \theta)\)</span> are <span class="math inline">\(\nu&gt;0\)</span>, <span class="math inline">\(\alpha&gt;\nu\)</span>, <span class="math inline">\(\beta \geqslant \alpha\)</span> and <span class="math inline">\(\theta &gt; 0\)</span>. Thus it is not more general than the <span class="math inline">\(\mathcal{G}\mathcal{B}\)</span> distribution, except for the case <span class="math inline">\(\beta = \alpha\)</span>. We will see that it is a Gamma distribution in this case. The condition <span class="math inline">\(\beta \geqslant \alpha\)</span> is not mentionned in the literature; Gupta &amp; Nagar, Gupta &amp; al., wrote <span class="math inline">\(\beta &gt; \nu\)</span>. However the density function they give is a positive quantity multiplied by <span class="math inline">\({}_1F_1\left(\alpha, \beta; -\frac{x}{\theta}\right)\)</span>, which can take negative values when <span class="math inline">\(\beta &lt; \alpha\)</span>.</p>
 <p>The density function of <span class="math inline">\(\mathcal{G}{B}(\nu,a,b,\theta)\)</span> at <span class="math inline">\(x \geqslant 0\)</span> is, thanks to <a href="https://en.wikipedia.org/wiki/Confluent_hypergeometric_function#Integral_representations">this integral representation</a> of the Kummer function <span class="math inline">\({}_1\!F_1\)</span>, <span class="math display">\[
 \theta^\nu \frac{\Gamma(a+b)}{B(a,\nu)\Gamma(a+b+\nu)}x^{\nu-1}
 {}_1\!F_1(a+\nu, a+b+\nu; -\theta x).
-\]</span> Indeed, this expression makes sense for <span class="math inline">\(b &gt; -a\)</span>.</p>
+\]</span> Indeed, this expression makes sense for <span class="math inline">\(b = 0\)</span>. One has <span class="math inline">\({}_1\!F_1(\alpha, 0; -\theta x) = \exp(-\theta x)\)</span>, and thus we get the density of <span class="math inline">\(\mathcal{G}(\nu, \theta)\)</span> when <span class="math inline">\(b=0\)</span>. This is not suprising because <span class="math inline">\(\mathcal{B}(a,b) \to \delta_1\)</span> when <span class="math inline">\(b \to 0^+\)</span>.</p>
+<p>Thanks to the identity <span class="math display">\[
+{}_1\!F_1(a+\nu, a+b+\nu; -\theta x) = 
+\exp(-\theta x) {}_1\!F_1(b, a+b+\nu; \theta x),
+\]</span> we can easily see that the density function is indeed positive.</p>
+<p>Now let’s implement this density in R:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">dGB &lt;-<span class="st"> </span><span class="cf">function</span>(x, nu, a, b, <span class="dt">theta =</span> <span class="dv">1</span>){</a>
-<a class="sourceLine" id="cb5-2" title="2">  <span class="kw">stopifnot</span>(nu<span class="op">&gt;</span><span class="dv">0</span>, a<span class="op">&gt;</span><span class="dv">0</span>, b<span class="op">&gt;</span><span class="dv">0</span>, theta<span class="op">&gt;</span><span class="dv">0</span>)</a>
-<a class="sourceLine" id="cb5-3" title="3">  out &lt;-<span class="st"> </span><span class="kw">numeric</span>(<span class="kw">length</span>(x))</a>
-<a class="sourceLine" id="cb5-4" title="4">  positive &lt;-<span class="st"> </span>x <span class="op">&gt;=</span><span class="st"> </span><span class="dv">0</span></a>
-<a class="sourceLine" id="cb5-5" title="5">  x &lt;-<span class="st"> </span>x[positive]</a>
-<a class="sourceLine" id="cb5-6" title="6">  nu_eq_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">rep</span>(nu <span class="op">==</span><span class="st"> </span><span class="dv">1</span>, <span class="kw">length</span>(x))</a>
-<a class="sourceLine" id="cb5-7" title="7">  log_x_power_nu_minus_one &lt;-<span class="st"> </span></a>
-<a class="sourceLine" id="cb5-8" title="8"><span class="st">    </span><span class="kw">ifelse</span>(nu_eq_<span class="dv">1</span>, <span class="dv">0</span>, (nu<span class="dv">-1</span>)<span class="op">*</span><span class="kw">log</span>(x))</a>
-<a class="sourceLine" id="cb5-9" title="9">  C &lt;-<span class="st"> </span><span class="kw">exp</span>(<span class="kw">lgamma</span>(a<span class="op">+</span>b) <span class="op">-</span><span class="st"> </span><span class="kw">lbeta</span>(a,nu) <span class="op">-</span><span class="st"> </span><span class="kw">lgamma</span>(a<span class="op">+</span>b<span class="op">+</span>nu) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb5-10" title="10"><span class="st">             </span>log_x_power_nu_minus_one <span class="op">+</span><span class="st"> </span>nu<span class="op">*</span><span class="kw">log</span>(theta))</a>
-<a class="sourceLine" id="cb5-11" title="11">  d &lt;-<span class="st"> </span><span class="kw">ifelse</span>(C <span class="op">==</span><span class="st"> </span><span class="ot">Inf</span>, <span class="co"># occurs when x=0 and nu &lt; 1</span></a>
-<a class="sourceLine" id="cb5-12" title="12">              <span class="ot">Inf</span>, C<span class="op">*</span><span class="kw">hyperg_1F1</span>(a<span class="op">+</span>nu, a<span class="op">+</span>b<span class="op">+</span>nu, <span class="op">-</span>x<span class="op">*</span>theta))</a>
-<a class="sourceLine" id="cb5-13" title="13">  out[positive] &lt;-<span class="st"> </span>d</a>
-<a class="sourceLine" id="cb5-14" title="14">  out</a>
-<a class="sourceLine" id="cb5-15" title="15">}</a></code></pre></div>
+<a class="sourceLine" id="cb5-2" title="2">  <span class="kw">stopifnot</span>(nu <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, a <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, b <span class="op">&gt;=</span><span class="st"> </span><span class="dv">0</span>, theta <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb5-3" title="3">  <span class="cf">if</span>(b <span class="op">==</span><span class="st"> </span><span class="dv">0</span>){</a>
+<a class="sourceLine" id="cb5-4" title="4">    <span class="kw">return</span>(<span class="kw">dgamma</span>(x, <span class="dt">shape =</span> nu, <span class="dt">rate =</span> theta))</a>
+<a class="sourceLine" id="cb5-5" title="5">  }</a>
+<a class="sourceLine" id="cb5-6" title="6">  out &lt;-<span class="st"> </span><span class="kw">numeric</span>(<span class="kw">length</span>(x))</a>
+<a class="sourceLine" id="cb5-7" title="7">  positive &lt;-<span class="st"> </span>x <span class="op">&gt;=</span><span class="st"> </span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb5-8" title="8">  x &lt;-<span class="st"> </span>x[positive]</a>
+<a class="sourceLine" id="cb5-9" title="9">  nu_eq_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">rep</span>(nu <span class="op">==</span><span class="st"> </span><span class="dv">1</span>, <span class="kw">length</span>(x))</a>
+<a class="sourceLine" id="cb5-10" title="10">  log_x_power_nu_minus_one &lt;-<span class="st"> </span></a>
+<a class="sourceLine" id="cb5-11" title="11"><span class="st">    </span><span class="kw">ifelse</span>(nu_eq_<span class="dv">1</span>, <span class="dv">0</span>, (nu<span class="dv">-1</span>)<span class="op">*</span><span class="kw">log</span>(x))</a>
+<a class="sourceLine" id="cb5-12" title="12">  C &lt;-<span class="st"> </span><span class="kw">exp</span>(<span class="op">-</span><span class="kw">lbeta</span>(a,nu) <span class="op">-</span><span class="st"> </span><span class="kw">lnpoch</span>(a<span class="op">+</span>b,nu) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb5-13" title="13"><span class="st">             </span>log_x_power_nu_minus_one <span class="op">+</span><span class="st"> </span>nu<span class="op">*</span><span class="kw">log</span>(theta))</a>
+<a class="sourceLine" id="cb5-14" title="14">  d &lt;-<span class="st"> </span><span class="kw">ifelse</span>(C <span class="op">==</span><span class="st"> </span><span class="ot">Inf</span>, <span class="co"># occurs when x=0 and nu &lt; 1</span></a>
+<a class="sourceLine" id="cb5-15" title="15">              <span class="ot">Inf</span>, C<span class="op">*</span><span class="kw">hyperg_1F1</span>(a<span class="op">+</span>nu, a<span class="op">+</span>b<span class="op">+</span>nu, <span class="op">-</span>x<span class="op">*</span>theta))</a>
+<a class="sourceLine" id="cb5-16" title="16">  out[positive] &lt;-<span class="st"> </span>d</a>
+<a class="sourceLine" id="cb5-17" title="17">  out</a>
+<a class="sourceLine" id="cb5-18" title="18">}</a></code></pre></div>
 <p>Let’s check:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">nu &lt;-<span class="st"> </span><span class="dv">5</span></a>
 <a class="sourceLine" id="cb6-2" title="2">sims &lt;-<span class="st"> </span><span class="kw">rGB</span>(nsims, nu, a, b, theta)</a>
@@ -185,18 +193,21 @@ C = (\theta q)^\nu \frac{\Gamma(a+b)}{B(a,\nu)\Gamma(a+\nu)\Gamma(b)} =
 <a class="sourceLine" id="cb7-4" title="4">  u<span class="op">^</span>(a<span class="op">+</span>nu<span class="dv">-1</span>)<span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>u)<span class="op">^</span>(b<span class="dv">-1</span>)<span class="op">*</span>v<span class="op">^</span>(nu<span class="dv">-1</span>)<span class="op">*</span><span class="kw">exp</span>(<span class="op">-</span>q<span class="op">*</span>u<span class="op">*</span>v<span class="op">*</span>theta)</a>
 <a class="sourceLine" id="cb7-5" title="5">}</a>
 <a class="sourceLine" id="cb7-6" title="6">pGB &lt;-<span class="st"> </span><span class="cf">function</span>(q, nu, a, b, <span class="dt">theta =</span> <span class="dv">1</span>){</a>
-<a class="sourceLine" id="cb7-7" title="7">  <span class="kw">stopifnot</span>(nu<span class="op">&gt;</span><span class="dv">0</span>, a<span class="op">&gt;</span><span class="dv">0</span>, b<span class="op">&gt;</span><span class="dv">0</span>, theta<span class="op">&gt;</span><span class="dv">0</span>)</a>
-<a class="sourceLine" id="cb7-8" title="8">  <span class="cf">if</span>(q <span class="op">&lt;=</span><span class="st"> </span><span class="dv">0</span>) <span class="kw">return</span>(<span class="dv">0</span>)</a>
-<a class="sourceLine" id="cb7-9" title="9">  <span class="cf">if</span>(q <span class="op">==</span><span class="st"> </span><span class="ot">Inf</span>) <span class="kw">return</span>(<span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb7-10" title="10">  integral_ &lt;-<span class="st"> </span></a>
-<a class="sourceLine" id="cb7-11" title="11"><span class="st">    </span><span class="kw">pcubature</span>(pGBintegrand, <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>), <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>), <span class="dt">theta =</span> theta, <span class="dt">q =</span> q)</a>
-<a class="sourceLine" id="cb7-12" title="12">  integral &lt;-<span class="st"> </span>integral_<span class="op">$</span>integral</a>
-<a class="sourceLine" id="cb7-13" title="13">  <span class="kw">exp</span>(nu<span class="op">*</span><span class="kw">log</span>(theta<span class="op">*</span>q) <span class="op">-</span><span class="st"> </span><span class="kw">lgamma</span>(nu) <span class="op">-</span><span class="st"> </span><span class="kw">lbeta</span>(a,b)) <span class="op">*</span><span class="st"> </span>integral</a>
-<a class="sourceLine" id="cb7-14" title="14">}</a>
-<a class="sourceLine" id="cb7-15" title="15"><span class="kw">pGB</span>(<span class="dv">3</span>, nu, a, b, theta)</a>
-<a class="sourceLine" id="cb7-16" title="16"><span class="co">## [1] 0.3726581</span></a>
-<a class="sourceLine" id="cb7-17" title="17"><span class="kw">sum</span>(sims <span class="op">&lt;</span><span class="st"> </span><span class="dv">3</span>)<span class="op">/</span>nsims</a>
-<a class="sourceLine" id="cb7-18" title="18"><span class="co">## [1] 0.37214</span></a></code></pre></div>
+<a class="sourceLine" id="cb7-7" title="7">  <span class="kw">stopifnot</span>(nu <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, a <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, b <span class="op">&gt;=</span><span class="st"> </span><span class="dv">0</span>, theta <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb7-8" title="8">  <span class="cf">if</span>(b <span class="op">==</span><span class="st"> </span><span class="dv">0</span>){</a>
+<a class="sourceLine" id="cb7-9" title="9">    <span class="kw">return</span>(<span class="kw">pgamma</span>(q, <span class="dt">shape =</span> nu, <span class="dt">rate =</span> theta))</a>
+<a class="sourceLine" id="cb7-10" title="10">  }</a>
+<a class="sourceLine" id="cb7-11" title="11">  <span class="cf">if</span>(q <span class="op">&lt;=</span><span class="st"> </span><span class="dv">0</span>) <span class="kw">return</span>(<span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb7-12" title="12">  <span class="cf">if</span>(q <span class="op">==</span><span class="st"> </span><span class="ot">Inf</span>) <span class="kw">return</span>(<span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb7-13" title="13">  integral_ &lt;-<span class="st"> </span></a>
+<a class="sourceLine" id="cb7-14" title="14"><span class="st">    </span><span class="kw">pcubature</span>(pGBintegrand, <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>), <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>), <span class="dt">theta =</span> theta, <span class="dt">q =</span> q)</a>
+<a class="sourceLine" id="cb7-15" title="15">  integral &lt;-<span class="st"> </span>integral_<span class="op">$</span>integral</a>
+<a class="sourceLine" id="cb7-16" title="16">  <span class="kw">exp</span>(nu<span class="op">*</span><span class="kw">log</span>(theta<span class="op">*</span>q) <span class="op">-</span><span class="st"> </span><span class="kw">lgamma</span>(nu) <span class="op">-</span><span class="st"> </span><span class="kw">lbeta</span>(a,b)) <span class="op">*</span><span class="st"> </span>integral</a>
+<a class="sourceLine" id="cb7-17" title="17">}</a>
+<a class="sourceLine" id="cb7-18" title="18"><span class="kw">pGB</span>(<span class="dv">3</span>, nu, a, b, theta)</a>
+<a class="sourceLine" id="cb7-19" title="19"><span class="co">## [1] 0.3726581</span></a>
+<a class="sourceLine" id="cb7-20" title="20"><span class="kw">sum</span>(sims <span class="op">&lt;</span><span class="st"> </span><span class="dv">3</span>)<span class="op">/</span>nsims</a>
+<a class="sourceLine" id="cb7-21" title="21"><span class="co">## [1] 0.37207</span></a></code></pre></div>
 <h1 id="poisson-gamma-beta-distribution">Poisson-Gamma-Beta distribution</h1>
 <p>The <em>Poisson-Gamma-Beta distribution</em> with parameters <span class="math inline">\(\nu,a,b,\theta&gt;0\)</span> is defined as the distribution of a random variable <span class="math inline">\(N\)</span> such that <span class="math display">\[
 (N \mid X=x) \sim \mathcal{P}(x), 
@@ -235,7 +246,7 @@ C = (\theta q)^\nu \frac{\Gamma(a+b)}{B(a,\nu)\Gamma(a+\nu)\Gamma(b)} =
 <p>And let’s check:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">sims &lt;-<span class="st"> </span><span class="kw">rPGB</span>(nsims, nu, a, b, theta)</a>
 <a class="sourceLine" id="cb10-2" title="2"><span class="kw">sum</span>(sims <span class="op">&lt;=</span><span class="st"> </span><span class="dv">5</span>) <span class="op">/</span><span class="st"> </span>nsims</a>
-<a class="sourceLine" id="cb10-3" title="3"><span class="co">## [1] 0.764005</span></a>
+<a class="sourceLine" id="cb10-3" title="3"><span class="co">## [1] 0.764015</span></a>
 <a class="sourceLine" id="cb10-4" title="4"><span class="kw">sum</span>(<span class="kw">dPGB</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">5</span>, nu, a, b, theta))</a>
 <a class="sourceLine" id="cb10-5" title="5"><span class="co">## [1] 0.7643542</span></a></code></pre></div>
 <p>We can write a R function for the cumulative distribution more efficient than taking the sum of the probability masses:</p>
