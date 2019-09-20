@@ -80,6 +80,7 @@
 <li><a href="#edit-columns-headers">Edit columns headers</a></li>
 <li><a href="#child-tables">Child tables</a></li>
 <li><a href="#change-row-css-properties-on-clicking-an-icon">Change row CSS properties on clicking an icon</a></li>
+<li><a href="#capturing-the-autofilled-cells">Capturing the autofilled cells</a></li>
 </ul>
 <h1 id="edit-cells-on-pressing-tab-and-arrow-keys">Edit cells on pressing Tab and arrow keys</h1>
 <p>This callback allows a more friendly way to edit the cells:</p>
@@ -707,6 +708,78 @@
 <a class="sourceLine" id="cb7-115" title="115"></a>
 <a class="sourceLine" id="cb7-116" title="116"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
 <p><img src="figures/DTcallback_rowCSSonclick.png" /></p>
+<h1 id="capturing-the-autofilled-cells">Capturing the autofilled cells</h1>
+<p>The <code>AutoFill</code> extension gives an Excel like option to a DataTable to click and drag over multiple cells, filling in information over the selected cells and incrementing numbers as needed.</p>
+<p>The callback below allows to update the data in the R server when some cells are edited or changed by autofilling.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="kw">library</span>(shiny)</a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="kw">library</span>(DT)</a>
+<a class="sourceLine" id="cb8-3" title="3"></a>
+<a class="sourceLine" id="cb8-4" title="4">callback &lt;-<span class="st"> </span><span class="kw">c</span>(</a>
+<a class="sourceLine" id="cb8-5" title="5">  <span class="st">&quot;var tbl = $(table.table().node());&quot;</span>,</a>
+<a class="sourceLine" id="cb8-6" title="6">  <span class="st">&quot;var id = tbl.closest('.datatables').attr('id');&quot;</span>,</a>
+<a class="sourceLine" id="cb8-7" title="7">  <span class="st">&quot;table.on('autoFill', function(e, datatable, cells){&quot;</span>,</a>
+<a class="sourceLine" id="cb8-8" title="8">  <span class="st">&quot;  var out = [];&quot;</span>,</a>
+<a class="sourceLine" id="cb8-9" title="9">  <span class="st">&quot;  for(var i = 0; i &lt; cells.length; ++i){&quot;</span>,</a>
+<a class="sourceLine" id="cb8-10" title="10">  <span class="st">&quot;    var cells_i = cells[i];&quot;</span>,</a>
+<a class="sourceLine" id="cb8-11" title="11">  <span class="st">&quot;    for(var j = 0; j &lt; cells_i.length; ++j){&quot;</span>,</a>
+<a class="sourceLine" id="cb8-12" title="12">  <span class="st">&quot;      var c = cells_i[j];&quot;</span>,</a>
+<a class="sourceLine" id="cb8-13" title="13">  <span class="st">&quot;      var value = c.set === null ? '' : c.set;&quot;</span>, <span class="co"># null =&gt; problem in R</span></a>
+<a class="sourceLine" id="cb8-14" title="14">  <span class="st">&quot;      out.push({&quot;</span>,</a>
+<a class="sourceLine" id="cb8-15" title="15">  <span class="st">&quot;        row: c.index.row + 1,&quot;</span>,</a>
+<a class="sourceLine" id="cb8-16" title="16">  <span class="st">&quot;        col: c.index.column,&quot;</span>,</a>
+<a class="sourceLine" id="cb8-17" title="17">  <span class="st">&quot;        value: value&quot;</span>,</a>
+<a class="sourceLine" id="cb8-18" title="18">  <span class="st">&quot;      });&quot;</span>,</a>
+<a class="sourceLine" id="cb8-19" title="19"><span class="co"># to color the autofilled cells, uncomment the two lines below  </span></a>
+<a class="sourceLine" id="cb8-20" title="20"><span class="co">#  &quot;      $(table.cell(c.index.row, c.index.column).node())&quot;,</span></a>
+<a class="sourceLine" id="cb8-21" title="21"><span class="co">#  &quot;        .css('background-color', 'yellow');&quot;,</span></a>
+<a class="sourceLine" id="cb8-22" title="22">  <span class="st">&quot;    }&quot;</span>,</a>
+<a class="sourceLine" id="cb8-23" title="23">  <span class="st">&quot;  }&quot;</span>,</a>
+<a class="sourceLine" id="cb8-24" title="24">  <span class="st">&quot;  Shiny.setInputValue(id + '_cells_filled:DT.cellInfo', out);&quot;</span>,</a>
+<a class="sourceLine" id="cb8-25" title="25">  <span class="st">&quot;  table.rows().invalidate();&quot;</span>, <span class="co"># this updates the column type</span></a>
+<a class="sourceLine" id="cb8-26" title="26">  <span class="st">&quot;});&quot;</span></a>
+<a class="sourceLine" id="cb8-27" title="27">)</a>
+<a class="sourceLine" id="cb8-28" title="28"></a>
+<a class="sourceLine" id="cb8-29" title="29">ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</a>
+<a class="sourceLine" id="cb8-30" title="30">  <span class="kw">br</span>(),</a>
+<a class="sourceLine" id="cb8-31" title="31">  <span class="kw">DTOutput</span>(<span class="st">&quot;dt&quot;</span>),</a>
+<a class="sourceLine" id="cb8-32" title="32">  <span class="kw">br</span>(),</a>
+<a class="sourceLine" id="cb8-33" title="33">  <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;table&quot;</span>)</a>
+<a class="sourceLine" id="cb8-34" title="34">)</a>
+<a class="sourceLine" id="cb8-35" title="35"></a>
+<a class="sourceLine" id="cb8-36" title="36">server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</a>
+<a class="sourceLine" id="cb8-37" title="37">  </a>
+<a class="sourceLine" id="cb8-38" title="38">  dat &lt;-<span class="st"> </span>iris[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>,]</a>
+<a class="sourceLine" id="cb8-39" title="39">  dat<span class="op">$</span>Species &lt;-<span class="st"> </span><span class="kw">as.character</span>(dat<span class="op">$</span>Species)</a>
+<a class="sourceLine" id="cb8-40" title="40">  </a>
+<a class="sourceLine" id="cb8-41" title="41">  output[[<span class="st">&quot;dt&quot;</span>]] &lt;-<span class="st"> </span><span class="kw">renderDT</span>({</a>
+<a class="sourceLine" id="cb8-42" title="42">    <span class="kw">datatable</span>(dat, </a>
+<a class="sourceLine" id="cb8-43" title="43">              <span class="dt">editable =</span> <span class="kw">list</span>(<span class="dt">target =</span> <span class="st">&quot;cell&quot;</span>),</a>
+<a class="sourceLine" id="cb8-44" title="44">              <span class="dt">selection =</span> <span class="st">&quot;none&quot;</span>,</a>
+<a class="sourceLine" id="cb8-45" title="45">              <span class="dt">extensions =</span> <span class="st">&quot;AutoFill&quot;</span>,</a>
+<a class="sourceLine" id="cb8-46" title="46">              <span class="dt">callback =</span> <span class="kw">JS</span>(callback), </a>
+<a class="sourceLine" id="cb8-47" title="47">              <span class="dt">options =</span> <span class="kw">list</span>(</a>
+<a class="sourceLine" id="cb8-48" title="48">                <span class="dt">autoFill =</span> <span class="ot">TRUE</span></a>
+<a class="sourceLine" id="cb8-49" title="49">              )</a>
+<a class="sourceLine" id="cb8-50" title="50">    )</a>
+<a class="sourceLine" id="cb8-51" title="51">  }, <span class="dt">server =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb8-52" title="52">  </a>
+<a class="sourceLine" id="cb8-53" title="53">  Data &lt;-<span class="st"> </span><span class="kw">reactive</span>({</a>
+<a class="sourceLine" id="cb8-54" title="54">    info &lt;-<span class="st"> </span><span class="kw">rbind</span>(input[[<span class="st">&quot;dt_cells_filled&quot;</span>]], input[[<span class="st">&quot;dt_cell_edit&quot;</span>]])</a>
+<a class="sourceLine" id="cb8-55" title="55">    <span class="cf">if</span>(<span class="op">!</span><span class="kw">is.null</span>(info)){</a>
+<a class="sourceLine" id="cb8-56" title="56">      info &lt;-<span class="st"> </span><span class="kw">unique</span>(info)</a>
+<a class="sourceLine" id="cb8-57" title="57">      info<span class="op">$</span>value[info<span class="op">$</span>value<span class="op">==</span><span class="st">&quot;&quot;</span>] &lt;-<span class="st"> </span><span class="ot">NA</span></a>
+<a class="sourceLine" id="cb8-58" title="58">      dat &lt;&lt;-<span class="st"> </span><span class="kw">editData</span>(dat, info, <span class="dt">proxy =</span> <span class="st">&quot;dt&quot;</span>)</a>
+<a class="sourceLine" id="cb8-59" title="59">    }</a>
+<a class="sourceLine" id="cb8-60" title="60">    dat</a>
+<a class="sourceLine" id="cb8-61" title="61">  })</a>
+<a class="sourceLine" id="cb8-62" title="62"></a>
+<a class="sourceLine" id="cb8-63" title="63">  output[[<span class="st">&quot;table&quot;</span>]] &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({<span class="kw">Data</span>()})  </a>
+<a class="sourceLine" id="cb8-64" title="64">}</a>
+<a class="sourceLine" id="cb8-65" title="65"></a>
+<a class="sourceLine" id="cb8-66" title="66"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
+<p><img src="figures/DTcallback_AutoFill.gif" /></p>
+<p>If you use <code>server = FALSE</code> in <code>renderDT</code>, just remove the <code>proxy</code> argument in <code>editData</code>:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">dat &lt;&lt;-<span class="st"> </span><span class="kw">editData</span>(dat, info)</a></code></pre></div>
 
     </div>
 
