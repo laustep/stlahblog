@@ -1,0 +1,155 @@
+<html>
+
+<head>
+  <title>Bonan-Jeener triple Klein's bottle</title>
+  <style>
+    html, body {
+       margin: 0;
+       height: 100%;
+       width: 100%;
+    }
+    #c {
+       width: 100%;
+       box-sizing: border-box;
+       display: block;
+    }
+  </style>
+
+  <script src="../libraries/jquery.min.js"></script>
+  <script src="../libraries/three_r103.min.js"></script>
+  <script src="../libraries/dat.gui.min.js"></script>
+
+</head>
+
+<body>
+
+  <canvas id="c"></canvas>
+
+  <script>
+    // dat.gui controls --------------------------------------------------------
+    var z0 = 6;
+    var dgcontrols = new function () {
+      this.cameraz = z0;
+      this.rotationSpeed = 0.001;
+    }
+    var gui = new dat.GUI({
+      autoplace: false,
+      width: 300
+    });
+    gui.add(dgcontrols, 'cameraz').min(1).max(9).step(1)
+      .name("Camera position");
+    gui.add(dgcontrols, 'rotationSpeed').min(0).max(0.005).step(0.0005)
+      .name("Rotation speed");
+  </script>
+
+  <script>
+    var uSteps = 49, vSteps = 49;
+    var pi = Math.PI;
+    var a = 3+1;
+    var b = 1.5;
+  </script>
+
+  <script> // parameterization -------------------------------------------------
+    function f0(u0, v0) {
+      // both u and v run from zero to one in Three.js
+      var u = 2 * pi * u0;
+      var v = 2 * pi * v0;
+      var x = 0.5 * (a * Math.cos(u) - Math.cos(a * u) - ((a - 1) / a) * (Math.sin((a - 1) * u) + b) * Math.sin((a + 1) * u / 2) * Math.cos(v));
+      var y = (Math.sin((a - 1) * u) + b) * Math.sin(v);
+      var z = 0.5 * (a * Math.sin(u) - Math.sin(a * u) + ((a - 1) / a) * (Math.sin((a - 1) * u) + b) * Math.cos((a + 1) * u / 2) * Math.cos(v));
+      return new THREE.Vector3(x, y, z);
+    }
+    function f(u, v, vector) {
+      var out = f0(u, v);
+      vector.set(out.x, out.y, out.z);
+    }
+  </script>
+
+  <script> // mesh -------------------------------------------------------------
+    var geom = new THREE.ParametricBufferGeometry(f, uSteps, vSteps);
+    var material = new THREE.MeshNormalMaterial({ wireframe: true });
+    var mesh = new THREE.Mesh(geom, material);
+  </script>
+
+  <script>
+    var container = document.getElementById("c");
+    $(container).css("height", window.innerHeight);
+    var width = $(container).width();
+    var height = $(container).height(); 
+    var aspect = width / height;
+    var camera = new THREE.PerspectiveCamera(70, aspect, 1, 10000);
+    camera.position.z = z0;
+
+    var renderer = new THREE.WebGLRenderer({canvas: container});
+    renderer.setSize(width, height);
+    renderer.toneMappingExposure = 1;
+
+    $(window).on("resize", function(){
+      $(container).css("width", window.innerWidth);
+      $(container).css("height", window.innerHeight); 
+      camera.aspect = 
+        renderer.domElement.clientWidth / renderer.domElement.clientHeight;
+      camera.updateProjectionMatrix();
+    })
+
+    var scene = new THREE.Scene();
+    scene.add(camera);
+    scene.add(mesh);
+    
+    window.requestAnimFrame = (function () {
+      return window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        function (callback) {
+          window.setTimeout(callback, 1000 / 60);
+        };
+    })();
+
+    function render() {
+      renderer.render(scene, camera);
+      camera.position.z = dgcontrols.cameraz;
+      mesh.rotation.x += dgcontrols.rotationSpeed;
+      mesh.rotation.y += dgcontrols.rotationSpeed;
+      requestAnimFrame(render);
+    }
+
+  </script>
+
+  <script> // mouse dragging ---------------------------------------------------
+    var isDragging = false;
+    var previousMousePosition = { x: 0, y: 0 };
+    $(renderer.domElement).on('mousedown', function (e) {
+      isDragging = true;
+    }).on('mousemove', function (e) {
+      var deltaMove = {
+        x: e.offsetX - previousMousePosition.x,
+        y: e.offsetY - previousMousePosition.y
+      };
+      if (isDragging) {
+        var deltaRotationQuaternion = new THREE.Quaternion()
+          .setFromEuler(new THREE.Euler(
+            Math.PI / 180 * (deltaMove.y * 0.5),
+            Math.PI / 180 * (deltaMove.x * 0.5),
+            0,
+            'XYZ'
+          ));
+        mesh.quaternion.multiplyQuaternions(deltaRotationQuaternion,
+            mesh.quaternion);
+      }
+      previousMousePosition = {
+        x: e.offsetX,
+        y: e.offsetY
+      };
+    });
+    $(document).on('mouseup', function (e) {
+      isDragging = false;
+    });
+  </script>
+
+  <script>
+    requestAnimFrame(render);
+  </script>
+
+</body>
+
+</html>
