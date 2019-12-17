@@ -1120,16 +1120,16 @@
 <a class="sourceLine" id="cb3-405" title="405">        subdiv(</a>
 <a class="sourceLine" id="cb3-406" title="406">            vertices[faces[i][<span class="fl">0</span>]], </a>
 <a class="sourceLine" id="cb3-407" title="407">            vertices[faces[i][<span class="fl">1</span>]], </a>
-<a class="sourceLine" id="cb3-408" title="408">            vertices[faces[i][<span class="fl">2</span>]], depth);</a>
+<a class="sourceLine" id="cb3-408" title="408">            vertices[faces[i][<span class="fl">2</span>]], r, depth);</a>
 <a class="sourceLine" id="cb3-409" title="409">    <span class="kw">#declare stereoTriangles</span>[i] = <span class="kw">array</span>[<span class="kw">dimension_size</span>(triangles4,<span class="fl">1</span>)][<span class="fl">3</span>];</a>
 <a class="sourceLine" id="cb3-410" title="410">    #for(j, <span class="fl">0</span>, <span class="kw">dimension_size</span>(triangles4,<span class="fl">1</span>)-<span class="fl">1</span>)</a>
 <a class="sourceLine" id="cb3-411" title="411">        <span class="kw">#local trgl4 </span>= triangles4[j];</a>
 <a class="sourceLine" id="cb3-412" title="412">        <span class="kw">#declare stereoTriangles</span>[i][j][<span class="fl">0</span>] = </a>
-<a class="sourceLine" id="cb3-413" title="413">            StereographicProjection(rotate4d(theta, beta, xi, trgl4[<span class="fl">0</span>]));</a>
+<a class="sourceLine" id="cb3-413" title="413">            StereographicProjection(rotate4d(theta, phi, xi, trgl4[<span class="fl">0</span>]), r);</a>
 <a class="sourceLine" id="cb3-414" title="414">        <span class="kw">#declare stereoTriangles</span>[i][j][<span class="fl">1</span>] = </a>
-<a class="sourceLine" id="cb3-415" title="415">            StereographicProjection(rotate4d(theta, beta, xi, trgl4[<span class="fl">1</span>]));</a>
+<a class="sourceLine" id="cb3-415" title="415">            StereographicProjection(rotate4d(theta, phi, xi, trgl4[<span class="fl">1</span>]), r);</a>
 <a class="sourceLine" id="cb3-416" title="416">        <span class="kw">#declare stereoTriangles</span>[i][j][<span class="fl">2</span>] = </a>
-<a class="sourceLine" id="cb3-417" title="417">            StereographicProjection(rotate4d(theta, beta, xi, trgl4[<span class="fl">2</span>]));</a>
+<a class="sourceLine" id="cb3-417" title="417">            StereographicProjection(rotate4d(theta, phi, xi, trgl4[<span class="fl">2</span>]), r);</a>
 <a class="sourceLine" id="cb3-418" title="418">    <span class="ot">#end</span></a>
 <a class="sourceLine" id="cb3-419" title="419"><span class="ot">#end</span></a>
 <a class="sourceLine" id="cb3-420" title="420"></a>
