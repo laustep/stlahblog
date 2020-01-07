@@ -1,0 +1,191 @@
+<html>
+  <head>
+    <script src="../libraries/paper-full.min.js"></script>
+    <style>
+      canvas {
+        width: 500px;
+        height: 500px;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      var nightlife = ["#00cffa", "#ff0038", "#ffce38", "#020509"];
+      var inferno = ["#000004", "#781C6D", "#ED6925", "#FCFFA4"];
+      var inferno_dark = ["#000004", "#420A68", "#932667", "#DD513A"];
+      var rainbow = ["#FF0000", "#80FF00", "#00FFFF", "#8000FF"];
+
+      var inferno_o50 = inferno.map(function(hex){return hex + "88";});
+      var nightlife_o25 = nightlife.map(function(hex){return hex + "44";}); 
+
+      function modularColour(palette, parameters, c){
+        var k = palette.length;
+        var index = c*parameters[0] + parameters[1];
+        return palette[index % k];
+      }
+
+      function mod(n, m){ // modulo function (always returns a positive number)
+        return ((n % m) + m) % m;
+      }
+
+      function precomputeCircles(dis, curvatureBound, xmax, ymax){
+        var dismod4 = mod(dis,4) === 1; 
+        var polyCoeffs = dismod4 ? [4, (1-dis)/4] : [0, -dis];
+        var coeffs = dismod4 ? [2, 2, 1, -dis] : [4, 4, 0, -4*dis]; 
+        var sLower = dismod4 ? Math.floor(-xmax*curvatureBound) + 1 : 0;
+        var sUpper = Math.floor(xmax*curvatureBound);
+        var tUpper = Math.floor(ymax*curvatureBound);
+        var tLower = Math.floor(-ymax*curvatureBound) + 1;
+        var coords = [];
+        for(var r = 0; r < Math.floor(curvatureBound); ++r){
+          var r_coords = [];
+          var requalzero = r === 0;
+          for(var s = sLower; s < sUpper+1; ++s){
+            for(var t = tLower; t < tUpper; ++t){
+              var x = s*s + polyCoeffs[0]*s*t + polyCoeffs[1]*t*t + t;
+              var m = requalzero ? x : mod(x, r);
+              if(m === 0){
+                var curv = coeffs[0]*r;
+                var xcoord = coeffs[1]*s + coeffs[2]*t;
+                var ycoord = coeffs[3]*t + 2;
+                var i = 0; var test = true;
+                while(i < r_coords.length){
+                  var r_coord = r_coords[i];
+                  if(xcoord === r_coord.x && ycoord === r_coord.y){
+                    test = false;
+                    break;
+                  };
+                  i = i + 1;
+                }
+                if(test){
+                  var xyc = {x: xcoord, y: ycoord, c: curv};
+                  r_coords.push(xyc);
+                  if(xcoord !== 0){
+                    var xyc = {x: -xcoord, y: ycoord, c: curv};
+                    r_coords.push(xyc);
+                  }
+                  if(ycoord !== 0){
+                    var xyc = {x: xcoord, y: -ycoord, c: curv};
+                    r_coords.push(xyc);
+                  }
+                  if(xcoord !== 0 && ycoord !== 0){
+                    var xyc = {x: -xcoord, y: -ycoord, c: curv};
+                    r_coords.push(xyc);
+                  }
+                }
+              }
+            }
+          }
+          coords = coords.concat(r_coords);
+        }
+        return {coords: coords, dis: dis};
+      }
+
+      function containment(circle, circles) {
+        var out = false;
+        var ctr = circle.center;
+        for (var i = 0; i < circles.length; ++i) {
+          var circlei = circles[i];
+          var ctri = circlei.center
+          var d = Math.sqrt((ctr.x - ctri.x)**2 + (ctr.y - ctri.y) ** 2);
+          if (d + circle.radius <= circlei.radius) {
+            out = true;
+            break;
+          }
+        }
+        return out;
+      }
+
+      function filterCirclesCircular(coordlist, curvature_lwr, curvature_upr, 
+              xctr, yctr, r2, sortDown, filterDown){
+        var dis = coordlist.dis;
+        var coords = coordlist.coords;
+        var rootval = Math.sqrt(-dis);
+        var cfactor = mod(dis,4) === 1 ? 1 : 2;
+        var circs = [];
+        if(filterDown){
+          coords = coords.sort(function (a, b) { return b.c - a.c });
+        }
+        for(var i = 0; i < coords.length; ++i){
+          var coord = coords[i];
+          var c = coord.c;
+          var ccf = c / cfactor;
+          if(ccf >= 2*curvature_lwr && ccf <= 2*curvature_upr){
+            if(c > 0){
+              var x = coord.x/c; var y = coord.y/c/rootval;
+              var d2 = (x-xctr)**2 + (y-yctr)**2;
+              if(d2 < r2){
+                var circ = {center: {x: x, y: y}, radius: 2*y/coord.y, c: ccf/2};
+                circs.push(circ);
+              }
+            }
+          }
+        }
+
+        if(filterDown){
+          var circs2 = [];
+          for (var i = 0; i < circs.length; ++i) {
+            var circs_clone = circs.slice(0);
+            circs_clone.splice(i, 1);
+            if(!containment(circs[i], circs_clone)){
+              circs2.push(circs[i]);
+            }
+          }
+          circs = circs2.slice(0);
+        }
+
+        if(sortDown){
+          circs = circs.sort(function(a, b){return b.c - a.c});
+        }
+
+        return circs;
+      } 
+    </script>
+
+    <script type="text/paperscript" canvas="quad">
+      function gradientDisk(center, radius, color1, color2){
+        var circle = 
+          new Path.Circle(view.center + new Point(center.x, center.y-0.5), radius);
+        circle.fillColor = {
+          gradient: {
+              stops: [color1, color2],
+              radial: true
+          },
+          origin: circle.position,
+          destination: circle.bounds.rightCenter
+        };
+        return circle.scale(1);
+      }
+
+      view.zoom = view.viewSize.width;
+
+      var coordlist = precomputeCircles(-1, 100, 1, 1);
+      var circles = 
+        filterCirclesCircular(coordlist, 0, 35, 0, 0.5, 0.25, true, false);
+      console.log(circles);
+      var paperCircles = new Array(circles.length);
+      for(var i = 0; i < circles.length; ++i){
+        var crcl = circles[i];
+        var center = 
+          view.center + new Point(crcl.center.x, crcl.center.y-0.5);
+        var fillColor = 
+          modularColour(["#00000088"], [0,0], crcl.c);
+        var strokeColor = 
+          modularColour(nightlife_o25, [2,0], crcl.c);
+        paperCircles[i] = new Path.Circle(center, crcl.radius-0.005);
+        paperCircles[i].fillColor = fillColor;
+        paperCircles[i].strokeColor = strokeColor;
+        paperCircles[i].strokeWidth = 0.005;
+        paperCircles[i].blendMode = "color-dodge";
+      }
+      var group = new Group(paperCircles);
+
+      function onFrame(event){
+        group.rotate(0.5);
+      }
+    </script>
+
+    <canvas id="quad" resize></canvas>
+  </body>
+</html>
+
