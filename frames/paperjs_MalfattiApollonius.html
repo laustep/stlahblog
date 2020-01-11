@@ -1,0 +1,372 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="../libraries/jquery-ui/jquery-ui.min.css">
+    <script src="../libraries/jquery.min.js"></script>
+    <script src="../libraries/jquery-ui/jquery-ui.min.js"></script>
+    <script src="../libraries/math.min.js"></script>
+    <script src="../libraries/paper-full.min.js"></script>
+    <style>
+      canvas {
+        width: 800px;
+        height: 600px;
+      }
+      .controls {
+        width: 100%;
+        display: table;
+        background-image: linear-gradient(to right, chartreuse, green);
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    
+    <div id="controls" class="controls">
+      <div style="display: table-row">
+        <div style="display: table-cell;">
+          <div id="sliderx" style="margin-right: 10px;"></div>
+        </div>
+        <div style="display: table-cell;">
+          <div id="slidery" style="margin-right: 10px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/paperscript" canvas="quad">
+      var strokeWidth = 3;
+      function length(A, B){
+        var x = A.x - B.x, y = A.y - B.y;
+        return Math.sqrt(x*x+y*y);
+      }
+      function inCircle(A, B, C){
+        var a = length(B, C), b = length(C, A), c = length(A, B);
+        var p = (a + b + c), s = p / 2;
+        var area =  Math.sqrt(s*(s-a)*(s-b)*(s-c));
+        // excenters
+        var excenterA = (-A*a + B*b + C*c)/(-a + b + c);
+        var excenterB = (A*a - B*b + C*c)/(a - b + c);
+        var excenterC = (A*a + B*b - C*c)/(a + b - c);
+        //
+        return {
+          center: (A*a + B*b + C*c) / p, 
+          radius: area / s,
+          exctrA: excenterA,
+          exctrB: excenterB,
+          exctrC: excenterC
+        };
+      }
+      function innerSoddyCircle(cA, cB, cC){
+        var r1 = cA.bounds.width/2, 
+          r2 = cB.bounds.width/2, 
+          r3 = cC.bounds.width/2;
+        var radius = 
+          1/(1/r1+1/r2+1/r3+2*Math.sqrt(1/r1/r2+1/r2/r3+1/r3/r1));
+        var A = cA.position, B = cB.position, C = cC.position;
+        var a = length(B, C), b = length(C, A), c = length(A, B);
+        var p = (a + b + c), s = p / 2;
+        var darea = 2*Math.sqrt(s*(s-a)*(s-b)*(s-c));
+        var p1 = a + a*darea/(a*(b+c-a)), 
+          p2 = b + b*darea/(b*(a+c-b)), 
+          p3 = c + c*darea/(c*(b+a-c));
+        var center = (A*p1 + B*p2 + C*p3) / (p1 + p2 + p3);
+        var soddy = new Path.Circle(center, radius);
+        soddy.visible = false;
+        return soddy;
+      }
+      function outerSoddyCircle(A, B, C){
+        var a = length(B, C), b = length(C, A), c = length(A, B);
+        var p = (a + b + c), s = p / 2;
+        var area = Math.sqrt(s*(s-a)*(s-b)*(s-c));
+        var R = a*b*c / (4*Math.sqrt(s*(a+b-s)*(a+c-s)*(b+c-s)));
+        var r = area / s;
+        var radius = area / (4*R + r - p);
+        var p1 = a - area/(s-a), p2 = b - area/(s-b), p3 = c - area/(s-c);
+        var center = (A*p1 + B*p2 + C*p3) / (p1 + p2 + p3);
+        return {center: center, radius: radius};
+      }
+      function projection(A, B, M){
+        return (M-A).project(B-A) + A;
+      }
+      function plotPoint(M, color){
+        var circle = new Path.Circle(M, strokeWidth);
+        if(color === undefined) color='red';
+        circle.fillColor = color;
+      }
+      function intersectionCircleSegment(circle, A, B){
+        var AB = new Path(); AB.add(A); AB.add(B);
+        return AB.getIntersections(circle)[0].point;
+      }
+      function circleOM(O, M){
+        var circle = new Path.Circle(O, length(O,M));
+        circle.visible = false;
+        return circle;        
+      }
+      function Segment(A, B){
+        var AB = new Path(); AB.add(A); AB.add(B);
+        AB.visible = false;
+        return AB;
+      }
+      function collinear(A, B, C){
+        var AB = B-A, AC = C-A;
+        var u = math.complex(AB.x, AB.y), v = math.complex(AC.x, AC.y);
+        var z = math.multiply(math.conj(u), v);
+        return Math.abs(z.im) < 0.00001;
+      }
+      function radicalaxis(Circ1, Circ2){ // Circ1 and Circ2 are tangent
+        var O1O2 = (Circ2.position-Circ1.position);
+        var I;
+        if(Circ1.bounds.width/2 > O1O2.length){
+          I = Circ2.position + O1O2.normalize()*(Circ2.bounds.width/2);
+        }else{
+          I = Circ1.position + O1O2.normalize()*(Circ1.bounds.width/2);
+        }
+        //var v = O1O2;
+        //v.angle = v.angle + 90;
+        var v = new Point(-O1O2.y, O1O2.x);
+        return Segment(I-v*600, I+v*600);
+      }
+      function radicalcenter(Circ1, Circ2, Circ3){ // for tangent circles
+        var raxis1 = radicalaxis(Circ1, Circ2);
+        var raxis2 = radicalaxis(Circ1, Circ3);
+        return raxis1.getIntersections(raxis2)[0].point;
+      }
+      function power(M, Circ){
+        var zRe = length(M, Circ.position);
+        var zIm = Circ.bounds.width / 2;
+        var z = math.complex(zRe, zIm);
+        var z2 = math.multiply(z,z);
+        return z2.re; 
+      }
+      function inversion(Circ1, Circ2, Circ3, exterior){
+        if(exterior === undefined){
+          exterior = false;
+        }
+        var rc = radicalcenter(Circ1, Circ2, Circ3);
+        var sgn = exterior ? -1 : 1;
+        return {pole: rc, k: sgn*Math.abs(power(rc, Circ1))};
+      }
+      function invertCircle(inversion, Circ){
+        var c0 = inversion.pole;
+        var c1 = Circ.position;
+        var sgn = inversion.k > 0 ? 1 : -1;
+        var r0 = Math.sqrt(sgn*inversion.k);
+        var r1 = Circ.bounds.width/2;
+        var z1 = (c0 - c1) / r0;
+        var D1 = r1*r1/r0/r0 - (z1.x*z1.x + z1.y*z1.y);
+        var z2 = -z1/D1*sgn;
+        var r2 = Math.sqrt(z2.x*z2.x + z2.y*z2.y + 1/D1);
+        var out = new Path.Circle(z2*r0+c0, r0*r2); 
+        out.visible = false;
+        return out;
+      }
+      function Malfatti(A, B, C){
+        var triangle = new Path();
+        triangle.strokeColor = "rgb(191,191,191)";
+        triangle.strokeWidth = strokeWidth;
+        triangle.dashArray = [5, 5];
+        triangle.add(A); triangle.add(B); triangle.add(C);
+        triangle.closed = true;
+        var incircle_ = inCircle(A, B, C);
+        var incircle = new Path.Circle(incircle_.center, incircle_.radius);
+        incircle.visible = false;
+        var I = incircle_.center;
+        var Y = projection(A, C, I);
+        var A1 = intersectionCircleSegment(incircle, A, I);
+        var B1 = intersectionCircleSegment(incircle, B, I);
+        var C1 = intersectionCircleSegment(incircle, C, I);
+        var A2 = intersectionCircleSegment(circleOM(A,A1), A, B);
+        var B2 = intersectionCircleSegment(circleOM(B,B1), B, C);
+        var C2 = intersectionCircleSegment(circleOM(C,C1), B, C);
+        var D = intersectionCircleSegment(circleOM(A,Y), A, I);
+        var E = intersectionCircleSegment(circleOM(I,D), I, incircle_.exctrC);
+        var F = intersectionCircleSegment(circleOM(I,D), I, incircle_.exctrB);
+        var B3 = intersectionCircleSegment(circleOM(C,E), B, C);
+        var C3 = intersectionCircleSegment(circleOM(B,F), B, C);
+        var G = intersectionCircleSegment(circleOM(C,Y), I, C);
+        var H = intersectionCircleSegment(circleOM(I,G), incircle_.exctrB, I);
+        var A3 = intersectionCircleSegment(circleOM(B,H), B, A);
+        var M1 = (A2+A3)/2, M2 = (B2+B3)/2, M3 = (C2+C3)/2;
+        //
+        var vAB = B-A;
+        var v1 = new Point(vAB.y, -vAB.x);
+        var X1 = M1 - v1, Y1 = M1 + v1; 
+        var X1Y1 = Segment(X1,Y1); 
+        var AI = Segment(A,I);
+        var O1 = X1Y1.getIntersections(AI)[0].point;
+        var cO1M1 = circleOM(O1,M1);
+        cO1M1.fillColor = {
+          gradient: {
+              stops: ['purple', 'black'],
+              radial: true
+          },
+          origin: cO1M1.position,
+          destination: cO1M1.bounds.rightCenter
+        };
+        //
+        var vBC = C-B;
+        var v2 = new Point(vBC.y, -vBC.x);
+        var X2 = M2 - v2, Y2 = M2 + v2;
+        var X2Y2 = Segment(X2,Y2); 
+        var BI = Segment(B,I);
+        var O2 = X2Y2.getIntersections(BI)[0].point;
+        var cO2M2 = circleOM(O2,M2);
+        cO2M2.fillColor = {
+          gradient: {
+              stops: ['purple', 'black'],
+              radial: true
+          },
+          origin: cO2M2.position,
+          destination: cO2M2.bounds.rightCenter
+        };
+        //
+        var X3 = M3 - v2, Y3 = M3 + v2;
+        var X3Y3 = Segment(X3,Y3); 
+        var CI = Segment(C,I);
+        var O3 = X3Y3.getIntersections(CI)[0].point;
+        var cO3M3 = circleOM(O3,M3);
+        cO3M3.fillColor = {
+          gradient: {
+              stops: ['purple', 'black'],
+              radial: true
+          },
+          origin: cO3M3.position,
+          destination: cO3M3.bounds.rightCenter
+        };
+        //
+        return [cO1M1, cO2M2, cO3M3];
+      }
+
+      function iteration(circles0, inversions){
+        var out = [];
+        for(var j = 0; j < circles0.length; ++j){
+          var mycircle = circles0[j];
+          var circle = mycircle.circle;
+          var ji = mycircle.inversion;
+          for(var i = 0; i < 4; ++i){
+            if(i != ji){
+              var inversion = inversions[i];
+              out.push({
+                circle : invertCircle(inversion, circle),
+                inversion: i
+              })
+            }
+          }
+        }
+        return out;
+      }
+
+      function gasket(circles0, inversions, depth, colors){
+        if(depth > 0){
+          circles = iteration(circles0, inversions);
+          for(var i = 0; i < circles.length; ++i){
+            circles[i].circle.fillColor = {
+              gradient: {
+                  stops: [colors[0], 'black'],
+                  radial: true
+              },
+              origin: circles[i].circle.position,
+              destination: circles[i].circle.bounds.rightCenter
+            };
+            circles[i].circle.visible = true;
+          }
+          colors.shift();
+          gasket(circles, inversions, depth-1, colors);
+        }
+      }
+
+      // -----------------------------------------------------------------------
+      var A = new Point(0,0), B = new Point(100,0); // do not change
+
+      var Center = view.center - new Point(0,25);
+      function drawCircles(A, B, C){
+        var circles = Malfatti(A,B,C);
+        var soddyO = outerSoddyCircle(
+          circles[0].position,
+          circles[1].position,
+          circles[2].position
+        );
+        var center = soddyO.center, radius = -soddyO.radius; // soddy.radius is <0!!
+        var A1 = (A-center)*100/radius + Center, 
+          B1 = (B-center)*100/radius + Center, 
+          C1 = (C-center)*100/radius + Center;
+        var Mcircles = Malfatti(A1,B1,C1);
+        Mcircles[0].visible = true;
+        Mcircles[1].visible = true;
+        Mcircles[2].visible = true;
+
+        var soddy = new Path.Circle(Center, 100);
+        soddy.strokeColor = 'black';
+        soddy.strokeWidth = strokeWidth;
+	      Mcircles.push(soddy);
+
+	      var inversions = new Array(4);
+	      var circles0 = new Array(4);
+	      inversions[0] = inversion(soddy, Mcircles[1], Mcircles[2], true);
+	      inversions[1] = inversion(soddy, Mcircles[0], Mcircles[2], true);
+	      inversions[2] = inversion(soddy, Mcircles[0], Mcircles[1], true);
+	      inversions[3] = inversion(Mcircles[0], Mcircles[1], Mcircles[2]);
+	      for(var i = 0; i < 4; ++i){
+          var circle = i < 3 ? invertCircle(inversions[i], Mcircles[i]) : 
+            innerSoddyCircle(Mcircles[0], Mcircles[1], Mcircles[2]); // i=3 does not work well
+          circle.fillColor = {
+            gradient: {
+                stops: ['pink', 'black'],
+                radial: true
+            },
+            origin: circle.position,
+            destination: circle.bounds.rightCenter
+          };
+          circle.visible = true;
+          circles0[i] = {circle: circle, inversion: i};
+          inversions[i].k = -Math.abs(inversions[i].k);
+	      }
+
+        gasket(circles0, inversions, 2, ['yellow', 'brown']);
+      }
+
+      // -----------------------------------------------------------------------
+      $("#sliderx").slider({
+        min: 0,
+        max: 100,
+        value: 50,
+        step: 1,
+        slide: function(){
+          var C = new Point(
+                $(this).slider("option", "value"), 
+                $("#slidery").slider("option", "value")
+              );
+          if(!collinear(A,B,C)){
+            project.activeLayer.removeChildren();
+            drawCircles(A, B, C);
+          }
+        }
+      });
+      $("#slidery").slider({
+        min: 36,
+        max: 136,
+        value: Math.sqrt(3)/2*100,
+        step: 1,
+        slide: function(){
+          var C = new Point(
+                $("#sliderx").slider("option", "value"), 
+                $(this).slider("option", "value")
+              );
+          if(!collinear(A,B,C)){
+            project.activeLayer.removeChildren();
+            drawCircles(A, B, C);
+          }
+        }
+      });
+      // -----------------------------------------------------------------------
+      var C = new Point(
+          $("#sliderx").slider("option", "value"), 
+          $("#slidery").slider("option", "value")
+        );
+      drawCircles(A, B, C);
+
+      view.zoom = view.viewSize.height / 300;
+
+    </script>
+    <canvas id="quad" resize></canvas>
+  </body>
+</html>
