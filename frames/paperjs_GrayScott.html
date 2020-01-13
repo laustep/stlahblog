@@ -1,0 +1,198 @@
+<html>
+  <head>
+    <script src="../libraries/jquery.min.js"></script>
+    <script src="../libraries/paper-full.min.js"></script>
+    <script src="../libraries/scale-color-perceptual/bundle.js"></script>
+    <script>
+      var scale = require('scale-color-perceptual');
+    </script>
+    <style>
+      canvas {
+        width: 400px;
+        height: 400px;
+        margin-top: 20px;
+        margin-left: 20px;
+      }
+      .controls {
+        width: 100%;
+        display: table;
+        background-image: linear-gradient(to right, chartreuse, green);
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+      #iterate {
+        margin-left: 5px;
+        margin-right: 5px;
+      }
+      #percentage {
+        width: 50px;
+      }
+      input:invalid{
+        background-color: crimson;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div id="controls" class="controls">
+      <div style="display: table-row">
+        <div style="display: table-cell;">
+          <button id="iterate">Iterate</button>
+        </div>
+        <div style="display: table-cell;">
+          <label for="iterations">Iterations</label>
+          <input id="iterations" type="number" value=100 min=1/>
+        </div>
+        <div style="display: table-cell;">
+          <label for="palette">Palette</label>
+          <select id="palette">
+            <option value="inferno">inferno</option>
+            <option value="viridis">viridis</option>
+            <option value="plasma">plasma</option>
+            <option value="magma">magma</option>
+          </select>
+        </div>
+        <div style="display: table-cell;">
+          <span>
+            <button id="start">Start</button>
+            with
+            <input id="percentage" type="number" value=1 min=1 max=10 />
+            % particles
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function getPalette(palette){
+        var f;
+        switch(palette){
+          case "inferno":
+            f = scale.inferno;
+            break;
+          case "viridis":
+            f = scale.viridis;
+            break;
+          case "plasma":
+            f = scale.plasma;
+            break;
+          case "magma":
+            f = scale.magma;
+            break;
+        };
+        return f;
+      }
+
+      function subm_index(M, x){
+        if(x<0)
+          return x+M;
+        if(x >= M)
+          return x-M;
+        return x;
+      }
+      function update_concentrations(X, L, DA, DB, f, k){ 
+        var sum_a, sum_b, x1, y1, t;
+        var m = X.A.length, n = X.A[0].length;
+        var A = new Array(m), B = new Array(m);
+        for(var i = 0; i < m; i++){
+          A[i] = new Array(n);
+          B[i] = new Array(n);
+        }        
+        for(var x = 0; x < m; x++) {
+          for(var y = 0; y < n; y++){
+            sum_a = 0.0; sum_b = 0.0;
+            for(var i = -1; i <= 1; i++){
+              for(var j = -1; j <= 1; j++){
+                x1 = subm_index(m, x - i);
+                y1 = subm_index(n, y - j);
+                sum_a = sum_a + L[i+1][j+1] * X.A[x1][y1];
+                sum_b = sum_b + L[i+1][j+1] * X.B[x1][y1];
+              }
+            }
+            t = X.A[x][y]*X.B[x][y]*X.B[x][y];
+            A[x][y] = X.A[x][y] + DA*sum_a - t + f*(1-X.A[x][y]);
+            B[x][y] = X.B[x][y] + DB*sum_b + t - (k+f)*X.B[x][y];
+          }
+        }
+        return {A: A, B: B};
+      }
+      function iterate_Gray_Scott(X, L, DA, DB, f, k, n, Paths, palette){
+        for(var i = 0; i < n; i++){
+          X = update_concentrations(X, L, DA, DB, f, k); 
+        }
+        var m = X.A.length, n = X.A[0].length;
+        var Bflat = [].concat.apply([], X.B);
+        var Bmin = Math.min.apply(null, Bflat);
+        var Bmax = Math.max.apply(null, Bflat);
+        var Brange = Bmax - Bmin;
+        console.log("Bmin", Bmin);
+        console.log("Bmax", Bmax);
+        var fcolor = getPalette(palette);
+        for (var x = 0; x < m; x++) {
+          for (var y = 0; y < n; y++) {
+            Paths[x][y].fillColor = fcolor((X.B[x][y]-Bmin)/Brange);
+          }
+        }
+        return X;
+      }
+
+      var L = [[0.05, 0.2, 0.05], [0.2, -1, 0.2], [0.05, 0.2, 0.05]];
+      var DA = 1;
+      var DB = 0.5;
+      var f = 0.0545;
+      var k = 0.062;
+
+      var pixels = 200;
+      var gridSize = 2;
+      var rectSize = 2;
+    </script>
+
+    <script type="text/paperscript" canvas="quad">
+      $("#iterate").prop("disabled", true);
+
+      var A = new Array(pixels);
+      var B = new Array(pixels);
+      var Paths = new Array(pixels);
+      var X; 
+      $("#start").on("click", function(){
+        var percentage = parseInt($("#percentage").val())/100;
+        for(var i = 0; i < pixels; i++){
+          A[i] = new Array(pixels);
+          B[i] = new Array(pixels);
+          Paths[i] = new Array(pixels);
+          for(var j = 0; j < pixels; j++){
+            A[i][j] = 1;
+            B[i][j] = Math.random() > percentage ? 0 : 1;
+          }
+        }
+        X = {A: A, B: B};
+        var palette = $("#palette").val();
+        var fpalette = getPalette(palette);
+        for(var y = 0; y < pixels; y++){
+          for(var x = 0; x < pixels; x++){
+            Paths[x][y] = new Path.Rectangle(new Point(x, y) * gridSize, new Size(rectSize, rectSize));
+            Paths[x][y].fillColor = fpalette(B[x][y]);
+          }
+        }
+        $("#iterate").prop("disabled", false);
+      })
+
+      project.activeLayer.position = view.center;
+
+      $("#iterate").on("click", function(){
+        var its = parseInt($("#iterations").val());
+        var palette = $("#palette").val();
+        X = iterate_Gray_Scott(X, L, DA, DB, f, k, its, Paths, palette);
+      })
+
+      $("#palette").on("change", function(){
+        if($("#iterate").prop("disabled") === false){
+          var palette = $("#palette").val();
+          X = iterate_Gray_Scott(X, L, DA, DB, f, k, 0, Paths, palette);
+        }
+      })
+    </script>
+
+    <canvas id="quad" resize></canvas>
+  </body>
+</html>
