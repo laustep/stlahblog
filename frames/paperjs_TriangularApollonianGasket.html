@@ -31,7 +31,7 @@
         var conjAB = new Point(AB.x, -AB.y);
         var re = conjAB.x*AC.x - conjAB.y*AC.y;
         var im = conjAB.y*AC.x + conjAB.x*AC.y;
-        return re*re/im/im > 10000;
+        return re*re/im/im > 1000;
       }
 
       function closestPoint(A, B, C, M){
