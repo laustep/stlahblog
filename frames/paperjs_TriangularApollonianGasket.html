@@ -1,0 +1,273 @@
+<html>
+  <head>
+    <script src="../libraries/paper-full.min.js"></script>
+    <style>
+      canvas {
+        width: 800px;
+        height: 600px;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="text/paperscript" canvas="quad">
+
+      function length(A, B){
+        var x = A.x - B.x, y = A.y - B.y;
+        return Math.sqrt(x*x+y*y);
+      }
+
+      function inCircle(A, B, C){
+        var a = length(B, C), b = length(C, A), c = length(A, B);
+        var p = (a + b + c), s = p / 2;
+        var area = Math.sqrt(s*(s-a)*(s-b)*(s-c));
+        return {
+          center: (A*a + B*b + C*c) / p, 
+          radius: area / s
+        };
+      }
+
+      function collinear(A, B, C){
+        var AB = B-A, AC = C-A;
+        var conjAB = new Point(AB.x, -AB.y);
+        var re = conjAB.x*AC.x - conjAB.y*AC.y;
+        var im = conjAB.y*AC.x + conjAB.x*AC.y;
+        return re*re/im/im > 10000;
+      }
+
+      function closestPoint(A, B, C, M){
+        var a = length(A, M);
+        var b = length(B, M);
+        var c = length(C, M);
+        return a < Math.min(b,c) ? 1 : (b < Math.min(a,c) ? 2 : 3);
+      }
+
+      function dot(A, B){
+        return A.x*B.x + A.y*B.y;
+      }
+
+      function fillGradientColor(circle, color){
+        circle.fillColor = {
+          gradient: {
+              stops: [color, 'black'],
+              radial: true
+          },
+          origin: circle.position,
+          destination: circle.bounds.rightCenter
+        };
+      }
+
+      function MalfattiCircles(A, B, C, color){
+        var triangle = new Path();
+        triangle.strokeColor = 'black';
+        triangle.add(A); triangle.add(B); triangle.add(C);
+        triangle.closed = true;
+        var a = length(B, C), b = length(A, C), c = length(B, A);
+        var p = (a + b + c), s = p / 2;
+        var areaABC = Math.sqrt(s*(s-a)*(s-b)*(s-c));
+        var I = (A*a + B*b + C*c) / p; // incenter
+        var r = areaABC / s; // inradius
+        // radii of Malfatti circles ####
+        var IA = length(I, A), IB = length(I, B), IC = length(I, C);
+        var r1 = r * (s-r-(IB+IC-IA)) / 2 / (s-a);
+        var r2 = r * (s-r-(IC+IA-IB)) / 2 / (s-b);
+        var r3 = r * (s-r-(IA+IB-IC)) / 2 / (s-c);
+        // centers of Malfatti circles ####
+        var d1 = r1 / Math.tan(Math.acos(dot(C-A,B-A)/b/c)/2);
+        var d2 = r2 / Math.tan(Math.acos(dot(C-B,A-B)/a/c)/2);
+        var d3 = r3 / Math.tan(Math.acos(dot(A-C,B-C)/b/a)/2);
+        var w = d1 + d2 + 2*Math.sqrt(r1*r2);
+        var u = d2 + d3 + 2*Math.sqrt(r2*r3);
+        var v = d3 + d1 + 2*Math.sqrt(r3*r1);
+        var d = Math.sqrt((-u+v+w)*(u+v-w)*(u-v+w)*(u+v+w));
+        var x = d/2/r1 - (v+w), y = u, z = u; // trilinear coordinates
+        var O1 = (A*u*x + B*v*y + C*w*z) / (u*x + v*y + w*z);
+        var x = v, y = d/2/r2 - (u+w), z = v // trilinear coordinates
+        var O2 = (A*u*x + B*v*y + C*w*z) / (u*x + v*y + w*z);
+        var x = w, y = w, z = d/2/r3 - (u+v); // trilinear coordinates
+        var O3 = (A*u*x + B*v*y + C*w*z) / (u*x + v*y + w*z);
+        // Malfatti circles ####
+        var C1 = new Path.Circle(O1, r1);
+        fillGradientColor(C1, color);
+        var C2 = new Path.Circle(O2, r2);
+        fillGradientColor(C2, color);
+        var C3 = new Path.Circle(O3, r3);
+        fillGradientColor(C3, color);
+        return [C1, C2, C3];
+      }
+
+      function innerSoddyRadius(r1, r2, r3){
+        return 1/(1/r1+1/r2+1/r3+2*Math.sqrt(1/r1/r2+1/r2/r3+1/r3/r1));
+      }
+
+      function innerSoddyCircle(cA, cB, cC, color){
+        var r1 = cA.bounds.width/2, 
+          r2 = cB.bounds.width/2, 
+          r3 = cC.bounds.width/2;
+        var radius = innerSoddyRadius(r1, r2, r3);
+        var A = cA.position, B = cB.position, C = cC.position;
+        var a = length(B, C), b = length(C, A), c = length(A, B);
+        var p = (a + b + c), s = p / 2;
+        var darea = 2*Math.sqrt(s*(s-a)*(s-b)*(s-c));
+        var p1 = a + darea/(b+c-a), 
+          p2 = b + darea/(a+c-b), 
+          p3 = c + darea/(b+a-c);
+        var center = (A*p1 + B*p2 + C*p3) / (p1 + p2 + p3);
+        var soddy = new Path.Circle(center, radius);
+        fillGradientColor(soddy, color);
+        return [
+          {type: "ccc", cA: soddy, cB: cA, cC: cB},
+          {type: "ccc", cA: soddy, cB: cB, cC: cC},
+          {type: "ccc", cA: soddy, cB: cA, cC: cC}
+        ];
+      }
+
+      function sideCircleCircle(A, B, cA, cB, color){
+        if(A.y > B.y){
+          return sideCircleCircle(B, A, cB, cA, color);
+        }
+        var rA = cA.bounds.width/2, rB = cB.bounds.width/2;
+        var oA = cA.position, oB = cB.position;
+        var c = length(A, B)
+        var alpha = Math.acos(dot(new Point(1,0), B-A)/c) * 180/Math.PI;
+        var X1 = (oA-B).rotate(-alpha);
+        var X2 = (oB-B).rotate(-alpha);
+        var soddyR = innerSoddyRadius(rA, rB, Infinity);
+        var sgn = X1.y >= 0 ? 1 : -1; 
+        var Y;
+        if(X1.x < X2.x){
+          Y = new Point(
+            2*rA*Math.sqrt(rB)/(Math.sqrt(rA)+Math.sqrt(rB)) + X1.x, 
+            sgn*soddyR
+          );
+        }else{
+          Y = new Point(
+            2*rB*Math.sqrt(rA)/(Math.sqrt(rA)+Math.sqrt(rB)) + X2.x, 
+            sgn*soddyR
+          );
+        }
+        var Z = Y.rotate(alpha) + B;
+        var cAB = new Path.Circle(Z, soddyR);
+        fillGradientColor(cAB, color);
+        return [
+          {type: "ccc", cA: cAB, cB: cA, cC: cB},
+          {type: "ccl", cA: cA, cB: cAB, A: A, B: B},
+          {type: "ccl", cA: cAB, cB: cB, A: A, B: B}
+        ];
+      }
+
+      // Intersection point of the lines (PQ) and (pq)
+      function LineLineIntersection(P, Q, p, q){
+        var ac = P-Q, bd = q-p;
+        var det = ac.x*bd.y - ac.y*bd.x;
+        if(det === 0) return new Point(Infinity, Infinity);
+        return P + ac * ((p.x-P.x)*bd.y - (p.y-P.y)*bd.x) / det;
+      }
+
+      function sideSideCircle(A, B, C, circle, color){
+        var O = circle.position;
+        var P = O + (A-O).normalize()*circle.bounds.width/2;
+        var OP = P-O;
+        var onTangent = P + new Point(-OP.y, OP.x);
+        var P1 = LineLineIntersection(P, onTangent, A, C);
+        var P2 = LineLineIntersection(P, onTangent, A, B);
+        var incircle_ = inCircle(A, P1, P2);
+        var incircle = new Path.Circle(incircle_.center, incircle_.radius);
+        fillGradientColor(incircle, color);
+        return [
+          {type: "cll", A: A, B: B, C: C, circle: incircle},
+          {type: "ccl", cA: circle, cB: incircle, A: A, B: B},
+          {type: "ccl", cA: circle, cB: incircle, A: A, B: C}
+        ]
+      }
+
+      function Newholes(holes, color){
+        var newholes = [];
+        for(var i = 0; i < 3; i++){
+          var h = holes[i];
+          if(h.type == "ccc"){
+            newholes.push(innerSoddyCircle(h.cA, h.cB, h.cC, color));
+          }else if(h.type == "ccl"){
+            newholes.push(sideCircleCircle(h.A, h.B, h.cA, h.cB, color));
+          }else if(h.type == "cll"){
+            newholes.push(sideSideCircle(h.A, h.B, h.C, h.circle, color));
+          }
+        }
+        return newholes;
+      }
+
+      function drawTriangularGasket(A, B, C, colors){
+        var Mcircles = MalfattiCircles(A, B, C, colors[0])
+        var C1 = Mcircles[0], C2 = Mcircles[1], C3 = Mcircles[2];        
+        
+        var holes = sideCircleCircle(A, B, C1, C2, colors[1])
+        var newholes = Newholes(holes, colors[2])
+        for(var j = 0; j < newholes.length; j++){
+          var invisible = Newholes(newholes[j], colors[3]);
+        }
+        
+        var holes = sideCircleCircle(B, C, C2, C3, colors[1])
+        var newholes = Newholes(holes, colors[2])
+        for(var j = 0; j < newholes.length; j++){
+          var invisible = Newholes(newholes[j], colors[3]);
+        }
+        
+        var holes = sideCircleCircle(C, A, C3, C1, colors[1]) 
+        var newholes = Newholes(holes, colors[2])
+        for(var j = 0; j < newholes.length; j++){
+          var invisible = Newholes(newholes[j], colors[3]);
+        }
+        
+        var holes = innerSoddyCircle(C1, C2, C3, colors[1])
+        var newholes = Newholes(holes, colors[2])
+        for(var j = 0; j < newholes.length; j++){
+          var invisible = Newholes(newholes[j], colors[3]);
+        }
+        
+        var holes = sideSideCircle(A, B, C, C1, colors[1])
+        var newholes = Newholes(holes, colors[2])
+        for(var j = 0; j < newholes.length; j++){
+          var invisible = Newholes(newholes[j], colors[3]);
+        }
+        
+        var holes = sideSideCircle(B, A, C, C2, colors[1])
+        var newholes = Newholes(holes, colors[2])
+        for(var j = 0; j < newholes.length; j++){
+          var invisible = Newholes(newholes[j], colors[3]);
+        }
+        
+        var holes = sideSideCircle(C, A, B, C3, colors[1])
+        var newholes = Newholes(holes, colors[2])
+        for(var j = 0; j < newholes.length; j++){
+          var invisible = Newholes(newholes[j], colors[3]);
+        }
+      }
+
+      // -----------------------------------------------------------------------
+      var A = new Point(380, 15),
+        B = new Point(615, 460),
+        C = new Point(100, 400);
+      var colors = ["#440154FF", "#31688EFF", "#35B779FF", "#FDE725FF"];
+      drawTriangularGasket(A, B, C, colors);
+
+      tool.maxDistance = 50;
+      tool.minDistance = 4; 
+      function onMouseDrag(event){
+        project.activeLayer.removeChildren();
+        var P = closestPoint(A, B, C, event.point);
+        if(P === 1){
+          A = event.point;
+        }else if (P === 2){
+          B = event.point;
+        }else{
+          C = event.point;
+        }
+        if(!collinear(A,B,C)){
+          drawTriangularGasket(A, B, C, colors);
+        }
+      }
+    </script>
+
+    <canvas id="quad" resize></canvas>
+
+  </body>
+</html>
