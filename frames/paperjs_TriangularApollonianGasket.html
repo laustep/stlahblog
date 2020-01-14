@@ -81,7 +81,7 @@
         var d = Math.sqrt((-u+v+w)*(u+v-w)*(u-v+w)*(u+v+w));
         var x = d/2/r1 - (v+w), y = u, z = u; // trilinear coordinates
         var O1 = (A*u*x + B*v*y + C*w*z) / (u*x + v*y + w*z);
-        var x = v, y = d/2/r2 - (u+w), z = v // trilinear coordinates
+        var x = v, y = d/2/r2 - (u+w), z = v; // trilinear coordinates
         var O2 = (A*u*x + B*v*y + C*w*z) / (u*x + v*y + w*z);
         var x = w, y = w, z = d/2/r3 - (u+v); // trilinear coordinates
         var O3 = (A*u*x + B*v*y + C*w*z) / (u*x + v*y + w*z);
@@ -127,7 +127,7 @@
         }
         var rA = cA.bounds.width/2, rB = cB.bounds.width/2;
         var oA = cA.position, oB = cB.position;
-        var c = length(A, B)
+        var c = length(A, B);
         var alpha = Math.acos(dot(new Point(1,0), B-A)/c) * 180/Math.PI;
         var X1 = (oA-B).rotate(-alpha);
         var X2 = (oB-B).rotate(-alpha);
@@ -196,47 +196,47 @@
       }
 
       function drawTriangularGasket(A, B, C, colors){
-        var Mcircles = MalfattiCircles(A, B, C, colors[0])
+        var Mcircles = MalfattiCircles(A, B, C, colors[0]);
         var C1 = Mcircles[0], C2 = Mcircles[1], C3 = Mcircles[2];        
         
-        var holes = sideCircleCircle(A, B, C1, C2, colors[1])
-        var newholes = Newholes(holes, colors[2])
+        var holes = sideCircleCircle(A, B, C1, C2, colors[1]);
+        var newholes = Newholes(holes, colors[2]);
         for(var j = 0; j < newholes.length; j++){
           var invisible = Newholes(newholes[j], colors[3]);
         }
         
-        var holes = sideCircleCircle(B, C, C2, C3, colors[1])
-        var newholes = Newholes(holes, colors[2])
+        var holes = sideCircleCircle(B, C, C2, C3, colors[1]);
+        var newholes = Newholes(holes, colors[2]);
         for(var j = 0; j < newholes.length; j++){
           var invisible = Newholes(newholes[j], colors[3]);
         }
         
-        var holes = sideCircleCircle(C, A, C3, C1, colors[1]) 
-        var newholes = Newholes(holes, colors[2])
+        var holes = sideCircleCircle(C, A, C3, C1, colors[1]); 
+        var newholes = Newholes(holes, colors[2]);
         for(var j = 0; j < newholes.length; j++){
           var invisible = Newholes(newholes[j], colors[3]);
         }
         
-        var holes = innerSoddyCircle(C1, C2, C3, colors[1])
-        var newholes = Newholes(holes, colors[2])
+        var holes = innerSoddyCircle(C1, C2, C3, colors[1]);
+        var newholes = Newholes(holes, colors[2]);
         for(var j = 0; j < newholes.length; j++){
           var invisible = Newholes(newholes[j], colors[3]);
         }
         
-        var holes = sideSideCircle(A, B, C, C1, colors[1])
-        var newholes = Newholes(holes, colors[2])
+        var holes = sideSideCircle(A, B, C, C1, colors[1]);
+        var newholes = Newholes(holes, colors[2]);
         for(var j = 0; j < newholes.length; j++){
           var invisible = Newholes(newholes[j], colors[3]);
         }
         
-        var holes = sideSideCircle(B, A, C, C2, colors[1])
-        var newholes = Newholes(holes, colors[2])
+        var holes = sideSideCircle(B, A, C, C2, colors[1]);
+        var newholes = Newholes(holes, colors[2]);
         for(var j = 0; j < newholes.length; j++){
           var invisible = Newholes(newholes[j], colors[3]);
         }
         
-        var holes = sideSideCircle(C, A, B, C3, colors[1])
-        var newholes = Newholes(holes, colors[2])
+        var holes = sideSideCircle(C, A, B, C3, colors[1]);
+        var newholes = Newholes(holes, colors[2]);
         for(var j = 0; j < newholes.length; j++){
           var invisible = Newholes(newholes[j], colors[3]);
         }
