@@ -1,0 +1,218 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="../libraries/jquery-ui/jquery-ui.min.css">
+    <script src="../libraries/jquery.min.js"></script>
+    <script src="../libraries/jquery-ui/jquery-ui.min.js"></script>
+    <script src="../libraries/math.min.js"></script>
+    <script src="../libraries/paper-full.min.js"></script>
+    <style>
+      canvas {
+        width: 600px;
+        height: 600px;
+      }
+      .controls {
+        width: 100%;
+        display: table;
+        background-image: linear-gradient(to right, chartreuse, green);
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="controls" class="controls">
+      <div style="display: table-row">
+        <div style="display: table-cell;">
+          <div id="sliderx" style="margin-right: 10px;"></div>
+        </div>
+        <div style="display: table-cell;">
+          <div id="slidery" style="margin-right: 10px;"></div>
+        </div>
+        <div style="display: table-cell;">
+          <div id="sliderz" style="margin-right: 10px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/paperscript" canvas="quad">
+
+      function length(A, B){
+        var x = A.x - B.x, y = A.y - B.y;
+        return Math.sqrt(x*x+y*y);
+      }
+
+      function outerSoddyCircle(A, B, C){
+        var a = length(B, C), b = length(C, A), c = length(A, B);
+        var p = (a + b + c), s = p / 2;
+        var area = Math.sqrt(s*(s-a)*(s-b)*(s-c));
+        var R = a*b*c / (4*Math.sqrt(s*(a+b-s)*(a+c-s)*(b+c-s)));
+        var r = area / s;
+        var radius = area / (4*R + r - p);
+        var p1 = a - area/(s-a), p2 = b - area/(s-b), p3 = c - area/(s-c);
+        var center = (A*p1 + B*p2 + C*p3) / (p1 + p2 + p3);
+        return {center: center, radius: radius};
+      }
+
+      function collinear(A, B, C){
+        var AB = B-A, AC = C-A;
+        var u = math.complex(AB.x, AB.y), v = math.complex(AC.x, AC.y);
+        var z = math.multiply(math.conj(u), v);
+        console.log("collinearity: ", z.re*z.re/z.im/z.im);
+        return z.re*z.re/z.im/z.im > 2000;
+      }
+
+      function dot(A, B){
+        return A.x*B.x + A.y*B.y;
+      }
+
+      function fillGradientColor(circle, color){
+        circle.fillColor = {
+          gradient: {
+              stops: [color, 'black'],
+              radial: true
+          },
+          origin: circle.position,
+          destination: circle.bounds.rightCenter
+        };
+      }
+
+      function Malfatti(A, B, C){
+        var triangle = new Path();
+        triangle.strokeColor = 'black';
+        triangle.strokeWidth = 0.05;
+        triangle.add(A); triangle.add(B); triangle.add(C);
+        triangle.closed = true;
+        var a = length(B, C), b = length(A, C), c = length(B, A);
+        var p = (a + b + c), s = p / 2;
+        var areaABC = Math.sqrt(s*(s-a)*(s-b)*(s-c));
+        var I = (A*a + B*b + C*c) / p; // incenter
+        var r = areaABC / s; // inradius
+        // radii of Malfatti circles ####
+        var IA = length(I, A), IB = length(I, B), IC = length(I, C);
+        var r1 = r * (s-r-(IB+IC-IA)) / 2 / (s-a);
+        var r2 = r * (s-r-(IC+IA-IB)) / 2 / (s-b);
+        var r3 = r * (s-r-(IA+IB-IC)) / 2 / (s-c);
+        // centers of Malfatti circles ####
+        var d1 = r1 / Math.tan(Math.acos(dot(C-A,B-A)/b/c)/2);
+        var d2 = r2 / Math.tan(Math.acos(dot(C-B,A-B)/a/c)/2);
+        var d3 = r3 / Math.tan(Math.acos(dot(A-C,B-C)/b/a)/2);
+        var w = d1 + d2 + 2*Math.sqrt(r1*r2);
+        var u = d2 + d3 + 2*Math.sqrt(r2*r3);
+        var v = d3 + d1 + 2*Math.sqrt(r3*r1);
+        var d = Math.sqrt((-u+v+w)*(u+v-w)*(u-v+w)*(u+v+w));
+        var x = d/2/r1 - (v+w), y = u, z = u; // trilinear coordinates
+        var O1 = (A*u*x + B*v*y + C*w*z) / (u*x + v*y + w*z);
+        var x = v, y = d/2/r2 - (u+w), z = v; // trilinear coordinates
+        var O2 = (A*u*x + B*v*y + C*w*z) / (u*x + v*y + w*z);
+        var x = w, y = w, z = d/2/r3 - (u+v); // trilinear coordinates
+        var O3 = (A*u*x + B*v*y + C*w*z) / (u*x + v*y + w*z);
+        // Malfatti circles ####
+        var C1 = new Path.Circle(O1, r1);
+        fillGradientColor(C1, 'red');
+        var C2 = new Path.Circle(O2, r2);
+        fillGradientColor(C2, 'green');
+        var C3 = new Path.Circle(O3, r3);
+        fillGradientColor(C3, 'blue');
+        return [C1, C2, C3];
+      }
+
+      var A = new Point(0, 0); // do not change
+
+      function drawCircles(A, B, C){
+        var circles = Malfatti(A,B,C);
+        var soddyO = outerSoddyCircle(
+          circles[0].position,
+          circles[1].position,
+          circles[2].position
+        );
+        var center = soddyO.center, radius = soddyO.radius;
+        var A1 = (A-center)/radius + view.center, 
+          B1 = (B-center)/radius + view.center, 
+          C1 = (C-center)/radius + view.center;
+        var circles1 = Malfatti(A1,B1,C1);
+        circles1[0].visible = true;
+        circles1[1].visible = true;
+        circles1[2].visible = true;
+        var soddy = new Path.Circle(view.center, 1);
+        soddy.strokeColor = 'black';
+        soddy.strokeWidth = 0.05;
+      }
+
+      // -----------------------------------------------------------------------
+      $("#sliderx").slider({
+        min: -4,
+        max: 4,
+        value: 0.5,
+        step: 0.1,
+        slide: function(){
+          var B = new Point(
+                1, 
+                $("#sliderz").slider("option", "value")
+              );
+          var C = new Point(
+                $(this).slider("option", "value"), 
+                $("#slidery").slider("option", "value")
+              );
+          if(!collinear(A,B,C)){
+            project.activeLayer.removeChildren();
+            drawCircles(A, B, C);
+          }
+        }
+      });
+      $("#slidery").slider({
+        min: -4,
+        max: 4,
+        value: Math.sqrt(3)/2,
+        step: 0.1,
+        slide: function(){
+          var B = new Point(
+                1, 
+                $("#sliderz").slider("option", "value")
+              );
+          var C = new Point(
+                $("#sliderx").slider("option", "value"), 
+                $(this).slider("option", "value")
+              );
+          if(!collinear(A,B,C)){
+            project.activeLayer.removeChildren();
+            drawCircles(A, B, C);
+          }
+        }
+      });
+      $("#sliderz").slider({
+        min: -4,
+        max: 4,
+        value: 0,
+        step: 0.1,
+        slide: function(){
+          var B = new Point(
+                1, 
+                $(this).slider("option", "value")
+              );
+          var C = new Point(
+                $("#sliderx").slider("option", "value"), 
+                $("#slidery").slider("option", "value")
+              );
+          if(!collinear(A,B,C)){
+            project.activeLayer.removeChildren();
+            drawCircles(A, B, C);
+          }
+        }
+      });
+      // -----------------------------------------------------------------------
+      var B = new Point(
+        1, 
+        $("#sliderz").slider("option", "value")
+      );
+      var C = new Point(
+        $("#sliderx").slider("option", "value"), 
+        $("#slidery").slider("option", "value")
+      );
+      drawCircles(A, B, C);
+
+      view.zoom = view.viewSize.width / 4;
+
+    </script>
+    <canvas id="quad" resize></canvas>
+  </body>
+</html>
