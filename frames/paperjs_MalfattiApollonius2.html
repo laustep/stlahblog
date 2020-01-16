@@ -89,7 +89,15 @@
         var AB = B-A, AC = C-A;
         var u = math.complex(AB.x, AB.y), v = math.complex(AC.x, AC.y);
         var z = math.multiply(math.conj(u), v);
-        return Math.abs(z.im) < 0.00001;
+        return z.re*z.re/z.im/z.im > 10000;
+      }
+      // Intersection point of the lines (P1Q1) and (P2Q2)
+      function intersectionLineLine(P1, Q1, P2, Q2) {
+        var ac = P1-Q1, bd = Q2 - P2;
+        var det = ac.x * bd.y - ac.y * bd.x;
+        if (det === 0) return new Point(Infinity, Infinity);
+        var K = ((P2.x - P1.x) * bd.y - (P2.y - P1.y) * bd.x) / det;
+        return P1 + ac*K;
       }
       function radicalaxis(Circ1, Circ2){ // Circ1 and Circ2 are tangent
         var O1O2 = (Circ2.position-Circ1.position);
@@ -102,12 +110,13 @@
         //var v = O1O2;
         //v.angle = v.angle + 90;
         var v = new Point(-O1O2.y, O1O2.x);
-        return Segment(I-v*600, I+v*600);
+        //return Segment(I-v*600, I+v*600);
+        return [I, I+v];
       }
       function radicalcenter(Circ1, Circ2, Circ3){ // for tangent circles
         var raxis1 = radicalaxis(Circ1, Circ2);
         var raxis2 = radicalaxis(Circ1, Circ3);
-        return raxis1.getIntersections(raxis2)[0].point;
+        return intersectionLineLine(raxis1[0], raxis1[1], raxis2[0], raxis2[1]);
       }
       function power(M, Circ){
         var zRe = length(M, Circ.position);
