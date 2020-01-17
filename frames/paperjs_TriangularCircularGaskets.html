@@ -777,6 +777,31 @@
           document.getElementById('n3').innerHTML = parseInt(values[handle]);
       });
 
+      var slidershift = document.getElementById('slidershift');
+      noUiSlider.create(slidershift, {
+        start: [shift],
+        step: 0.01,
+        range: {
+            'min': [0],
+            'max': [1]
+        },
+        orientation: 'horizontal',
+        tooltips: true
+      });
+      slidershift.noUiSlider.on("change", function(values) {
+        shift = parseFloat(values[0]);
+        group1.remove(); group2.remove(); group3.remove();
+        group1 = new Group();
+        drawCircularGasket(Mcircles[0], n1, depth2, phi, shift, group1);
+        group2 = new Group();
+        drawCircularGasket(Mcircles[1], n2, depth2, phi, shift, group2);
+        group3 = new Group();
+        drawCircularGasket(Mcircles[2], n3, depth2, phi, shift, group3);
+      });
+      slidershift.noUiSlider.on('update', function (values, handle) {
+          document.getElementById('shift').innerHTML = parseFloat(values[handle]);
+      });
+
       var sliderphi = document.getElementById('sliderphi');
       noUiSlider.create(sliderphi, {
         start: [phi],
@@ -804,34 +829,21 @@
         var phi = parseFloat(values[handle]);
         if(phi === 0){
           document.getElementById('phi').innerHTML = '' + phi + ' not allowed';
+          slider.setAttribute('disabled', true);
+          sliderdepth2.setAttribute('disabled', true);
+          slider1.setAttribute('disabled', true);
+          slider2.setAttribute('disabled', true);
+          slider3.setAttribute('disabled', true);
+          slidershift.setAttribute('disabled', true);
         }else{
           document.getElementById('phi').innerHTML = phi;
+          slider.removeAttribute('disabled');
+          sliderdepth2.removeAttribute('disabled');
+          slider1.removeAttribute('disabled');
+          slider2.removeAttribute('disabled');
+          slider3.removeAttribute('disabled');
+          slidershift.removeAttribute('disabled');
         }
-      });
-
-      var slidershift = document.getElementById('slidershift');
-      noUiSlider.create(slidershift, {
-        start: [shift],
-        step: 0.01,
-        range: {
-            'min': [0],
-            'max': [1]
-        },
-        orientation: 'horizontal',
-        tooltips: true
-      });
-      slidershift.noUiSlider.on("change", function(values) {
-        shift = parseFloat(values[0]);
-        group1.remove(); group2.remove(); group3.remove();
-        group1 = new Group();
-        drawCircularGasket(Mcircles[0], n1, depth2, phi, shift, group1);
-        group2 = new Group();
-        drawCircularGasket(Mcircles[1], n2, depth2, phi, shift, group2);
-        group3 = new Group();
-        drawCircularGasket(Mcircles[2], n3, depth2, phi, shift, group3);
-      });
-      slidershift.noUiSlider.on('update', function (values, handle) {
-          document.getElementById('shift').innerHTML = parseFloat(values[handle]);
       });
 
       // -----------------------------------------------------------------------
