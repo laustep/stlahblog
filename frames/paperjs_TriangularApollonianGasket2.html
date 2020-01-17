@@ -1,0 +1,567 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="../libraries/nouislider.min.css">
+    <script src="../libraries/nouislider.min.js"></script>
+    <script src="../libraries/math.min.js"></script>
+    <script src="../libraries/paper-full.min.js"></script>
+    
+    <style>
+      canvas {
+        width: 800px;
+        height: 600px;
+      }
+      .noUi-touch-area {
+        background-color: crimson;
+      }
+    </style>
+  </head>
+  <body>
+
+    <script> 
+      // cividis colors
+      var cividis = [
+        "#00204DFF",
+        "#00214EFF",
+        "#002250FF",
+        "#002252FF",
+        "#002353FF",
+        "#002455FF",
+        "#002557FF",
+        "#002558FF",
+        "#00265AFF",
+        "#00275CFF",
+        "#00275EFF",
+        "#002860FF",
+        "#002961FF",
+        "#002A63FF",
+        "#002A65FF",
+        "#002B67FF",
+        "#002C69FF",
+        "#002C6AFF",
+        "#002D6CFF",
+        "#002E6EFF",
+        "#002E6FFF",
+        "#002F6FFF",
+        "#002F6FFF",
+        "#00306FFF",
+        "#00306FFF",
+        "#00316FFF",
+        "#00326FFF",
+        "#00336FFF",
+        "#00336FFF",
+        "#00346FFF",
+        "#00356EFF",
+        "#01366EFF",
+        "#06366EFF",
+        "#0B376EFF",
+        "#0F386EFF",
+        "#12386DFF",
+        "#15396DFF",
+        "#183A6DFF",
+        "#1A3B6DFF",
+        "#1D3B6DFF",
+        "#1F3C6DFF",
+        "#213D6DFF",
+        "#233E6CFF",
+        "#243E6CFF",
+        "#263F6CFF",
+        "#28406CFF",
+        "#2A406CFF",
+        "#2B416CFF",
+        "#2D426CFF",
+        "#2E436CFF",
+        "#30436CFF",
+        "#31446BFF",
+        "#32456BFF",
+        "#34456BFF",
+        "#35466BFF",
+        "#36476BFF",
+        "#38486BFF",
+        "#39486BFF",
+        "#3A496BFF",
+        "#3B4A6BFF",
+        "#3D4A6BFF",
+        "#3E4B6BFF",
+        "#3F4C6BFF",
+        "#404D6BFF",
+        "#414D6BFF",
+        "#424E6BFF",
+        "#434F6BFF",
+        "#444F6BFF",
+        "#46506BFF",
+        "#47516BFF",
+        "#48526BFF",
+        "#49526BFF",
+        "#4A536BFF",
+        "#4B546CFF",
+        "#4C546CFF",
+        "#4D556CFF",
+        "#4E566CFF",
+        "#4F576CFF",
+        "#50576CFF",
+        "#51586CFF",
+        "#52596CFF",
+        "#53596CFF",
+        "#545A6CFF",
+        "#555B6DFF",
+        "#565C6DFF",
+        "#575C6DFF",
+        "#585D6DFF",
+        "#595E6DFF",
+        "#595F6DFF",
+        "#5A5F6DFF",
+        "#5B606EFF",
+        "#5C616EFF",
+        "#5D616EFF",
+        "#5E626EFF",
+        "#5F636EFF",
+        "#60646FFF",
+        "#61646FFF",
+        "#62656FFF",
+        "#63666FFF",
+        "#64666FFF",
+        "#646770FF",
+        "#656870FF",
+        "#666970FF",
+        "#676970FF",
+        "#686A71FF",
+        "#696B71FF",
+        "#6A6C71FF",
+        "#6B6C71FF",
+        "#6C6D72FF",
+        "#6C6E72FF",
+        "#6D6E72FF",
+        "#6E6F73FF",
+        "#6F7073FF",
+        "#707173FF",
+        "#717174FF",
+        "#727274FF",
+        "#727374FF",
+        "#737475FF",
+        "#747475FF",
+        "#757575FF",
+        "#767676FF",
+        "#777776FF",
+        "#787777FF",
+        "#787877FF",
+        "#797977FF",
+        "#7A7A78FF",
+        "#7B7A78FF",
+        "#7C7B78FF",
+        "#7D7C78FF",
+        "#7E7D78FF",
+        "#7F7D78FF",
+        "#807E79FF",
+        "#817F79FF",
+        "#828079FF",
+        "#838079FF",
+        "#848179FF",
+        "#848279FF",
+        "#858379FF",
+        "#868379FF",
+        "#878479FF",
+        "#888579FF",
+        "#898679FF",
+        "#8A8779FF",
+        "#8B8779FF",
+        "#8C8879FF",
+        "#8D8979FF",
+        "#8E8A79FF",
+        "#8F8A79FF",
+        "#908B79FF",
+        "#918C78FF",
+        "#928D78FF",
+        "#938E78FF",
+        "#948E78FF",
+        "#958F78FF",
+        "#969078FF",
+        "#979178FF",
+        "#989278FF",
+        "#999278FF",
+        "#9A9377FF",
+        "#9B9477FF",
+        "#9C9577FF",
+        "#9D9677FF",
+        "#9E9677FF",
+        "#9F9777FF",
+        "#A09877FF",
+        "#A19976FF",
+        "#A29A76FF",
+        "#A39A76FF",
+        "#A49B76FF",
+        "#A59C76FF",
+        "#A69D75FF",
+        "#A89E75FF",
+        "#A99F75FF",
+        "#AA9F75FF",
+        "#ABA074FF",
+        "#ACA174FF",
+        "#ADA274FF",
+        "#AEA374FF",
+        "#AFA473FF",
+        "#B0A473FF",
+        "#B1A573FF",
+        "#B2A672FF",
+        "#B3A772FF",
+        "#B4A872FF",
+        "#B5A971FF",
+        "#B6A971FF",
+        "#B7AA71FF",
+        "#B8AB70FF",
+        "#B9AC70FF",
+        "#BAAD70FF",
+        "#BBAE6FFF",
+        "#BCAF6FFF",
+        "#BEAF6FFF",
+        "#BFB06EFF",
+        "#C0B16EFF",
+        "#C1B26DFF",
+        "#C2B36DFF",
+        "#C3B46DFF",
+        "#C4B56CFF",
+        "#C5B56CFF",
+        "#C6B66BFF",
+        "#C7B76BFF",
+        "#C8B86AFF",
+        "#C9B96AFF",
+        "#CBBA69FF",
+        "#CCBB69FF",
+        "#CDBC68FF",
+        "#CEBC68FF",
+        "#CFBD67FF",
+        "#D0BE67FF",
+        "#D1BF66FF",
+        "#D2C066FF",
+        "#D3C165FF",
+        "#D4C264FF",
+        "#D6C364FF",
+        "#D7C463FF",
+        "#D8C563FF",
+        "#D9C562FF",
+        "#DAC661FF",
+        "#DBC761FF",
+        "#DCC860FF",
+        "#DDC95FFF",
+        "#DECA5FFF",
+        "#E0CB5EFF",
+        "#E1CC5DFF",
+        "#E2CD5CFF",
+        "#E3CE5CFF",
+        "#E4CF5BFF",
+        "#E5D05AFF",
+        "#E6D159FF",
+        "#E8D259FF",
+        "#E9D358FF",
+        "#EAD357FF",
+        "#EBD456FF",
+        "#ECD555FF",
+        "#EDD654FF",
+        "#EFD753FF",
+        "#F0D852FF",
+        "#F1D951FF",
+        "#F2DA50FF",
+        "#F3DB4FFF",
+        "#F4DC4EFF",
+        "#F6DD4DFF",
+        "#F7DE4CFF",
+        "#F8DF4BFF",
+        "#F9E04AFF",
+        "#FAE149FF",
+        "#FBE248FF",
+        "#FDE346FF",
+        "#FEE445FF",
+        "#FFE544FF",
+        "#FFE642FF",
+        "#FFE742FF",
+        "#FFE843FF",
+        "#FFE944FF",
+        "#FFEA46FF"
+      ];
+      function palette(n, hexs) {
+        if(n === 1) return [hexs[0]];
+        var colors = new Array(n);
+        for (let i = 0; i < n; ++i) {
+          var idx = Math.floor(255 * i / (n - 1));
+          colors[i] = hexs[idx];
+        }
+        return colors;
+      }
+    </script>
+
+    <script type="text/paperscript" canvas="quad">
+
+      function length(A, B){
+        var x = A.x - B.x, y = A.y - B.y;
+        return Math.sqrt(x*x+y*y);
+      }
+
+      function inCircle(A, B, C){
+        var a = length(B, C), b = length(C, A), c = length(A, B);
+        var p = (a + b + c), s = p / 2;
+        var area = Math.sqrt(s*(s-a)*(s-b)*(s-c));
+        return {
+          center: (A*a + B*b + C*c) / p, 
+          radius: area / s
+        };
+      }
+
+      function collinear(A, B, C){
+        var AB = B-A, AC = C-A;
+        var conjAB = new Point(AB.x, -AB.y);
+        var re = conjAB.x*AC.x - conjAB.y*AC.y;
+        var im = conjAB.y*AC.x + conjAB.x*AC.y;
+        return re*re/im/im > 100;
+      }
+
+      function closestPoint(A, B, C, M){
+        var a = length(A, M);
+        var b = length(B, M);
+        var c = length(C, M);
+        return a < Math.min(b,c) ? 1 : (b < Math.min(a,c) ? 2 : 3);
+      }
+
+      function dot(A, B){
+        return A.x*B.x + A.y*B.y;
+      }
+
+      function fillGradientColor(circle, color){
+        circle.fillColor = {
+          gradient: {
+              stops: [color, 'black'],
+              radial: true
+          },
+          origin: circle.position,
+          destination: circle.bounds.rightCenter
+        };
+      }
+
+      function MalfattiCircles(A, B, C, color){
+        var triangle = new Path();
+        triangle.strokeColor = 'black';
+        triangle.add(A); triangle.add(B); triangle.add(C);
+        triangle.closed = true;
+        var a = length(B, C), b = length(A, C), c = length(B, A);
+        var p = (a + b + c), s = p / 2;
+        var areaABC = Math.sqrt(s*(s-a)*(s-b)*(s-c));
+        var I = (A*a + B*b + C*c) / p; // incenter
+        var r = areaABC / s; // inradius
+        // radii of Malfatti circles ####
+        var IA = length(I, A), IB = length(I, B), IC = length(I, C);
+        var r1 = r * (s-r-(IB+IC-IA)) / 2 / (s-a);
+        var r2 = r * (s-r-(IC+IA-IB)) / 2 / (s-b);
+        var r3 = r * (s-r-(IA+IB-IC)) / 2 / (s-c);
+        // centers of Malfatti circles ####
+        var d1 = r1 / Math.tan(Math.acos(dot(C-A,B-A)/b/c)/2);
+        var d2 = r2 / Math.tan(Math.acos(dot(C-B,A-B)/a/c)/2);
+        var d3 = r3 / Math.tan(Math.acos(dot(A-C,B-C)/b/a)/2);
+        var w = d1 + d2 + 2*Math.sqrt(r1*r2);
+        var u = d2 + d3 + 2*Math.sqrt(r2*r3);
+        var v = d3 + d1 + 2*Math.sqrt(r3*r1);
+        var d = Math.sqrt((-u+v+w)*(u+v-w)*(u-v+w)*(u+v+w));
+        var x = d/2/r1 - (v+w), y = u, z = u; // trilinear coordinates
+        var O1 = (A*u*x + B*v*y + C*w*z) / (u*x + v*y + w*z);
+        var x = v, y = d/2/r2 - (u+w), z = v; // trilinear coordinates
+        var O2 = (A*u*x + B*v*y + C*w*z) / (u*x + v*y + w*z);
+        var x = w, y = w, z = d/2/r3 - (u+v); // trilinear coordinates
+        var O3 = (A*u*x + B*v*y + C*w*z) / (u*x + v*y + w*z);
+        // Malfatti circles ####
+        var C1 = new Path.Circle(O1, r1);
+        fillGradientColor(C1, color);
+        var C2 = new Path.Circle(O2, r2);
+        fillGradientColor(C2, color);
+        var C3 = new Path.Circle(O3, r3);
+        fillGradientColor(C3, color);
+        return [C1, C2, C3];
+      }
+
+      function innerSoddyRadius(r1, r2, r3){
+        return 1/(1/r1+1/r2+1/r3+2*Math.sqrt(1/r1/r2+1/r2/r3+1/r3/r1));
+      }
+
+      function innerSoddyCircle(cA, cB, cC, color){
+        var r1 = cA.bounds.width/2, 
+          r2 = cB.bounds.width/2, 
+          r3 = cC.bounds.width/2;
+        var radius = innerSoddyRadius(r1, r2, r3);
+        var A = cA.position, B = cB.position, C = cC.position;
+        var a = length(B, C), b = length(C, A), c = length(A, B);
+        var p = (a + b + c), s = p / 2;
+        var darea = 2*Math.sqrt(s*(s-a)*(s-b)*(s-c));
+        var p1 = a + darea/(b+c-a), 
+          p2 = b + darea/(a+c-b), 
+          p3 = c + darea/(b+a-c);
+        var center = (A*p1 + B*p2 + C*p3) / (p1 + p2 + p3);
+        var soddy = new Path.Circle(center, radius);
+        fillGradientColor(soddy, color);
+        return [
+          {type: "ccc", cA: soddy, cB: cA, cC: cB},
+          {type: "ccc", cA: soddy, cB: cB, cC: cC},
+          {type: "ccc", cA: soddy, cB: cA, cC: cC}
+        ];
+      }
+
+      function sideCircleCircle(A, B, cA, cB, color){
+        if(A.y > B.y){
+          return sideCircleCircle(B, A, cB, cA, color);
+        }
+        var rA = cA.bounds.width/2, rB = cB.bounds.width/2;
+        var oA = cA.position, oB = cB.position;
+        var c = length(A, B);
+        var alpha = Math.acos(dot(new Point(1,0), B-A)/c) * 180/Math.PI;
+        var X1 = (oA-B).rotate(-alpha);
+        var X2 = (oB-B).rotate(-alpha);
+        var soddyR = innerSoddyRadius(rA, rB, Infinity);
+        var sgn = X1.y >= 0 ? 1 : -1; 
+        var Y;
+        if(X1.x < X2.x){
+          Y = new Point(
+            2*rA*Math.sqrt(rB)/(Math.sqrt(rA)+Math.sqrt(rB)) + X1.x, 
+            sgn*soddyR
+          );
+        }else{
+          Y = new Point(
+            2*rB*Math.sqrt(rA)/(Math.sqrt(rA)+Math.sqrt(rB)) + X2.x, 
+            sgn*soddyR
+          );
+        }
+        var Z = Y.rotate(alpha) + B;
+        var cAB = new Path.Circle(Z, soddyR);
+        fillGradientColor(cAB, color);
+        return [
+          {type: "ccc", cA: cAB, cB: cA, cC: cB},
+          {type: "ccl", cA: cA, cB: cAB, A: A, B: B},
+          {type: "ccl", cA: cAB, cB: cB, A: A, B: B}
+        ];
+      }
+
+      // Intersection point of the lines (PQ) and (pq)
+      function LineLineIntersection(P, Q, p, q){
+        var ac = P-Q, bd = q-p;
+        var det = ac.x*bd.y - ac.y*bd.x;
+        if(det === 0) return new Point(Infinity, Infinity);
+        return P + ac * ((p.x-P.x)*bd.y - (p.y-P.y)*bd.x) / det;
+      }
+
+      function sideSideCircle(A, B, C, circle, color){
+        var O = circle.position;
+        var P = O + (A-O).normalize()*circle.bounds.width/2;
+        var OP = P-O;
+        var onTangent = P + new Point(-OP.y, OP.x);
+        var P1 = LineLineIntersection(P, onTangent, A, C);
+        var P2 = LineLineIntersection(P, onTangent, A, B);
+        var incircle_ = inCircle(A, P1, P2);
+        var incircle = new Path.Circle(incircle_.center, incircle_.radius);
+        fillGradientColor(incircle, color);
+        return [
+          {type: "cll", A: A, B: B, C: C, circle: incircle},
+          {type: "ccl", cA: circle, cB: incircle, A: A, B: B},
+          {type: "ccl", cA: circle, cB: incircle, A: A, B: C}
+        ]
+      }
+
+      function Newholes(holes, color){
+        var newholes = [];
+        for(var i = 0; i < 3; i++){
+          var h = holes[i];
+          if(h.type == "ccc"){
+            newholes.push(innerSoddyCircle(h.cA, h.cB, h.cC, color));
+          }else if(h.type == "ccl"){
+            newholes.push(sideCircleCircle(h.A, h.B, h.cA, h.cB, color));
+          }else if(h.type == "cll"){
+            newholes.push(sideSideCircle(h.A, h.B, h.C, h.circle, color));
+          }
+        }
+        return newholes;
+      }
+
+      function drawTriangularGasket(A, B, C, depth){
+
+        var colors = palette(depth+1, cividis);
+
+        var Mcircles = MalfattiCircles(A, B, C, colors[0]);
+        var C1 = Mcircles[0], C2 = Mcircles[1], C3 = Mcircles[2];        
+        
+        if(depth > 0){
+          var holes = [
+            sideCircleCircle(A, B, C1, C2, colors[1]),
+            sideCircleCircle(B, C, C2, C3, colors[1]),
+            sideCircleCircle(C, A, C3, C1, colors[1]),
+            innerSoddyCircle(C1, C2, C3, colors[1]),
+            sideSideCircle(A, B, C, C1, colors[1]),
+            sideSideCircle(B, A, C, C2, colors[1]),
+            sideSideCircle(C, A, B, C3, colors[1])
+          ];
+
+          for(var d = 0; d < depth-1; ++d){
+            var Holes = new Array(holes.length);
+            for(var i = 0; i < holes.length; ++i){
+              Holes[i] = Newholes(holes[i], colors[d+2]);
+            }
+            holes = [].concat.apply([], Holes);
+          }
+        }
+      }
+
+      // -----------------------------------------------------------------------
+      var A = new Point(380, 15),
+        B = new Point(615, 460),
+        C = new Point(100, 400);
+      var depth = 1;
+      drawTriangularGasket(A, B, C, depth);
+
+      // -----------------------------------------------------------------------
+      var slider = document.getElementById('slider');
+      noUiSlider.create(slider, {
+        start: [1],
+        step: 1,
+        range: {
+            'min': [0],
+            'max': [6]
+        },
+        orientation: 'vertical',
+        tooltips: [ 
+        {
+          to: function (value) {
+            return value.toFixed(0);
+          },
+          from: function (value) {
+            return parseInt(value);
+          }
+        }]
+      });
+      slider.noUiSlider.on("change", function(values) {
+        project.activeLayer.removeChildren();
+        depth = parseInt(values[0]);
+        drawTriangularGasket(A, B, C, depth);
+      });
+
+      // -----------------------------------------------------------------------
+      tool.maxDistance = 50;
+      tool.minDistance = 4; 
+      function onMouseDrag(event){
+        project.activeLayer.removeChildren();
+        var P = closestPoint(A, B, C, event.point);
+        if(P === 1){
+          A = event.point;
+        }else if (P === 2){
+          B = event.point;
+        }else{
+          C = event.point;
+        }
+        if(!collinear(A,B,C)){
+          drawTriangularGasket(A, B, C, depth);
+        }
+      }
+    </script>
+
+    <div>
+      <div style="display: inline-block; vertical-align: top; margin-left: 30px; margin-top: 10px;">
+        <div id="slider" style="height: 300px;"></div>
+      </div>
+      <div style="display: inline-block;">
+        <canvas id="quad" resize></canvas>
+      </div>
+    </div>
+
+  </body>
+</html>
