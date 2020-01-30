@@ -1,0 +1,293 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Complex incomplete elliptic integral of the second kind</title>
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/pandoc-solarized.css" />  
+  <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+</head>
+
+<body>
+  <!-- Sidebar. -->
+  <div class="sidebar">
+    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+      <a href="https://www.r-bloggers.com/">
+        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+      </a>
+      <br />
+      <a href="http://t-redactyl.io/">
+        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
+      </a>
+      <a href="http://timelyportfolio.blogspot.be/">
+        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
+      </a>
+      <br />
+      <a href="https://antoineguillot.wordpress.com/blog/">
+        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+      </a>
+      <br />
+      <a href="https://fronkonstin.com/">
+        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="header">
+      <div id="logo" style="position:absolute;">
+        <a href="../">
+          <img src="../images/stla.jpg" alt="stla" width="100px" />
+        </a>
+      </div>
+      <div id="navigation" style="margin-top:50px;">
+        <a href="../">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../archive.html">Archive</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Complex incomplete elliptic integral of the second kind</h1> <div class="info">
+    Posted on January 30, 2020
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="../tags/R.html">R</a>, <a href="../tags/maths.html">maths</a>, <a href="../tags/special-functions.html">special-functions</a>
+    
+</div>
+
+<p>The <em>incomplete elliptic integral of the second kind</em> is usually defined by <span class="math display">\[
+E(\phi \mid k) = 
+\int_0^\phi \sqrt{1 - k^2\sin^2t}\,\mathrm{d}t
+\]</span> for <span class="math inline">\(-\frac{\pi}{2} \leqslant \phi \leqslant \frac{\pi}{2}\)</span> and <span class="math inline">\(k^2 \leqslant \frac{1}{\sin^2\phi}\)</span>.</p>
+<p>It can be evaluated in R with the <code>gsl</code> package:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">f &lt;-<span class="st"> </span><span class="cf">function</span>(t, k) <span class="kw">sqrt</span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>k<span class="op">^</span><span class="dv">2</span><span class="op">*</span><span class="kw">sin</span>(t)<span class="op">^</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb1-2" title="2">phi &lt;-<span class="st"> </span><span class="dv">1</span>; k &lt;-<span class="st"> </span><span class="fl">0.5</span></a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="kw">integrate</span>(f, <span class="dv">0</span>, phi, <span class="dt">k =</span> k)<span class="op">$</span>value</a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="co">## [1] 0.9648765</span></a>
+<a class="sourceLine" id="cb1-5" title="5">gsl<span class="op">::</span><span class="kw">ellint_E</span>(phi, k)</a>
+<a class="sourceLine" id="cb1-6" title="6"><span class="co">## [1] 0.9648765</span></a></code></pre></div>
+<p>That said, this elliptic integral is more generally defined by <span class="math display">\[
+E(\phi \mid m) = 
+\int_0^\phi \sqrt{1 - m\sin^2t}\,\mathrm{d}t
+\]</span> for <span class="math inline">\(-\frac{\pi}{2} \leqslant \phi \leqslant \frac{\pi}{2}\)</span> and <span class="math inline">\(-\infty &lt; m \leqslant \frac{1}{\sin^2\phi}\)</span>.</p>
+<h1 id="evaluation-of-ephi-mid-m">Evaluation of <span class="math inline">\(E(\phi \mid m)\)</span></h1>
+<p>Thus, <code>gsl</code> allows to evaluate <span class="math inline">\(E(\phi \mid m)\)</span> for a positive value of the parameter <span class="math inline">\(m\)</span> only, with the <code>ellint_E</code> function. However it is possible to use <code>gsl</code> to evaluate <span class="math inline">\(E(\phi \mid m)\)</span> for a negative parameter <span class="math inline">\(m\)</span>, with the help of the <em>Carlson elliptic integrals</em> <span class="math inline">\(R_F\)</span> and <span class="math inline">\(R_D\)</span>. These elliptic integrals are evaluated in <code>gsl</code> by the functions <code>ellint_RF</code> and <code>ellint_RD</code>.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">E &lt;-<span class="st"> </span><span class="cf">function</span>(phi, m){</a>
+<a class="sourceLine" id="cb2-2" title="2">  <span class="cf">if</span>(phi <span class="op">==</span><span class="st"> </span><span class="dv">0</span>){</a>
+<a class="sourceLine" id="cb2-3" title="3">    <span class="dv">0</span></a>
+<a class="sourceLine" id="cb2-4" title="4">  }<span class="cf">else</span> <span class="cf">if</span>(phi <span class="op">&gt;=</span><span class="st"> </span><span class="op">-</span>pi<span class="op">/</span><span class="dv">2</span> <span class="op">&amp;&amp;</span><span class="st"> </span>phi <span class="op">&lt;=</span><span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span>){</a>
+<a class="sourceLine" id="cb2-5" title="5">    sine &lt;-<span class="st"> </span><span class="kw">sin</span>(phi)</a>
+<a class="sourceLine" id="cb2-6" title="6">    sine2 &lt;-<span class="st"> </span>sine<span class="op">*</span>sine</a>
+<a class="sourceLine" id="cb2-7" title="7">    cosine2 &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span>sine2</a>
+<a class="sourceLine" id="cb2-8" title="8">    oneminusmsine2 &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span>m<span class="op">*</span>sine2</a>
+<a class="sourceLine" id="cb2-9" title="9">    sine <span class="op">*</span><span class="st"> </span>(gsl<span class="op">::</span><span class="kw">ellint_RF</span>(cosine2, oneminusmsine2, <span class="dv">1</span>) <span class="op">-</span></a>
+<a class="sourceLine" id="cb2-10" title="10"><span class="st">              </span>m <span class="op">*</span><span class="st"> </span>sine2 <span class="op">*</span><span class="st"> </span>gsl<span class="op">::</span><span class="kw">ellint_RD</span>(cosine2, oneminusmsine2, <span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb2-11" title="11">  }<span class="cf">else</span>{</a>
+<a class="sourceLine" id="cb2-12" title="12">    <span class="ot">NaN</span></a>
+<a class="sourceLine" id="cb2-13" title="13">  }</a>
+<a class="sourceLine" id="cb2-14" title="14">}</a></code></pre></div>
+<p>Let’s try it:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw">E</span>(<span class="dt">phi =</span> <span class="dv">1</span>, <span class="dt">m =</span> <span class="dv">-5</span>)</a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="co">## [1] 1.493736</span></a></code></pre></div>
+<p>You can compare with <a href="https://www.wolframalpha.com/input/?i=EllipticE%5B1%2C+-5%5D"><code>EllipticE[1,-5]</code></a> on WolframAlpha.</p>
+<p>Here is how the function looks like for a fixed value of <span class="math inline">\(\phi\)</span>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">opar &lt;-<span class="st"> </span><span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">5</span>,<span class="dv">4</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb4-2" title="2">phi &lt;-<span class="st"> </span>pi<span class="op">/</span><span class="dv">4</span></a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="kw">curve</span>(</a>
+<a class="sourceLine" id="cb4-4" title="4">  <span class="kw">E</span>(phi, x), <span class="dt">from =</span> <span class="dv">-5</span>, <span class="dt">to =</span> <span class="dv">1</span><span class="op">/</span><span class="kw">sin</span>(phi)<span class="op">^</span><span class="dv">2</span>, <span class="dt">lwd =</span> <span class="dv">2</span>, </a>
+<a class="sourceLine" id="cb4-5" title="5">  <span class="dt">xlab =</span> <span class="kw">expression</span>(<span class="kw">italic</span>(m)), </a>
+<a class="sourceLine" id="cb4-6" title="6">  <span class="dt">ylab =</span> <span class="kw">expression</span>(<span class="kw">paste</span>(<span class="kw">italic</span>(E), <span class="st">&quot;(&quot;</span>, <span class="kw">italic</span>(phi1), <span class="st">&quot; | &quot;</span>, <span class="kw">italic</span>(m), <span class="st">&quot;)&quot;</span>))</a>
+<a class="sourceLine" id="cb4-7" title="7">)</a></code></pre></div>
+<p><img src="figures/EllipticII-curveE-1.png" /></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">par</span>(opar)</a></code></pre></div>
+<h1 id="extending-ephi-mid-m-to-arbitrary-real-phi">Extending <span class="math inline">\(E(\phi \mid m)\)</span> to arbitrary real <span class="math inline">\(\phi\)</span></h1>
+<p>There is a continuous extension of <span class="math inline">\(E(\phi \mid m)\)</span>. It is given by the formula <span class="math display">\[
+E(\phi + k\pi \mid m) = 2 k E\Bigl(\frac{\pi}{2} \mid m\Bigr) + E(\phi \mid m)
+\]</span> for any <span class="math inline">\(k \in \mathbb{Z}\)</span>.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">E &lt;-<span class="st"> </span><span class="cf">function</span>(phi, m){</a>
+<a class="sourceLine" id="cb6-2" title="2">  <span class="cf">if</span>(phi <span class="op">==</span><span class="st"> </span><span class="dv">0</span>){</a>
+<a class="sourceLine" id="cb6-3" title="3">    <span class="dv">0</span></a>
+<a class="sourceLine" id="cb6-4" title="4">  }<span class="cf">else</span> <span class="cf">if</span>(phi <span class="op">&gt;=</span><span class="st"> </span><span class="op">-</span>pi<span class="op">/</span><span class="dv">2</span> <span class="op">&amp;&amp;</span><span class="st"> </span>phi <span class="op">&lt;=</span><span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span>){</a>
+<a class="sourceLine" id="cb6-5" title="5">    sine &lt;-<span class="st"> </span><span class="kw">sin</span>(phi)</a>
+<a class="sourceLine" id="cb6-6" title="6">    sine2 &lt;-<span class="st"> </span>sine<span class="op">*</span>sine</a>
+<a class="sourceLine" id="cb6-7" title="7">    cosine2 &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span>sine2</a>
+<a class="sourceLine" id="cb6-8" title="8">    oneminusmsine2 &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span>m<span class="op">*</span>sine2</a>
+<a class="sourceLine" id="cb6-9" title="9">    sine <span class="op">*</span><span class="st"> </span>(gsl<span class="op">::</span><span class="kw">ellint_RF</span>(cosine2, oneminusmsine2, <span class="dv">1</span>) <span class="op">-</span></a>
+<a class="sourceLine" id="cb6-10" title="10"><span class="st">              </span>m <span class="op">*</span><span class="st"> </span>sine2 <span class="op">*</span><span class="st"> </span>gsl<span class="op">::</span><span class="kw">ellint_RD</span>(cosine2, oneminusmsine2, <span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb6-11" title="11">  }<span class="cf">else</span> <span class="cf">if</span>(phi <span class="op">&gt;</span><span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span>){</a>
+<a class="sourceLine" id="cb6-12" title="12">    k &lt;-<span class="st"> </span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb6-13" title="13">    <span class="cf">while</span>(phi <span class="op">&gt;</span><span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span>){</a>
+<a class="sourceLine" id="cb6-14" title="14">      phi &lt;-<span class="st"> </span>phi <span class="op">-</span><span class="st"> </span>pi</a>
+<a class="sourceLine" id="cb6-15" title="15">      k &lt;-<span class="st"> </span>k <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb6-16" title="16">    }</a>
+<a class="sourceLine" id="cb6-17" title="17">    <span class="dv">2</span><span class="op">*</span>k<span class="op">*</span><span class="kw">E</span>(pi<span class="op">/</span><span class="dv">2</span>, m) <span class="op">+</span><span class="st"> </span><span class="kw">E</span>(phi, m)</a>
+<a class="sourceLine" id="cb6-18" title="18">  }<span class="cf">else</span>{</a>
+<a class="sourceLine" id="cb6-19" title="19">    k &lt;-<span class="st"> </span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb6-20" title="20">    <span class="cf">while</span>(phi <span class="op">&lt;</span><span class="st"> </span><span class="op">-</span>pi<span class="op">/</span><span class="dv">2</span>){</a>
+<a class="sourceLine" id="cb6-21" title="21">      phi &lt;-<span class="st"> </span>phi <span class="op">+</span><span class="st"> </span>pi</a>
+<a class="sourceLine" id="cb6-22" title="22">      k &lt;-<span class="st"> </span>k <span class="op">-</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb6-23" title="23">    }</a>
+<a class="sourceLine" id="cb6-24" title="24">    <span class="dv">2</span><span class="op">*</span>k<span class="op">*</span><span class="kw">E</span>(pi<span class="op">/</span><span class="dv">2</span>, m) <span class="op">+</span><span class="st"> </span><span class="kw">E</span>(phi, m)</a>
+<a class="sourceLine" id="cb6-25" title="25">  }</a>
+<a class="sourceLine" id="cb6-26" title="26">}</a></code></pre></div>
+<p>Let’s try it:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="kw">E</span>(<span class="dt">phi =</span> <span class="dv">7</span>, <span class="dt">m =</span> <span class="dv">-5</span>)</a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="co">## [1] 12.25899</span></a></code></pre></div>
+<p>and compare with <a href="https://www.wolframalpha.com/input/?i=EllipticE%5B7%2C+-5%5D"><code>EllipticE[7,-5]</code></a> on WolframAlpha.</p>
+<h1 id="extending-ephi-mid-m-to-complex-phi">Extending <span class="math inline">\(E(\phi \mid m)\)</span> to complex <span class="math inline">\(\phi\)</span></h1>
+<p>Now we will construct the analytical continuation of <span class="math inline">\(E(\phi \mid m)\)</span>.</p>
+<p>I found a nice implementation of the Carlson elliptic integrals <a href="https://www.codeproject.com/Articles/566614/Elliptic-integrals">here</a>, which can easily be generalized to complex values of the parameters:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">RF &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, z, <span class="dt">minerror =</span> <span class="fl">1e-7</span>){</a>
+<a class="sourceLine" id="cb8-2" title="2">  x &lt;-<span class="st"> </span><span class="kw">as.complex</span>(x); y &lt;-<span class="st"> </span><span class="kw">as.complex</span>(y); z &lt;-<span class="st"> </span><span class="kw">as.complex</span>(z)</a>
+<a class="sourceLine" id="cb8-3" title="3">  dx &lt;-<span class="st"> </span>dy &lt;-<span class="st"> </span>dz &lt;-<span class="st"> </span><span class="ot">Inf</span></a>
+<a class="sourceLine" id="cb8-4" title="4">  <span class="cf">while</span>(<span class="kw">max</span>(dx,dy,dz) <span class="op">&gt;</span><span class="st"> </span>minerror){</a>
+<a class="sourceLine" id="cb8-5" title="5">    lambda &lt;-<span class="st"> </span><span class="kw">sqrt</span>(x<span class="op">*</span>y) <span class="op">+</span><span class="st"> </span><span class="kw">sqrt</span>(y<span class="op">*</span>z) <span class="op">+</span><span class="st"> </span><span class="kw">sqrt</span>(z<span class="op">*</span>x)</a>
+<a class="sourceLine" id="cb8-6" title="6">    x &lt;-<span class="st"> </span>(x <span class="op">+</span><span class="st"> </span>lambda) <span class="op">/</span><span class="st"> </span><span class="dv">4</span></a>
+<a class="sourceLine" id="cb8-7" title="7">    y &lt;-<span class="st"> </span>(y <span class="op">+</span><span class="st"> </span>lambda) <span class="op">/</span><span class="st"> </span><span class="dv">4</span></a>
+<a class="sourceLine" id="cb8-8" title="8">    z &lt;-<span class="st"> </span>(z <span class="op">+</span><span class="st"> </span>lambda) <span class="op">/</span><span class="st"> </span><span class="dv">4</span></a>
+<a class="sourceLine" id="cb8-9" title="9">    A &lt;-<span class="st"> </span>(x<span class="op">+</span>y<span class="op">+</span>z) <span class="op">/</span><span class="st"> </span><span class="dv">3</span></a>
+<a class="sourceLine" id="cb8-10" title="10">    dx &lt;-<span class="st"> </span><span class="kw">Mod</span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>x<span class="op">/</span>A)</a>
+<a class="sourceLine" id="cb8-11" title="11">    dy &lt;-<span class="st"> </span><span class="kw">Mod</span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>y<span class="op">/</span>A)</a>
+<a class="sourceLine" id="cb8-12" title="12">    dz &lt;-<span class="st"> </span><span class="kw">Mod</span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>z<span class="op">/</span>A)</a>
+<a class="sourceLine" id="cb8-13" title="13">  }</a>
+<a class="sourceLine" id="cb8-14" title="14">  E2 &lt;-<span class="st"> </span>dx<span class="op">*</span>dy <span class="op">+</span><span class="st"> </span>dy<span class="op">*</span>dz <span class="op">+</span><span class="st"> </span>dz<span class="op">*</span>dx</a>
+<a class="sourceLine" id="cb8-15" title="15">  E3 &lt;-<span class="st"> </span>dy<span class="op">*</span>dx<span class="op">*</span>dz</a>
+<a class="sourceLine" id="cb8-16" title="16">  (<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>E2<span class="op">/</span><span class="dv">10</span> <span class="op">+</span><span class="st"> </span>E3<span class="op">/</span><span class="dv">14</span> <span class="op">+</span><span class="st"> </span>E2<span class="op">*</span>E2<span class="op">/</span><span class="dv">24</span> <span class="op">-</span><span class="st"> </span><span class="dv">3</span><span class="op">*</span>E2<span class="op">*</span>E3<span class="op">/</span><span class="dv">44</span> <span class="op">-</span><span class="st"> </span><span class="dv">5</span><span class="op">*</span>E2<span class="op">*</span>E2<span class="op">*</span>E2<span class="op">/</span><span class="dv">208</span> <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb8-17" title="17"><span class="st">      </span><span class="dv">3</span><span class="op">*</span>E3<span class="op">*</span>E3<span class="op">/</span><span class="dv">104</span> <span class="op">+</span><span class="st"> </span>E2<span class="op">*</span>E2<span class="op">*</span>E3<span class="op">/</span><span class="dv">16</span>) <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(A)</a>
+<a class="sourceLine" id="cb8-18" title="18">}</a>
+<a class="sourceLine" id="cb8-19" title="19">RD &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, z, <span class="dt">minerror =</span> <span class="fl">1e-7</span>){</a>
+<a class="sourceLine" id="cb8-20" title="20">  x &lt;-<span class="st"> </span><span class="kw">as.complex</span>(x); y &lt;-<span class="st"> </span><span class="kw">as.complex</span>(y); z &lt;-<span class="st"> </span><span class="kw">as.complex</span>(z)</a>
+<a class="sourceLine" id="cb8-21" title="21">  dx &lt;-<span class="st"> </span>dy &lt;-<span class="st"> </span>dz &lt;-<span class="st"> </span><span class="ot">Inf</span></a>
+<a class="sourceLine" id="cb8-22" title="22">  s &lt;-<span class="st"> </span><span class="dv">0</span>; fac &lt;-<span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb8-23" title="23">  <span class="cf">while</span>(<span class="kw">max</span>(dx,dy,dz) <span class="op">&gt;</span><span class="st"> </span>minerror){</a>
+<a class="sourceLine" id="cb8-24" title="24">    lambda &lt;-<span class="st"> </span><span class="kw">sqrt</span>(x<span class="op">*</span>y) <span class="op">+</span><span class="st"> </span><span class="kw">sqrt</span>(y<span class="op">*</span>z) <span class="op">+</span><span class="st"> </span><span class="kw">sqrt</span>(z<span class="op">*</span>x)</a>
+<a class="sourceLine" id="cb8-25" title="25">    s &lt;-<span class="st"> </span>s <span class="op">+</span><span class="st"> </span>fac <span class="op">/</span><span class="st"> </span>(<span class="kw">sqrt</span>(z) <span class="op">*</span><span class="st"> </span>(z <span class="op">+</span><span class="st"> </span>lambda))</a>
+<a class="sourceLine" id="cb8-26" title="26">    fac &lt;-<span class="st"> </span>fac<span class="op">/</span><span class="dv">4</span></a>
+<a class="sourceLine" id="cb8-27" title="27">    x &lt;-<span class="st"> </span>(x <span class="op">+</span><span class="st"> </span>lambda) <span class="op">/</span><span class="st"> </span><span class="dv">4</span></a>
+<a class="sourceLine" id="cb8-28" title="28">    y &lt;-<span class="st"> </span>(y <span class="op">+</span><span class="st"> </span>lambda) <span class="op">/</span><span class="st"> </span><span class="dv">4</span></a>
+<a class="sourceLine" id="cb8-29" title="29">    z &lt;-<span class="st"> </span>(z <span class="op">+</span><span class="st"> </span>lambda) <span class="op">/</span><span class="st"> </span><span class="dv">4</span></a>
+<a class="sourceLine" id="cb8-30" title="30">    A &lt;-<span class="st"> </span>(x <span class="op">+</span><span class="st"> </span>y <span class="op">+</span><span class="st"> </span><span class="dv">3</span><span class="op">*</span>z) <span class="op">/</span><span class="st"> </span><span class="dv">5</span></a>
+<a class="sourceLine" id="cb8-31" title="31">    dx &lt;-<span class="st"> </span><span class="kw">Mod</span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>x<span class="op">/</span>A)</a>
+<a class="sourceLine" id="cb8-32" title="32">    dy &lt;-<span class="st"> </span><span class="kw">Mod</span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>y<span class="op">/</span>A)</a>
+<a class="sourceLine" id="cb8-33" title="33">    dz &lt;-<span class="st"> </span><span class="kw">Mod</span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>z<span class="op">/</span>A)</a>
+<a class="sourceLine" id="cb8-34" title="34">  }</a>
+<a class="sourceLine" id="cb8-35" title="35">  E2 &lt;-<span class="st"> </span>dx<span class="op">*</span>dy <span class="op">+</span><span class="st"> </span>dy<span class="op">*</span>dz <span class="op">+</span><span class="st"> </span><span class="dv">3</span><span class="op">*</span>dz<span class="op">*</span>dz <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>dz<span class="op">*</span>dx <span class="op">+</span><span class="st"> </span>dx<span class="op">*</span>dz <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>dy<span class="op">*</span>dz</a>
+<a class="sourceLine" id="cb8-36" title="36">  E3 &lt;-<span class="st"> </span>dz<span class="op">*</span>dz<span class="op">*</span>dz <span class="op">+</span><span class="st"> </span>dx<span class="op">*</span>dz<span class="op">*</span>dz <span class="op">+</span><span class="st"> </span><span class="dv">3</span><span class="op">*</span>dx<span class="op">*</span>dy<span class="op">*</span>dz <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>dy<span class="op">*</span>dz<span class="op">*</span>dz <span class="op">+</span><span class="st"> </span>dy<span class="op">*</span>dz<span class="op">*</span>dz <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>dx<span class="op">*</span>dz<span class="op">*</span>dz</a>
+<a class="sourceLine" id="cb8-37" title="37">  E4 &lt;-<span class="st"> </span>dy<span class="op">*</span>dz<span class="op">*</span>dz<span class="op">*</span>dz <span class="op">+</span><span class="st"> </span>dx<span class="op">*</span>dz<span class="op">*</span>dz<span class="op">*</span>dz <span class="op">+</span><span class="st"> </span>dx<span class="op">*</span>dy<span class="op">*</span>dz<span class="op">*</span>dz <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>dx<span class="op">*</span>dy<span class="op">*</span>dz<span class="op">*</span>dz</a>
+<a class="sourceLine" id="cb8-38" title="38">  E5 &lt;-<span class="st"> </span>dx<span class="op">*</span>dy<span class="op">*</span>dz<span class="op">*</span>dz<span class="op">*</span>dz</a>
+<a class="sourceLine" id="cb8-39" title="39">  <span class="dv">3</span><span class="op">*</span>s <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-40" title="40"><span class="st">    </span>fac <span class="op">*</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="dv">3</span><span class="op">*</span>E2<span class="op">/</span><span class="dv">14</span> <span class="op">+</span><span class="st"> </span>E3<span class="op">/</span><span class="dv">6</span> <span class="op">+</span><span class="st"> </span><span class="dv">9</span><span class="op">*</span>E2<span class="op">*</span>E2<span class="op">/</span><span class="dv">88</span> <span class="op">-</span><span class="st"> </span><span class="dv">3</span><span class="op">*</span>E4<span class="op">/</span><span class="dv">22</span> <span class="op">-</span><span class="st"> </span><span class="dv">9</span><span class="op">*</span>E2<span class="op">*</span>E3<span class="op">/</span><span class="dv">52</span> <span class="op">+</span><span class="st"> </span><span class="dv">3</span><span class="op">*</span>E5<span class="op">/</span><span class="dv">26</span> <span class="op">-</span></a>
+<a class="sourceLine" id="cb8-41" title="41"><span class="st">             </span>E2<span class="op">*</span>E2<span class="op">*</span>E2<span class="op">/</span><span class="dv">16</span> <span class="op">+</span><span class="st"> </span><span class="dv">3</span><span class="op">*</span>E3<span class="op">*</span>E3<span class="op">/</span><span class="dv">40</span> <span class="op">+</span><span class="st"> </span><span class="dv">3</span><span class="op">*</span>E2<span class="op">*</span>E4<span class="op">/</span><span class="dv">20</span> <span class="op">+</span><span class="st"> </span><span class="dv">45</span><span class="op">*</span>E2<span class="op">*</span>E2<span class="op">*</span>E3<span class="op">/</span><span class="dv">272</span> <span class="op">-</span></a>
+<a class="sourceLine" id="cb8-42" title="42"><span class="st">             </span><span class="dv">9</span><span class="op">*</span>(E3<span class="op">*</span>E4 <span class="op">+</span><span class="st"> </span>E2<span class="op">*</span>E5)<span class="op">/</span><span class="dv">68</span>) <span class="op">/</span><span class="st"> </span>A <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(A)</a>
+<a class="sourceLine" id="cb8-43" title="43">}</a></code></pre></div>
+<p>Now here is the implementation of the incomplete elliptic integral of the second kind allowing complex values of <span class="math inline">\(\phi\)</span>:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">E &lt;-<span class="st"> </span><span class="cf">function</span>(phi, m){</a>
+<a class="sourceLine" id="cb9-2" title="2">  <span class="cf">if</span>(phi <span class="op">==</span><span class="st"> </span><span class="dv">0</span>){</a>
+<a class="sourceLine" id="cb9-3" title="3">    <span class="dv">0</span></a>
+<a class="sourceLine" id="cb9-4" title="4">  }<span class="cf">else</span> <span class="cf">if</span>(<span class="kw">Re</span>(phi) <span class="op">&gt;=</span><span class="st"> </span><span class="op">-</span>pi<span class="op">/</span><span class="dv">2</span> <span class="op">&amp;&amp;</span><span class="st"> </span><span class="kw">Re</span>(phi) <span class="op">&lt;=</span><span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span>){</a>
+<a class="sourceLine" id="cb9-5" title="5">    sine &lt;-<span class="st"> </span><span class="kw">sin</span>(phi)</a>
+<a class="sourceLine" id="cb9-6" title="6">    sine2 &lt;-<span class="st"> </span>sine<span class="op">*</span>sine</a>
+<a class="sourceLine" id="cb9-7" title="7">    cosine2 &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span>sine2</a>
+<a class="sourceLine" id="cb9-8" title="8">    oneminusmsine2 &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span>m<span class="op">*</span>sine2</a>
+<a class="sourceLine" id="cb9-9" title="9">    sine <span class="op">*</span><span class="st"> </span>(<span class="kw">RF</span>(cosine2, oneminusmsine2, <span class="dv">1</span>) <span class="op">-</span></a>
+<a class="sourceLine" id="cb9-10" title="10"><span class="st">              </span>m <span class="op">*</span><span class="st"> </span>sine2 <span class="op">*</span><span class="st"> </span><span class="kw">RD</span>(cosine2, oneminusmsine2, <span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb9-11" title="11">  }<span class="cf">else</span> <span class="cf">if</span>(<span class="kw">Re</span>(phi) <span class="op">&gt;</span><span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span>){</a>
+<a class="sourceLine" id="cb9-12" title="12">    k &lt;-<span class="st"> </span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb9-13" title="13">    <span class="cf">while</span>(<span class="kw">Re</span>(phi) <span class="op">&gt;</span><span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span>){</a>
+<a class="sourceLine" id="cb9-14" title="14">      phi &lt;-<span class="st"> </span>phi <span class="op">-</span><span class="st"> </span>pi</a>
+<a class="sourceLine" id="cb9-15" title="15">      k &lt;-<span class="st"> </span>k <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb9-16" title="16">    }</a>
+<a class="sourceLine" id="cb9-17" title="17">    <span class="dv">2</span><span class="op">*</span>k<span class="op">*</span><span class="kw">E</span>(pi<span class="op">/</span><span class="dv">2</span>, m) <span class="op">+</span><span class="st"> </span><span class="kw">E</span>(phi, m)</a>
+<a class="sourceLine" id="cb9-18" title="18">  }<span class="cf">else</span>{</a>
+<a class="sourceLine" id="cb9-19" title="19">    k &lt;-<span class="st"> </span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb9-20" title="20">    <span class="cf">while</span>(<span class="kw">Re</span>(phi) <span class="op">&lt;</span><span class="st"> </span><span class="op">-</span>pi<span class="op">/</span><span class="dv">2</span>){</a>
+<a class="sourceLine" id="cb9-21" title="21">      phi &lt;-<span class="st"> </span>phi <span class="op">+</span><span class="st"> </span>pi</a>
+<a class="sourceLine" id="cb9-22" title="22">      k &lt;-<span class="st"> </span>k <span class="op">-</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb9-23" title="23">    }</a>
+<a class="sourceLine" id="cb9-24" title="24">    <span class="dv">2</span><span class="op">*</span>k<span class="op">*</span><span class="kw">E</span>(pi<span class="op">/</span><span class="dv">2</span>, m) <span class="op">+</span><span class="st"> </span><span class="kw">E</span>(phi, m)</a>
+<a class="sourceLine" id="cb9-25" title="25">  }</a>
+<a class="sourceLine" id="cb9-26" title="26">}</a></code></pre></div>
+<p>Let’s try it:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">E</span>(<span class="dt">phi =</span> <span class="dv">7</span><span class="op">+</span>2i, <span class="dt">m =</span> <span class="dv">-5</span>)</a>
+<a class="sourceLine" id="cb10-2" title="2"><span class="co">## [1] 7.763389+5.631026i</span></a></code></pre></div>
+<p>and compare with <a href="https://www.wolframalpha.com/input/?i=EllipticE%5B7%2B2I%2C+-5%5D"><code>EllipticE[7+2I,-5]</code></a> on WolframAlpha.</p>
+<p>I also find the same results as the ones of WolframAlpha when <span class="math inline">\(\phi\)</span> is real and <span class="math inline">\(m\)</span> is complex, but not always when both are complex.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="kw">E</span>(<span class="dt">phi =</span> <span class="dv">1</span><span class="op">+</span>1i, <span class="dt">m =</span> <span class="op">-</span>5i) <span class="co"># same as Wolfram</span></a>
+<a class="sourceLine" id="cb11-2" title="2"><span class="co">## [1] -0.66421+1.746623i</span></a>
+<a class="sourceLine" id="cb11-3" title="3"><span class="kw">E</span>(<span class="dt">phi =</span> <span class="dv">7</span><span class="op">+</span>2i, <span class="dt">m =</span> <span class="op">-</span>5i) <span class="co"># not the same as Wolfram</span></a>
+<a class="sourceLine" id="cb11-4" title="4"><span class="co">## [1] -0.78406+2.057178i</span></a></code></pre></div>
+
+    </div>
+
+
+    <div id="footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </div>
+
+  </div>
+
+  <div id="disqus_thread"></div>
+  <div class="pagination">
+    <ul>
+      <li>
+        <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+      </li>
+    </ul>
+  </div>
+</body>
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+<!-- Google Prettify -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+<script>
+  var pres = document.getElementsByTagName("pre");
+  for (var i = 0; i < pres.length; ++i) {
+    
+    pres[i].className = pres[i].className + " prettyprint linenums";
+    
+  }
+  prettyPrint();
+</script> 
+
+</html>
