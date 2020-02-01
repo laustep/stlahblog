@@ -91,17 +91,19 @@ E(\phi \mid m) =
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">E &lt;-<span class="st"> </span><span class="cf">function</span>(phi, m){</a>
 <a class="sourceLine" id="cb2-2" title="2">  <span class="cf">if</span>(phi <span class="op">==</span><span class="st"> </span><span class="dv">0</span>){</a>
 <a class="sourceLine" id="cb2-3" title="3">    <span class="dv">0</span></a>
-<a class="sourceLine" id="cb2-4" title="4">  }<span class="cf">else</span> <span class="cf">if</span>(phi <span class="op">&gt;=</span><span class="st"> </span><span class="op">-</span>pi<span class="op">/</span><span class="dv">2</span> <span class="op">&amp;&amp;</span><span class="st"> </span>phi <span class="op">&lt;=</span><span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span>){</a>
-<a class="sourceLine" id="cb2-5" title="5">    sine &lt;-<span class="st"> </span><span class="kw">sin</span>(phi)</a>
-<a class="sourceLine" id="cb2-6" title="6">    sine2 &lt;-<span class="st"> </span>sine<span class="op">*</span>sine</a>
-<a class="sourceLine" id="cb2-7" title="7">    cosine2 &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span>sine2</a>
-<a class="sourceLine" id="cb2-8" title="8">    oneminusmsine2 &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span>m<span class="op">*</span>sine2</a>
-<a class="sourceLine" id="cb2-9" title="9">    sine <span class="op">*</span><span class="st"> </span>(gsl<span class="op">::</span><span class="kw">ellint_RF</span>(cosine2, oneminusmsine2, <span class="dv">1</span>) <span class="op">-</span></a>
-<a class="sourceLine" id="cb2-10" title="10"><span class="st">              </span>m <span class="op">*</span><span class="st"> </span>sine2 <span class="op">*</span><span class="st"> </span>gsl<span class="op">::</span><span class="kw">ellint_RD</span>(cosine2, oneminusmsine2, <span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb2-11" title="11">  }<span class="cf">else</span>{</a>
-<a class="sourceLine" id="cb2-12" title="12">    <span class="ot">NaN</span></a>
-<a class="sourceLine" id="cb2-13" title="13">  }</a>
-<a class="sourceLine" id="cb2-14" title="14">}</a></code></pre></div>
+<a class="sourceLine" id="cb2-4" title="4">  }<span class="cf">else</span> <span class="cf">if</span>(phi <span class="op">==</span><span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span> <span class="op">&amp;&amp;</span><span class="st"> </span>m <span class="op">==</span><span class="st"> </span><span class="dv">1</span>){</a>
+<a class="sourceLine" id="cb2-5" title="5">    <span class="dv">1</span></a>
+<a class="sourceLine" id="cb2-6" title="6">  }<span class="cf">else</span> <span class="cf">if</span>(phi <span class="op">&gt;=</span><span class="st"> </span><span class="op">-</span>pi<span class="op">/</span><span class="dv">2</span> <span class="op">&amp;&amp;</span><span class="st"> </span>phi <span class="op">&lt;=</span><span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span>){</a>
+<a class="sourceLine" id="cb2-7" title="7">    sine &lt;-<span class="st"> </span><span class="kw">sin</span>(phi)</a>
+<a class="sourceLine" id="cb2-8" title="8">    sine2 &lt;-<span class="st"> </span>sine<span class="op">*</span>sine</a>
+<a class="sourceLine" id="cb2-9" title="9">    cosine2 &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span>sine2</a>
+<a class="sourceLine" id="cb2-10" title="10">    oneminusmsine2 &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span>m<span class="op">*</span>sine2</a>
+<a class="sourceLine" id="cb2-11" title="11">    sine <span class="op">*</span><span class="st"> </span>(gsl<span class="op">::</span><span class="kw">ellint_RF</span>(cosine2, oneminusmsine2, <span class="dv">1</span>) <span class="op">-</span></a>
+<a class="sourceLine" id="cb2-12" title="12"><span class="st">              </span>m <span class="op">*</span><span class="st"> </span>sine2 <span class="op">*</span><span class="st"> </span>gsl<span class="op">::</span><span class="kw">ellint_RD</span>(cosine2, oneminusmsine2, <span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb2-13" title="13">  }<span class="cf">else</span>{</a>
+<a class="sourceLine" id="cb2-14" title="14">    <span class="ot">NaN</span></a>
+<a class="sourceLine" id="cb2-15" title="15">  }</a>
+<a class="sourceLine" id="cb2-16" title="16">}</a></code></pre></div>
 <p>Let’s try it:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw">E</span>(<span class="dt">phi =</span> <span class="dv">1</span>, <span class="dt">m =</span> <span class="dv">-5</span>)</a>
 <a class="sourceLine" id="cb3-2" title="2"><span class="co">## [1] 1.493736</span></a></code></pre></div>
@@ -123,29 +125,31 @@ E(\phi + k\pi \mid m) = 2 k E\Bigl(\frac{\pi}{2} \mid m\Bigr) + E(\phi \mid m)
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">E &lt;-<span class="st"> </span><span class="cf">function</span>(phi, m){</a>
 <a class="sourceLine" id="cb6-2" title="2">  <span class="cf">if</span>(phi <span class="op">==</span><span class="st"> </span><span class="dv">0</span>){</a>
 <a class="sourceLine" id="cb6-3" title="3">    <span class="dv">0</span></a>
-<a class="sourceLine" id="cb6-4" title="4">  }<span class="cf">else</span> <span class="cf">if</span>(phi <span class="op">&gt;=</span><span class="st"> </span><span class="op">-</span>pi<span class="op">/</span><span class="dv">2</span> <span class="op">&amp;&amp;</span><span class="st"> </span>phi <span class="op">&lt;=</span><span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span>){</a>
-<a class="sourceLine" id="cb6-5" title="5">    sine &lt;-<span class="st"> </span><span class="kw">sin</span>(phi)</a>
-<a class="sourceLine" id="cb6-6" title="6">    sine2 &lt;-<span class="st"> </span>sine<span class="op">*</span>sine</a>
-<a class="sourceLine" id="cb6-7" title="7">    cosine2 &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span>sine2</a>
-<a class="sourceLine" id="cb6-8" title="8">    oneminusmsine2 &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span>m<span class="op">*</span>sine2</a>
-<a class="sourceLine" id="cb6-9" title="9">    sine <span class="op">*</span><span class="st"> </span>(gsl<span class="op">::</span><span class="kw">ellint_RF</span>(cosine2, oneminusmsine2, <span class="dv">1</span>) <span class="op">-</span></a>
-<a class="sourceLine" id="cb6-10" title="10"><span class="st">              </span>m <span class="op">*</span><span class="st"> </span>sine2 <span class="op">*</span><span class="st"> </span>gsl<span class="op">::</span><span class="kw">ellint_RD</span>(cosine2, oneminusmsine2, <span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb6-11" title="11">  }<span class="cf">else</span> <span class="cf">if</span>(phi <span class="op">&gt;</span><span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span>){</a>
-<a class="sourceLine" id="cb6-12" title="12">    k &lt;-<span class="st"> </span><span class="dv">0</span></a>
-<a class="sourceLine" id="cb6-13" title="13">    <span class="cf">while</span>(phi <span class="op">&gt;</span><span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span>){</a>
-<a class="sourceLine" id="cb6-14" title="14">      phi &lt;-<span class="st"> </span>phi <span class="op">-</span><span class="st"> </span>pi</a>
-<a class="sourceLine" id="cb6-15" title="15">      k &lt;-<span class="st"> </span>k <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb6-16" title="16">    }</a>
-<a class="sourceLine" id="cb6-17" title="17">    <span class="dv">2</span><span class="op">*</span>k<span class="op">*</span><span class="kw">E</span>(pi<span class="op">/</span><span class="dv">2</span>, m) <span class="op">+</span><span class="st"> </span><span class="kw">E</span>(phi, m)</a>
-<a class="sourceLine" id="cb6-18" title="18">  }<span class="cf">else</span>{</a>
-<a class="sourceLine" id="cb6-19" title="19">    k &lt;-<span class="st"> </span><span class="dv">0</span></a>
-<a class="sourceLine" id="cb6-20" title="20">    <span class="cf">while</span>(phi <span class="op">&lt;</span><span class="st"> </span><span class="op">-</span>pi<span class="op">/</span><span class="dv">2</span>){</a>
-<a class="sourceLine" id="cb6-21" title="21">      phi &lt;-<span class="st"> </span>phi <span class="op">+</span><span class="st"> </span>pi</a>
-<a class="sourceLine" id="cb6-22" title="22">      k &lt;-<span class="st"> </span>k <span class="op">-</span><span class="st"> </span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb6-23" title="23">    }</a>
-<a class="sourceLine" id="cb6-24" title="24">    <span class="dv">2</span><span class="op">*</span>k<span class="op">*</span><span class="kw">E</span>(pi<span class="op">/</span><span class="dv">2</span>, m) <span class="op">+</span><span class="st"> </span><span class="kw">E</span>(phi, m)</a>
-<a class="sourceLine" id="cb6-25" title="25">  }</a>
-<a class="sourceLine" id="cb6-26" title="26">}</a></code></pre></div>
+<a class="sourceLine" id="cb6-4" title="4">  }<span class="cf">else</span> <span class="cf">if</span>(phi <span class="op">==</span><span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span> <span class="op">&amp;&amp;</span><span class="st"> </span>m <span class="op">==</span><span class="st"> </span><span class="dv">1</span>){</a>
+<a class="sourceLine" id="cb6-5" title="5">    <span class="dv">1</span></a>
+<a class="sourceLine" id="cb6-6" title="6">  }<span class="cf">else</span> <span class="cf">if</span>(phi <span class="op">&gt;=</span><span class="st"> </span><span class="op">-</span>pi<span class="op">/</span><span class="dv">2</span> <span class="op">&amp;&amp;</span><span class="st"> </span>phi <span class="op">&lt;=</span><span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span>){</a>
+<a class="sourceLine" id="cb6-7" title="7">    sine &lt;-<span class="st"> </span><span class="kw">sin</span>(phi)</a>
+<a class="sourceLine" id="cb6-8" title="8">    sine2 &lt;-<span class="st"> </span>sine<span class="op">*</span>sine</a>
+<a class="sourceLine" id="cb6-9" title="9">    cosine2 &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span>sine2</a>
+<a class="sourceLine" id="cb6-10" title="10">    oneminusmsine2 &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span>m<span class="op">*</span>sine2</a>
+<a class="sourceLine" id="cb6-11" title="11">    sine <span class="op">*</span><span class="st"> </span>(gsl<span class="op">::</span><span class="kw">ellint_RF</span>(cosine2, oneminusmsine2, <span class="dv">1</span>) <span class="op">-</span></a>
+<a class="sourceLine" id="cb6-12" title="12"><span class="st">              </span>m <span class="op">*</span><span class="st"> </span>sine2 <span class="op">*</span><span class="st"> </span>gsl<span class="op">::</span><span class="kw">ellint_RD</span>(cosine2, oneminusmsine2, <span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb6-13" title="13">  }<span class="cf">else</span> <span class="cf">if</span>(phi <span class="op">&gt;</span><span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span>){</a>
+<a class="sourceLine" id="cb6-14" title="14">    k &lt;-<span class="st"> </span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb6-15" title="15">    <span class="cf">while</span>(phi <span class="op">&gt;</span><span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span>){</a>
+<a class="sourceLine" id="cb6-16" title="16">      phi &lt;-<span class="st"> </span>phi <span class="op">-</span><span class="st"> </span>pi</a>
+<a class="sourceLine" id="cb6-17" title="17">      k &lt;-<span class="st"> </span>k <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb6-18" title="18">    }</a>
+<a class="sourceLine" id="cb6-19" title="19">    <span class="dv">2</span><span class="op">*</span>k<span class="op">*</span><span class="kw">E</span>(pi<span class="op">/</span><span class="dv">2</span>, m) <span class="op">+</span><span class="st"> </span><span class="kw">E</span>(phi, m)</a>
+<a class="sourceLine" id="cb6-20" title="20">  }<span class="cf">else</span>{</a>
+<a class="sourceLine" id="cb6-21" title="21">    k &lt;-<span class="st"> </span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb6-22" title="22">    <span class="cf">while</span>(phi <span class="op">&lt;</span><span class="st"> </span><span class="op">-</span>pi<span class="op">/</span><span class="dv">2</span>){</a>
+<a class="sourceLine" id="cb6-23" title="23">      phi &lt;-<span class="st"> </span>phi <span class="op">+</span><span class="st"> </span>pi</a>
+<a class="sourceLine" id="cb6-24" title="24">      k &lt;-<span class="st"> </span>k <span class="op">-</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb6-25" title="25">    }</a>
+<a class="sourceLine" id="cb6-26" title="26">    <span class="dv">2</span><span class="op">*</span>k<span class="op">*</span><span class="kw">E</span>(pi<span class="op">/</span><span class="dv">2</span>, m) <span class="op">+</span><span class="st"> </span><span class="kw">E</span>(phi, m)</a>
+<a class="sourceLine" id="cb6-27" title="27">  }</a>
+<a class="sourceLine" id="cb6-28" title="28">}</a></code></pre></div>
 <p>Let’s try it:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="kw">E</span>(<span class="dt">phi =</span> <span class="dv">7</span>, <span class="dt">m =</span> <span class="dv">-5</span>)</a>
 <a class="sourceLine" id="cb7-2" title="2"><span class="co">## [1] 12.25899</span></a></code></pre></div>
@@ -200,29 +204,31 @@ E(\phi + k\pi \mid m) = 2 k E\Bigl(\frac{\pi}{2} \mid m\Bigr) + E(\phi \mid m)
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">E &lt;-<span class="st"> </span><span class="cf">function</span>(phi, m){</a>
 <a class="sourceLine" id="cb9-2" title="2">  <span class="cf">if</span>(phi <span class="op">==</span><span class="st"> </span><span class="dv">0</span>){</a>
 <a class="sourceLine" id="cb9-3" title="3">    <span class="dv">0</span></a>
-<a class="sourceLine" id="cb9-4" title="4">  }<span class="cf">else</span> <span class="cf">if</span>(<span class="kw">Re</span>(phi) <span class="op">&gt;=</span><span class="st"> </span><span class="op">-</span>pi<span class="op">/</span><span class="dv">2</span> <span class="op">&amp;&amp;</span><span class="st"> </span><span class="kw">Re</span>(phi) <span class="op">&lt;=</span><span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span>){</a>
-<a class="sourceLine" id="cb9-5" title="5">    sine &lt;-<span class="st"> </span><span class="kw">sin</span>(phi)</a>
-<a class="sourceLine" id="cb9-6" title="6">    sine2 &lt;-<span class="st"> </span>sine<span class="op">*</span>sine</a>
-<a class="sourceLine" id="cb9-7" title="7">    cosine2 &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span>sine2</a>
-<a class="sourceLine" id="cb9-8" title="8">    oneminusmsine2 &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span>m<span class="op">*</span>sine2</a>
-<a class="sourceLine" id="cb9-9" title="9">    sine <span class="op">*</span><span class="st"> </span>(<span class="kw">RF</span>(cosine2, oneminusmsine2, <span class="dv">1</span>) <span class="op">-</span></a>
-<a class="sourceLine" id="cb9-10" title="10"><span class="st">              </span>m <span class="op">*</span><span class="st"> </span>sine2 <span class="op">*</span><span class="st"> </span><span class="kw">RD</span>(cosine2, oneminusmsine2, <span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb9-11" title="11">  }<span class="cf">else</span> <span class="cf">if</span>(<span class="kw">Re</span>(phi) <span class="op">&gt;</span><span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span>){</a>
-<a class="sourceLine" id="cb9-12" title="12">    k &lt;-<span class="st"> </span><span class="dv">0</span></a>
-<a class="sourceLine" id="cb9-13" title="13">    <span class="cf">while</span>(<span class="kw">Re</span>(phi) <span class="op">&gt;</span><span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span>){</a>
-<a class="sourceLine" id="cb9-14" title="14">      phi &lt;-<span class="st"> </span>phi <span class="op">-</span><span class="st"> </span>pi</a>
-<a class="sourceLine" id="cb9-15" title="15">      k &lt;-<span class="st"> </span>k <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb9-16" title="16">    }</a>
-<a class="sourceLine" id="cb9-17" title="17">    <span class="dv">2</span><span class="op">*</span>k<span class="op">*</span><span class="kw">E</span>(pi<span class="op">/</span><span class="dv">2</span>, m) <span class="op">+</span><span class="st"> </span><span class="kw">E</span>(phi, m)</a>
-<a class="sourceLine" id="cb9-18" title="18">  }<span class="cf">else</span>{</a>
-<a class="sourceLine" id="cb9-19" title="19">    k &lt;-<span class="st"> </span><span class="dv">0</span></a>
-<a class="sourceLine" id="cb9-20" title="20">    <span class="cf">while</span>(<span class="kw">Re</span>(phi) <span class="op">&lt;</span><span class="st"> </span><span class="op">-</span>pi<span class="op">/</span><span class="dv">2</span>){</a>
-<a class="sourceLine" id="cb9-21" title="21">      phi &lt;-<span class="st"> </span>phi <span class="op">+</span><span class="st"> </span>pi</a>
-<a class="sourceLine" id="cb9-22" title="22">      k &lt;-<span class="st"> </span>k <span class="op">-</span><span class="st"> </span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb9-23" title="23">    }</a>
-<a class="sourceLine" id="cb9-24" title="24">    <span class="dv">2</span><span class="op">*</span>k<span class="op">*</span><span class="kw">E</span>(pi<span class="op">/</span><span class="dv">2</span>, m) <span class="op">+</span><span class="st"> </span><span class="kw">E</span>(phi, m)</a>
-<a class="sourceLine" id="cb9-25" title="25">  }</a>
-<a class="sourceLine" id="cb9-26" title="26">}</a></code></pre></div>
+<a class="sourceLine" id="cb9-4" title="4">  }<span class="cf">else</span> <span class="cf">if</span>(phi <span class="op">==</span><span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span> <span class="op">&amp;&amp;</span><span class="st"> </span>m <span class="op">==</span><span class="st"> </span><span class="dv">1</span>){</a>
+<a class="sourceLine" id="cb9-5" title="5">    <span class="dv">1</span></a>
+<a class="sourceLine" id="cb9-6" title="6">  }<span class="cf">else</span> <span class="cf">if</span>(<span class="kw">Re</span>(phi) <span class="op">&gt;=</span><span class="st"> </span><span class="op">-</span>pi<span class="op">/</span><span class="dv">2</span> <span class="op">&amp;&amp;</span><span class="st"> </span><span class="kw">Re</span>(phi) <span class="op">&lt;=</span><span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span>){</a>
+<a class="sourceLine" id="cb9-7" title="7">    sine &lt;-<span class="st"> </span><span class="kw">sin</span>(phi)</a>
+<a class="sourceLine" id="cb9-8" title="8">    sine2 &lt;-<span class="st"> </span>sine<span class="op">*</span>sine</a>
+<a class="sourceLine" id="cb9-9" title="9">    cosine2 &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span>sine2</a>
+<a class="sourceLine" id="cb9-10" title="10">    oneminusmsine2 &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span>m<span class="op">*</span>sine2</a>
+<a class="sourceLine" id="cb9-11" title="11">    sine <span class="op">*</span><span class="st"> </span>(<span class="kw">RF</span>(cosine2, oneminusmsine2, <span class="dv">1</span>) <span class="op">-</span></a>
+<a class="sourceLine" id="cb9-12" title="12"><span class="st">              </span>m <span class="op">*</span><span class="st"> </span>sine2 <span class="op">*</span><span class="st"> </span><span class="kw">RD</span>(cosine2, oneminusmsine2, <span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb9-13" title="13">  }<span class="cf">else</span> <span class="cf">if</span>(<span class="kw">Re</span>(phi) <span class="op">&gt;</span><span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span>){</a>
+<a class="sourceLine" id="cb9-14" title="14">    k &lt;-<span class="st"> </span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb9-15" title="15">    <span class="cf">while</span>(<span class="kw">Re</span>(phi) <span class="op">&gt;</span><span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span>){</a>
+<a class="sourceLine" id="cb9-16" title="16">      phi &lt;-<span class="st"> </span>phi <span class="op">-</span><span class="st"> </span>pi</a>
+<a class="sourceLine" id="cb9-17" title="17">      k &lt;-<span class="st"> </span>k <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb9-18" title="18">    }</a>
+<a class="sourceLine" id="cb9-19" title="19">    <span class="dv">2</span><span class="op">*</span>k<span class="op">*</span><span class="kw">E</span>(pi<span class="op">/</span><span class="dv">2</span>, m) <span class="op">+</span><span class="st"> </span><span class="kw">E</span>(phi, m)</a>
+<a class="sourceLine" id="cb9-20" title="20">  }<span class="cf">else</span>{</a>
+<a class="sourceLine" id="cb9-21" title="21">    k &lt;-<span class="st"> </span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb9-22" title="22">    <span class="cf">while</span>(<span class="kw">Re</span>(phi) <span class="op">&lt;</span><span class="st"> </span><span class="op">-</span>pi<span class="op">/</span><span class="dv">2</span>){</a>
+<a class="sourceLine" id="cb9-23" title="23">      phi &lt;-<span class="st"> </span>phi <span class="op">+</span><span class="st"> </span>pi</a>
+<a class="sourceLine" id="cb9-24" title="24">      k &lt;-<span class="st"> </span>k <span class="op">-</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb9-25" title="25">    }</a>
+<a class="sourceLine" id="cb9-26" title="26">    <span class="dv">2</span><span class="op">*</span>k<span class="op">*</span><span class="kw">E</span>(pi<span class="op">/</span><span class="dv">2</span>, m) <span class="op">+</span><span class="st"> </span><span class="kw">E</span>(phi, m)</a>
+<a class="sourceLine" id="cb9-27" title="27">  }</a>
+<a class="sourceLine" id="cb9-28" title="28">}</a></code></pre></div>
 <p>Let’s try it:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">E</span>(<span class="dt">phi =</span> <span class="dv">7</span><span class="op">+</span>2i, <span class="dt">m =</span> <span class="dv">-5</span>)</a>
 <a class="sourceLine" id="cb10-2" title="2"><span class="co">## [1] 7.763389+5.631026i</span></a></code></pre></div>
@@ -232,6 +238,36 @@ E(\phi + k\pi \mid m) = 2 k E\Bigl(\frac{\pi}{2} \mid m\Bigr) + E(\phi \mid m)
 <a class="sourceLine" id="cb11-2" title="2"><span class="co">## [1] -0.66421+1.746623i</span></a>
 <a class="sourceLine" id="cb11-3" title="3"><span class="kw">E</span>(<span class="dt">phi =</span> <span class="dv">7</span><span class="op">+</span>2i, <span class="dt">m =</span> <span class="op">-</span>5i) <span class="co"># not the same as Wolfram</span></a>
 <a class="sourceLine" id="cb11-4" title="4"><span class="co">## [1] -0.78406+2.057178i</span></a></code></pre></div>
+<p>So this implementation is not perfect.</p>
+<h2 id="resorting-to-the-appell-function">Resorting to the Appell function</h2>
+<p>Another way is to use the relation with the <em>first Appell hypergeometric function</em>: <span class="math display">\[
+E(\phi, m) = \sin\phi \times 
+F_1\Bigl(\frac12, \frac12, -\frac{3}{2}, \sin^2\phi, m\sin^2\phi\Bigr),
+\]</span> and the Euler integral representation <span class="math display">\[
+F_1\Bigl(\frac12, \frac12, -\frac{3}{2}, z_1, z_2\Bigr) = 
+\frac12\int_0^1 \frac{\sqrt{1-z_2t}}{\sqrt{t}\sqrt{1-z_1t}}\,\mathrm{d}t.
+\]</span></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1">f &lt;-<span class="st"> </span><span class="cf">function</span>(t, z1, z2){</a>
+<a class="sourceLine" id="cb12-2" title="2">  <span class="kw">sqrt</span>(<span class="dv">1</span><span class="op">-</span>t<span class="op">*</span>z2) <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(t) <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="dv">1</span><span class="op">-</span>t<span class="op">*</span>z1)</a>
+<a class="sourceLine" id="cb12-3" title="3">}</a>
+<a class="sourceLine" id="cb12-4" title="4">f1 &lt;-<span class="st"> </span><span class="cf">function</span>(t, z1, z2) <span class="kw">Re</span>(<span class="kw">f</span>(t, z1, z2))</a>
+<a class="sourceLine" id="cb12-5" title="5">f2 &lt;-<span class="st"> </span><span class="cf">function</span>(t, z1, z2) <span class="kw">Im</span>(<span class="kw">f</span>(t, z1, z2))</a>
+<a class="sourceLine" id="cb12-6" title="6"><span class="co">#</span></a>
+<a class="sourceLine" id="cb12-7" title="7">phi &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">+</span>1i; sine &lt;-<span class="st"> </span><span class="kw">sin</span>(phi)</a>
+<a class="sourceLine" id="cb12-8" title="8">m &lt;-<span class="st"> </span><span class="op">-</span>5i</a>
+<a class="sourceLine" id="cb12-9" title="9">I1 &lt;-<span class="st"> </span><span class="kw">integrate</span>(f1, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">z1 =</span> sine<span class="op">^</span><span class="dv">2</span>, <span class="dt">z2 =</span> m<span class="op">*</span>sine<span class="op">^</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb12-10" title="10">I2 &lt;-<span class="st"> </span><span class="kw">integrate</span>(f2, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">z1 =</span> sine<span class="op">^</span><span class="dv">2</span>, <span class="dt">z2 =</span> m<span class="op">*</span>sine<span class="op">^</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb12-11" title="11">sine<span class="op">/</span><span class="dv">2</span> <span class="op">*</span><span class="st"> </span>(I1<span class="op">$</span>value <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>I2<span class="op">$</span>value)</a>
+<a class="sourceLine" id="cb12-12" title="12"><span class="co">## [1] -0.664216+1.746635i</span></a>
+<a class="sourceLine" id="cb12-13" title="13"><span class="kw">E</span>(phi,m)</a>
+<a class="sourceLine" id="cb12-14" title="14"><span class="co">## [1] -0.66421+1.746623i</span></a>
+<a class="sourceLine" id="cb12-15" title="15"><span class="co">#</span></a>
+<a class="sourceLine" id="cb12-16" title="16">phi &lt;-<span class="st"> </span><span class="dv">7</span><span class="op">+</span>2i; sine &lt;-<span class="st"> </span><span class="kw">sin</span>(phi)</a>
+<a class="sourceLine" id="cb12-17" title="17">m &lt;-<span class="st"> </span><span class="op">-</span>5i</a>
+<a class="sourceLine" id="cb12-18" title="18">I1 &lt;-<span class="st"> </span><span class="kw">integrate</span>(f1, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">z1 =</span> sine<span class="op">^</span><span class="dv">2</span>, <span class="dt">z2 =</span> m<span class="op">*</span>sine<span class="op">^</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb12-19" title="19">I2 &lt;-<span class="st"> </span><span class="kw">integrate</span>(f2, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">z1 =</span> sine<span class="op">^</span><span class="dv">2</span>, <span class="dt">z2 =</span> m<span class="op">*</span>sine<span class="op">^</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb12-20" title="20">sine<span class="op">/</span><span class="dv">2</span> <span class="op">*</span><span class="st"> </span>(I1<span class="op">$</span>value <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>I2<span class="op">$</span>value) <span class="co"># same as Wolfram</span></a>
+<a class="sourceLine" id="cb12-21" title="21"><span class="co">## [1] 6.421623-0.321337i</span></a></code></pre></div>
 
     </div>
 
