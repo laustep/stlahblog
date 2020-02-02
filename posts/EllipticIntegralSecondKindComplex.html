@@ -154,14 +154,14 @@ E(\phi + k\pi \mid m) = 2 k E\Bigl(\frac{\pi}{2} \mid m\Bigr) + E(\phi \mid m)
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="kw">E</span>(<span class="dt">phi =</span> <span class="dv">7</span>, <span class="dt">m =</span> <span class="dv">-5</span>)</a>
 <a class="sourceLine" id="cb7-2" title="2"><span class="co">## [1] 12.25899</span></a></code></pre></div>
 <p>and compare with <a href="https://www.wolframalpha.com/input/?i=EllipticE%5B7%2C+-5%5D"><code>EllipticE[7,-5]</code></a> on WolframAlpha.</p>
-<h1 id="extending-ephi-mid-m-to-complex-phi">Extending <span class="math inline">\(E(\phi \mid m)\)</span> to complex <span class="math inline">\(\phi\)</span></h1>
+<h1 id="extending-ephi-mid-m-to-complex-phi-and-m">Extending <span class="math inline">\(E(\phi \mid m)\)</span> to complex <span class="math inline">\(\phi\)</span> and <span class="math inline">\(m\)</span></h1>
 <p>Now we will construct the analytical continuation of <span class="math inline">\(E(\phi \mid m)\)</span>.</p>
 <p>I found a nice implementation of the Carlson elliptic integrals <a href="https://www.codeproject.com/Articles/566614/Elliptic-integrals">here</a>, which can easily be generalized to complex values of the parameters:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">RF &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, z, <span class="dt">minerror =</span> <span class="fl">1e-7</span>){</a>
 <a class="sourceLine" id="cb8-2" title="2">  x &lt;-<span class="st"> </span><span class="kw">as.complex</span>(x); y &lt;-<span class="st"> </span><span class="kw">as.complex</span>(y); z &lt;-<span class="st"> </span><span class="kw">as.complex</span>(z)</a>
 <a class="sourceLine" id="cb8-3" title="3">  dx &lt;-<span class="st"> </span>dy &lt;-<span class="st"> </span>dz &lt;-<span class="st"> </span><span class="ot">Inf</span></a>
 <a class="sourceLine" id="cb8-4" title="4">  <span class="cf">while</span>(<span class="kw">max</span>(dx,dy,dz) <span class="op">&gt;</span><span class="st"> </span>minerror){</a>
-<a class="sourceLine" id="cb8-5" title="5">    lambda &lt;-<span class="st"> </span><span class="kw">sqrt</span>(x<span class="op">*</span>y) <span class="op">+</span><span class="st"> </span><span class="kw">sqrt</span>(y<span class="op">*</span>z) <span class="op">+</span><span class="st"> </span><span class="kw">sqrt</span>(z<span class="op">*</span>x)</a>
+<a class="sourceLine" id="cb8-5" title="5">    lambda &lt;-<span class="st"> </span><span class="kw">sqrt</span>(x)<span class="op">*</span><span class="kw">sqrt</span>(y) <span class="op">+</span><span class="st"> </span><span class="kw">sqrt</span>(y)<span class="op">*</span><span class="kw">sqrt</span>(z) <span class="op">+</span><span class="st"> </span><span class="kw">sqrt</span>(z)<span class="op">*</span><span class="kw">sqrt</span>(x)</a>
 <a class="sourceLine" id="cb8-6" title="6">    x &lt;-<span class="st"> </span>(x <span class="op">+</span><span class="st"> </span>lambda) <span class="op">/</span><span class="st"> </span><span class="dv">4</span></a>
 <a class="sourceLine" id="cb8-7" title="7">    y &lt;-<span class="st"> </span>(y <span class="op">+</span><span class="st"> </span>lambda) <span class="op">/</span><span class="st"> </span><span class="dv">4</span></a>
 <a class="sourceLine" id="cb8-8" title="8">    z &lt;-<span class="st"> </span>(z <span class="op">+</span><span class="st"> </span>lambda) <span class="op">/</span><span class="st"> </span><span class="dv">4</span></a>
@@ -180,7 +180,7 @@ E(\phi + k\pi \mid m) = 2 k E\Bigl(\frac{\pi}{2} \mid m\Bigr) + E(\phi \mid m)
 <a class="sourceLine" id="cb8-21" title="21">  dx &lt;-<span class="st"> </span>dy &lt;-<span class="st"> </span>dz &lt;-<span class="st"> </span><span class="ot">Inf</span></a>
 <a class="sourceLine" id="cb8-22" title="22">  s &lt;-<span class="st"> </span><span class="dv">0</span>; fac &lt;-<span class="st"> </span><span class="dv">1</span></a>
 <a class="sourceLine" id="cb8-23" title="23">  <span class="cf">while</span>(<span class="kw">max</span>(dx,dy,dz) <span class="op">&gt;</span><span class="st"> </span>minerror){</a>
-<a class="sourceLine" id="cb8-24" title="24">    lambda &lt;-<span class="st"> </span><span class="kw">sqrt</span>(x<span class="op">*</span>y) <span class="op">+</span><span class="st"> </span><span class="kw">sqrt</span>(y<span class="op">*</span>z) <span class="op">+</span><span class="st"> </span><span class="kw">sqrt</span>(z<span class="op">*</span>x)</a>
+<a class="sourceLine" id="cb8-24" title="24">    lambda &lt;-<span class="st"> </span><span class="kw">sqrt</span>(x)<span class="op">*</span><span class="kw">sqrt</span>(y) <span class="op">+</span><span class="st"> </span><span class="kw">sqrt</span>(y)<span class="op">*</span><span class="kw">sqrt</span>(z) <span class="op">+</span><span class="st"> </span><span class="kw">sqrt</span>(z)<span class="op">*</span><span class="kw">sqrt</span>(x)</a>
 <a class="sourceLine" id="cb8-25" title="25">    s &lt;-<span class="st"> </span>s <span class="op">+</span><span class="st"> </span>fac <span class="op">/</span><span class="st"> </span>(<span class="kw">sqrt</span>(z) <span class="op">*</span><span class="st"> </span>(z <span class="op">+</span><span class="st"> </span>lambda))</a>
 <a class="sourceLine" id="cb8-26" title="26">    fac &lt;-<span class="st"> </span>fac<span class="op">/</span><span class="dv">4</span></a>
 <a class="sourceLine" id="cb8-27" title="27">    x &lt;-<span class="st"> </span>(x <span class="op">+</span><span class="st"> </span>lambda) <span class="op">/</span><span class="st"> </span><span class="dv">4</span></a>
@@ -200,7 +200,12 @@ E(\phi + k\pi \mid m) = 2 k E\Bigl(\frac{\pi}{2} \mid m\Bigr) + E(\phi \mid m)
 <a class="sourceLine" id="cb8-41" title="41"><span class="st">             </span>E2<span class="op">*</span>E2<span class="op">*</span>E2<span class="op">/</span><span class="dv">16</span> <span class="op">+</span><span class="st"> </span><span class="dv">3</span><span class="op">*</span>E3<span class="op">*</span>E3<span class="op">/</span><span class="dv">40</span> <span class="op">+</span><span class="st"> </span><span class="dv">3</span><span class="op">*</span>E2<span class="op">*</span>E4<span class="op">/</span><span class="dv">20</span> <span class="op">+</span><span class="st"> </span><span class="dv">45</span><span class="op">*</span>E2<span class="op">*</span>E2<span class="op">*</span>E3<span class="op">/</span><span class="dv">272</span> <span class="op">-</span></a>
 <a class="sourceLine" id="cb8-42" title="42"><span class="st">             </span><span class="dv">9</span><span class="op">*</span>(E3<span class="op">*</span>E4 <span class="op">+</span><span class="st"> </span>E2<span class="op">*</span>E5)<span class="op">/</span><span class="dv">68</span>) <span class="op">/</span><span class="st"> </span>A <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(A)</a>
 <a class="sourceLine" id="cb8-43" title="43">}</a></code></pre></div>
-<p>Now here is the implementation of the incomplete elliptic integral of the second kind allowing complex values of <span class="math inline">\(\phi\)</span>:</p>
+<p>An important note. In the link I gave above, the author takes <span class="math display">\[
+\lambda = \sqrt{xy} + \sqrt{yz} + \sqrt{zx}
+\]</span> whereas I take <span class="math display">\[
+\lambda = \sqrt{x}\sqrt{y} + \sqrt{y}\sqrt{z} + \sqrt{z}\sqrt{x}.
+\]</span> This is important: the square root of a product is not equal to the product of the square roots in general, for complex numbers!</p>
+<p>Now here is the implementation of the incomplete elliptic integral of the second kind allowing complex values of <span class="math inline">\(\phi\)</span> and <span class="math inline">\(m\)</span>:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">E &lt;-<span class="st"> </span><span class="cf">function</span>(phi, m){</a>
 <a class="sourceLine" id="cb9-2" title="2">  <span class="cf">if</span>(phi <span class="op">==</span><span class="st"> </span><span class="dv">0</span>){</a>
 <a class="sourceLine" id="cb9-3" title="3">    <span class="dv">0</span></a>
@@ -233,17 +238,19 @@ E(\phi + k\pi \mid m) = 2 k E\Bigl(\frac{\pi}{2} \mid m\Bigr) + E(\phi \mid m)
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">E</span>(<span class="dt">phi =</span> <span class="dv">7</span><span class="op">+</span>2i, <span class="dt">m =</span> <span class="dv">-5</span>)</a>
 <a class="sourceLine" id="cb10-2" title="2"><span class="co">## [1] 7.763389+5.631026i</span></a></code></pre></div>
 <p>and compare with <a href="https://www.wolframalpha.com/input/?i=EllipticE%5B7%2B2I%2C+-5%5D"><code>EllipticE[7+2I,-5]</code></a> on WolframAlpha.</p>
-<p>I also find the same results as the ones of WolframAlpha when <span class="math inline">\(\phi\)</span> is real and <span class="math inline">\(m\)</span> is complex, but not always when both are complex.</p>
+<p>I also find the same results as the ones of WolframAlpha when <span class="math inline">\(\phi\)</span><br />
+and <span class="math inline">\(m\)</span> are complex.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="kw">E</span>(<span class="dt">phi =</span> <span class="dv">1</span><span class="op">+</span>1i, <span class="dt">m =</span> <span class="op">-</span>5i) <span class="co"># same as Wolfram</span></a>
 <a class="sourceLine" id="cb11-2" title="2"><span class="co">## [1] -0.66421+1.746623i</span></a>
-<a class="sourceLine" id="cb11-3" title="3"><span class="kw">E</span>(<span class="dt">phi =</span> <span class="dv">7</span><span class="op">+</span>2i, <span class="dt">m =</span> <span class="op">-</span>5i) <span class="co"># not the same as Wolfram</span></a>
-<a class="sourceLine" id="cb11-4" title="4"><span class="co">## [1] -0.78406+2.057178i</span></a></code></pre></div>
-<p>So this implementation is not perfect.</p>
+<a class="sourceLine" id="cb11-3" title="3"><span class="kw">E</span>(<span class="dt">phi =</span> <span class="dv">7</span><span class="op">+</span>2i, <span class="dt">m =</span> <span class="op">-</span>5i) <span class="co"># same as Wolfram</span></a>
+<a class="sourceLine" id="cb11-4" title="4"><span class="co">## [1] 14.95287+4.83345i</span></a></code></pre></div>
 <h2 id="resorting-to-the-appell-function">Resorting to the Appell function</h2>
-<p>Another way is to use the relation with the <em>first Appell hypergeometric function</em>: <span class="math display">\[
+<p>As a sanity check, let’s propose another way.</p>
+<p>This way consists in using the relation between the incomplete elliptic integral of the second kind and the <em>first Appell hypergeometric function</em>: <span class="math display">\[
 E(\phi, m) = \sin\phi \times 
 F_1\Bigl(\frac12, \frac12, -\frac{3}{2}, \sin^2\phi, m\sin^2\phi\Bigr),
-\]</span> for <span class="math inline">\(-\frac{\pi}{2} \leqslant \Re(\phi) \leqslant \frac{\pi}{2}\)</span>, and the Euler integral representation <span class="math display">\[
+\]</span> for <span class="math inline">\(-\frac{\pi}{2} \leqslant \Re(\phi) \leqslant \frac{\pi}{2}\)</span>.</p>
+<p>Unfortunately there’s no available R implementation of <span class="math inline">\(F_1\)</span> allowing complex values of the variables. Then we will use the Euler integral representation <span class="math display">\[
 F_1\Bigl(\frac12, \frac12, -\frac{3}{2}, z_1, z_2\Bigr) = 
 \frac12\int_0^1 \frac{\sqrt{1-z_2t}}{\sqrt{t}\sqrt{1-z_1t}}\,\mathrm{d}t.
 \]</span></p>
@@ -280,11 +287,12 @@ F_1\Bigl(\frac12, \frac12, -\frac{3}{2}, z_1, z_2\Bigr) =
 <a class="sourceLine" id="cb12-31" title="31">  }</a>
 <a class="sourceLine" id="cb12-32" title="32">}</a>
 <a class="sourceLine" id="cb12-33" title="33"><span class="co">#</span></a>
-<a class="sourceLine" id="cb12-34" title="34"><span class="kw">E</span>(<span class="dv">1</span><span class="op">+</span>1i, <span class="op">-</span>5i)</a>
+<a class="sourceLine" id="cb12-34" title="34"><span class="kw">E</span>(<span class="dv">1</span><span class="op">+</span>1i, <span class="op">-</span>5i) <span class="co"># almost the same as before</span></a>
 <a class="sourceLine" id="cb12-35" title="35"><span class="co">## [1] -0.664216+1.746635i</span></a>
 <a class="sourceLine" id="cb12-36" title="36"><span class="co">#</span></a>
-<a class="sourceLine" id="cb12-37" title="37"><span class="kw">E</span>(<span class="dv">7</span><span class="op">+</span>2i, <span class="op">-</span>5i) <span class="co"># same as Wolfram</span></a>
+<a class="sourceLine" id="cb12-37" title="37"><span class="kw">E</span>(<span class="dv">7</span><span class="op">+</span>2i, <span class="op">-</span>5i) <span class="co"># almost the same as before</span></a>
 <a class="sourceLine" id="cb12-38" title="38"><span class="co">## [1] 14.95287+4.83346i</span></a></code></pre></div>
+<p>The slight differences are due to the numerical integrations. The previous way is preferable.</p>
 
     </div>
 
