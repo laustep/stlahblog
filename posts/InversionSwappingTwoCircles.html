@@ -1,0 +1,301 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Inversion swapping two circles</title>
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/pandoc-solarized.css" />  
+  <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+</head>
+
+<body>
+  <!-- Sidebar. -->
+  <div class="sidebar">
+    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+      <a href="https://www.r-bloggers.com/">
+        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+      </a>
+      <br />
+      <a href="http://t-redactyl.io/">
+        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
+      </a>
+      <a href="http://timelyportfolio.blogspot.be/">
+        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
+      </a>
+      <br />
+      <a href="https://antoineguillot.wordpress.com/blog/">
+        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+      </a>
+      <br />
+      <a href="https://fronkonstin.com/">
+        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="header">
+      <div id="logo" style="position:absolute;">
+        <a href="../">
+          <img src="../images/stla.jpg" alt="stla" width="100px" />
+        </a>
+      </div>
+      <div id="navigation" style="margin-top:50px;">
+        <a href="../">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../archive.html">Archive</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Inversion swapping two circles</h1> <div class="info">
+    Posted on February  9, 2020
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="../tags/R.html">R</a>, <a href="../tags/maths.html">maths</a>, <a href="../tags/geometry.html">geometry</a>
+    
+</div>
+
+<p>Consider two circles <span class="math inline">\(\mathcal{C}_1(O_1,r_1)\)</span> and <span class="math inline">\(\mathcal{C}_2(O_2,r_2)\)</span>. There is always an inversion which swaps <span class="math inline">\(\mathcal{C}_1\)</span> and <span class="math inline">\(\mathcal{C}_2\)</span> (which maps <span class="math inline">\(\mathcal{C}_1\)</span> to <span class="math inline">\(\mathcal{C}_2\)</span> and <span class="math inline">\(\mathcal{C}_2\)</span> to <span class="math inline">\(\mathcal{C}_1\)</span>). When this is an inversion on a circle, this circle of inversion is called a <em>mid-circle</em> of <span class="math inline">\(\mathcal{C}_1\)</span> and <span class="math inline">\(\mathcal{C}_2\)</span>.</p>
+<h1 id="congruent-case">Congruent case</h1>
+<p>When <span class="math inline">\(r_1 = r_2\)</span>, the two circles <span class="math inline">\(\mathcal{C}_1\)</span> and <span class="math inline">\(\mathcal{C}_2\)</span> can be swapped by an inversion on a line (that is, a reflection with respect to this line); obviously, this line is the perpendicular bisector of the segment joining the two centers <span class="math inline">\(O_1\)</span> and <span class="math inline">\(O_2\)</span>. We could say that this line is a mid-circle, if we allow the mid-circle to be a generalized circle.</p>
+<p>If the two circles are tangent, this is the unique mid-circle.</p>
+<p>When <span class="math inline">\(r_1 = r_2\)</span>, the two circles <span class="math inline">\(\mathcal{C}_1\)</span> and <span class="math inline">\(\mathcal{C}_2\)</span> can be swapped by an inversion on a circle if they intersect each other at two points. The pole of this inversion is <span class="math inline">\(I = \frac{1}{2}(O_1+O_2)\)</span>, and its power is <span class="math inline">\(k = |IO_2^2 - r_2^2|\)</span>. That is, the circle of center <span class="math inline">\(I\)</span> and radius <span class="math inline">\(\sqrt{k}\)</span> is a mid-circle.</p>
+<p>When <span class="math inline">\(r_1 = r_2\)</span> and the two circles <span class="math inline">\(\mathcal{C}_1\)</span> and <span class="math inline">\(\mathcal{C}_2\)</span> do not intersect each other, there is no inversion on a circle which swaps these circles. But they can be swapped by an inversion with a negative power; the pole of this inversion is <span class="math inline">\(I = \frac{1}{2}(O_1+O_2)\)</span>, and its power is <span class="math inline">\(k = -|IO_2^2 - r_2^2|\)</span>.</p>
+<p>Let’s check this latest claim. In a <a href="./Inversions.html">previous post</a>, I gave a formula to calculate the image of a circle by an inversion on a circle. A more general formula for the image circle <span class="math inline">\(\mathcal{C}'(O',r')\)</span> of the circle <span class="math inline">\(\mathcal{C}(O,r)\)</span> by the inversion of pole <span class="math inline">\(I\)</span> and possibly negative power <span class="math inline">\(k\)</span>, is: <span class="math inline">\(O' = I + \frac{k}{d}(O-I)\)</span> and <span class="math inline">\(r' = \left|\frac{k}{d}\right|r\)</span> at condition that <span class="math inline">\(d := OI^2 - r^2 \neq 0\)</span> (if <span class="math inline">\(d=0\)</span>, the image of <span class="math inline">\(\mathcal{C}\)</span> is a line).</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">invertCircle &lt;-<span class="st"> </span><span class="cf">function</span>(I, k, circle){</a>
+<a class="sourceLine" id="cb1-2" title="2">  O &lt;-<span class="st"> </span>circle<span class="op">$</span>center; r &lt;-<span class="st"> </span>circle<span class="op">$</span>radius</a>
+<a class="sourceLine" id="cb1-3" title="3">  d &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">crossprod</span>(O<span class="op">-</span>I)) <span class="op">-</span><span class="st"> </span>r<span class="op">^</span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb1-4" title="4">  <span class="kw">list</span>(</a>
+<a class="sourceLine" id="cb1-5" title="5">    <span class="dt">center =</span> I <span class="op">+</span><span class="st"> </span>k<span class="op">/</span>d<span class="op">*</span>(O<span class="op">-</span>I),</a>
+<a class="sourceLine" id="cb1-6" title="6">    <span class="dt">radius =</span> <span class="kw">abs</span>(k<span class="op">/</span>d)<span class="op">*</span>r</a>
+<a class="sourceLine" id="cb1-7" title="7">  )</a>
+<a class="sourceLine" id="cb1-8" title="8">}</a>
+<a class="sourceLine" id="cb1-9" title="9"><span class="co"># two congruent circles which do not intersect each other</span></a>
+<a class="sourceLine" id="cb1-10" title="10">C1 &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">center =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), <span class="dt">radius =</span> <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb1-11" title="11">C2 &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">center =</span> <span class="kw">c</span>(<span class="dv">14</span>,<span class="dv">15</span>), <span class="dt">radius =</span> <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb1-12" title="12"><span class="co"># inversion which swaps the two circles</span></a>
+<a class="sourceLine" id="cb1-13" title="13">I &lt;-<span class="st"> </span>(C1<span class="op">$</span>center <span class="op">+</span><span class="st"> </span>C2<span class="op">$</span>center) <span class="op">/</span><span class="st"> </span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb1-14" title="14">k &lt;-<span class="st"> </span><span class="op">-</span><span class="kw">abs</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(I<span class="op">-</span>C2<span class="op">$</span>center) <span class="op">-</span><span class="st"> </span>C2<span class="op">$</span>radius<span class="op">^</span><span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb1-15" title="15"><span class="co"># check</span></a>
+<a class="sourceLine" id="cb1-16" title="16"><span class="kw">invertCircle</span>(I, k, C1) <span class="co"># should be C2</span></a>
+<a class="sourceLine" id="cb1-17" title="17"><span class="co">## $center</span></a>
+<a class="sourceLine" id="cb1-18" title="18"><span class="co">## [1] 14 15</span></a>
+<a class="sourceLine" id="cb1-19" title="19"><span class="co">## </span></a>
+<a class="sourceLine" id="cb1-20" title="20"><span class="co">## $radius</span></a>
+<a class="sourceLine" id="cb1-21" title="21"><span class="co">## [1] 3</span></a>
+<a class="sourceLine" id="cb1-22" title="22"><span class="kw">invertCircle</span>(I, k, C2) <span class="co"># should be C1</span></a>
+<a class="sourceLine" id="cb1-23" title="23"><span class="co">## $center</span></a>
+<a class="sourceLine" id="cb1-24" title="24"><span class="co">## [1] 1 2</span></a>
+<a class="sourceLine" id="cb1-25" title="25"><span class="co">## </span></a>
+<a class="sourceLine" id="cb1-26" title="26"><span class="co">## $radius</span></a>
+<a class="sourceLine" id="cb1-27" title="27"><span class="co">## [1] 3</span></a></code></pre></div>
+<h1 id="non-congruent-case">Non-congruent case</h1>
+<p>Now we assume <span class="math inline">\(r_1 \neq r_2\)</span>. We set <span class="math inline">\(\rho = \frac{r_1}{r_2}\)</span>.</p>
+<h2 id="non-intersecting-circles">Non-intersecting circles</h2>
+<p>We firstly consider the case when the two circles do not intersect. They can be outside each other, or one of them can contain the other, and we distinguish these two cases. In both cases, there are two inversions which swap the two circles, one with a positive power and the other with a negative power. So the first one defines a mid-circle, and this is the only one.</p>
+<h3 id="case-when-the-circles-are-outside-each-other">Case when the circles are outside each other</h3>
+<p>The inversion with positive power has pole <span class="math inline">\(I = O_1 - \frac{\rho}{1-\rho}(O_2-O_1)\)</span>, and power <span class="math inline">\(k = \rho|IO_2^2 - r_2^2|\)</span>.</p>
+<p>The inversion with negative power has pole <span class="math inline">\(I = O_1 + \frac{\rho}{1+\rho}(O_2-O_1)\)</span>, and power <span class="math inline">\(k = -\rho|IO_2^2 - r_2^2|\)</span>.</p>
+<p>Here is a picture of the mid-circle:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">O1 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">2</span>); r1 &lt;-<span class="st"> </span><span class="dv">3</span></a>
+<a class="sourceLine" id="cb2-2" title="2">O2 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">4</span>,<span class="dv">5</span>); r2 &lt;-<span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb2-3" title="3">rho &lt;-<span class="st"> </span>r1<span class="op">/</span>r2</a>
+<a class="sourceLine" id="cb2-4" title="4">I &lt;-<span class="st"> </span>O1 <span class="op">-</span><span class="st"> </span>rho<span class="op">/</span>(<span class="dv">1</span><span class="op">-</span>rho)<span class="op">*</span>(O2<span class="op">-</span>O1)</a>
+<a class="sourceLine" id="cb2-5" title="5">k &lt;-<span class="st"> </span>rho <span class="op">*</span><span class="st"> </span><span class="kw">abs</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(I<span class="op">-</span>O2))<span class="op">-</span>r2<span class="op">^</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb2-6" title="6"><span class="kw">library</span>(plotrix)</a>
+<a class="sourceLine" id="cb2-7" title="7">opar &lt;-<span class="st"> </span><span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">4</span>,<span class="dv">4</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb2-8" title="8"><span class="kw">plot</span>(<span class="ot">NULL</span>, <span class="dt">asp =</span> <span class="dv">1</span>, <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">3</span>, <span class="dv">6</span>), <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>,<span class="dv">6</span>), </a>
+<a class="sourceLine" id="cb2-9" title="9">     <span class="dt">xlab =</span> <span class="ot">NA</span>, <span class="dt">ylab =</span> <span class="ot">NA</span>)</a>
+<a class="sourceLine" id="cb2-10" title="10"><span class="kw">draw.circle</span>(O1[<span class="dv">1</span>], O1[<span class="dv">2</span>], r1, <span class="dt">lwd =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb2-11" title="11"><span class="kw">draw.circle</span>(O2[<span class="dv">1</span>], O2[<span class="dv">2</span>], r2, <span class="dt">lwd =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb2-12" title="12"><span class="kw">draw.circle</span>(I[<span class="dv">1</span>], I[<span class="dv">2</span>], <span class="kw">sqrt</span>(k), <span class="dt">lwd =</span> <span class="dv">3</span>, <span class="dt">border =</span> <span class="st">&quot;red&quot;</span>)</a></code></pre></div>
+<p><img src="figures/InversionSwappingCircles-midcircle_outside-1.png" /></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="co"># check</span></a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="kw">invertCircle</span>(I, k, <span class="kw">list</span>(<span class="dt">center=</span>O1, <span class="dt">radius=</span>r1)) <span class="co"># should be C2</span></a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="co">## $center</span></a>
+<a class="sourceLine" id="cb3-4" title="4"><span class="co">## [1] 4 5</span></a>
+<a class="sourceLine" id="cb3-5" title="5"><span class="co">## </span></a>
+<a class="sourceLine" id="cb3-6" title="6"><span class="co">## $radius</span></a>
+<a class="sourceLine" id="cb3-7" title="7"><span class="co">## [1] 1</span></a>
+<a class="sourceLine" id="cb3-8" title="8"><span class="kw">invertCircle</span>(I, k, <span class="kw">list</span>(<span class="dt">center=</span>O2, <span class="dt">radius=</span>r2)) <span class="co"># should be C1</span></a>
+<a class="sourceLine" id="cb3-9" title="9"><span class="co">## $center</span></a>
+<a class="sourceLine" id="cb3-10" title="10"><span class="co">## [1] 0 2</span></a>
+<a class="sourceLine" id="cb3-11" title="11"><span class="co">## </span></a>
+<a class="sourceLine" id="cb3-12" title="12"><span class="co">## $radius</span></a>
+<a class="sourceLine" id="cb3-13" title="13"><span class="co">## [1] 3</span></a></code></pre></div>
+<h3 id="case-when-one-circle-contains-the-other">Case when one circle contains the other</h3>
+<p>The inversion with positive power has pole <span class="math inline">\(I = O_1 + \frac{\rho}{1+\rho}(O_2-O_1)\)</span>, and power <span class="math inline">\(k = \rho|IO_2^2 - r_2^2|\)</span>.</p>
+<p>The inversion with negative power has pole <span class="math inline">\(I = O_1 - \frac{\rho}{1-\rho}(O_2-O_1)\)</span>, and power <span class="math inline">\(k = -\rho|IO_2^2 - r_2^2|\)</span>.</p>
+<p>Here is a picture of the mid-circle:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">O1 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>); r1 &lt;-<span class="st"> </span><span class="dv">3</span></a>
+<a class="sourceLine" id="cb4-2" title="2">O2 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.7</span>,<span class="dv">1</span>); r2 &lt;-<span class="st"> </span><span class="fl">0.7</span></a>
+<a class="sourceLine" id="cb4-3" title="3">rho &lt;-<span class="st"> </span>r1<span class="op">/</span>r2</a>
+<a class="sourceLine" id="cb4-4" title="4">I &lt;-<span class="st"> </span>O1 <span class="op">+</span><span class="st"> </span>rho<span class="op">/</span>(<span class="dv">1</span><span class="op">+</span>rho)<span class="op">*</span>(O2<span class="op">-</span>O1)</a>
+<a class="sourceLine" id="cb4-5" title="5">k &lt;-<span class="st"> </span>rho <span class="op">*</span><span class="st"> </span><span class="kw">abs</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(I<span class="op">-</span>O2))<span class="op">-</span>r2<span class="op">^</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb4-6" title="6">opar &lt;-<span class="st"> </span><span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">4</span>,<span class="dv">4</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb4-7" title="7"><span class="kw">plot</span>(<span class="ot">NULL</span>, <span class="dt">asp =</span> <span class="dv">1</span>, <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>), <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">3</span>,<span class="dv">3</span>), </a>
+<a class="sourceLine" id="cb4-8" title="8">     <span class="dt">xlab =</span> <span class="ot">NA</span>, <span class="dt">ylab =</span> <span class="ot">NA</span>)</a>
+<a class="sourceLine" id="cb4-9" title="9"><span class="kw">draw.circle</span>(O1[<span class="dv">1</span>], O1[<span class="dv">2</span>], r1, <span class="dt">lwd =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb4-10" title="10"><span class="kw">draw.circle</span>(O2[<span class="dv">1</span>], O2[<span class="dv">2</span>], r2, <span class="dt">lwd =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb4-11" title="11"><span class="kw">draw.circle</span>(I[<span class="dv">1</span>], I[<span class="dv">2</span>], <span class="kw">sqrt</span>(k), <span class="dt">lwd =</span> <span class="dv">3</span>, <span class="dt">border =</span> <span class="st">&quot;red&quot;</span>)</a></code></pre></div>
+<p><img src="figures/InversionSwappingCircles-midcircle_contains-1.png" /></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="co"># check</span></a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="kw">invertCircle</span>(I, k, <span class="kw">list</span>(<span class="dt">center=</span>O1, <span class="dt">radius=</span>r1)) <span class="co"># should be C2</span></a>
+<a class="sourceLine" id="cb5-3" title="3"><span class="co">## $center</span></a>
+<a class="sourceLine" id="cb5-4" title="4"><span class="co">## [1] 0.7 1.0</span></a>
+<a class="sourceLine" id="cb5-5" title="5"><span class="co">## </span></a>
+<a class="sourceLine" id="cb5-6" title="6"><span class="co">## $radius</span></a>
+<a class="sourceLine" id="cb5-7" title="7"><span class="co">## [1] 0.7</span></a>
+<a class="sourceLine" id="cb5-8" title="8"><span class="kw">invertCircle</span>(I, k, <span class="kw">list</span>(<span class="dt">center=</span>O2, <span class="dt">radius=</span>r2)) <span class="co"># should be C1</span></a>
+<a class="sourceLine" id="cb5-9" title="9"><span class="co">## $center</span></a>
+<a class="sourceLine" id="cb5-10" title="10"><span class="co">## [1] 1.110223e-16 2.220446e-16</span></a>
+<a class="sourceLine" id="cb5-11" title="11"><span class="co">## </span></a>
+<a class="sourceLine" id="cb5-12" title="12"><span class="co">## $radius</span></a>
+<a class="sourceLine" id="cb5-13" title="13"><span class="co">## [1] 3</span></a></code></pre></div>
+<h2 id="circles-intersecting-at-two-points">Circles intersecting at two points</h2>
+<p>In this case, there are two mid-circles.<br />
+The first inversion has pole <span class="math inline">\(I = O_1 - \frac{\rho}{1-\rho}(O_2-O_1)\)</span>, and power <span class="math inline">\(k = \rho|IO_2^2 - r_2^2|\)</span>. The second inversion has pole <span class="math inline">\(I = O_1 + \frac{\rho}{1+\rho}(O_2-O_1)\)</span>, and power <span class="math inline">\(k = \rho|IO_2^2 - r_2^2|\)</span>.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">O1 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">5</span>,<span class="dv">4</span>); r1 &lt;-<span class="st"> </span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb6-2" title="2">O2 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">8</span>,<span class="dv">5</span>); r2 &lt;-<span class="st"> </span><span class="dv">3</span></a>
+<a class="sourceLine" id="cb6-3" title="3">rho &lt;-<span class="st"> </span>r1<span class="op">/</span>r2</a>
+<a class="sourceLine" id="cb6-4" title="4">I1 &lt;-<span class="st"> </span>O1 <span class="op">-</span><span class="st"> </span>rho<span class="op">/</span>(<span class="dv">1</span><span class="op">-</span>rho)<span class="op">*</span>(O2<span class="op">-</span>O1)</a>
+<a class="sourceLine" id="cb6-5" title="5">k1 &lt;-<span class="st"> </span>rho <span class="op">*</span><span class="st"> </span><span class="kw">abs</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(I1<span class="op">-</span>O2))<span class="op">-</span>r2<span class="op">^</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb6-6" title="6">I2 &lt;-<span class="st"> </span>O1 <span class="op">+</span><span class="st"> </span>rho<span class="op">/</span>(<span class="dv">1</span><span class="op">+</span>rho)<span class="op">*</span>(O2<span class="op">-</span>O1)</a>
+<a class="sourceLine" id="cb6-7" title="7">k2 &lt;-<span class="st"> </span>rho <span class="op">*</span><span class="st"> </span><span class="kw">abs</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(I2<span class="op">-</span>O2))<span class="op">-</span>r2<span class="op">^</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb6-8" title="8">opar &lt;-<span class="st"> </span><span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">4</span>,<span class="dv">4</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb6-9" title="9"><span class="kw">plot</span>(<span class="ot">NULL</span>, <span class="dt">asp =</span> <span class="dv">1</span>, <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">3</span>, <span class="dv">11</span>), <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">8</span>), </a>
+<a class="sourceLine" id="cb6-10" title="10">     <span class="dt">xlab =</span> <span class="ot">NA</span>, <span class="dt">ylab =</span> <span class="ot">NA</span>)</a>
+<a class="sourceLine" id="cb6-11" title="11"><span class="kw">draw.circle</span>(O1[<span class="dv">1</span>], O1[<span class="dv">2</span>], r1, <span class="dt">lwd =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb6-12" title="12"><span class="kw">draw.circle</span>(O2[<span class="dv">1</span>], O2[<span class="dv">2</span>], r2, <span class="dt">lwd =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb6-13" title="13"><span class="kw">draw.circle</span>(I1[<span class="dv">1</span>], I1[<span class="dv">2</span>], <span class="kw">sqrt</span>(k1), <span class="dt">lwd =</span> <span class="dv">3</span>, <span class="dt">border =</span> <span class="st">&quot;red&quot;</span>)</a>
+<a class="sourceLine" id="cb6-14" title="14"><span class="kw">draw.circle</span>(I2[<span class="dv">1</span>], I2[<span class="dv">2</span>], <span class="kw">sqrt</span>(k2), <span class="dt">lwd =</span> <span class="dv">3</span>, <span class="dt">border =</span> <span class="st">&quot;red&quot;</span>)</a></code></pre></div>
+<p><img src="figures/InversionSwappingCircles-midcircle_intersect-1.png" /></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="co"># check</span></a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="kw">invertCircle</span>(I1, k1, <span class="kw">list</span>(<span class="dt">center=</span>O1, <span class="dt">radius=</span>r1)) <span class="co"># should be C2</span></a>
+<a class="sourceLine" id="cb7-3" title="3"><span class="co">## $center</span></a>
+<a class="sourceLine" id="cb7-4" title="4"><span class="co">## [1] 8 5</span></a>
+<a class="sourceLine" id="cb7-5" title="5"><span class="co">## </span></a>
+<a class="sourceLine" id="cb7-6" title="6"><span class="co">## $radius</span></a>
+<a class="sourceLine" id="cb7-7" title="7"><span class="co">## [1] 3</span></a>
+<a class="sourceLine" id="cb7-8" title="8"><span class="kw">invertCircle</span>(I1, k1, <span class="kw">list</span>(<span class="dt">center=</span>O2, <span class="dt">radius=</span>r2)) <span class="co"># should be C1</span></a>
+<a class="sourceLine" id="cb7-9" title="9"><span class="co">## $center</span></a>
+<a class="sourceLine" id="cb7-10" title="10"><span class="co">## [1] 5 4</span></a>
+<a class="sourceLine" id="cb7-11" title="11"><span class="co">## </span></a>
+<a class="sourceLine" id="cb7-12" title="12"><span class="co">## $radius</span></a>
+<a class="sourceLine" id="cb7-13" title="13"><span class="co">## [1] 2</span></a>
+<a class="sourceLine" id="cb7-14" title="14"><span class="kw">invertCircle</span>(I2, k2, <span class="kw">list</span>(<span class="dt">center=</span>O1, <span class="dt">radius=</span>r1)) <span class="co"># should be C2</span></a>
+<a class="sourceLine" id="cb7-15" title="15"><span class="co">## $center</span></a>
+<a class="sourceLine" id="cb7-16" title="16"><span class="co">## [1] 8 5</span></a>
+<a class="sourceLine" id="cb7-17" title="17"><span class="co">## </span></a>
+<a class="sourceLine" id="cb7-18" title="18"><span class="co">## $radius</span></a>
+<a class="sourceLine" id="cb7-19" title="19"><span class="co">## [1] 3</span></a>
+<a class="sourceLine" id="cb7-20" title="20"><span class="kw">invertCircle</span>(I2, k2, <span class="kw">list</span>(<span class="dt">center=</span>O2, <span class="dt">radius=</span>r2)) <span class="co"># should be C1</span></a>
+<a class="sourceLine" id="cb7-21" title="21"><span class="co">## $center</span></a>
+<a class="sourceLine" id="cb7-22" title="22"><span class="co">## [1] 5 4</span></a>
+<a class="sourceLine" id="cb7-23" title="23"><span class="co">## </span></a>
+<a class="sourceLine" id="cb7-24" title="24"><span class="co">## $radius</span></a>
+<a class="sourceLine" id="cb7-25" title="25"><span class="co">## [1] 2</span></a></code></pre></div>
+<h2 id="tangent-circles">Tangent circles</h2>
+<p>In the case when the two circles are tangent, there is only one inversion which swaps the two circles, and this is an inversion on a circle (thus the unique mid-circle).</p>
+<p>This inversion has pole <span class="math inline">\(I = O_1 - \frac{\rho}{1-\rho}(O_2-O_1)\)</span>, and power <span class="math inline">\(k = \rho|IO_2^2 - r_2^2|\)</span>.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">O1 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">5</span>,<span class="dv">4</span>); r1 &lt;-<span class="st"> </span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb8-2" title="2">O2 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">8</span>,<span class="dv">4</span>); r2 &lt;-<span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb8-3" title="3">rho &lt;-<span class="st"> </span>r1<span class="op">/</span>r2</a>
+<a class="sourceLine" id="cb8-4" title="4">I &lt;-<span class="st"> </span>O1 <span class="op">-</span><span class="st"> </span>rho<span class="op">/</span>(<span class="dv">1</span><span class="op">-</span>rho)<span class="op">*</span>(O2<span class="op">-</span>O1)</a>
+<a class="sourceLine" id="cb8-5" title="5">k &lt;-<span class="st"> </span>rho <span class="op">*</span><span class="st"> </span><span class="kw">abs</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(I<span class="op">-</span>O2))<span class="op">-</span>r2<span class="op">^</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb8-6" title="6">opar &lt;-<span class="st"> </span><span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">4</span>,<span class="dv">4</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb8-7" title="7"><span class="kw">plot</span>(<span class="ot">NULL</span>, <span class="dt">asp =</span> <span class="dv">1</span>, <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">9</span>), <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">6</span>), </a>
+<a class="sourceLine" id="cb8-8" title="8">     <span class="dt">xlab =</span> <span class="ot">NA</span>, <span class="dt">ylab =</span> <span class="ot">NA</span>)</a>
+<a class="sourceLine" id="cb8-9" title="9"><span class="kw">draw.circle</span>(O1[<span class="dv">1</span>], O1[<span class="dv">2</span>], r1, <span class="dt">lwd =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb8-10" title="10"><span class="kw">draw.circle</span>(O2[<span class="dv">1</span>], O2[<span class="dv">2</span>], r2, <span class="dt">lwd =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb8-11" title="11"><span class="kw">draw.circle</span>(I[<span class="dv">1</span>], I[<span class="dv">2</span>], <span class="kw">sqrt</span>(k), <span class="dt">lwd =</span> <span class="dv">3</span>, <span class="dt">border =</span> <span class="st">&quot;red&quot;</span>)</a></code></pre></div>
+<p><img src="figures/InversionSwappingCircles-midcircle_tangent-1.png" /></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="co"># check</span></a>
+<a class="sourceLine" id="cb9-2" title="2"><span class="kw">invertCircle</span>(I, k, <span class="kw">list</span>(<span class="dt">center=</span>O1, <span class="dt">radius=</span>r1)) <span class="co"># should be C2</span></a>
+<a class="sourceLine" id="cb9-3" title="3"><span class="co">## $center</span></a>
+<a class="sourceLine" id="cb9-4" title="4"><span class="co">## [1] 8 4</span></a>
+<a class="sourceLine" id="cb9-5" title="5"><span class="co">## </span></a>
+<a class="sourceLine" id="cb9-6" title="6"><span class="co">## $radius</span></a>
+<a class="sourceLine" id="cb9-7" title="7"><span class="co">## [1] 1</span></a>
+<a class="sourceLine" id="cb9-8" title="8"><span class="kw">invertCircle</span>(I, k, <span class="kw">list</span>(<span class="dt">center=</span>O2, <span class="dt">radius=</span>r2)) <span class="co"># should be C1</span></a>
+<a class="sourceLine" id="cb9-9" title="9"><span class="co">## $center</span></a>
+<a class="sourceLine" id="cb9-10" title="10"><span class="co">## [1] 5 4</span></a>
+<a class="sourceLine" id="cb9-11" title="11"><span class="co">## </span></a>
+<a class="sourceLine" id="cb9-12" title="12"><span class="co">## $radius</span></a>
+<a class="sourceLine" id="cb9-13" title="13"><span class="co">## [1] 2</span></a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">par</span>(opar)</a></code></pre></div>
+
+    </div>
+
+
+    <div id="footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </div>
+
+  </div>
+
+  <div id="disqus_thread"></div>
+  <div class="pagination">
+    <ul>
+      <li>
+        <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+      </li>
+    </ul>
+  </div>
+</body>
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+<!-- Google Prettify -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+<script>
+  var pres = document.getElementsByTagName("pre");
+  for (var i = 0; i < pres.length; ++i) {
+    
+    pres[i].className = pres[i].className + " prettyprint linenums";
+    
+  }
+  prettyPrint();
+</script> 
+
+</html>
