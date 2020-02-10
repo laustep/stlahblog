@@ -213,7 +213,9 @@ The first inversion has pole <span class="math inline">\(I = O_1 - \frac{\rho}{1
 <a class="sourceLine" id="cb7-25" title="25"><span class="co">## [1] 2</span></a></code></pre></div>
 <h2 id="tangent-circles">Tangent circles</h2>
 <p>In the case when the two circles are tangent, there is only one inversion which swaps the two circles, and this is an inversion on a circle (thus the unique mid-circle).</p>
-<p>This inversion has pole <span class="math inline">\(I = O_1 - \frac{\rho}{1-\rho}(O_2-O_1)\)</span>, and power <span class="math inline">\(k = \rho|IO_2^2 - r_2^2|\)</span>.</p>
+<ul>
+<li><em>If the two circles are externally tangent</em>, this inversion has pole <span class="math inline">\(I = O_1 - \frac{\rho}{1-\rho}(O_2-O_1)\)</span>, and power <span class="math inline">\(k = \rho|IO_2^2 - r_2^2|\)</span>.</li>
+</ul>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">O1 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">5</span>,<span class="dv">4</span>); r1 &lt;-<span class="st"> </span><span class="dv">2</span></a>
 <a class="sourceLine" id="cb8-2" title="2">O2 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">8</span>,<span class="dv">4</span>); r2 &lt;-<span class="st"> </span><span class="dv">1</span></a>
 <a class="sourceLine" id="cb8-3" title="3">rho &lt;-<span class="st"> </span>r1<span class="op">/</span>r2</a>
@@ -239,7 +241,35 @@ The first inversion has pole <span class="math inline">\(I = O_1 - \frac{\rho}{1
 <a class="sourceLine" id="cb9-11" title="11"><span class="co">## </span></a>
 <a class="sourceLine" id="cb9-12" title="12"><span class="co">## $radius</span></a>
 <a class="sourceLine" id="cb9-13" title="13"><span class="co">## [1] 2</span></a></code></pre></div>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">par</span>(opar)</a></code></pre></div>
+<ul>
+<li><em>If the two circles are internally tangent</em>, the inversion has pole <span class="math inline">\(I = O_1 + \frac{\rho}{1+\rho}(O_2-O_1)\)</span>, and power <span class="math inline">\(k = \rho|IO_2^2 - r_2^2|\)</span>.</li>
+</ul>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">O1 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">5</span>,<span class="dv">4</span>); r1 &lt;-<span class="st"> </span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb10-2" title="2">O2 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">6</span>,<span class="dv">4</span>); r2 &lt;-<span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb10-3" title="3">rho &lt;-<span class="st"> </span>r1<span class="op">/</span>r2</a>
+<a class="sourceLine" id="cb10-4" title="4">I &lt;-<span class="st"> </span>O1 <span class="op">+</span><span class="st"> </span>rho<span class="op">/</span>(<span class="dv">1</span><span class="op">+</span>rho)<span class="op">*</span>(O2<span class="op">-</span>O1)</a>
+<a class="sourceLine" id="cb10-5" title="5">k &lt;-<span class="st"> </span>rho <span class="op">*</span><span class="st"> </span><span class="kw">abs</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(I<span class="op">-</span>O2))<span class="op">-</span>r2<span class="op">^</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb10-6" title="6">opar &lt;-<span class="st"> </span><span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">4</span>,<span class="dv">4</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb10-7" title="7"><span class="kw">plot</span>(<span class="ot">NULL</span>, <span class="dt">asp =</span> <span class="dv">1</span>, <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">7</span>), <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">6</span>), </a>
+<a class="sourceLine" id="cb10-8" title="8">     <span class="dt">xlab =</span> <span class="ot">NA</span>, <span class="dt">ylab =</span> <span class="ot">NA</span>)</a>
+<a class="sourceLine" id="cb10-9" title="9"><span class="kw">draw.circle</span>(O1[<span class="dv">1</span>], O1[<span class="dv">2</span>], r1, <span class="dt">lwd =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb10-10" title="10"><span class="kw">draw.circle</span>(O2[<span class="dv">1</span>], O2[<span class="dv">2</span>], r2, <span class="dt">lwd =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb10-11" title="11"><span class="kw">draw.circle</span>(I[<span class="dv">1</span>], I[<span class="dv">2</span>], <span class="kw">sqrt</span>(k), <span class="dt">lwd =</span> <span class="dv">3</span>, <span class="dt">border =</span> <span class="st">&quot;red&quot;</span>)</a></code></pre></div>
+<p><img src="figures/InversionSwappingCircles-midcircle_tangent2-1.png" /></p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="co"># check</span></a>
+<a class="sourceLine" id="cb11-2" title="2"><span class="kw">invertCircle</span>(I, k, <span class="kw">list</span>(<span class="dt">center=</span>O1, <span class="dt">radius=</span>r1)) <span class="co"># should be C2</span></a>
+<a class="sourceLine" id="cb11-3" title="3"><span class="co">## $center</span></a>
+<a class="sourceLine" id="cb11-4" title="4"><span class="co">## [1] 6 4</span></a>
+<a class="sourceLine" id="cb11-5" title="5"><span class="co">## </span></a>
+<a class="sourceLine" id="cb11-6" title="6"><span class="co">## $radius</span></a>
+<a class="sourceLine" id="cb11-7" title="7"><span class="co">## [1] 1</span></a>
+<a class="sourceLine" id="cb11-8" title="8"><span class="kw">invertCircle</span>(I, k, <span class="kw">list</span>(<span class="dt">center=</span>O2, <span class="dt">radius=</span>r2)) <span class="co"># should be C1</span></a>
+<a class="sourceLine" id="cb11-9" title="9"><span class="co">## $center</span></a>
+<a class="sourceLine" id="cb11-10" title="10"><span class="co">## [1] 5 4</span></a>
+<a class="sourceLine" id="cb11-11" title="11"><span class="co">## </span></a>
+<a class="sourceLine" id="cb11-12" title="12"><span class="co">## $radius</span></a>
+<a class="sourceLine" id="cb11-13" title="13"><span class="co">## [1] 2</span></a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1"><span class="kw">par</span>(opar)</a></code></pre></div>
 
     </div>
 
