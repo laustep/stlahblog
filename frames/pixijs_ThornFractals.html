@@ -1,0 +1,109 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Thorn fractals</title>
+  <style>
+    html, body { 
+      margin: 0; 
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<script src="../libraries/pixi.min.js"></script>
+
+<body>
+
+  <script type="text/javascript">
+    let type = "WebGL"
+    if (!PIXI.utils.isWebGLSupported()) {
+      type = "canvas"
+    }
+    PIXI.utils.sayHello(type)
+  </script>
+
+  <div id="container"></div>
+
+  <script id="fragmentShader" type="x-shader/x-fragment">
+    uniform vec2 iResolution;
+    uniform vec2 mouse;
+
+    float lerp(float t, float a, float b){
+      return a + t*(b-a);
+    }
+    float norm(float t, float a, float b){
+      return (t-a)/(b-a);
+    }
+    float map(float t, float e1, float s1, float e2, float s2){
+      return lerp(norm(t, e1, s1), e2, s2);
+    }
+//    vec3 hsv2rgb(vec3 c){
+//      vec4 K = vec4(1.0, 2.0/3.0, 1.0/3.0, 3.0);
+//      vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+//      return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+//    }
+
+    void main(void){
+      float px_x = gl_FragCoord.x; 
+      float px_y = gl_FragCoord.y; 
+      float diff = iResolution.x - iResolution.y;
+      float r = 3.1415/2.0;
+      float x = map(px_x, diff*0.5, iResolution.x-diff*0.5, -r, r);
+      float y = map(px_y, 0.0, iResolution.y, -r, r);
+      float cx = map(mouse.x, 0.0, iResolution.x, -2.0, 2.0);
+      float cy = map(mouse.y, 0.0, iResolution.y, -2.0, 2.0);
+    
+      float ii;    
+      for(int i = 0; i < 64; i++){
+        float nx = x/cos(y) + cx;
+        float ny = y/sin(x) + cy;
+        x = nx;
+        y = ny;
+        ii = float(i);
+        if(x*x + y*y > 1000000.0){
+          break;
+        }
+      }
+      gl_FragColor = vec4(vec3(ii/64.0, ii/64.0, ii/64.0), 1.0);
+//    gl_FragColor=vec4(hsv2rgb(vec3(ii/100.0,0.5,1.0)),1.0);
+    }
+  </script>
+
+  <script>
+    var app = new PIXI.Application({ width: window.innerWidth, height: window.innerHeight });
+    app.resizeTo = window;
+
+    let fragmentShader = document.getElementById('fragmentShader').textContent;
+
+    let filter = new PIXI.Filter(null, fragmentShader);
+    filter.uniforms.iResolution = [app.screen.width, app.screen.height];
+    filter.uniforms.mouse = { x: 0, y: 0 }; 
+
+    document.onmousemove = function(evt){
+      //Get the mouse position
+      mousePos = { x: evt.clientX, y: evt.clientY }
+      filter.uniforms.mouse = mousePos;
+    };
+
+    let container = new PIXI.Container();
+    container.filterArea = app.screen;
+    container.filters = [filter];
+
+    app.stage.addChild(container);
+    document.getElementById('container').appendChild(app.view);
+
+    function onresize(event){
+      if(app.resize)
+        app.resize();
+      container.filterArea = app.screen;
+      filter.uniforms.iResolution = [app.screen.width, app.screen.height];
+    }
+    window.addEventListener('resize', onresize, false);
+
+  </script>
+</body>
+
+</html>

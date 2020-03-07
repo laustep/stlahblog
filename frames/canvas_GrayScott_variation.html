@@ -1,0 +1,228 @@
+<html>
+  <head>
+    <script src="../libraries/jquery.min.js"></script>
+    <script src="../libraries/scale-color-perceptual/bundle.js"></script>
+    <script>
+      var scale = require('scale-color-perceptual');
+    </script>
+    <style>
+      canvas {
+        width: 400px;
+        height: 400px;
+        margin-top: 20px;
+        margin-left: 20px;
+      }
+      .controls {
+        width: 100%;
+        display: table;
+        background-image: linear-gradient(to right, chartreuse, green);
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+      #percentage {
+        width: 50px;
+      }
+      input:invalid{
+        background-color: crimson;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div id="controls" class="controls">
+      <div style="display: table-row;">
+        <div style="display: table-cell">
+          <label for="palette" style="padding-left: 10px;">Palette</label>
+          <select id="palette">
+            <option value="inferno">inferno</option>
+            <option value="viridis">viridis</option>
+            <option value="plasma">plasma</option>
+            <option value="magma">magma</option>
+          </select>
+        </div>
+        <div style="display: table-cell;">
+          <span>
+            <button id="start">Start</button>
+            with
+            <input id="percentage" type="number" value=1 min=1 max=10 />
+            % particles
+          </span>
+        </div>
+      </div>
+    </div>
+    <p>Calculations... <span id="frame">0</span>/100</p>
+    <canvas id="quad" resize></canvas>
+
+    <script>
+      function getPalette(palette){
+        var f;
+        switch(palette){
+          case "inferno":
+            f = scale.inferno;
+            break;
+          case "viridis":
+            f = scale.viridis;
+            break;
+          case "plasma":
+            f = scale.plasma;
+            break;
+          case "magma":
+            f = scale.magma;
+            break;
+        };
+        return f;
+      }
+
+      function hex2rgb(hex) {
+        return {
+          // skip # at position 0
+          r: parseInt(hex.slice(1, 3), 16),
+          g: parseInt(hex.slice(3, 5), 16),
+          b: parseInt(hex.slice(5, 7), 16)
+        }
+      } 
+          
+      function subm_index(M, x){
+        if(x<0)
+          return x+M;
+        if(x >= M)
+          return x-M;
+        return x;
+      }
+
+      function update_concentrations(X, L, DA, DB, f, k){ 
+        var sum_a, sum_b, x1, y1, ta, tb;
+        var m = X.A.length, n = X.A[0].length;
+        var A = new Array(m), B = new Array(m);
+        for(var i = 0; i < m; i++){
+          A[i] = new Array(n);
+          B[i] = new Array(n);
+        }        
+        for(var x = 0; x < m; x++) {
+          for(var y = 0; y < n; y++){
+            sum_a = 0.0; sum_b = 0.0;
+            for(var i = -1; i <= 1; i++){
+              for(var j = -1; j <= 1; j++){
+                x1 = subm_index(m, x - i);
+                y1 = subm_index(n, y - j);
+                sum_a = sum_a + L[i+1][j+1] * X.A[x1][y1];
+                sum_b = sum_b + L[i+1][j+1] * X.B[x1][y1];
+              }
+            }
+            ta = X.A[x][y] * X.B[x][y] * X.B[x][y];
+            tb = X.B[x][y] * X.A[x][y] * X.A[x][y];
+            A[x][y] = X.A[x][y] + DA*sum_a - ta + f*(1-X.A[x][y]);
+            B[x][y] = Math.min(1, X.B[x][y] + DB*sum_b + tb - (k+f)*X.B[x][y]);
+          }
+        }
+        return {A: A, B: B};
+      }
+
+      function iterate_Gray_Scott(X, L, DA, DB, f, k, niter, palette, ctx){
+        for(let i = 0; i < niter; i++){
+          X = update_concentrations(X, L, DA, DB, f, k); 
+        }
+        //console.log(X.B);
+        var m = X.A.length, n = X.A[0].length;
+        var Bflat = [].concat.apply([], X.B);
+        var Bmin = Math.min.apply(null, Bflat);
+        var Bmax = Math.max.apply(null, Bflat);
+        var Brange = Bmax - Bmin;
+        console.log("Brange: ", Brange);
+        var fcolor = getPalette(palette);
+        var hex, rgb;
+        var imgData = ctx.createImageData(m, n);
+        var i = 0;
+        for (let y = 0; y < n; y++) {
+          for (let x = 0; x < m; x++) {
+            hex = fcolor((X.B[x][y]-Bmin)/Brange);
+            rgb = hex2rgb(hex);
+            imgData.data[i + 0] = rgb.r;
+            imgData.data[i + 1] = rgb.g;
+            imgData.data[i + 2] = rgb.b;
+            imgData.data[i + 3] = 255;
+            i += 4;
+          }
+        }
+        return {X: X, imgData: imgData};
+      }
+
+      var L = [[0.05, 0.2, 0.05], [0.2, -1, 0.2], [0.05, 0.2, 0.05]];
+      var DA = 1;
+      var DB = 0.5;
+      var f = 0.0545;
+//      var k = 0.062;
+
+      var pixels = 200;
+      var gridSize = 2;
+      var rectSize = 2;
+
+      var c = document.getElementById("quad");
+      c.width = 200;
+      c.height = 200;
+      var ctx = c.getContext("2d");
+      ctx.scale(2,2);
+
+      var nframes = 100;
+      var images = new Array(nframes);
+
+      var A = new Array(pixels);
+      var B = new Array(pixels);
+      var X; 
+
+      var span = document.getElementById("frame");
+
+      var myReq;
+
+      $("#start").on("click", function(){
+        cancelAnimationFrame(myReq);
+        var percentage = parseInt($("#percentage").val())/100;
+        for(let i = 0; i < pixels; i++){
+          A[i] = new Array(pixels);
+          B[i] = new Array(pixels);
+          for(let j = 0; j < pixels; j++){
+            A[i][j] = 1;
+            B[i][j] = Math.random() > percentage ? 0 : 1;
+          }
+        }
+        X = {A: A, B: B};
+        var palette = $("#palette").val();
+        var Ximg;
+        var frm = 0;
+        function loop(){
+          span.innerHTML = frm+1;
+          var k = (60 + frm)/1000;
+          Ximg = iterate_Gray_Scott(X, L, DA, DB, f, k, 50, palette, ctx);
+          //X = Ximg.X;
+          images[frm] = Ximg.imgData;
+          if (++frm < nframes) {
+            setTimeout(loop, 0);
+          }else{
+            // launch the animation
+            animate();
+          }
+        }
+        loop();
+
+      })
+
+      // Counter used to swicth between frames.
+      let currentFrame = 0;
+
+      function animate() {
+        // Draw current frame.
+        draw();
+        // Update frame counter (make it loop after last frame).
+        currentFrame = currentFrame < nframes - 1 ? currentFrame + 1 : 0;
+        // Do a recursive call to render next frame.
+        myReq = requestAnimationFrame(animate);
+      }
+
+      function draw() {
+        ctx.putImageData(images[currentFrame], 0, 0);
+      }      
+
+    </script>
+
+  </body>
+</html>
