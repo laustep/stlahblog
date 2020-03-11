@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="utf-8">
+  <script src="../libraries/hamster.min.js"></script>
   <title>Thorn fractals</title>
   <style>
     html, body { 
@@ -32,6 +33,7 @@
     uniform float iGlobalTime;
     uniform vec2 mouse;
     uniform bool color;
+    uniform float s;
 
     float lerp(float t, float a, float b){
       return a + t*(b-a);
@@ -85,7 +87,7 @@
       );
       float cx = map(mouse.x, 0.0, iResolution.x, -2.0, 2.0);
       float cy = map(mouse.y, 0.0, iResolution.y, -2.0, 2.0);
-      vec2 zprime = mobius(z, gamma, 1.0 + cos(iGlobalTime));
+      vec2 zprime = s * mobius(z/s, gamma, 1.0 + cos(iGlobalTime));
       float x = zprime.x; float y = zprime.y;
       float ii;    
       for(int i = 0; i < 32; i++){
@@ -113,6 +115,7 @@
     filter.uniforms.iGlobalTime = 0;
     filter.uniforms.mouse = { x: 0, y: 0 }; 
     filter.uniforms.color = false;
+    filter.uniforms.s = 1;
 
     document.onmousemove = function(evt){
       filter.uniforms.mouse = { x: evt.clientX, y: evt.clientY };
@@ -121,6 +124,13 @@
     document.onclick = function(evt){
       filter.uniforms.color = !filter.uniforms.color;
     };
+
+    let factor0 = 1.001;
+    let hamster = Hamster(document.body);
+    hamster.wheel(function (event, delta, deltaX, deltaY) {
+      let factor = Math.max(0.1, Math.pow(factor0, deltaY));
+      filter.uniforms.s /= factor;
+    });
 
     let container = new PIXI.Container();
     container.filterArea = app.screen;
