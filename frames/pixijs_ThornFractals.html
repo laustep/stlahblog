@@ -18,11 +18,11 @@
 <body>
 
   <script type="text/javascript">
-    let type = "WebGL"
+    let type = "WebGL";
     if (!PIXI.utils.isWebGLSupported()) {
-      type = "canvas"
+      type = "canvas";
     }
-    PIXI.utils.sayHello(type)
+    PIXI.utils.sayHello(type);
   </script>
 
   <div id="container"></div>
@@ -30,6 +30,7 @@
   <script id="fragmentShader" type="x-shader/x-fragment">
     uniform vec2 iResolution;
     uniform vec2 mouse;
+    uniform bool color;
 
     float lerp(float t, float a, float b){
       return a + t*(b-a);
@@ -40,11 +41,13 @@
     float map(float t, float e1, float s1, float e2, float s2){
       return lerp(norm(t, e1, s1), e2, s2);
     }
-//    vec3 hsv2rgb(vec3 c){
-//      vec4 K = vec4(1.0, 2.0/3.0, 1.0/3.0, 3.0);
-//      vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-//      return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
-//    }
+    vec3 viridis(float u){
+      return vec3(
+        70.0 - 18.0*u + 449.0*u*u - 3461.0*u*u*u + 6058.0*u*u*u*u - 2847.0*u*u*u*u*u, 
+        4.0 + 320.0*u - 50.0*u*u - 40.0*u*u*u,
+        85.0 + 346.0*u + 119.0*u*u - 5374.0*u*u*u + 15427.0*u*u*u*u - 17627.0*u*u*u*u*u + 7057.0*u*u*u*u*u*u
+      ) / 255.0;
+    }
 
     void main(void){
       float px_x = gl_FragCoord.x; 
@@ -57,7 +60,7 @@
       float cy = map(mouse.y, 0.0, iResolution.y, -2.0, 2.0);
     
       float ii;    
-      for(int i = 0; i < 64; i++){
+      for(int i = 0; i < 32; i++){
         float nx = x/cos(y) + cx;
         float ny = y/sin(x) + cy;
         x = nx;
@@ -67,8 +70,7 @@
           break;
         }
       }
-      gl_FragColor = vec4(vec3(ii/64.0, ii/64.0, ii/64.0), 1.0);
-//    gl_FragColor=vec4(hsv2rgb(vec3(ii/100.0,0.5,1.0)),1.0);
+      gl_FragColor = color ? vec4(viridis(ii/32.0), 1.0) : vec4(vec3(ii/32.0), 1.0);
     }
   </script>
 
@@ -81,11 +83,16 @@
     let filter = new PIXI.Filter(null, fragmentShader);
     filter.uniforms.iResolution = [app.screen.width, app.screen.height];
     filter.uniforms.mouse = { x: 0, y: 0 }; 
+    filter.uniforms.color = false;
 
     document.onmousemove = function(evt){
       //Get the mouse position
       mousePos = { x: evt.clientX, y: evt.clientY }
       filter.uniforms.mouse = mousePos;
+    };
+
+    document.onclick = function(evt){
+      filter.uniforms.color = !filter.uniforms.color;
     };
 
     let container = new PIXI.Container();
