@@ -71,10 +71,10 @@
       float h = sqrt(1.0 - g2);
       vec2 d2 = pow(h, t) * vec2(cos(t*pio2), sin(t*pio2));
       vec2 d1 = conjugate(d2);
-      vec2 a = (-d1*(1.0-h) + d2*(1.0+h)) / 2.0 / h;
+      vec2 a = vec2(d1.x, -d1.y/h);
       vec2 b = d2.y * gamma / h;
       vec2 c = conjugate(b);
-      vec2 d = (-d2*(1.0-h) + d1*(1.0+h)) / 2.0 / h;
+      vec2 d = conjugate(a);
       return divide(product(a, z) + b, product(c, z) + d);
     }
 
