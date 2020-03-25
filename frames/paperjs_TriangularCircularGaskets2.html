@@ -1,0 +1,921 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="../libraries/nouislider.min.css">
+    <script src="../libraries/nouislider.min.js"></script>
+    <script src="../libraries/math.min.js"></script>
+    <script src="../libraries/paper-full.min.js"></script>
+    
+    <style>
+      canvas {
+        width: 800px;
+        height: 600px;
+      }
+      .noUi-touch-area {
+        background-color: crimson;
+      }
+      .noUi-tooltip {
+        display: none;
+      }
+      .noUi-active .noUi-tooltip {
+          display: block;
+      }
+      .vspace {
+        height: 10px;
+      }
+    </style>
+  </head>
+  <body>
+
+    <script> 
+      // cividis colors
+      var cividis = [
+        "#00204DFF", "#00214EFF", "#002250FF", "#002252FF",
+        "#002353FF", "#002455FF", "#002557FF", "#002558FF",
+        "#00265AFF", "#00275CFF", "#00275EFF", "#002860FF",
+        "#002961FF", "#002A63FF", "#002A65FF", "#002B67FF",
+        "#002C69FF", "#002C6AFF", "#002D6CFF", "#002E6EFF",
+        "#002E6FFF", "#002F6FFF", "#002F6FFF", "#00306FFF",
+        "#00306FFF", "#00316FFF", "#00326FFF", "#00336FFF",
+        "#00336FFF", "#00346FFF", "#00356EFF", "#01366EFF",
+        "#06366EFF", "#0B376EFF", "#0F386EFF", "#12386DFF",
+        "#15396DFF", "#183A6DFF", "#1A3B6DFF", "#1D3B6DFF",
+        "#1F3C6DFF", "#213D6DFF", "#233E6CFF", "#243E6CFF",
+        "#263F6CFF", "#28406CFF", "#2A406CFF", "#2B416CFF",
+        "#2D426CFF", "#2E436CFF", "#30436CFF", "#31446BFF",
+        "#32456BFF", "#34456BFF", "#35466BFF", "#36476BFF",
+        "#38486BFF", "#39486BFF", "#3A496BFF", "#3B4A6BFF",
+        "#3D4A6BFF", "#3E4B6BFF", "#3F4C6BFF", "#404D6BFF",
+        "#414D6BFF", "#424E6BFF", "#434F6BFF", "#444F6BFF",
+        "#46506BFF", "#47516BFF", "#48526BFF", "#49526BFF",
+        "#4A536BFF", "#4B546CFF", "#4C546CFF", "#4D556CFF",
+        "#4E566CFF", "#4F576CFF", "#50576CFF", "#51586CFF",
+        "#52596CFF", "#53596CFF", "#545A6CFF", "#555B6DFF",
+        "#565C6DFF", "#575C6DFF", "#585D6DFF", "#595E6DFF",
+        "#595F6DFF", "#5A5F6DFF", "#5B606EFF", "#5C616EFF",
+        "#5D616EFF", "#5E626EFF", "#5F636EFF", "#60646FFF",
+        "#61646FFF", "#62656FFF", "#63666FFF", "#64666FFF",
+        "#646770FF", "#656870FF", "#666970FF", "#676970FF",
+        "#686A71FF", "#696B71FF", "#6A6C71FF", "#6B6C71FF",
+        "#6C6D72FF", "#6C6E72FF", "#6D6E72FF", "#6E6F73FF",
+        "#6F7073FF", "#707173FF", "#717174FF", "#727274FF",
+        "#727374FF", "#737475FF", "#747475FF", "#757575FF",
+        "#767676FF", "#777776FF", "#787777FF", "#787877FF",
+        "#797977FF", "#7A7A78FF", "#7B7A78FF", "#7C7B78FF",
+        "#7D7C78FF", "#7E7D78FF", "#7F7D78FF", "#807E79FF",
+        "#817F79FF", "#828079FF", "#838079FF", "#848179FF",
+        "#848279FF", "#858379FF", "#868379FF", "#878479FF",
+        "#888579FF", "#898679FF", "#8A8779FF", "#8B8779FF",
+        "#8C8879FF", "#8D8979FF", "#8E8A79FF", "#8F8A79FF",
+        "#908B79FF", "#918C78FF", "#928D78FF", "#938E78FF",
+        "#948E78FF", "#958F78FF", "#969078FF", "#979178FF",
+        "#989278FF", "#999278FF", "#9A9377FF", "#9B9477FF",
+        "#9C9577FF", "#9D9677FF", "#9E9677FF", "#9F9777FF",
+        "#A09877FF", "#A19976FF", "#A29A76FF", "#A39A76FF",
+        "#A49B76FF", "#A59C76FF", "#A69D75FF", "#A89E75FF",
+        "#A99F75FF", "#AA9F75FF", "#ABA074FF", "#ACA174FF",
+        "#ADA274FF", "#AEA374FF", "#AFA473FF", "#B0A473FF",
+        "#B1A573FF", "#B2A672FF", "#B3A772FF", "#B4A872FF",
+        "#B5A971FF", "#B6A971FF", "#B7AA71FF", "#B8AB70FF",
+        "#B9AC70FF", "#BAAD70FF", "#BBAE6FFF", "#BCAF6FFF",
+        "#BEAF6FFF", "#BFB06EFF", "#C0B16EFF", "#C1B26DFF",
+        "#C2B36DFF", "#C3B46DFF", "#C4B56CFF", "#C5B56CFF",
+        "#C6B66BFF", "#C7B76BFF", "#C8B86AFF", "#C9B96AFF",
+        "#CBBA69FF", "#CCBB69FF", "#CDBC68FF", "#CEBC68FF",
+        "#CFBD67FF", "#D0BE67FF", "#D1BF66FF", "#D2C066FF",
+        "#D3C165FF", "#D4C264FF", "#D6C364FF", "#D7C463FF",
+        "#D8C563FF", "#D9C562FF", "#DAC661FF", "#DBC761FF",
+        "#DCC860FF", "#DDC95FFF", "#DECA5FFF", "#E0CB5EFF",
+        "#E1CC5DFF", "#E2CD5CFF", "#E3CE5CFF", "#E4CF5BFF",
+        "#E5D05AFF", "#E6D159FF", "#E8D259FF", "#E9D358FF",
+        "#EAD357FF", "#EBD456FF", "#ECD555FF", "#EDD654FF",
+        "#EFD753FF", "#F0D852FF", "#F1D951FF", "#F2DA50FF",
+        "#F3DB4FFF", "#F4DC4EFF", "#F6DD4DFF", "#F7DE4CFF",
+        "#F8DF4BFF", "#F9E04AFF", "#FAE149FF", "#FBE248FF",
+        "#FDE346FF", "#FEE445FF", "#FFE544FF", "#FFE642FF",
+        "#FFE742FF", "#FFE843FF", "#FFE944FF", "#FFEA46FF"
+      ];
+
+      var viridis = [
+        "#440154FF", "#440256FF", "#450457FF", "#450559FF",
+        "#46075AFF", "#46085CFF", "#460A5DFF", "#460B5EFF",
+        "#470D60FF", "#470E61FF", "#471063FF", "#471164FF",
+        "#471365FF", "#481467FF", "#481668FF", "#481769FF",
+        "#48186AFF", "#481A6CFF", "#481B6DFF", "#481C6EFF",
+        "#481D6FFF", "#481F70FF", "#482071FF", "#482173FF",
+        "#482374FF", "#482475FF", "#482576FF", "#482677FF",
+        "#482878FF", "#482979FF", "#472A7AFF", "#472C7AFF",
+        "#472D7BFF", "#472E7CFF", "#472F7DFF", "#46307EFF",
+        "#46327EFF", "#46337FFF", "#463480FF", "#453581FF",
+        "#453781FF", "#453882FF", "#443983FF", "#443A83FF",
+        "#443B84FF", "#433D84FF", "#433E85FF", "#423F85FF",
+        "#424086FF", "#424186FF", "#414287FF", "#414487FF",
+        "#404588FF", "#404688FF", "#3F4788FF", "#3F4889FF",
+        "#3E4989FF", "#3E4A89FF", "#3E4C8AFF", "#3D4D8AFF",
+        "#3D4E8AFF", "#3C4F8AFF", "#3C508BFF", "#3B518BFF",
+        "#3B528BFF", "#3A538BFF", "#3A548CFF", "#39558CFF",
+        "#39568CFF", "#38588CFF", "#38598CFF", "#375A8CFF",
+        "#375B8DFF", "#365C8DFF", "#365D8DFF", "#355E8DFF",
+        "#355F8DFF", "#34608DFF", "#34618DFF", "#33628DFF",
+        "#33638DFF", "#32648EFF", "#32658EFF", "#31668EFF",
+        "#31678EFF", "#31688EFF", "#30698EFF", "#306A8EFF",
+        "#2F6B8EFF", "#2F6C8EFF", "#2E6D8EFF", "#2E6E8EFF",
+        "#2E6F8EFF", "#2D708EFF", "#2D718EFF", "#2C718EFF",
+        "#2C728EFF", "#2C738EFF", "#2B748EFF", "#2B758EFF",
+        "#2A768EFF", "#2A778EFF", "#2A788EFF", "#29798EFF",
+        "#297A8EFF", "#297B8EFF", "#287C8EFF", "#287D8EFF",
+        "#277E8EFF", "#277F8EFF", "#27808EFF", "#26818EFF",
+        "#26828EFF", "#26828EFF", "#25838EFF", "#25848EFF",
+        "#25858EFF", "#24868EFF", "#24878EFF", "#23888EFF",
+        "#23898EFF", "#238A8DFF", "#228B8DFF", "#228C8DFF",
+        "#228D8DFF", "#218E8DFF", "#218F8DFF", "#21908DFF",
+        "#21918CFF", "#20928CFF", "#20928CFF", "#20938CFF",
+        "#1F948CFF", "#1F958BFF", "#1F968BFF", "#1F978BFF",
+        "#1F988BFF", "#1F998AFF", "#1F9A8AFF", "#1E9B8AFF",
+        "#1E9C89FF", "#1E9D89FF", "#1F9E89FF", "#1F9F88FF",
+        "#1FA088FF", "#1FA188FF", "#1FA187FF", "#1FA287FF",
+        "#20A386FF", "#20A486FF", "#21A585FF", "#21A685FF",
+        "#22A785FF", "#22A884FF", "#23A983FF", "#24AA83FF",
+        "#25AB82FF", "#25AC82FF", "#26AD81FF", "#27AD81FF",
+        "#28AE80FF", "#29AF7FFF", "#2AB07FFF", "#2CB17EFF",
+        "#2DB27DFF", "#2EB37CFF", "#2FB47CFF", "#31B57BFF",
+        "#32B67AFF", "#34B679FF", "#35B779FF", "#37B878FF",
+        "#38B977FF", "#3ABA76FF", "#3BBB75FF", "#3DBC74FF",
+        "#3FBC73FF", "#40BD72FF", "#42BE71FF", "#44BF70FF",
+        "#46C06FFF", "#48C16EFF", "#4AC16DFF", "#4CC26CFF",
+        "#4EC36BFF", "#50C46AFF", "#52C569FF", "#54C568FF",
+        "#56C667FF", "#58C765FF", "#5AC864FF", "#5CC863FF",
+        "#5EC962FF", "#60CA60FF", "#63CB5FFF", "#65CB5EFF",
+        "#67CC5CFF", "#69CD5BFF", "#6CCD5AFF", "#6ECE58FF",
+        "#70CF57FF", "#73D056FF", "#75D054FF", "#77D153FF",
+        "#7AD151FF", "#7CD250FF", "#7FD34EFF", "#81D34DFF",
+        "#84D44BFF", "#86D549FF", "#89D548FF", "#8BD646FF",
+        "#8ED645FF", "#90D743FF", "#93D741FF", "#95D840FF",
+        "#98D83EFF", "#9BD93CFF", "#9DD93BFF", "#A0DA39FF",
+        "#A2DA37FF", "#A5DB36FF", "#A8DB34FF", "#AADC32FF",
+        "#ADDC30FF", "#B0DD2FFF", "#B2DD2DFF", "#B5DE2BFF",
+        "#B8DE29FF", "#BADE28FF", "#BDDF26FF", "#C0DF25FF",
+        "#C2DF23FF", "#C5E021FF", "#C8E020FF", "#CAE11FFF",
+        "#CDE11DFF", "#D0E11CFF", "#D2E21BFF", "#D5E21AFF",
+        "#D8E219FF", "#DAE319FF", "#DDE318FF", "#DFE318FF",
+        "#E2E418FF", "#E5E419FF", "#E7E419FF", "#EAE51AFF",
+        "#ECE51BFF", "#EFE51CFF", "#F1E51DFF", "#F4E61EFF",
+        "#F6E620FF", "#F8E621FF", "#FBE723FF", "#FDE725FF"
+      ];
+
+      var moonrise3 = [
+        "#85D4E3", "#86D3E2", "#88D3E1", "#8AD2E1",
+        "#8BD2E0", "#8DD1E0", "#8FD1DF", "#91D0DE",
+        "#92D0DE", "#94CFDD", "#96CFDD", "#98CEDC",
+        "#99CEDB", "#9BCDDB", "#9DCDDA", "#9FCCDA",
+        "#A0CCD9", "#A2CBD8", "#A4CBD8", "#A6CAD7",
+        "#A7CAD7", "#A9C9D6", "#ABC9D5", "#ADC8D5",
+        "#AEC8D4", "#B0C7D4", "#B2C7D3", "#B4C6D2",
+        "#B5C6D2", "#B7C5D1", "#B9C5D1", "#BAC4D0",
+        "#BCC4CF", "#BEC3CF", "#C0C3CE", "#C1C2CE",
+        "#C3C2CD", "#C5C2CC", "#C7C1CC", "#C8C1CB",
+        "#CAC0CB", "#CCC0CA", "#CEBFC9", "#CFBFC9",
+        "#D1BEC8", "#D3BEC8", "#D5BDC7", "#D6BDC6",
+        "#D8BCC6", "#DABCC5", "#DCBBC5", "#DDBBC4",
+        "#DFBAC4", "#E1BAC3", "#E3B9C2", "#E4B9C2",
+        "#E6B8C1", "#E8B8C1", "#E9B7C0", "#EBB7BF",
+        "#EDB6BF", "#EFB6BE", "#F0B5BE", "#F2B5BD",
+        "#F3B4BC", "#F2B4BA", "#F0B3B8", "#EFB3B7",
+        "#EEB2B5", "#ECB2B3", "#EBB1B1", "#E9B1AF",
+        "#E8B0AE", "#E7B0AC", "#E5B0AA", "#E4AFA8",
+        "#E3AFA6", "#E1AEA5", "#E0AEA3", "#DEADA1",
+        "#DDAD9F", "#DCAC9D", "#DAAC9C", "#D9AB9A",
+        "#D8AB98", "#D6AA96", "#D5AA94", "#D3A993",
+        "#D2A991", "#D1A88F", "#CFA88D", "#CEA78B",
+        "#CDA78A", "#CBA688", "#CAA686", "#C8A584",
+        "#C7A582", "#C6A481", "#C4A47F", "#C3A37D",
+        "#C1A37B", "#C0A279", "#BFA278", "#BDA176",
+        "#BCA174", "#BBA072", "#B9A070", "#B89F6E",
+        "#B69F6D", "#B59E6B", "#B49E69", "#B29E67",
+        "#B19D65", "#B09D64", "#AE9C62", "#AD9C60",
+        "#AB9B5E", "#AA9B5C", "#A99A5B", "#A79A59",
+        "#A69957", "#A49955", "#A39853", "#A29852",
+        "#A09750", "#9F974E", "#9E964C", "#9C964A",
+        "#9C964A", "#9D964B", "#9D974C", "#9E984D",
+        "#9F984E", "#A0994F", "#A09A50", "#A19A51",
+        "#A29B52", "#A39C53", "#A49C54", "#A49D55",
+        "#A59E56", "#A69E57", "#A79F59", "#A7A05A",
+        "#A8A05B", "#A9A15C", "#AAA25D", "#AAA25E",
+        "#ABA35F", "#ACA460", "#ADA461", "#AEA562",
+        "#AEA663", "#AFA664", "#B0A765", "#B1A866",
+        "#B1A867", "#B2A968", "#B3AA69", "#B4AA6A",
+        "#B4AB6B", "#B5AC6C", "#B6AC6D", "#B7AD6E",
+        "#B8AE6F", "#B8AE70", "#B9AF71", "#BAB072",
+        "#BBB073", "#BBB174", "#BCB276", "#BDB277",
+        "#BEB378", "#BEB379", "#BFB47A", "#C0B57B",
+        "#C1B57C", "#C2B67D", "#C2B77E", "#C3B77F",
+        "#C4B880", "#C5B981", "#C5B982", "#C6BA83",
+        "#C7BB84", "#C8BB85", "#C8BC86", "#C9BD87",
+        "#CABD88", "#CBBE89", "#CCBF8A", "#CCBF8B",
+        "#CDC08B", "#CEC08B", "#CEC08B", "#CFC18B",
+        "#D0C18A", "#D1C28A", "#D1C28A", "#D2C289",
+        "#D3C389", "#D3C389", "#D4C389", "#D5C488",
+        "#D6C488", "#D6C488", "#D7C588", "#D8C587",
+        "#D8C687", "#D9C687", "#DAC687", "#DAC786",
+        "#DBC786", "#DCC786", "#DDC885", "#DDC885",
+        "#DEC885", "#DFC985", "#DFC984", "#E0CA84",
+        "#E1CA84", "#E2CA84", "#E2CB83", "#E3CB83",
+        "#E4CB83", "#E4CC83", "#E5CC82", "#E6CC82",
+        "#E6CD82", "#E7CD81", "#E8CD81", "#E9CE81",
+        "#E9CE81", "#EACF80", "#EBCF80", "#EBCF80",
+        "#ECD080", "#EDD07F", "#EED07F", "#EED17F",
+        "#EFD17F", "#F0D17E", "#F0D27E", "#F1D27E",
+        "#F2D37D", "#F2D37D", "#F3D37D", "#F4D47D",
+        "#F5D47C", "#F5D47C", "#F6D57C", "#F7D57C",
+        "#F7D57B", "#F8D67B", "#F9D67B", "#FAD77B"
+      ];
+
+      function palette(n, hexs) {
+        if(n === 1) return [hexs[0]];
+        var colors = new Array(n);
+        for (let i = 0; i < n; ++i) {
+          var idx = Math.floor(255 * i / (n - 1));
+          colors[i] = hexs[idx];
+        }
+        return colors;
+      }
+    </script>
+
+    <script type="text/paperscript" canvas="quad">
+
+      function length(A, B){
+        var x = A.x - B.x, y = A.y - B.y;
+        return Math.sqrt(x*x+y*y);
+      }
+
+      function inCircle(A, B, C){
+        var a = length(B, C), b = length(C, A), c = length(A, B);
+        var p = (a + b + c), s = p / 2;
+        var area = Math.sqrt(s*(s-a)*(s-b)*(s-c));
+        return {
+          center: (A*a + B*b + C*c) / p, 
+          radius: area / s
+        };
+      }
+
+      function collinear(A, B, C){
+        var AB = B-A, AC = C-A;
+        var conjAB = new Point(AB.x, -AB.y);
+        var re = conjAB.x*AC.x - conjAB.y*AC.y;
+        var im = conjAB.y*AC.x + conjAB.x*AC.y;
+        return re*re/im/im > 100;
+      }
+
+      function closestPoint(A, B, C, M){
+        var a = length(A, M);
+        var b = length(B, M);
+        var c = length(C, M);
+        return a < Math.min(b,c) ? 1 : (b < Math.min(a,c) ? 2 : 3);
+      }
+
+      function dot(A, B){
+        return A.x*B.x + A.y*B.y;
+      }
+
+      function fillGradientColor(circle, color){
+        circle.fillColor = {
+          gradient: {
+              stops: [color, 'black'],
+              radial: true
+          },
+          origin: circle.position,
+          destination: circle.bounds.rightCenter
+        };
+      }
+
+      function MalfattiCircles(A, B, C, color, grp){
+        var triangle = new Path();
+        triangle.strokeColor = 'black';
+        triangle.add(A); triangle.add(B); triangle.add(C);
+        triangle.closed = true;
+        grp.addChild(triangle);
+        var a = length(B, C), b = length(A, C), c = length(B, A);
+        var p = (a + b + c), s = p / 2;
+        var areaABC = Math.sqrt(s*(s-a)*(s-b)*(s-c));
+        var I = (A*a + B*b + C*c) / p; // incenter
+        var r = areaABC / s; // inradius
+        // radii of Malfatti circles ####
+        var IA = length(I, A), IB = length(I, B), IC = length(I, C);
+        var r1 = r * (s-r-(IB+IC-IA)) / 2 / (s-a);
+        var r2 = r * (s-r-(IC+IA-IB)) / 2 / (s-b);
+        var r3 = r * (s-r-(IA+IB-IC)) / 2 / (s-c);
+        // centers of Malfatti circles ####
+        var d1 = r1 / Math.tan(Math.acos(dot(C-A,B-A)/b/c)/2);
+        var d2 = r2 / Math.tan(Math.acos(dot(C-B,A-B)/a/c)/2);
+        var d3 = r3 / Math.tan(Math.acos(dot(A-C,B-C)/b/a)/2);
+        var w = d1 + d2 + 2*Math.sqrt(r1*r2);
+        var u = d2 + d3 + 2*Math.sqrt(r2*r3);
+        var v = d3 + d1 + 2*Math.sqrt(r3*r1);
+        var d = Math.sqrt((-u+v+w)*(u+v-w)*(u-v+w)*(u+v+w));
+        var x = d/2/r1 - (v+w), y = u, z = u; // trilinear coordinates
+        var O1 = (A*u*x + B*v*y + C*w*z) / (u*x + v*y + w*z);
+        var x = v, y = d/2/r2 - (u+w), z = v; // trilinear coordinates
+        var O2 = (A*u*x + B*v*y + C*w*z) / (u*x + v*y + w*z);
+        var x = w, y = w, z = d/2/r3 - (u+v); // trilinear coordinates
+        var O3 = (A*u*x + B*v*y + C*w*z) / (u*x + v*y + w*z);
+        // Malfatti circles ####
+        var C1 = new Path.Circle(O1, r1);
+        C1.strokeColor = color;
+        var C2 = new Path.Circle(O2, r2);
+        C2.strokeColor = color;
+        var C3 = new Path.Circle(O3, r3);
+        C3.strokeColor = color;
+        grp.addChild(C1); grp.addChild(C2); grp.addChild(C3);
+        return [C1, C2, C3];
+      }
+
+      function innerSoddyRadius(r1, r2, r3){
+        return 1/(1/r1+1/r2+1/r3+2*Math.sqrt(1/r1/r2+1/r2/r3+1/r3/r1));
+      }
+
+      function innerSoddyCircle(cA, cB, cC, color, grp){
+        var r1 = cA.bounds.width/2, 
+          r2 = cB.bounds.width/2, 
+          r3 = cC.bounds.width/2;
+        var radius = innerSoddyRadius(r1, r2, r3);
+        var A = cA.position, B = cB.position, C = cC.position;
+        var a = length(B, C), b = length(C, A), c = length(A, B);
+        var p = (a + b + c), s = p / 2;
+        var darea = 2*Math.sqrt(s*(s-a)*(s-b)*(s-c));
+        var p1 = a + darea/(b+c-a), 
+          p2 = b + darea/(a+c-b), 
+          p3 = c + darea/(b+a-c);
+        var center = (A*p1 + B*p2 + C*p3) / (p1 + p2 + p3);
+        var soddy = new Path.Circle(center, radius);
+        fillGradientColor(soddy, color);
+        grp.addChild(soddy);
+        return [
+          {type: "ccc", cA: soddy, cB: cA, cC: cB},
+          {type: "ccc", cA: soddy, cB: cB, cC: cC},
+          {type: "ccc", cA: soddy, cB: cA, cC: cC}
+        ];
+      }
+
+      function sideCircleCircle(A, B, cA, cB, color, grp){
+        if(A.y > B.y){
+          return sideCircleCircle(B, A, cB, cA, color, grp);
+        }
+        var rA = cA.bounds.width/2, rB = cB.bounds.width/2;
+        var oA = cA.position, oB = cB.position;
+        var c = length(A, B);
+        var alpha = Math.acos(dot(new Point(1,0), B-A)/c) * 180/Math.PI;
+        var X1 = (oA-B).rotate(-alpha);
+        var X2 = (oB-B).rotate(-alpha);
+        var soddyR = innerSoddyRadius(rA, rB, Infinity);
+        var sgn = X1.y >= 0 ? 1 : -1; 
+        var Y;
+        if(X1.x < X2.x){
+          Y = new Point(
+            2*rA*Math.sqrt(rB)/(Math.sqrt(rA)+Math.sqrt(rB)) + X1.x, 
+            sgn*soddyR
+          );
+        }else{
+          Y = new Point(
+            2*rB*Math.sqrt(rA)/(Math.sqrt(rA)+Math.sqrt(rB)) + X2.x, 
+            sgn*soddyR
+          );
+        }
+        var Z = Y.rotate(alpha) + B;
+        var cAB = new Path.Circle(Z, soddyR);
+        fillGradientColor(cAB, color);
+        grp.addChild(cAB);
+        return [
+          {type: "ccc", cA: cAB, cB: cA, cC: cB},
+          {type: "ccl", cA: cA, cB: cAB, A: A, B: B},
+          {type: "ccl", cA: cAB, cB: cB, A: A, B: B}
+        ];
+      }
+
+      // Intersection point of the lines (PQ) and (pq)
+      function LineLineIntersection(P, Q, p, q){
+        var ac = P-Q, bd = q-p;
+        var det = ac.x*bd.y - ac.y*bd.x;
+        if(det === 0) return new Point(Infinity, Infinity);
+        return P + ac * ((p.x-P.x)*bd.y - (p.y-P.y)*bd.x) / det;
+      }
+
+      function sideSideCircle(A, B, C, circle, color, grp){
+        var O = circle.position;
+        var P = O + (A-O).normalize()*circle.bounds.width/2;
+        var OP = P-O;
+        var onTangent = P + new Point(-OP.y, OP.x);
+        var P1 = LineLineIntersection(P, onTangent, A, C);
+        var P2 = LineLineIntersection(P, onTangent, A, B);
+        var incircle_ = inCircle(A, P1, P2);
+        var incircle = new Path.Circle(incircle_.center, incircle_.radius);
+        fillGradientColor(incircle, color);
+        grp.addChild(incircle);
+        return [
+          {type: "cll", A: A, B: B, C: C, circle: incircle},
+          {type: "ccl", cA: circle, cB: incircle, A: A, B: B},
+          {type: "ccl", cA: circle, cB: incircle, A: A, B: C}
+        ]
+      }
+
+      function Newholes(holes, color, group){
+        var newholes = [];
+        for(var i = 0; i < 3; i++){
+          var h = holes[i];
+          if(h.type == "ccc"){
+            newholes.push(innerSoddyCircle(h.cA, h.cB, h.cC, color, group));
+          }else if(h.type == "ccl"){
+            newholes.push(sideCircleCircle(h.A, h.B, h.cA, h.cB, color, group));
+          }else if(h.type == "cll"){
+            newholes.push(sideSideCircle(h.A, h.B, h.C, h.circle, color, group));
+          }
+        }
+        return newholes;
+      }
+
+      // -----------------------------------------------------------------------
+      // -- functions for the circular gaskets ---------------------------------
+      // -----------------------------------------------------------------------
+      function squaredModulus(z) {
+        return z.re * z.re + z.im * z.im;
+      }
+
+      function Modulus(z) {
+        return Math.sqrt(squaredModulus(z));
+      }
+
+      // helper function for circumcircle
+      function orient(z1, z2, z3){
+        var d1 = z2.re * z3.im - z3.re * z2.im;
+        var d2 = z1.re * z3.im - z3.re * z1.im;
+        var d3 = z1.re * z2.im - z2.re * z1.im;
+        return d1 - d2 + d3;
+      }
+
+      function toCplx(x, y){
+        return math.complex(x, y);
+      }
+
+      function circumcircle(z1, z2, z3){
+        var a = orient(z1, z2, z3);
+        var q1 = squaredModulus(z1);
+        var q2 = squaredModulus(z2);
+        var q3 = squaredModulus(z3);
+        var Dx = 
+          orient(toCplx(q1, z1.im), toCplx(q2, z2.im), toCplx(q3, z3.im));
+        var Dy = 
+          orient(toCplx(q1, z1.re), toCplx(q2, z2.re), toCplx(q3, z3.re));
+        var centerx = 0.5 / a * Dx;
+        var centery = -0.5 / a * Dy;
+        var center = toCplx(centerx, centery);
+        var r = Modulus(math.subtract(z1, center));
+        return {center: toCplx(centerx,centery), radius: r};
+      }
+
+      function invertCircle(zcircle0, zcircle1){
+        var ctr0 = zcircle0.center;
+        var ctr1 = zcircle1.center;
+        var r0 = zcircle0.radius;
+        var r1 = zcircle1.radius;
+        var z1 = math.divide(math.subtract(ctr1, ctr0), r0);
+        var D1 = r1 * r1 / r0 / r0 - squaredModulus(z1);
+        var z2 = math.divide(z1, -D1);
+        var r2 = Math.sqrt(squaredModulus(z2) + 1 / D1);
+        return { 
+          center: toCplx(r0 * z2.re + ctr0.re, r0 * z2.im + ctr0.im), 
+          radius: r0 * r2
+        };
+      }
+
+      function invertPoint(zcircle0, zM){
+        return math.add(
+          zcircle0.center, 
+          math.divide(zcircle0.radius * zcircle0.radius, 
+                  math.conj(math.subtract(zM, zcircle0.center)))
+        );
+      }
+
+      // starting circles and inversion circles --------------------------------------
+      function startingCircles(zcircle0, n, phi, shift){ // zcircle0 : exterior circle
+        var invphi = 1 / phi;
+        var I = math.add(toCplx(zcircle0.radius * invphi, 0), zcircle0.center);
+        var r = zcircle0.radius * Math.sqrt(invphi * invphi - 1);
+        var zcirc0 = {center: I, radius: r};
+        var sine = Math.sin(Math.PI / n);
+        var Cradius = zcircle0.radius / (1 + sine);
+        var Cside = Cradius * sine;
+        var circles0 = new Array(n+1);
+        var K = new Array(n); 
+        for(var i = 0; i < n; ++i) {
+          var beta = (i + shift) * 2 * Math.PI / n;
+          K[i] = invertPoint(zcirc0, 
+            math.add(zcircle0.center, math.Complex.fromPolar(zcircle0.radius, beta)));
+          var pti = math.add(math.Complex.fromPolar(Cradius, beta), zcircle0.center);
+          var zcirc1 = {center: pti, radius: Cside};
+          circles0[i] = invertCircle(zcirc0, zcirc1);
+        }
+        circles0[n] = invertCircle(zcirc0, 
+          {center: zcircle0.center, radius: zcircle0.radius - 2 * Cside});
+        var J = new Array(n);
+        var invCircles = new Array(n + 1);
+        for(var i = 0; i < n; ++i){
+          var ip1 = (i + 1) % n, ip2 = (i + 2) % n;
+          var zA = circles0[ip2].center;
+          var rad = circles0[ip2].radius;
+          var zB = circles0[ip1].center;
+          var zAB = math.subtract(zB, zA);
+          J[i] = math.add(zA, math.multiply(rad / Modulus(zAB), zAB));
+          invCircles[i] = circumcircle(J[i], K[ip1], K[ip2]);
+        }
+        invCircles[n] = circumcircle(J[0], J[1], J[2]);
+        var out = [circles0, invCircles];
+        return out;
+      }
+
+      // first generation of children ------------------------------------------
+      function Circles1(circles0, invCircles){
+        var circles1 = []; var invs = [];
+        var n = circles0.length - 1;
+        for(var i = 0; i < n; i++){
+          var ip1 = (i+1) % n; var ip2 = (i+2) % n;
+          for(var j = 0; j <= n; j++){
+            if(j !== ip1 && j !== ip2){
+              var circle = invertCircle(invCircles[i], circles0[j]);
+              circles1.push(circle);
+              invs.push(i);
+            }
+          }
+        }
+        return {circles: circles1, inversions : invs};
+      }
+
+      // calculate children ----------------------------------------------------
+      function children(invCircles, icircles1){
+        var m = invCircles.length;
+        var circles1 = icircles1.circles;
+        var inversions = icircles1.inversions;
+        var n = circles1.length;
+        var circles2 = [];
+        var invs2 = [];
+        for(var i = 0; i < n; ++i){
+          for(var j = 0; j < m; ++j){
+            if(inversions[i] !== j){
+              var circle = invertCircle(invCircles[j], circles1[i]);
+              circles2.push(circle);
+              invs2.push(j);
+            }
+          }
+        }
+        return {circles: circles2, inversions : invs2};
+      }
+
+      // -----------------------------------------------------------------------
+      // -----------------------------------------------------------------------
+      // -----------------------------------------------------------------------
+      function drawTriangularGasket(A, B, C, Mcircles, depth, group){
+
+        var colors = palette(depth+1, viridis);
+
+        var C1 = Mcircles[0], C2 = Mcircles[1], C3 = Mcircles[2];        
+        
+        if(depth > 0){
+          var holes = [
+            sideCircleCircle(A, B, C1, C2, colors[1], group),
+            sideCircleCircle(B, C, C2, C3, colors[1], group),
+            sideCircleCircle(C, A, C3, C1, colors[1], group),
+            innerSoddyCircle(C1, C2, C3, colors[1], group),
+            sideSideCircle(A, B, C, C1, colors[1], group),
+            sideSideCircle(B, A, C, C2, colors[1], group),
+            sideSideCircle(C, A, B, C3, colors[1], group)
+          ];
+
+          for(var d = 0; d < depth-1; ++d){
+            var Holes = new Array(holes.length);
+            for(var i = 0; i < holes.length; ++i){
+              Holes[i] = Newholes(holes[i], colors[d+2], group);
+            }
+            holes = [].concat.apply([], Holes);
+          }
+        }
+      }
+
+      function complexToPoint(z){
+        return new Point(z.re, z.im);
+      }
+
+      function fillGradientColor(circle, color){
+        circle.fillColor = {
+          gradient: {
+              stops: [color, 'black'],
+              radial: true
+          },
+          origin: circle.position,
+          destination: circle.bounds.rightCenter
+        };
+      }
+
+      function drawCircularGasket(circle0, n, depth, phi, shift, grp){
+        var center0 = circle0.position;
+        var zcircle0 = {
+          center: toCplx(center0.x,center0.y), 
+          radius: circle0.bounds.width/2
+        }
+        var scircles = startingCircles(zcircle0, n, phi, n*shift);
+        var circles0 = scircles[0];
+        var invCircles = scircles[1];
+        // construct the children ----------------------------------------------
+        var allCircles = new Array(depth);
+        allCircles[0] = {circles: circles0};
+        if(depth > 1){
+          allCircles[1] = Circles1(circles0, invCircles);
+          for(var i = 2; i < depth; ++i){
+            allCircles[i] = children(invCircles, allCircles[i - 1]);
+          }
+        }
+
+        var colors = palette(depth, moonrise3);
+        for(var i = 0; i < depth; ++i){
+          var zcircles = allCircles[i].circles;
+          for(var j = 0; j < zcircles.length; ++j){
+            var zcircle = zcircles[j];
+            var circle = 
+              new Path.Circle(complexToPoint(zcircle.center), zcircle.radius);
+            fillGradientColor(circle, colors[i]);
+            grp.addChild(circle);
+          }
+        }
+      }
+
+      // -----------------------------------------------------------------------
+      var A = new Point(380, 15),
+        B = new Point(615, 460),
+        C = new Point(100, 400);
+      var depth = 1;
+      var group0 = new Group();
+      var Mcircles = MalfattiCircles(A, B, C, viridis[0], group0);
+      var groupT = new Group();
+      drawTriangularGasket(A, B, C, Mcircles, depth, groupT);
+      var n1 = 3, n2 = 3, n3 = 3;
+      var depth2 = 2;
+      var phi = 0.25;
+      var shift = 0;
+      var group1 = new Group();
+      drawCircularGasket(Mcircles[0], n1, depth2, phi, shift, group1);
+      var group2 = new Group();
+      drawCircularGasket(Mcircles[1], n2, depth2, phi, shift, group2);
+      var group3 = new Group();
+      drawCircularGasket(Mcircles[2], n3, depth2, phi, shift, group3);
+
+      // -----------------------------------------------------------------------
+      var tooltipFormatter = [ 
+        {
+          to: function (value) {
+            return value.toFixed(0);
+          },
+          from: function (value) {
+            return parseInt(value);
+          }
+        }
+      ];
+
+      var slider = document.getElementById('slider');
+      noUiSlider.create(slider, {
+        start: [depth],
+        step: 1,
+        range: {
+            'min': [0],
+            'max': [6]
+        },
+        orientation: 'horizontal',
+        tooltips: tooltipFormatter
+      });
+      slider.noUiSlider.on("change", function(values) {
+        groupT.remove();
+        depth = parseInt(values[0]);
+        groupT = new Group();
+        drawTriangularGasket(A, B, C, Mcircles, depth, groupT);
+      });
+      slider.noUiSlider.on('update', function (values, handle) {
+          document.getElementById('depth').innerHTML = parseInt(values[handle]);
+      });
+
+      var sliderdepth2 = document.getElementById('sliderdepth2');
+      noUiSlider.create(sliderdepth2, {
+        start: [depth2],
+        step: 1,
+        range: {
+            'min': [1],
+            'max': [6]
+        },
+        orientation: 'horizontal',
+        tooltips: tooltipFormatter
+      });
+      sliderdepth2.noUiSlider.on("change", function(values) {
+        group1.remove(); group2.remove(); group3.remove();
+        depth2 = parseInt(values[0]);
+        group1 = new Group();
+        drawCircularGasket(Mcircles[0], n1, depth2, phi, shift, group1);
+        group2 = new Group();
+        drawCircularGasket(Mcircles[1], n2, depth2, phi, shift, group2);
+        group3 = new Group();
+        drawCircularGasket(Mcircles[2], n3, depth2, phi, shift, group3);
+      });
+      sliderdepth2.noUiSlider.on('update', function (values, handle) {
+          document.getElementById('depth2').innerHTML = parseInt(values[handle]);
+      });
+
+      var slider1 = document.getElementById('slidern1');
+      noUiSlider.create(slider1, {
+        start: [n1],
+        step: 1,
+        range: {
+            'min': [3],
+            'max': [7]
+        },
+        orientation: 'horizontal',
+        tooltips: tooltipFormatter
+      });
+      slider1.noUiSlider.on("change", function(values) {
+        group1.remove();
+        n1 = parseInt(values[0]);
+        group1 = new Group();
+        drawCircularGasket(Mcircles[0], n1, depth2, phi, shift, group1);
+      });
+      slider1.noUiSlider.on('update', function (values, handle) {
+          document.getElementById('n1').innerHTML = parseInt(values[handle]);
+      });
+
+      var slider2 = document.getElementById('slidern2');
+      noUiSlider.create(slider2, {
+        start: [n2],
+        step: 1,
+        range: {
+            'min': [3],
+            'max': [7]
+        },
+        orientation: 'horizontal',
+        tooltips: tooltipFormatter
+      });
+      slider2.noUiSlider.on("change", function(values) {
+        group2.remove();
+        n2 = parseInt(values[0]);
+        group2 = new Group();
+        drawCircularGasket(Mcircles[1], n2, depth2, phi, shift, group2);
+      });
+      slider2.noUiSlider.on('update', function (values, handle) {
+          document.getElementById('n2').innerHTML = parseInt(values[handle]);
+      });
+
+      var slider3 = document.getElementById('slidern3');
+      noUiSlider.create(slider3, {
+        start: [n3],
+        step: 1,
+        range: {
+            'min': [3],
+            'max': [7]
+        },
+        orientation: 'horizontal',
+        tooltips: tooltipFormatter
+      });
+      slider3.noUiSlider.on("change", function(values) {
+        group3.remove();
+        n3 = parseInt(values[0]);
+        group3 = new Group();
+        drawCircularGasket(Mcircles[2], n3, depth2, phi, shift, group3);
+      });
+      slider3.noUiSlider.on('update', function (values, handle) {
+          document.getElementById('n3').innerHTML = parseInt(values[handle]);
+      });
+
+      var slidershift = document.getElementById('slidershift');
+      noUiSlider.create(slidershift, {
+        start: [shift],
+        step: 0.01,
+        range: {
+            'min': [0],
+            'max': [1]
+        },
+        orientation: 'horizontal',
+        tooltips: true
+      });
+      slidershift.noUiSlider.on("change", function(values) {
+        shift = parseFloat(values[0]);
+        group1.remove(); group2.remove(); group3.remove();
+        group1 = new Group();
+        drawCircularGasket(Mcircles[0], n1, depth2, phi, shift, group1);
+        group2 = new Group();
+        drawCircularGasket(Mcircles[1], n2, depth2, phi, shift, group2);
+        group3 = new Group();
+        drawCircularGasket(Mcircles[2], n3, depth2, phi, shift, group3);
+      });
+      slidershift.noUiSlider.on('update', function (values, handle) {
+          document.getElementById('shift').innerHTML = parseFloat(values[handle]);
+      });
+
+      var sliderphi = document.getElementById('sliderphi');
+      noUiSlider.create(sliderphi, {
+        start: [phi],
+        step: 0.05,
+        range: {
+            'min': [-0.95],
+            'max': [0.95]
+        },
+        orientation: 'horizontal',
+        tooltips: true
+      });
+      sliderphi.noUiSlider.on("change", function(values) {
+        phi = parseFloat(values[0]);
+        if(phi !== 0){
+          group1.remove(); group2.remove(); group3.remove();
+          group1 = new Group();
+          drawCircularGasket(Mcircles[0], n1, depth2, phi, shift, group1);
+          group2 = new Group();
+          drawCircularGasket(Mcircles[1], n2, depth2, phi, shift, group2);
+          group3 = new Group();
+          drawCircularGasket(Mcircles[2], n3, depth2, phi, shift, group3);
+        }
+      });
+      sliderphi.noUiSlider.on('update', function (values, handle) {
+        var phi = parseFloat(values[handle]);
+        if(phi === 0){
+          document.getElementById('phi').innerHTML = '' + phi + ' not allowed';
+          slider.setAttribute('disabled', true);
+          sliderdepth2.setAttribute('disabled', true);
+          slider1.setAttribute('disabled', true);
+          slider2.setAttribute('disabled', true);
+          slider3.setAttribute('disabled', true);
+          slidershift.setAttribute('disabled', true);
+        }else{
+          document.getElementById('phi').innerHTML = phi;
+          slider.removeAttribute('disabled');
+          sliderdepth2.removeAttribute('disabled');
+          slider1.removeAttribute('disabled');
+          slider2.removeAttribute('disabled');
+          slider3.removeAttribute('disabled');
+          slidershift.removeAttribute('disabled');
+        }
+      });
+
+      // -----------------------------------------------------------------------
+      tool.maxDistance = 50;
+      tool.minDistance = 4; 
+      function onMouseDrag(event){
+        project.activeLayer.removeChildren();
+        var P = closestPoint(A, B, C, event.point);
+        if(P === 1){
+          A = event.point;
+        }else if (P === 2){
+          B = event.point;
+        }else{
+          C = event.point;
+        }
+        if(!collinear(A,B,C)){
+          group0 = new Group();
+          Mcircles = MalfattiCircles(A, B, C, viridis[0], group0);
+          groupT = new Group();
+          drawTriangularGasket(A, B, C, Mcircles, depth, groupT);
+          group1 = new Group();
+          drawCircularGasket(Mcircles[0], n1, depth2, phi, shift, group1);
+          group2 = new Group();
+          drawCircularGasket(Mcircles[1], n2, depth2, phi, shift, group2);
+          group3 = new Group();
+          drawCircularGasket(Mcircles[2], n3, depth2, phi, shift, group3);
+        }
+      }
+    </script>
+
+    <p>Click and drag to move the vertices</p>
+    <div style="display: inline-flex;">
+      <div style="width: 200px; display: inline-block; vertical-align: top; margin-top: 25px; margin-left: 10px;">
+        <div id="slider" style="margin-bottom: 5px;"></div>
+        <label for="slider"><em>depth </em>&equals;&nbsp;<span id="depth"></span></label>
+
+        <div class="vspace"></div>
+        <div id="sliderdepth2" style="margin-bottom: 5px;"></div>
+        <label for="sliderdepth2"><em>inner depth </em>&equals;&nbsp;<span id="depth2"></span></label>
+
+        <div class="vspace"></div>
+        <div id="slidern1" style="margin-bottom: 5px;"></div>
+        <label for="slidern1"><em>n<sub>1</sub> </em>&equals;&nbsp;<span id="n1"></span></label>
+
+        <div class="vspace"></div>
+        <div id="slidern2" style="margin-bottom: 5px;"></div>
+        <label for="slidern2"><em>n<sub>2</sub> </em>&equals;&nbsp;<span id="n2"></span></label>
+
+        <div class="vspace"></div>
+        <div id="slidern3" style="margin-bottom: 5px;"></div>
+        <label for="slidern3"><em>n<sub>3</sub> </em>&equals;&nbsp;<span id="n3"></span></label>
+
+        <div class="vspace"></div>
+        <div id="sliderphi" style="margin-bottom: 5px;"></div>
+        <label for="sliderphi"><em>phi </em>&equals;&nbsp;<span id="phi"></span></label>
+
+        <div class="vspace"></div>
+        <div id="slidershift" style="margin-bottom: 5px;"></div>
+        <label for="slidershift"><em>shift </em>&equals;&nbsp;<span id="shift"></span></label>
+      </div>
+      <div style="display: inline-block;">
+        <canvas id="quad" resize></canvas>
+      </div>
+    </div>
+
+  </body>
+</html>

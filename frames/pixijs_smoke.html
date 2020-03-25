@@ -1,0 +1,205 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <script src="../libraries/hamster.min.js"></script>
+  <title>Hyperbolic tiling</title>
+  <style>
+    html, body { 
+      margin: 0; 
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<script src="../libraries/pixi.min.js"></script>
+
+<body>
+
+  <script type="text/javascript">
+    let type = "WebGL";
+    if(!PIXI.utils.isWebGLSupported()){
+      type = "canvas";
+    }
+    PIXI.utils.sayHello(type);
+  </script>
+
+  <div id="container"></div>
+
+  <script id="fragmentShader" type="x-shader/x-fragment">
+    uniform vec2 iResolution;
+    uniform float xmin;
+    uniform float xmax;
+    uniform float ymin;
+    uniform float ymax;
+    uniform float iGlobalTime;
+    uniform bool anim;
+    uniform float time;
+
+    const float pi = 3.1415926535897932384626433832795;
+
+    // complex numbers
+    vec2 product(vec2 a, vec2 b){
+      return vec2(a.x*b.x-a.y*b.y, a.x*b.y+a.y*b.x);
+    }
+    vec2 conjugate(vec2 a){
+      return vec2(a.x, -a.y);
+    }
+    vec2 divide(vec2 a, vec2 b){
+      return vec2(a.x*b.x+a.y*b.y, a.y*b.x-a.x*b.y) / (b.x*b.x+b.y*b.y);
+    }
+
+    vec2 mobius(vec2 z, vec2 gamma, float t){
+      float g2 = gamma.x*gamma.x + gamma.y*gamma.y;
+      float h = sqrt(1.0 - g2);
+      vec2 d2 = pow(h, t) * vec2(cos(t*pi/2.0), sin(t*pi/2.0));
+      vec2 d1 = conjugate(d2);
+      vec2 a = vec2(d1.x, -d1.y/h);
+      vec2 b = d2.y * gamma / h;
+      vec2 c = conjugate(b);
+      vec2 d = conjugate(a);
+      return divide(product(a, z) + b, product(c, z) + d);
+    }
+
+    float random(vec2 _st){
+      return fract(sin(dot(_st, vec2(12.9898,78.233))) * 43758.5453123);
+    }
+
+    float noise(vec2 _st){
+      vec2 i = floor(_st);
+      vec2 f = fract(_st);
+      float a = random(i);
+      float b = random(i + vec2(1.0, 0.0));
+      float c = random(i + vec2(0.0, 1.0));
+      float d = random(i + vec2(1.0, 1.0));
+      vec2 u = f * f * (3.0 - 2.0 * f);
+      return mix(a, b, u.x) + (c - a)*u.y*(1.0 - u.x) + (d - b)*u.x*u.y;
+    }
+
+    float fbm(vec2 _st){
+      float v = 0.0;
+      float a = 0.5;
+      vec2 shift = vec2(100.0);
+      // Rotate to reduce axial bias
+      mat2 rot = mat2(cos(0.5), sin(0.5),
+                      -sin(0.5), cos(0.50));
+      for(int i = 0; i < 5; ++i){
+        v += a * noise(_st);
+        _st = rot * _st * 2.0 + shift;
+        a *= 0.5;
+      }
+      return v;
+    }
+    
+    void main(void){
+      float t = 1.0 + (anim ? sin(iGlobalTime) : sin(time));
+      vec2 st0 = vec2(
+        (xmax - xmin) * gl_FragCoord.x/iResolution.x + xmin, 
+        (ymax - ymin) * gl_FragCoord.y/iResolution.y + ymin
+      );
+      //vec2 st = mobius(st0, vec2(0.8,0.2), t);
+      float l = length(st0);
+      vec2 st = vec2(
+        cos(l*t)*st0.x + sin(l*t)*st0.y,
+        -sin(l*t)*st0.x + cos(l*t)*st0.y
+      );
+
+      vec3 color;
+
+      vec2 q = vec2(fbm(st), fbm(st + vec2(1.0)));
+
+      vec2 r = vec2(
+        fbm(st + 1.0*q + vec2(1.7,9.2)+ 0.55*iGlobalTime),
+        fbm(st + 1.0*q + vec2(8.3,2.8)+ 0.526*iGlobalTime)
+      );
+
+      float f = fbm(st+r);
+
+      color = mix(vec3(0.101961,0.619608,0.666667),
+                  vec3(0.666667,0.666667,0.498039),
+                  clamp((f*f)*4.0,0.0,1.0));
+
+      color = mix(color,
+                  vec3(0,0,0.164706),
+                  clamp(length(q),0.0,1.0));
+
+      color = mix(color,
+                  vec3(0.666667,1,1),
+                  clamp(length(r.x),0.0,1.0));
+
+      gl_FragColor = vec4((f*f*f+0.6*f*f+0.5*f)*color,1.0);
+    }
+  </script>
+
+  <script>
+
+    let xmin = -3, xmax = 3, ymin = -3, ymax = 3; // 0 -- 3
+
+    var app = new PIXI.Application({ width: window.innerWidth, height: window.innerHeight, antialiasing: false });
+    app.resizeTo = window;
+
+    let fragmentShader = document.getElementById('fragmentShader').textContent;
+    let filter = new PIXI.Filter(null, fragmentShader);
+    filter.uniforms.iResolution = {x: app.screen.width, y: app.screen.height};
+    filter.uniforms.xmin = xmin;
+    filter.uniforms.xmax = xmax;
+    filter.uniforms.ymin = ymin;
+    filter.uniforms.ymax = ymax;
+    filter.uniforms.iGlobalTime = 0;
+    filter.uniforms.anim = false;
+    filter.uniforms.time = -Math.PI/2;
+
+    document.onclick = function(evt){
+      filter.uniforms.anim = !filter.uniforms.anim;
+      filter.uniforms.time = filter.uniforms.iGlobalTime;
+    };
+
+    let zoom0 = 1.001;
+    let hamster = Hamster(document.body);
+    hamster.wheel(function(event, delta, deltaX, deltaY){
+      let ex = event.originalEvent.clientX;
+      let ey = event.originalEvent.clientY;
+      let zoom = Math.pow(zoom0, deltaY);
+      let sx = (filter.uniforms.xmax - filter.uniforms.xmin) / filter.uniforms.iResolution.x;
+      let sy = (filter.uniforms.ymax - filter.uniforms.ymin) / filter.uniforms.iResolution.y;
+      let dx = ex - filter.uniforms.iResolution.x / 2;
+      let dy = filter.uniforms.iResolution.y / 2 - ey;
+      sx /= zoom;
+      sy /= zoom;
+      let midx = (filter.uniforms.xmin + filter.uniforms.xmax) / 2 + (zoom - 1) * dx * sx;
+      let midy = (filter.uniforms.ymin + filter.uniforms.ymax) / 2 + (zoom - 1) * dy * sy;
+      let rangex = (filter.uniforms.xmax - filter.uniforms.xmin) / zoom;
+      let rangey = (filter.uniforms.ymax - filter.uniforms.ymin) / zoom;
+      filter.uniforms.xmax = (rangex + 2 * midx) / 2;
+      filter.uniforms.ymax = (rangey + 2 * midy) / 2;
+      filter.uniforms.xmin = filter.uniforms.xmax - rangex;
+      filter.uniforms.ymin = filter.uniforms.ymax - rangey;
+    });
+
+    let container = new PIXI.Container();
+    container.filterArea = app.screen;
+    container.filters = [filter];
+    app.stage.addChild(container);
+    
+    document.getElementById('container').appendChild(app.view);
+
+    function onresize(event){
+      if(app.resize)
+        app.resize();
+      container.filterArea = app.screen;
+      filter.uniforms.iResolution = {x: app.screen.width, y: app.screen.height};
+    }
+    window.addEventListener('resize', onresize, false);
+
+    let startTime = Date.now();
+    app.ticker.add(function(delta){
+      var currentTime = Date.now();
+      filter.uniforms.iGlobalTime = (currentTime - startTime) * 0.00025;
+    });
+
+  </script>
+</body>
+
+</html>

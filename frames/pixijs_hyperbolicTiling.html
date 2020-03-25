@@ -1,0 +1,192 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <script src="../libraries/hamster.min.js"></script>
+  <title>Hyperbolic tiling</title>
+  <style>
+    html, body { 
+      margin: 0; 
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<script src="../libraries/pixi.min.js"></script>
+
+<body>
+
+  <script type="text/javascript">
+    let type = "WebGL";
+    if(!PIXI.utils.isWebGLSupported()){
+      type = "canvas";
+    }
+    PIXI.utils.sayHello(type);
+  </script>
+
+  <div id="container"></div>
+
+  <script id="fragmentShader" type="x-shader/x-fragment">
+    uniform vec2 iResolution;
+    uniform float xmin;
+    uniform float xmax;
+    uniform float ymin;
+    uniform float ymax;
+    uniform float iGlobalTime;
+    uniform bool anim;
+    uniform float time;
+
+    float pi = 3.1415926535897932384626433832795;
+
+    // complex numbers
+    vec2 product(vec2 a, vec2 b){
+      return vec2(a.x*b.x-a.y*b.y, a.x*b.y+a.y*b.x);
+    }
+    vec2 conjugate(vec2 a){
+      return vec2(a.x, -a.y);
+    }
+    vec2 divide(vec2 a, vec2 b){
+      return vec2(a.x*b.x+a.y*b.y, a.y*b.x-a.x*b.y) / (b.x*b.x+b.y*b.y);
+    }
+
+    vec2 mobius(vec2 z, vec2 gamma, float t){
+      float g2 = gamma.x*gamma.x + gamma.y*gamma.y;
+      float h = sqrt(1.0 - g2);
+      vec2 d2 = pow(h, t) * vec2(cos(t*pi/2.0), sin(t*pi/2.0));
+      vec2 d1 = conjugate(d2);
+      vec2 a = vec2(d1.x, -d1.y/h);
+      vec2 b = d2.y * gamma / h;
+      vec2 c = conjugate(b);
+      vec2 d = conjugate(a);
+      return divide(product(a, z) + b, product(c, z) + d);
+    }
+
+    const float sqrt3 = sqrt(3.0);
+    const vec2 c1 = vec2(2.0, 0.0);
+    const vec2 c2 = vec2(-1.0, sqrt3);
+    const vec2 c3 = vec2(-1.0, -sqrt3);
+    const float R2 = 3.0;
+
+    float squaredLength(vec2 v){
+      return v.x*v.x + v.y*v.y;
+    }
+
+    vec2 iota(vec2 pole, float k, vec2 M){
+      vec2 pole_M = M - pole;
+      return pole + k/squaredLength(pole_M) * pole_M;
+    }
+
+    bool contains(vec2 c, float r2, vec2 M){
+      return squaredLength(M-c) < r2;
+    }
+
+    vec3 g(vec2 M){
+      if(squaredLength(M) > 2.25){
+        return vec3(0,0,0);
+      }
+      int itr = 0;
+      for(int i=0; i < 100; i++){
+        if(contains(c1, R2, M)){
+          M = iota(c1, R2, M);
+          itr += 1;
+        }else if(contains(c2, R2, M)){
+          M = iota(c2, R2, M);
+          itr += 1;
+        }else if(contains(c3, R2, M)){
+          M = iota(c3, R2, M);
+          itr += 1;
+        }else{
+          break;
+        }
+      }
+      bool even = mod(float(itr),2.0) == 0.0;
+      if(squaredLength(M) < 1.0){
+        return even ? vec3(0.0,1.0,1.0) : vec3(0.098,0.098,0.439);
+      }else{
+        return even ? vec3(1.0,1.0,0.0) : vec3(1.0,0.647,0.0);
+      }
+    }
+
+    void main(void){
+      float t = 1.0 + (anim ? sin(iGlobalTime) : sin(time));
+      vec2 z0 = vec2(
+        (xmax - xmin) * gl_FragCoord.x/iResolution.x + xmin, 
+        (ymax - ymin) * gl_FragCoord.y/iResolution.y + ymin
+      );
+      vec2 z = mobius(z0, vec2(0.1,0.2), t);
+      gl_FragColor = vec4(g(z), 1.0);
+    }
+  </script>
+
+  <script>
+
+    let xmin = -1.25, xmax = 1.25, ymin = -1.25, ymax = 1.25;
+
+    var app = new PIXI.Application({ width: window.innerWidth, height: window.innerHeight, antialiasing: false });
+    app.resizeTo = window;
+
+    let fragmentShader = document.getElementById('fragmentShader').textContent;
+    let filter = new PIXI.Filter(null, fragmentShader);
+    filter.uniforms.iResolution = {x: app.screen.width, y: app.screen.height};
+    filter.uniforms.xmin = xmin;
+    filter.uniforms.xmax = xmax;
+    filter.uniforms.ymin = ymin;
+    filter.uniforms.ymax = ymax;
+    filter.uniforms.iGlobalTime = 0;
+    filter.uniforms.anim = false;
+    filter.uniforms.time = 0;
+
+    document.onclick = function(evt){
+      filter.uniforms.anim = !filter.uniforms.anim;
+      filter.uniforms.time = filter.uniforms.iGlobalTime;
+    };
+
+    let zoom0 = 1.001;
+    let hamster = Hamster(document.body);
+    hamster.wheel(function(event, delta, deltaX, deltaY){
+      let ex = event.originalEvent.clientX;
+      let ey = event.originalEvent.clientY;
+      let zoom = Math.pow(zoom0, deltaY);
+      let sx = (filter.uniforms.xmax - filter.uniforms.xmin) / filter.uniforms.iResolution.x;
+      let sy = (filter.uniforms.ymax - filter.uniforms.ymin) / filter.uniforms.iResolution.y;
+      let dx = ex - filter.uniforms.iResolution.x / 2;
+      let dy = filter.uniforms.iResolution.y / 2 - ey;
+      sx /= zoom;
+      sy /= zoom;
+      let midx = (filter.uniforms.xmin + filter.uniforms.xmax) / 2 + (zoom - 1) * dx * sx;
+      let midy = (filter.uniforms.ymin + filter.uniforms.ymax) / 2 + (zoom - 1) * dy * sy;
+      let rangex = (filter.uniforms.xmax - filter.uniforms.xmin) / zoom;
+      let rangey = (filter.uniforms.ymax - filter.uniforms.ymin) / zoom;
+      filter.uniforms.xmax = (rangex + 2 * midx) / 2;
+      filter.uniforms.ymax = (rangey + 2 * midy) / 2;
+      filter.uniforms.xmin = filter.uniforms.xmax - rangex;
+      filter.uniforms.ymin = filter.uniforms.ymax - rangey;
+    });
+
+    let container = new PIXI.Container();
+    container.filterArea = app.screen;
+    container.filters = [filter];
+    app.stage.addChild(container);
+    
+    document.getElementById('container').appendChild(app.view);
+
+    function onresize(event){
+      if(app.resize)
+        app.resize();
+      container.filterArea = app.screen;
+      filter.uniforms.iResolution = {x: app.screen.width, y: app.screen.height};
+    }
+    window.addEventListener('resize', onresize, false);
+
+    let startTime = Date.now();
+    app.ticker.add(function(delta){
+      var currentTime = Date.now();
+      filter.uniforms.iGlobalTime = (currentTime - startTime) * 0.00025;
+    });
+
+  </script>
+</body>
+
+</html>
