@@ -4,6 +4,7 @@
 <head>
   <meta charset="utf-8">
   <script src="../libraries/hamster.min.js"></script>
+  <script src="../libraries/math.min.js"></script>
   <title>Hyperbolic tiling</title>
   <style>
     html, body { 
@@ -29,6 +30,11 @@
   <div id="container"></div>
 
   <script id="fragmentShader" type="x-shader/x-fragment">
+    struct torusTransfo{
+      mat4 transfo;
+      float radius;
+    };
+
     uniform vec2 iResolution;
     uniform float xmin;
     uniform float xmax;
@@ -37,80 +43,19 @@
     uniform float iGlobalTime;
     uniform bool anim;
     uniform float time;
+    uniform mat4 M1;
+    uniform float R1;
+    uniform mat4 M2;
+    uniform float R2;
+    uniform mat4 M3;
+    uniform float R3;
+    uniform mat4 M4;
+    uniform float R4;
 
-    struct torusTransfo{
-      mat4 transfo;
-      float radius;
-    };
-
-    mat3 inverse(mat3 m) {
-      float a00 = m[0][0], a01 = m[0][1], a02 = m[0][2];
-      float a10 = m[1][0], a11 = m[1][1], a12 = m[1][2];
-      float a20 = m[2][0], a21 = m[2][1], a22 = m[2][2];
-
-      float b01 = a22 * a11 - a12 * a21;
-      float b11 = -a22 * a10 + a12 * a20;
-      float b21 = a21 * a10 - a11 * a20;
-
-      float det = a00 * b01 + a01 * b11 + a02 * b21;
-
-      return mat3(b01, (-a22 * a01 + a02 * a21), (a12 * a01 - a02 * a11),
-                  b11, (a22 * a00 - a02 * a20), (-a12 * a00 + a02 * a10),
-                  b21, (-a21 * a00 + a01 * a20), (a11 * a00 - a01 * a10)) / det;
-    }
-
-    mat4 inverse(mat4 m) {
-      float
-        a00 = m[0][0], a01 = m[0][1], a02 = m[0][2], a03 = m[0][3],
-        a10 = m[1][0], a11 = m[1][1], a12 = m[1][2], a13 = m[1][3],
-        a20 = m[2][0], a21 = m[2][1], a22 = m[2][2], a23 = m[2][3],
-        a30 = m[3][0], a31 = m[3][1], a32 = m[3][2], a33 = m[3][3],
-
-        b00 = a00 * a11 - a01 * a10,
-        b01 = a00 * a12 - a02 * a10,
-        b02 = a00 * a13 - a03 * a10,
-        b03 = a01 * a12 - a02 * a11,
-        b04 = a01 * a13 - a03 * a11,
-        b05 = a02 * a13 - a03 * a12,
-        b06 = a20 * a31 - a21 * a30,
-        b07 = a20 * a32 - a22 * a30,
-        b08 = a20 * a33 - a23 * a30,
-        b09 = a21 * a32 - a22 * a31,
-        b10 = a21 * a33 - a23 * a31,
-        b11 = a22 * a33 - a23 * a32,
-
-        det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
-
-      return mat4(
-        a11 * b11 - a12 * b10 + a13 * b09,
-        a02 * b10 - a01 * b11 - a03 * b09,
-        a31 * b05 - a32 * b04 + a33 * b03,
-        a22 * b04 - a21 * b05 - a23 * b03,
-        a12 * b08 - a10 * b11 - a13 * b07,
-        a00 * b11 - a02 * b08 + a03 * b07,
-        a32 * b02 - a30 * b05 - a33 * b01,
-        a20 * b05 - a22 * b02 + a23 * b01,
-        a10 * b10 - a11 * b08 + a13 * b06,
-        a01 * b08 - a00 * b10 - a03 * b06,
-        a30 * b04 - a31 * b02 + a33 * b00,
-        a21 * b02 - a20 * b04 - a23 * b00,
-        a11 * b07 - a10 * b09 - a12 * b06,
-        a00 * b09 - a01 * b07 + a02 * b06,
-        a31 * b01 - a30 * b03 - a32 * b00,
-        a20 * b03 - a21 * b01 + a22 * b00) / det;
-    }
-
-    mat3 transpose(mat3 m) {
-      return mat3(m[0][0], m[1][0], m[2][0],
-                  m[0][1], m[1][1], m[2][1],
-                  m[0][2], m[1][2], m[2][2]);
-    }
-
-    mat4 inverseTransfoMatrix(mat4 M){
-      mat3 B = transpose(mat3(M)); // this is the inverse of the upper left block
-      vec3 v = B * M[3].xyz;
-      return mat4(vec4(B[0],0.0),vec4(B[1],0.0),vec4(B[2],0.0), vec4(-v, 1.0));
-    }
+    torusTransfo tr1 = torusTransfo(M1, R1);
+    torusTransfo tr2 = torusTransfo(M2, R2);
+    torusTransfo tr3 = torusTransfo(M3, R3);
+    torusTransfo tr4 = torusTransfo(M4, R4);
  
     mat3 Rx(float phi){
       return mat3(1.0, 0.0, 0.0, 0.0, cos(phi), -sin(phi), 0.0, sin(phi), cos(phi));
@@ -128,50 +73,14 @@
       return Rx(ax) * (Ry(ay) * (Rz(az) * pt));
     }
 
-    torusTransfo T(vec3 p1, vec3 p2, vec3 p3){
-      vec3 p12 = (p1+p2)/2.0, p23 = (p2+p3)/2.0;
-      vec3 coeffs = vec3(
-        (p1.y-p2.y)*(p2.z-p3.z)-(p1.z-p2.z)*(p2.y-p3.y),
-        (p1.z-p2.z)*(p2.x-p3.x)-(p1.x-p2.x)*(p2.z-p3.z),
-        (p1.x-p2.x)*(p2.y-p3.y)-(p1.y-p2.y)*(p2.x-p3.x)
-      );
-      float offset1 = dot(p1, coeffs);
-      vec3 v12 = p2-p1, v23 = p3-p2;
-      float offset21 = dot(p12,v12), offset22 = dot(p23,v23);
-      mat3 A = transpose(mat3(coeffs, v12, v23));
-      // center of circle passing by p1,p2,p3
-      vec3 center = inverse(A) * vec3(offset1,offset21,offset22);
-      // radius
-      float radius = length(p1-center);
-      //
-      if(coeffs.x==0.0 && coeffs.y==0.0){
-        mat4 t = mat4(vec4(1.0,0.0,0.0,0.0),vec4(0.0,1.0,0.0,0.0),vec4(0.0,0.0,1.0,0.0),vec4(-center,1.0));
-        return torusTransfo(t, radius);
-      }
-      //
-      vec3 n = normalize(coeffs);
-      float s = sqrt(n.x*n.x+n.y*n.y);
-      vec3 u = vec3(n.y/s, -n.x/s, 0.0);
-      vec3 v = cross(n,u);
-      mat4 t = mat4(vec4(u,0.0), vec4(v,0.0), vec4(n,0.0), vec4(center,1.0));
-      return torusTransfo(inverseTransfoMatrix(t), radius);
-    }
 
-    // define a tetrahedron
-    const float phi = (1.0+sqrt(5.0))/2.0;
-    const float a = 1.0/sqrt(3.0);
-    const float b = a/phi;
-    const float c = a*phi;
-    const vec3 A = vec3(a,  a, -a);
-    const vec3 B = vec3(-c,  0.0, -b);
-    const vec3 C = vec3(b, -c,  0.0);
-    const vec3 D = vec3(0.0,  b,  c);
     const float r = 0.1;
-
+    const float dblpi = 6.283;
+    
     // signed distance
-    float f(vec3 pt, torusTransfo tr1, torusTransfo tr2, torusTransfo tr3, torusTransfo tr4){
+    float f(vec3 pt){
       float R1 = tr1.radius, R2 = tr2.radius, R3 = tr3.radius, R4 = tr4.radius;
-      pt = rotate(pt, iGlobalTime, iGlobalTime, 0.0);
+      pt = rotate(pt, mod(iGlobalTime, dblpi), mod(iGlobalTime, dblpi), 0.0);
       vec3 pt1 = (tr1.transfo * vec4(pt, 1.0)).xyz;
       float d1 = length(vec2(length(pt1.xy) - R1, pt1.z)) - r;
       vec3 pt2 = (tr2.transfo * vec4(pt, 1.0)).xyz;
@@ -185,17 +94,13 @@
 
     // ro is the ray origin, rd is the ray direction
     float getT( vec3 ro, vec3 rd ) {
-      torusTransfo tr1 = T(A, B, C);
-      torusTransfo tr2 = T(A, B, D);
-      torusTransfo tr3 = T(A, C, D);
-      torusTransfo tr4 = T(B, C, D);
       float t = 0.0; 
       float d;
       vec3 r;
       for(int i = 0; i < 100; i++){
         r = ro + t*rd;
-        d = f(r, tr1, tr2, tr3, tr4);
-        if(d < 0.001){
+        d = f(r);
+        if(d < 0.0001){
           return t;
         }
         t += d;
@@ -204,19 +109,15 @@
     }
 
     vec3 normal(vec3 r, float eps){
-      torusTransfo tr1 = T(A, B, C);
-      torusTransfo tr2 = T(A, B, D);
-      torusTransfo tr3 = T(A, C, D);
-      torusTransfo tr4 = T(B, C, D);
       float outx = 
-        f(vec3(r.x+eps,r.y,r.z), tr1, tr2, tr3, tr4) - 
-        f(vec3(r.x-eps,r.y,r.z), tr1, tr2, tr3, tr4);
+        f(vec3(r.x+eps,r.y,r.z)) - 
+        f(vec3(r.x-eps,r.y,r.z));
       float outy = 
-        f(vec3(r.x,r.y+eps,r.z), tr1, tr2, tr3, tr4) - 
-        f(vec3(r.x,r.y-eps,r.z), tr1, tr2, tr3, tr4);
+        f(vec3(r.x,r.y+eps,r.z)) - 
+        f(vec3(r.x,r.y-eps,r.z));
       float outz = 
-        f(vec3(r.x,r.y,r.z+eps), tr1, tr2, tr3, tr4) - 
-        f(vec3(r.x,r.y,r.z-eps), tr1, tr2, tr3, tr4);
+        f(vec3(r.x,r.y,r.z+eps)) - 
+        f(vec3(r.x,r.y,r.z-eps));
       return normalize(vec3(outx, outy, outz));
     }
 
@@ -259,7 +160,73 @@
   </script>
 
   <script>
+    // transformation matrix
 
+    function inverseTransfoMatrix(M){
+      var B = math.transpose(math.subset(M, math.index([0, 1, 2], [0, 1, 2])));
+      var v = math.multiply(B, math.subset(M, math.index([0,1,2],3)));
+      return math.concat(math.concat(B,math.multiply(v,-1)), math.matrix([[0.0, 0.0, 0.0, 1.0]]), 0);
+    }
+
+    function T(p1, p2, p3){
+      var p12 = math.divide(math.add(p1, p2), 2), 
+          p23 = math.divide(math.add(p2, p3), 2);
+      var coeffs = math.matrix(
+        [
+          (p1[1] - p2[1]) * (p2[2] - p3[2]) - (p1[2] - p2[2]) * (p2[1] - p3[1]),
+          (p1[2] - p2[2]) * (p2[0] - p3[0]) - (p1[0] - p2[0]) * (p2[2] - p3[2]),
+          (p1[0] - p2[0]) * (p2[1] - p3[1]) - (p1[1] - p2[1]) * (p2[0] - p3[0])
+        ]
+      );
+      var offset1 = math.dot(p1, coeffs);
+      var v12 = math.subtract(p2, p1), v23 = math.subtract(p3, p2);
+      var offset21 = math.dot(p12, v12), offset22 = math.dot(p23, v23);
+      var A = math.matrix([coeffs, v12, v23]);
+      // center of circle passing by p1,p2,p3
+      var center = math.transpose(math.multiply(math.inv(A), math.transpose(math.matrix([offset1, offset21, offset22]))));
+      // radius
+      var radius = math.norm(math.subtract(p1, center));
+      //
+      if (coeffs._data[0] == 0.0 && coeffs._data[1] == 0.0) {
+        var t = math.matrix([
+          [1.0, 0.0, 0.0, -center[0]], 
+          [0.0, 1.0, 0.0, -center[1]], 
+          [0.0, 0.0, 1.0, -center[2]], 
+          [0.0, 0.0, 0.0, 1.0]
+        ]);
+        return {transfo: t, radius: radius};
+      }
+      //
+      var n = math.divide(coeffs, math.norm(coeffs))._data;
+      var s = Math.sqrt(n[0] * n[0] + n[1] * n[1]);
+      var u = math.matrix([n[1] / s, -n[0] / s, 0.0]);
+      var v = math.cross(n, u);
+      var t = math.concat(math.matrix([u, v, n, center]), math.matrix([[0.0],[0.0],[0.0],[1.0]]));
+      return {transfo: inverseTransfoMatrix(math.transpose(t)), radius: radius}; 
+    }
+
+    function transfo2uniform(tr){
+      return math.flatten(math.transpose(tr.transfo))._data;
+    }
+
+//    var m = math.matrix([[1,2,3], [4,5,6], [7,8,9]]);
+//    console.log(math.subset(m, math.index([0,1,2],[0,1])));
+
+    const phi = (1.0 + Math.sqrt(5.0)) / 2.0;
+    const a = 1.0 / Math.sqrt(3.0);
+    const b = a / phi;
+    const c = a * phi;
+    const A = [a, a, -a];
+    const B = [-c, 0.0, -b];
+    const C = [b, -c, 0.0];
+    const D = [0.0, b, c]; 
+
+    let tr1 = T(A,B,C); 
+    let tr2 = T(A, B, D);
+    let tr3 = T(A, C, D);
+    let tr4 = T(B,C,D);
+
+    // PIXI --------------------------------------------------------------------
     let xmin = -1.2, xmax = 1.2, ymin = -1.2, ymax = 1.2; 
 
     var app = new PIXI.Application({ width: window.innerWidth, height: window.innerHeight, antialiasing: false });
@@ -275,6 +242,14 @@
     filter.uniforms.iGlobalTime = 0;
     filter.uniforms.anim = false;
     filter.uniforms.time = -Math.PI/2;
+    filter.uniforms.M1 = transfo2uniform(tr1);
+    filter.uniforms.R1 = tr1.radius;
+    filter.uniforms.M2 = transfo2uniform(tr2);
+    filter.uniforms.R2 = tr2.radius;
+    filter.uniforms.M3 = transfo2uniform(tr3);
+    filter.uniforms.R3 = tr3.radius;
+    filter.uniforms.M4 = transfo2uniform(tr4);
+    filter.uniforms.R4 = tr4.radius;
 
     document.onclick = function(evt){
       filter.uniforms.anim = !filter.uniforms.anim;
