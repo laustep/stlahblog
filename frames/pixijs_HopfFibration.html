@@ -1,0 +1,425 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <script src="../libraries/hamster.min.js"></script>
+  <script src="../libraries/math.min.js"></script>
+  <title>Hopf fibration</title>
+  <style>
+    html, body { 
+      margin: 0; 
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<script src="../libraries/pixi.min.js"></script>
+
+<body>
+
+  <script type="text/javascript">
+    let type = "WebGL";
+    if(!PIXI.utils.isWebGLSupported()){
+      type = "canvas";
+    }
+    PIXI.utils.sayHello(type);
+  </script>
+
+  <div id="container"></div>
+
+  <script id="fragmentShader" type="x-shader/x-fragment">
+    uniform vec2 iResolution;
+    uniform float xmin;
+    uniform float xmax;
+    uniform float ymin;
+    uniform float ymax;
+    uniform float iGlobalTime;
+    uniform bool anim;
+    uniform float time;
+    uniform mat4 Ms1[15];
+    uniform mat3 MMs1[15];
+    uniform float Rs1[15];
+    uniform mat4 Ms2[15];
+    uniform mat3 MMs2[15];
+    uniform float Rs2[15];
+    uniform mat4 Ms3[15];
+    uniform mat3 MMs3[15];
+    uniform float Rs3[15];
+ 
+    mat3 Rx(float phi){
+      return mat3(1.0, 0.0, 0.0, 0.0, cos(phi), -sin(phi), 0.0, sin(phi), cos(phi));
+    }
+    mat3 Ry(float phi){
+      return mat3(cos(phi), 0.0, sin(phi), 0.0, 1.0, 0.0, -sin(phi), 0.0, cos(phi));
+    }
+    mat3 Rz(float phi){
+      return mat3(cos(phi), -sin(phi), 0.0, sin(phi), cos(phi), 0.0, 0.0, 0.0, 1.0);
+    }
+    vec3 rotate(vec3 pt, float ax, float ay, float az){
+      return Rx(ax) * (Ry(ay) * (Rz(az) * pt));
+    }
+    vec3 invrotate(vec3 pt, float ax, float ay, float az){
+      return Rz(-az) * (Ry(-ay) * (Rx(-ax) * pt));
+    }
+
+    float iTorus(vec3 ro, vec3 rd, float Ra, float ra){
+
+      float po = 1.0;
+      
+      float Ra2 = Ra*Ra;
+      float ra2 = ra*ra;
+    
+      float m = dot(ro,ro);
+      float n = dot(ro,rd);
+    
+      float k = (m - ra2 - Ra2)/2.0;
+      float k3 = n;
+      float k2 = n*n + Ra2*rd.z*rd.z + k;
+      float k1 = k*n + Ra2*ro.z*rd.z;
+      float k0 = k*k + Ra2*ro.z*ro.z - Ra2*ra2;
+    
+      // prevent |c1| from being too close to zero
+      if(abs(k3*(k3*k3 - k2) + k1) < 0.00005*Ra/8.0){
+          po = -1.0;
+          float tmp=k1; k1=k3; k3=tmp;
+          k0 = 1.0/k0;
+          k1 = k1*k0;
+          k2 = k2*k0;
+          k3 = k3*k0;
+      }
+ 
+      float c2 = 2.0*k2 - 3.0*k3*k3;
+      float c1 = k3*(k3*k3 - k2) + k1;
+      float c0 = k3*(k3*(-3.0*k3*k3 + 4.0*k2) - 8.0*k1) + 4.0*k0;
+      
+      c2 /= 3.0;
+      c1 *= 2.0;
+      c0 /= 3.0;
+      
+      float Q = c2*c2 + c0;
+      float R = 3.0*c0*c2 - c2*c2*c2 - c1*c1;
+    
+      float h = R*R - Q*Q*Q;
+      float z = 0.0;
+      if(h < 0.0){
+        // 4 intersections
+          float sQ = sqrt(Q);
+          z = 2.0*sQ*cos( acos(R/(sQ*Q)) / 3.0 );
+      }else{
+          // 2 intersections
+          float sQ = pow( sqrt(h) + abs(R), 1.0/3.0 );
+          z = sign(R)*abs( sQ + Q/sQ );
+      }		
+      z = c2 - z;
+    
+      float d1 = z   - 3.0*c2;
+      float d2 = z*z - 3.0*c0;
+      if(abs(d1) < 1.0e-3*Ra/4.0){
+          if( d2 < 0.0 ) return -1.0;
+          d2 = sqrt(d2);
+      }else{
+          if( d1 < 0.0 ) return -1.0;
+          d1 = sqrt( d1/2.0 );
+          d2 = c1/d1;
+      }
+
+      //----------------------------------
+    
+      float result = 1e20;
+
+      h = d1*d1 - z + d2;
+      if(h > 0.0){
+          h = sqrt(h);
+          float t1 = -d1 - h - k3; t1 = (po<0.0)?2.0/t1:t1;
+          float t2 = -d1 + h - k3; t2 = (po<0.0)?2.0/t2:t2;
+          if( t1 > 0.0 ) result = t1; 
+          if( t2 > 0.0 ) result = min(result,t2);
+      }
+
+      h = d1*d1 - z - d2;
+      if(h > 0.0){
+          h = sqrt(h);
+          float t1 = d1 - h - k3;  t1 = (po<0.0)?2.0/t1:t1;
+          float t2 = d1 + h - k3;  t2 = (po<0.0)?2.0/t2:t2;
+          if( t1 > 0.0 ) result = min(result,t1);
+          if( t2 > 0.0 ) result = min(result,t2);
+      }
+
+      return result;
+    }
+
+    // df(x)/dx
+    vec3 nTorus(vec3 pos, float Ra, float ra){
+      return normalize(pos*(dot(pos,pos)- ra*ra - Ra*Ra*vec3(1.0,1.0,-1.0)));
+    }
+
+
+    const float r = 0.45; // minor radius of tori
+    
+    // ro is the ray origin, rd is the ray direction
+    float getT(vec3 ro, vec3 rd, out vec3 nrml, out int j){
+      float t = 1.0e20; 
+      vec3 Mro; vec3 Mrd;
+      float ti;
+      nrml = vec3(0.0);
+      float az = anim ? iGlobalTime : time;
+      vec4 ro4 = vec4(rotate(ro, -az, az, az), 1.0);
+      vec3 rd3 = rotate(rd, -az, az, az);
+      j = 1;
+      for(int i = 0; i < 15; i++){
+        Mro = (Ms3[i] * ro4).xyz;
+        Mrd = mat3(Ms3[i]) * rd3;
+        ti = iTorus(Mro, Mrd, Rs3[i], r);
+        if(ti > 0.0){
+          nrml = ti < t ? invrotate(MMs3[i]*nTorus(Mro+ti*Mrd, Rs3[i], r), -az, az, az) : nrml;
+          t = min(t, ti);
+        }
+      }
+      float t1 = t;
+      for(int i = 0; i < 15; i++){
+        Mro = (Ms2[i] * ro4).xyz;
+        Mrd = mat3(Ms2[i]) * rd3;
+        ti = iTorus(Mro, Mrd, Rs2[i], r);
+        if(ti > 0.0){
+          nrml = ti < t ? invrotate(MMs2[i]*nTorus(Mro+ti*Mrd, Rs2[i], r), -az, az, az) : nrml;
+          t = min(t, ti);
+        }
+      }
+      float t2 = t;
+      j = t2 < t1 ? 2 : 1;
+      for(int i = 0; i < 15; i++){
+        Mro = (Ms1[i] * ro4).xyz;
+        Mrd = mat3(Ms1[i]) * rd3;
+        ti = iTorus(Mro, Mrd, Rs1[i], r);
+        if(ti > 0.0){
+          nrml = ti < t ? invrotate(MMs1[i]*nTorus(Mro+ti*Mrd, Rs1[i], r), -az, az, az) : nrml;
+          t = min(t, ti);
+        }
+      }
+      j = t < min(t1,t2) ? 3 : j;
+      return t;
+    }
+
+    
+    void main(void){
+      float aspectRatio = iResolution.x/iResolution.y;
+      vec2 uv = vec2(
+        ((xmax - xmin) * gl_FragCoord.x/iResolution.x + xmin) * aspectRatio, 
+        (ymax - ymin) * gl_FragCoord.y/iResolution.y + ymin
+      );
+
+      // Cast a ray out from the eye position into the scene
+      vec3 ro = vec3(uv, 20); 
+      vec3 rd = normalize(vec3(uv, -15));
+
+      // Default color if we don't intersect with anything
+      vec3 rayColor = vec3(0.1, 0.1, 0.1);
+      // Direction the lighting is coming from
+      vec3 lightDir = normalize(vec3(0.0, 0.0, 1.0));
+      // Ambient light color
+      vec3 ambient = vec3(0.05, 0.1, 0.1);
+      // See if the ray intesects with any objects.
+      vec3 nrml; int j;
+      float t = getT(ro, rd, nrml, j);
+      nrml = normalize(nrml);
+      if(!(t == 1.0e20)){
+        vec3 objColor = j == 1 ? vec3(0.5, 0.0, 0.0) : j == 2 ? vec3(0.0, 0.5, 0.0) : vec3(0.0, 0.0, 0.5);
+        vec3 toEye = -rd;
+        vec3 r_m = normalize(-reflect(lightDir, nrml));
+        float specular = 0.32 * pow(max(dot(r_m, toEye), 0.0), 8.0);
+        float diffuse = max(dot(nrml, lightDir), 0.0); // diffuse factor
+        rayColor = objColor * (diffuse + ambient) + specular;
+      }
+      gl_FragColor = vec4(rayColor, 1.0);
+    }
+  </script>
+
+  <script>
+    // transformation matrix for torus passing by three points -----------------
+
+    function inverseTransfoMatrix(M){ // inverse 4x4 transformation matrix
+      var B = math.transpose(math.subset(M, math.index([0, 1, 2], [0, 1, 2])));
+      var v = math.multiply(B, math.subset(M, math.index([0, 1, 2], 3)));
+      return math.concat(math.concat(B,math.multiply(v,-1)), math.matrix([[0.0, 0.0, 0.0, 1.0]]), 0);
+    }
+
+    function T(p1, p2, p3){ // returns transformation matrix and radius
+      var p12 = math.divide(math.add(p1, p2), 2), 
+          p23 = math.divide(math.add(p2, p3), 2);
+      var coeffs = math.matrix(
+        [
+          (p1[1] - p2[1]) * (p2[2] - p3[2]) - (p1[2] - p2[2]) * (p2[1] - p3[1]),
+          (p1[2] - p2[2]) * (p2[0] - p3[0]) - (p1[0] - p2[0]) * (p2[2] - p3[2]),
+          (p1[0] - p2[0]) * (p2[1] - p3[1]) - (p1[1] - p2[1]) * (p2[0] - p3[0])
+        ]
+      );
+      var offset1 = math.dot(p1, coeffs);
+      var v12 = math.subtract(p2, p1), v23 = math.subtract(p3, p2);
+      var offset21 = math.dot(p12, v12), offset22 = math.dot(p23, v23);
+      var A = math.matrix([coeffs, v12, v23]);
+      // center of circle passing by p1,p2,p3
+      var center = 
+        math.transpose(math.multiply(math.inv(A), math.transpose(math.matrix([offset1, offset21, offset22]))));
+      center = center._data;
+      center[0] = Math.abs(center[0]) < 1e-14 ? 0 : center[0];
+      center[1] = Math.abs(center[1]) < 1e-14 ? 0 : center[1];
+      center[2] = Math.abs(center[2]) < 1e-14 ? 0 : center[2];
+
+      // radius
+      var radius = math.norm(math.subtract(p1, center));
+      // transformation matrix
+      if (coeffs._data[0] == 0.0 && coeffs._data[1] == 0.0) {
+        console.log("XXXXX");
+        var t = math.matrix([
+          [1.0, 0.0, 0.0, -center._data[0]], 
+          [0.0, 1.0, 0.0, -center._data[1]], 
+          [0.0, 0.0, 1.0, -center._data[2]], 
+          [0.0, 0.0, 0.0, 1.0]
+        ]);
+        return {transfo: t, radius: radius};
+      }
+      //
+      var n = math.divide(coeffs, math.norm(coeffs))._data;
+      var s = Math.sqrt(n[0] * n[0] + n[1] * n[1]);
+      var u = math.matrix([n[1] / s, -n[0] / s, 0.0]);
+      var v = math.cross(n, u);
+      var t = math.concat(math.matrix([u, v, n, center]), math.matrix([[0.0],[0.0],[0.0],[1.0]]));
+      return {
+        transfo: math.transpose(math.subset(t, math.index([0, 1, 2], [0, 1, 2]))), 
+        itransfo: inverseTransfoMatrix(math.transpose(t)), 
+        radius: radius
+      }; 
+    }
+
+    function transfo2uniform(M){ // flatten the matrix to pass it as uniform for the shader
+      return math.flatten(math.transpose(M))._data;
+    }
+
+
+    // Hopf stuff --------------------------------------------------------------
+
+    // Clifford circle parameterization 
+    function clifford(beta, theta0, phi){
+      var den = 1 - 1*Math.sin(beta) * Math.sin(phi);
+      return [
+        2*Math.cos(theta0 + beta) * Math.cos(phi) / den,
+        2*Math.sin(theta0 + beta) * Math.cos(phi) / den,
+        2*Math.cos(beta) * Math.sin(phi) / den
+      ];
+    }
+
+    const ncircles = 15;
+    function circles(phi){ // 0 < phi < pi/2
+      var out = new Array(ncircles);
+      for(let i = 0; i < ncircles; i++){
+        var theta0 = i * 2 * Math.PI / ncircles;
+        var p1 = clifford(0, theta0, phi);
+        var p2 = clifford(2*Math.PI/3, theta0, phi);
+        var p3 = clifford(4 * Math.PI / 3, theta0, phi);
+        out[i] = T(p1, p2, p3);
+      }
+      return out;
+    }
+
+    // make transformations 
+    var Ms1 = [], MMs1 = [], Rs1 = new Array(ncircles);
+    var Ms2 = [], MMs2 = [], Rs2 = new Array(ncircles);
+    var Ms3 = [], MMs3 = [], Rs3 = new Array(ncircles);
+    var circles1 = circles(1.3), circles2 = circles(1.2), circles3 = circles(1.05);
+    for(let i = 0; i < ncircles; i++){
+      Ms1 = Ms1.concat(transfo2uniform(circles1[i].itransfo));
+      MMs1 = MMs1.concat(transfo2uniform(circles1[i].transfo));
+      Rs1[i] = circles1[i].radius;
+      Ms2 = Ms2.concat(transfo2uniform(circles2[i].itransfo));
+      MMs2 = MMs2.concat(transfo2uniform(circles2[i].transfo));
+      Rs2[i] = circles2[i].radius;
+      Ms3 = Ms3.concat(transfo2uniform(circles3[i].itransfo));
+      MMs3 = MMs3.concat(transfo2uniform(circles3[i].transfo));
+      Rs3[i] = circles3[i].radius;
+    }
+
+
+    // PIXI --------------------------------------------------------------------
+    let xmin = -10.4, xmax = 10.4, ymin = -10.4, ymax = 10.4; 
+
+    var app = new PIXI.Application({
+      width: 512, 
+      height: 512, 
+      antialiasing: true
+    });
+//    app.resizeTo = window;
+
+    let fragmentShader = document.getElementById('fragmentShader').textContent;
+    let filter = new PIXI.Filter(null, fragmentShader);
+    filter.uniforms.iResolution = {x: app.screen.width, y: app.screen.height};
+    filter.uniforms.xmin = xmin;
+    filter.uniforms.xmax = xmax;
+    filter.uniforms.ymin = ymin;
+    filter.uniforms.ymax = ymax;
+    filter.uniforms.iGlobalTime = 0;
+    filter.uniforms.anim = true;
+    filter.uniforms.time = 0;
+    filter.uniforms.Ms1 = new Float32Array(Ms1);
+    filter.uniforms.MMs1 = new Float32Array(MMs1);
+    filter.uniforms.Rs1 = new Float32Array(Rs1);
+    filter.uniforms.Ms2 = new Float32Array(Ms2);
+    filter.uniforms.MMs2 = new Float32Array(MMs2);
+    filter.uniforms.Rs2 = new Float32Array(Rs2);
+    filter.uniforms.Ms3 = new Float32Array(Ms3);
+    filter.uniforms.MMs3 = new Float32Array(MMs3);
+    filter.uniforms.Rs3 = new Float32Array(Rs3);
+
+    document.onclick = function(evt){
+      filter.uniforms.anim = !filter.uniforms.anim;
+      filter.uniforms.time = filter.uniforms.iGlobalTime;
+    };
+
+    let zoom0 = 1.001;
+    let hamster = Hamster(document.body);
+    hamster.wheel(function(event, delta, deltaX, deltaY){
+      let ex = event.originalEvent.clientX;
+      let ey = event.originalEvent.clientY;
+      let zoom = Math.pow(zoom0, deltaY);
+      let sx = (filter.uniforms.xmax - filter.uniforms.xmin) / filter.uniforms.iResolution.x;
+      let sy = (filter.uniforms.ymax - filter.uniforms.ymin) / filter.uniforms.iResolution.y;
+      let dx = ex - filter.uniforms.iResolution.x / 2;
+      let dy = filter.uniforms.iResolution.y / 2 - ey;
+      sx /= zoom;
+      sy /= zoom;
+      let midx = (filter.uniforms.xmin + filter.uniforms.xmax) / 2 + (zoom - 1) * dx * sx;
+      let midy = (filter.uniforms.ymin + filter.uniforms.ymax) / 2 + (zoom - 1) * dy * sy;
+      let rangex = (filter.uniforms.xmax - filter.uniforms.xmin) / zoom;
+      let rangey = (filter.uniforms.ymax - filter.uniforms.ymin) / zoom;
+      filter.uniforms.xmax = (rangex + 2 * midx) / 2;
+      filter.uniforms.ymax = (rangey + 2 * midy) / 2;
+      filter.uniforms.xmin = filter.uniforms.xmax - rangex;
+      filter.uniforms.ymin = filter.uniforms.ymax - rangey;
+    });
+
+    let container = new PIXI.Container();
+    container.filterArea = app.screen;
+    container.filters = [filter];
+    app.stage.addChild(container);
+    
+    document.getElementById('container').appendChild(app.view);
+
+    function onresize(event){
+      if(app.resize)
+        app.resize();
+      container.filterArea = app.screen;
+      filter.uniforms.iResolution = {x: app.screen.width, y: app.screen.height};
+    }
+    window.addEventListener('resize', onresize, false);
+
+    let startTime = Date.now();
+    app.ticker.add(function(delta){
+      var currentTime = Date.now();
+      filter.uniforms.iGlobalTime = (currentTime - startTime) * 0.0005;
+    });
+
+  </script>
+</body>
+
+</html>

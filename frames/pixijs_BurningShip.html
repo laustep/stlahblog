@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <script src="../libraries/hamster.min.js"></script>
+  <title>Burning ship</title>
+  <style>
+    html, body { 
+      margin: 0; 
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<script src="../libraries/pixi.min.js"></script>
+
+<body>
+
+  <script type="text/javascript">
+    let type = "WebGL";
+    if (!PIXI.utils.isWebGLSupported()) {
+      type = "canvas";
+    }
+    PIXI.utils.sayHello(type);
+  </script>
+
+  <div id="container"></div>
+
+  <script id="fragmentShader" type="x-shader/x-fragment">
+    uniform vec2 iResolution;
+    uniform bool color;
+    uniform float xmin;
+    uniform float xmax;
+    uniform float ymin;
+    uniform float ymax;
+
+    vec3 inferno(float r, float g, float b){
+      return vec3(
+        38.0*r + 2748.0*pow(r,2.0) - 9193.0*pow(r,3.0) + 15152.0*pow(r,4.0)- 11011.0*pow(r,5.0) + 824.0*pow(r,6.0) + 1690.0*pow(r,7.0), 
+        246.0*g - 2744.0*pow(g,2.0) + 15047.0*pow(g,3.0) - 39169.0*pow(g,4.0) + 53844.0*pow(g,5.0) - 36715.0*pow(g,6.0) + 9746.0*pow(g,7.0),
+        5.0 + 206.0*b + 7444.0*pow(b,2.0) - 53422.0*pow(b,3.0) + 157704.0*pow(b,4.0) - 238709.0*pow(b,5.0) + 179985.0*pow(b,6.0) - 53051.0*pow(b,7.0)
+      ) / 255.0;
+    }
+
+    vec2 cplxproduct(vec2 a, vec2 b){
+      return vec2(a.x*b.x-a.y*b.y, a.x*b.y+a.y*b.x);
+    }
+
+    float BS(float x, float y){
+      vec2 c = vec2(x,y);
+      vec2 z = vec2(0.0);
+      int ii;
+      vec2 absz;
+      for(int i = 0; i < 256; i++){
+        ii = i;
+        if(length(z-c)>10.0){
+          break;
+        }
+        absz = vec2(abs(z.x), abs(z.y));
+        z = cplxproduct(absz, absz) + c;
+      }
+      return float(ii)/255.0;
+    }
+
+    void main(void){
+      vec2 uv = vec2(
+        (xmax - xmin) * gl_FragCoord.x/iResolution.x + xmin, 
+        (ymax - ymin) * gl_FragCoord.y/iResolution.y + ymin
+      );
+      float bs = BS(uv.x, -uv.y);
+      gl_FragColor = color ? vec4(inferno(bs,bs,bs), 1.0) : vec4(vec3(bs), 1.0);
+    }
+  </script>
+
+  <script>
+    var app = new PIXI.Application({ width: window.innerWidth, height: window.innerHeight });
+    app.resizeTo = window;
+
+    let fragmentShader = document.getElementById('fragmentShader').textContent;
+
+    let xmin = -1.8, xmax = -1.7, ymin = -0.02, ymax = 0.095;
+
+    let filter = new PIXI.Filter(null, fragmentShader);
+    filter.uniforms.iResolution = {x: app.screen.width, y: app.screen.height};
+    filter.uniforms.color = true;
+    filter.uniforms.xmin = xmin;
+    filter.uniforms.xmax = xmax;
+    filter.uniforms.ymin = ymin;
+    filter.uniforms.ymax = ymax;
+
+    document.onclick = function(evt){
+      filter.uniforms.color = !filter.uniforms.color;
+    };
+
+    let zoom0 = 1.001;
+    let hamster = Hamster(document.body);
+    hamster.wheel(function (event, delta, deltaX, deltaY) {
+      let ex = event.originalEvent.clientX;
+      let ey = event.originalEvent.clientY;
+      let zoom = Math.pow(zoom0, deltaY);
+      let sx = (filter.uniforms.xmax - filter.uniforms.xmin) / filter.uniforms.iResolution.x;
+      let sy = (filter.uniforms.ymax - filter.uniforms.ymin) / filter.uniforms.iResolution.y;
+      let dx = ex - filter.uniforms.iResolution.x / 2;
+      let dy = filter.uniforms.iResolution.y / 2 - ey;
+      sx /= zoom;
+      sy /= zoom;
+      let midx = (filter.uniforms.xmin + filter.uniforms.xmax) / 2 + (zoom - 1) * dx * sx;
+      let midy = (filter.uniforms.ymin + filter.uniforms.ymax) / 2 + (zoom - 1) * dy * sy;
+      let rangex = (filter.uniforms.xmax - filter.uniforms.xmin) / zoom;
+      let rangey = (filter.uniforms.ymax - filter.uniforms.ymin) / zoom;
+      filter.uniforms.xmax = (rangex + 2 * midx) / 2;
+      filter.uniforms.ymax = (rangey + 2 * midy) / 2;
+      filter.uniforms.xmin = filter.uniforms.xmax - rangex;
+      filter.uniforms.ymin = filter.uniforms.ymax - rangey;
+    });
+
+    let container = new PIXI.Container();
+    container.filterArea = app.screen;
+    container.filters = [filter];
+
+    app.stage.addChild(container);
+    document.getElementById('container').appendChild(app.view);
+
+    function onresize(event){
+      if(app.resize)
+        app.resize();
+      container.filterArea = app.screen;
+      filter.uniforms.iResolution = {x: app.screen.width, y: app.screen.height};
+    }
+    window.addEventListener('resize', onresize, false);
+
+  </script>
+</body>
+
+</html>
