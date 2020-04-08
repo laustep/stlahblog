@@ -44,6 +44,7 @@
     const float CRADIUS = 0.15; // cylinders radius
     const float SRADIUS = 0.25;  // spheres radius
 
+    // ROTATIONS 3D ------------------------------------------------------------
     mat3 Rx(float phi){
       return mat3(1.0, 0.0, 0.0, 0.0, cos(phi), -sin(phi), 0.0, sin(phi), cos(phi));
     }
@@ -59,6 +60,21 @@
     vec3 invrotate(vec3 pt, float ax, float ay, float az){
       return Rz(-az) * (Ry(-ay) * (Rx(-ax) * pt));
     }
+
+    // ROTATION 4D -------------------------------------------------------------
+    vec4 rotation4D(vec4 axis1, vec4 axis2, float theta, vec4 v){
+      axis1 = normalize(axis1);
+      axis2 = normalize(axis2);
+      float vx = dot(v, axis1);
+      float vy = dot(v, axis2);
+      float coef1 = vx * cos(theta) - vy * sin(theta);
+      float coef2 = vy * cos(theta) + vx * sin(theta);
+      vec4 pvector = vx*axis1 + vy*axis2; 
+      return coef1*axis1 + coef2*axis2 + (v-pvector);
+    }
+
+    const vec4 AX1 = vec4(0, 1, 0, 0);
+    const vec4 AX2 = vec4(0, 0, 0, 1);
 
     // SPHERE STUFF ------------------------------------------------------------
     // ro is the ray origin, rd is the (normalized) ray direction, and R is the radius
@@ -151,9 +167,11 @@
       vec4 tnorm;
       shape = 1;
       for(int i = 0; i < 4; i++){
+        vec3 vi = stereog(rotation4D(AX1, AX2, theta, vertices[i])); 
         for(int j = 1; j < 5; j++){
           if(j > i){
-            tnorm = iCappedCone(rro, rrd, stereog(vertices[i]), stereog(vertices[j]), CRADIUS, CRADIUS, false);
+          vec3 vj = stereog(rotation4D(AX1, AX2, theta, vertices[j])); 
+            tnorm = iCappedCone(rro, rrd, vi, vj, CRADIUS, CRADIUS, false);
             if(tnorm.x > 0.0){
               tnorm.yzw = invrotate(tnorm.yzw, -theta, theta, theta);
               OUTPUT = tnorm.x < t ? tnorm : OUTPUT;
@@ -165,7 +183,8 @@
       }
       float t_cylinder = t;
       for(int i = 0; i < 5; i++){
-        tnorm = iSphere(rro - stereog(vertices[i]), rrd, SRADIUS);
+        vec3 vi = stereog(rotation4D(AX1, AX2, theta, vertices[i])); 
+        tnorm = iSphere(rro - vi, rrd, SRADIUS);
         if(tnorm.x > 0.0){
           tnorm.yzw = invrotate(tnorm.yzw, -theta, theta, theta);
           OUTPUT = tnorm.x < t ? tnorm : OUTPUT;
