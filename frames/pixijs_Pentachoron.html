@@ -73,8 +73,27 @@
       return coef1*axis1 + coef2*axis2 + (v-pvector);
     }
 
-    const vec4 AX1 = vec4(0, 1, 0, 0);
-    const vec4 AX2 = vec4(0, 0, 0, 1);
+    const vec4 AX1 = vec4(0, 0, 0, 1);
+    const vec4 AX2 = vec4(0, 1, 0, 0);
+
+    vec4 rotation4DR(vec4 v, float theta, float phi, float xi){
+      float a = cos(xi);
+      float b = sin(theta)*cos(phi)*sin(xi);
+      float c = sin(theta)*sin(phi)*sin(xi);
+      float d = cos(theta)*sin(xi);
+      float p = v.x, q = v.y, r = v.z, s = v.w;
+      return vec4(
+        a*p - b*q - c*r - d*s,
+        a*q + b*p + c*s - d*r,
+        a*r - b*s + c*p + d*q,
+        a*s + b*r - c*q + d*p
+      );
+    }
+
+    const float THETA = 0.8;
+    const float PHI = 0.8;
+
+    const int RTYPE = 0;
 
     // SPHERE STUFF ------------------------------------------------------------
     // ro is the ray origin, rd is the (normalized) ray direction, and R is the radius
@@ -122,7 +141,6 @@
       if(h < 0.0) return vec4(-1.0);
 
       float t = (-k1-sqrt(h))/k2;
-
       float y = m1 + t*m3;
       if(y > 0.0 && y < m0){
         return vec4(t, normalize(m0*(m0*(oa+t*rd)+rr*ba*ra)-ba*hy*y));
@@ -166,11 +184,16 @@
       vec3 rrd = rotate(rd, -theta, theta, theta);
       vec4 tnorm;
       shape = 1;
+      float xi = iGlobalTime;
       for(int i = 0; i < 4; i++){
-        vec3 vi = stereog(rotation4D(AX1, AX2, theta, vertices[i])); 
+        vec3 vi = RTYPE == 0 ? 
+          stereog(rotation4D(AX1, AX2, xi, vertices[i])) : 
+          stereog(rotation4DR(vertices[i], xi, PHI, xi)); 
         for(int j = 1; j < 5; j++){
           if(j > i){
-          vec3 vj = stereog(rotation4D(AX1, AX2, theta, vertices[j])); 
+            vec3 vj = RTYPE == 0 ? 
+              stereog(rotation4D(AX1, AX2, xi, vertices[j])) :
+              stereog(rotation4DR(vertices[j], xi, PHI, xi)); 
             tnorm = iCappedCone(rro, rrd, vi, vj, CRADIUS, CRADIUS, false);
             if(tnorm.x > 0.0){
               tnorm.yzw = invrotate(tnorm.yzw, -theta, theta, theta);
@@ -183,7 +206,9 @@
       }
       float t_cylinder = t;
       for(int i = 0; i < 5; i++){
-        vec3 vi = stereog(rotation4D(AX1, AX2, theta, vertices[i])); 
+        vec3 vi = RTYPE == 0 ? 
+          stereog(rotation4D(AX1, AX2, xi, vertices[i])) : 
+          stereog(rotation4DR(vertices[i], xi, PHI, xi)); 
         tnorm = iSphere(rro - vi, rrd, SRADIUS);
         if(tnorm.x > 0.0){
           tnorm.yzw = invrotate(tnorm.yzw, -theta, theta, theta);
