@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <script src="../libraries/hamster.min.js"></script>
   <script src="../libraries/math.min.js"></script>
-  <title>Hopf torus</title>
+  <title>Four tori</title>
   <style>
     html, body { 
       margin: 0; 
@@ -30,6 +30,11 @@
   <div id="container"></div>
 
   <script id="fragmentShader" type="x-shader/x-fragment">
+    struct torusTransfo{
+      mat4 transfo;
+      float radius;
+    };
+
     uniform vec2 iResolution;
     uniform float xmin;
     uniform float xmax;
@@ -38,53 +43,69 @@
     uniform float iGlobalTime;
     uniform bool anim;
     uniform float time;
-    uniform mat4 Ms[300];
-    uniform float Rs[300];
+    uniform mat4 M1;
+    uniform float R1;
+    uniform mat4 M2;
+    uniform float R2;
+    uniform mat4 M3;
+    uniform float R3;
+    uniform mat4 M4;
+    uniform float R4;
+
+    torusTransfo tr1 = torusTransfo(M1, R1);
+    torusTransfo tr2 = torusTransfo(M2, R2);
+    torusTransfo tr3 = torusTransfo(M3, R3);
+    torusTransfo tr4 = torusTransfo(M4, R4);
  
     mat3 Rx(float phi){
       return mat3(1.0, 0.0, 0.0, 0.0, cos(phi), -sin(phi), 0.0, sin(phi), cos(phi));
     }
+
     mat3 Ry(float phi){
       return mat3(cos(phi), 0.0, sin(phi), 0.0, 1.0, 0.0, -sin(phi), 0.0, cos(phi));
     }
+
     mat3 Rz(float phi){
       return mat3(cos(phi), -sin(phi), 0.0, sin(phi), cos(phi), 0.0, 0.0, 0.0, 1.0);
     }
+
     vec3 rotate(vec3 pt, float ax, float ay, float az){
       return Rx(ax) * (Ry(ay) * (Rz(az) * pt));
     }
 
 
-    const float r = 0.35; // minor radius of tori
-    const float K = -32.0; // constant used for the smooth union
+    const float r = 0.1;
+    const float dblpi = 6.283;
     
     // signed distance
     float f(vec3 pt){
-      pt = rotate(pt, 0.0, 1.57, 0.3);
-      float d = 0.0;
-      vec4 pti;
-      float di;
-      for(int i = 0; i < 300; i++){
-        pti = Ms[i] * vec4(pt, 1.0);
-        di = length(vec2(length(pti.xy) - Rs[i], pti.z)) - r; // torus signed distance
-        d += exp(K*di); // smooth union
-      }
-      return log(max(0.0001,d))/K;
+      float R1 = tr1.radius, R2 = tr2.radius, R3 = tr3.radius, R4 = tr4.radius;
+      pt = rotate(pt, mod(iGlobalTime, dblpi), mod(iGlobalTime, dblpi), 0.0);
+      vec3 pt1 = (tr1.transfo * vec4(pt, 1.0)).xyz;
+      float d1 = length(vec2(length(pt1.xy) - 1.0, pt1.z)) - r;
+      vec3 pt2 = (tr2.transfo * vec4(pt, 1.0)).xyz;
+      float d2 = length(vec2(length(pt2.xy) - 1.0, pt2.z)) - r;
+      vec3 pt3 = (tr3.transfo * vec4(pt, 1.0)).xyz;
+      float d3 = length(vec2(length(pt3.xy) - 1.0, pt3.z)) - r;
+      vec3 pt4 = (tr4.transfo * vec4(pt, 1.0)).xyz;
+      float d4 = length(vec2(length(pt4.xy) - 1.0, pt4.z)) - r;
+      float k = 32.0;
+      return -log(max(0.0001, exp(-k*d1)+exp(-k*d2)+exp(-k*d3)+exp(-k*d4))) / k;
     }
 
     // ro is the ray origin, rd is the ray direction
-    float getT(vec3 ro, vec3 rd){
+    float getT( vec3 ro, vec3 rd ) {
       float t = 10.8; 
       float d;
       vec3 r;
       for(int i = 0; i < 100; i++){
         r = ro + t*rd;
         d = f(r);
-        if(d < 0.01){
+        if(d < 0.001){
           return t;
         }
         t += d;
-        if(t > 16.0){
+        if(t > 13.0){
           return 0.0;
         }
       }
@@ -101,10 +122,11 @@
       float outz = 
         f(vec3(r.x,r.y,r.z+eps)) - 
         f(vec3(r.x,r.y,r.z-eps));
-      return normalize(vec3(outx, outy, outz)); 
+      return normalize(vec3(outx, outy, outz));
     }
 
-    vec3 objColor = vec3(0.5, 0.5, 0.0);
+
+    vec3 sphereColor = vec3(0.5, 0.5, 0.0);
     
     void main(void){
       float aspectRatio = iResolution.x/iResolution.y;
@@ -114,8 +136,9 @@
       );
 
       // Cast a ray out from the eye position into the scene
-      vec3 ro = vec3(uv, 15.0); 
-      vec3 rd = normalize(vec3(uv, -14.0));
+      vec3 ro = vec3(uv.x, uv.y, 12.0); // Eye position is slightly up and back from the scene origin
+      // Ray we cast is tilted slightly downward to give a better view of the scene
+      vec3 rd = normalize(vec3(-0.0 + uv, -11.0));
 
       // Default color if we don't intersect with anything
       vec3 rayColor = vec3(0.2, 0.2, 0.2);
@@ -124,29 +147,32 @@
       // Ambient light color
       vec3 ambient = vec3(0.05, 0.1, 0.1);
       // See if the ray intesects with any objects.
+      // Provides the normal of the nearest intersection point and color
       float t = getT(ro, rd);
-      if(!(t == 0.0)){
+      if ( t > 0.0 ) {
         vec3 nrml = normal(ro + t*rd, 0.01);
+
         vec3 toEye = -rd;
         vec3 r_m = -reflect(lightDir, nrml);
-        float specular = 0.32 * pow(max(dot(r_m, toEye), 0.0), 8.0);
-        float diffuse = max(dot(nrml, lightDir), 0.0); // diffuse factor
-        rayColor = objColor * (diffuse + ambient) + specular;
+        float spec    = 0.4 * 0.8 * pow(max(dot(r_m, toEye), 0.0), 8.0);
+
+        float diffuse = clamp(dot(nrml, lightDir), 0.0, 1.0); // diffuse factor
+        rayColor = sphereColor * (diffuse + ambient) + spec;
       }
       gl_FragColor = vec4(rayColor, 1.0);
     }
   </script>
 
   <script>
-    // transformation matrix for torus passing by three points -----------------
+    // transformation matrix
 
-    function inverseTransfoMatrix(M){ // inverse 4x4 transformation matrix
+    function inverseTransfoMatrix(M){
       var B = math.transpose(math.subset(M, math.index([0, 1, 2], [0, 1, 2])));
-      var v = math.multiply(B, math.subset(M, math.index([0, 1, 2], 3)));
+      var v = math.multiply(B, math.subset(M, math.index([0,1,2],3)));
       return math.concat(math.concat(B,math.multiply(v,-1)), math.matrix([[0.0, 0.0, 0.0, 1.0]]), 0);
     }
 
-    function T(p1, p2, p3){ // returns transformation matrix and radius
+    function T(p1, p2, p3){
       var p12 = math.divide(math.add(p1, p2), 2), 
           p23 = math.divide(math.add(p2, p3), 2);
       var coeffs = math.matrix(
@@ -161,16 +187,15 @@
       var offset21 = math.dot(p12, v12), offset22 = math.dot(p23, v23);
       var A = math.matrix([coeffs, v12, v23]);
       // center of circle passing by p1,p2,p3
-      var center = 
-        math.transpose(math.multiply(math.inv(A), math.transpose(math.matrix([offset1, offset21, offset22]))));
+      var center = math.transpose(math.multiply(math.inv(A), math.transpose(math.matrix([offset1, offset21, offset22]))));
       // radius
       var radius = math.norm(math.subtract(p1, center));
-      // transformation matrix
+      //
       if (coeffs._data[0] == 0.0 && coeffs._data[1] == 0.0) {
         var t = math.matrix([
-          [1.0, 0.0, 0.0, -center._data[0]], 
-          [0.0, 1.0, 0.0, -center._data[1]], 
-          [0.0, 0.0, 1.0, -center._data[2]], 
+          [1.0, 0.0, 0.0, -center[0]], 
+          [0.0, 1.0, 0.0, -center[1]], 
+          [0.0, 0.0, 1.0, -center[2]], 
           [0.0, 0.0, 0.0, 1.0]
         ]);
         return {transfo: t, radius: radius};
@@ -184,65 +209,39 @@
       return {transfo: inverseTransfoMatrix(math.transpose(t)), radius: radius}; 
     }
 
-    function transfo2uniform(tr){ // flatten the matrix to pass it as uniform for the shader
+    function transfo2uniform(tr){
       return math.flatten(math.transpose(tr.transfo))._data;
     }
 
+//    var m = math.matrix([[1,2,3], [4,5,6], [7,8,9]]);
+//    console.log(math.subset(m, math.index([0,1,2],[0,1])));
 
-    // Hopf stuff --------------------------------------------------------------
+    const phi = (1.0 + Math.sqrt(5.0)) / 2.0;
+    const a = 1.0 / Math.sqrt(3.0);
+    const b = a / phi;
+    const c = a * phi;
+    const A = [a, a, -a];
+    const B = [-c, 0.0, -b];
+    const C = [b, -c, 0.0];
+    const D = [0.0, b, c]; 
 
-    // Hopf "inverse" function 
-    function HopfInverse(p, xi){
-      var den = Math.sqrt(2 * (1 + p[2]));
-      return [ 
-        (p[0] * Math.cos(xi) + p[1] * Math.sin(xi)) / den,
-        (Math.sin(xi) * (1 + p[2])) / den,
-        (Math.cos(xi) * (1 + p[2])) / den,
-        (p[0] * Math.sin(xi) - p[1] * Math.cos(xi)) / den
-      ]; 
-    }
+    let tr1 = T(A,B,C); 
+    let tr2 = T(A, B, D);
+    let tr3 = T(A, C, D);
+    let tr4 = T(B,C,D);
 
-    // Stereographic projection
-    function StereographicProjection(q){
-      return [q[0] / (1 - q[3]), q[1] / (1 - q[3]), q[2] / (1 - q[3])];
-    }
-
-    // map point on the "tennis ball" curve to transfo matrix
-    function TennisBall(s){
-      const A = 0.4;
-      const nlobes = 3;
-      const pi_2 = Math.PI / 2;
-      const pt = [
-        Math.sin(pi_2 - (pi_2 - A) * Math.cos(s)) * Math.cos(s / nlobes + A * Math.sin(2 * s)),
-        Math.sin(pi_2 - (pi_2 - A) * Math.cos(s)) * Math.sin(s / nlobes + A * Math.sin(2 * s)),
-        Math.cos(pi_2 - (pi_2 - A) * Math.cos(s))
-      ];
-      const p1 = StereographicProjection(HopfInverse(pt, 0));
-      const p2 = StereographicProjection(HopfInverse(pt, 2));
-      const p3 = StereographicProjection(HopfInverse(pt, 4));
-      return T(p1, p2, p3);
-    }
-
-    // make transformations 
-    const ncircles = 300;
-    var Ms = [], Rs = new Array(ncircles);
-    var tr;
-    for(let i = 0; i < ncircles; i++){
-      tr = TennisBall(6*i*Math.PI/ncircles);
-      Ms = Ms.concat(transfo2uniform(tr));
-      Rs[i] = tr.radius;
-    }
-
+    console.log(tr1.radius);
+      console.log(tr2.radius);
 
     // PIXI --------------------------------------------------------------------
-    let xmin = -5.4, xmax = 5.4, ymin = -5.4, ymax = 5.4; 
+    let xmin = -1.2, xmax = 1.2, ymin = -1.2, ymax = 1.2; 
 
-    var app = new PIXI.Application({
-      width: 256, 
-      height: 256, 
-      antialiasing: false
+    var app = new PIXI.Application({ 
+      width: window.innerWidth, 
+      height: window.innerHeight, 
+      antialiasing: false 
     });
-//    app.resizeTo = window;
+    app.resizeTo = window;
 
     let fragmentShader = document.getElementById('fragmentShader').textContent;
     let filter = new PIXI.Filter(null, fragmentShader);
@@ -254,8 +253,14 @@
     filter.uniforms.iGlobalTime = 0;
     filter.uniforms.anim = false;
     filter.uniforms.time = -Math.PI/2;
-    filter.uniforms.Ms = new Float32Array(Ms);
-    filter.uniforms.Rs = new Float32Array(Rs);
+    filter.uniforms.M1 = transfo2uniform(tr1);
+    filter.uniforms.R1 = tr1.radius;
+    filter.uniforms.M2 = transfo2uniform(tr2);
+    filter.uniforms.R2 = tr2.radius;
+    filter.uniforms.M3 = transfo2uniform(tr3);
+    filter.uniforms.R3 = tr3.radius;
+    filter.uniforms.M4 = transfo2uniform(tr4);
+    filter.uniforms.R4 = tr4.radius;
 
     document.onclick = function(evt){
       filter.uniforms.anim = !filter.uniforms.anim;

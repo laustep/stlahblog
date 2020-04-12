@@ -1,0 +1,550 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <script src="../libraries/hamster.min.js"></script>
+  <script src="../libraries/math.min.js"></script>
+  <title>Twenty tori</title>
+  <style>
+    html, body { 
+      margin: 0; 
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<script src="../libraries/pixi.min.js"></script>
+
+<body>
+
+  <script type="text/javascript">
+    let type = "WebGL";
+    if(!PIXI.utils.isWebGLSupported()){
+      type = "canvas";
+    }
+    PIXI.utils.sayHello(type);
+  </script>
+
+  <div id="container"></div>
+
+  <script id="fragmentShader" type="x-shader/x-fragment">
+    uniform vec2 iResolution;
+    uniform float xmin;
+    uniform float xmax;
+    uniform float ymin;
+    uniform float ymax;
+    uniform float iGlobalTime;
+    uniform bool anim;
+    uniform float time;
+    uniform mat3 Rs[20];
+    uniform mat3 RRs[20];
+    uniform mat4 Ms[20];
+    uniform mat3 MMs[20];
+    uniform vec3 colors[20];
+    uniform float factor;
+
+    float RADIUS = factor * 0.125;
+    float radius = factor * 0.05;
+    float HEIGHT = factor * 0.5;
+ 
+    mat3 Rx(float phi){
+      return mat3(1.0, 0.0, 0.0, 0.0, cos(phi), -sin(phi), 0.0, sin(phi), cos(phi));
+    }
+    mat3 Ry(float phi){
+      return mat3(cos(phi), 0.0, sin(phi), 0.0, 1.0, 0.0, -sin(phi), 0.0, cos(phi));
+    }
+    mat3 Rz(float phi){
+      return mat3(cos(phi), -sin(phi), 0.0, sin(phi), cos(phi), 0.0, 0.0, 0.0, 1.0);
+    }
+    vec3 rotate(vec3 pt, float ax, float ay, float az){
+      return Rx(ax) * (Ry(ay) * (Rz(az) * pt));
+    }
+    vec3 invrotate(vec3 pt, float ax, float ay, float az){
+      return Rz(-az) * (Ry(-ay) * (Rx(-ax) * pt));
+    }
+
+    // TORUS STUFF -------------------------------------------------------------
+
+    vec3 nTorus(vec3 pos, float Ra, float ra){
+      return normalize(pos*(dot(pos,pos)- ra*ra - Ra*Ra*vec3(1.0,1.0,-1.0)));
+    }
+
+    vec4 iTorus(vec3 ro, vec3 rd, float Ra, float ra){
+
+      float po = 1.0;
+      
+      float Ra2 = Ra*Ra;
+      float ra2 = ra*ra;
+    
+      float m = dot(ro,ro);
+      float n = dot(ro,rd);
+    
+      float k = (m - ra2 - Ra2)/2.0;
+      float k3 = n;
+      float k2 = n*n + Ra2*rd.z*rd.z + k;
+      float k1 = k*n + Ra2*ro.z*rd.z;
+      float k0 = k*k + Ra2*ro.z*ro.z - Ra2*ra2;
+    
+      // prevent |c1| from being too close to zero
+      if(abs(k3*(k3*k3 - k2) + k1) < 0.00005*Ra/8.0){
+        po = -1.0;
+        float tmp=k1; k1=k3; k3=tmp;
+        k0 = 1.0/k0;
+        k1 = k1*k0;
+        k2 = k2*k0;
+        k3 = k3*k0;
+      }
+ 
+      float c2 = 2.0*k2 - 3.0*k3*k3;
+      float c1 = k3*(k3*k3 - k2) + k1;
+      float c0 = k3*(k3*(-3.0*k3*k3 + 4.0*k2) - 8.0*k1) + 4.0*k0;
+      
+      c2 /= 3.0;
+      c1 *= 2.0;
+      c0 /= 3.0;
+      
+      float Q = c2*c2 + c0;
+      float R = 3.0*c0*c2 - c2*c2*c2 - c1*c1;
+    
+      float h = R*R - Q*Q*Q;
+      float z = 0.0;
+      if(h < 0.0){
+        // 4 intersections
+        float sQ = sqrt(Q);
+        z = 2.0*sQ*cos( acos(R/(sQ*Q)) / 3.0 );
+      }else{
+        // 2 intersections
+        float sQ = pow( sqrt(h) + abs(R), 1.0/3.0 );
+        z = sign(R)*abs( sQ + Q/sQ );
+      }		
+      z = c2 - z;
+    
+      float d1 = z   - 3.0*c2;
+      float d2 = z*z - 3.0*c0;
+      if(abs(d1) < 1.0e-3*Ra/4.0){
+        if( d2 < 0.0 ) return vec4(-1.0);
+        d2 = sqrt(d2);
+      }else{
+        if( d1 < 0.0 ) return vec4(-1.0);
+        d1 = sqrt( d1/2.0 );
+        d2 = c1/d1;
+      }
+
+      //----------------------------------
+    
+      bool ok = false; 
+
+      float t = 1e20;
+
+      h = d1*d1 - z + d2;
+      if(h > 0.0){
+        ok = true;
+        h = sqrt(h);
+        float t1 = -d1 - h - k3; t1 = (po < 0.0) ? 2.0/t1 : t1;
+        float t2 = -d1 + h - k3; t2 = (po < 0.0) ? 2.0/t2 : t2;
+        if( t1 > 0.0 ) t = t1; 
+        if( t2 > 0.0 ) t = min(t,t2);
+      }
+
+      h = d1*d1 - z - d2;
+      if(h > 0.0){
+        ok = true;
+        h = sqrt(h);
+        float t1 = d1 - h - k3;  t1 = (po < 0.0) ? 2.0/t1 : t1;
+        float t2 = d1 + h - k3;  t2 = (po < 0.0) ? 2.0/t2 : t2;
+        if( t1 > 0.0 ) t = min(t,t1);
+        if( t2 > 0.0 ) t = min(t,t2);
+      }
+
+      if(ok){
+        vec3 nrml = nTorus(ro + t*rd, Ra, ra);
+        return vec4(t, nrml);
+      }
+
+      return vec4(-1.0);
+    }
+
+    // CONE STUFF --------------------------------------------------------------
+    // ro is the ray origin, rd is the ray direction
+    vec3 coneNormal(vec3 pt, float radius, float height){
+      float r = length(pt.xz);
+      return normalize(vec3(pt.x, r*radius/height, pt.z));
+    }
+
+    float dot2(vec3 v){
+      return dot(v, v);
+    }
+
+    vec4 intersCone(vec3 ro, vec3 rd, float radius, float height){
+
+      // cap
+      vec3  ba = vec3(0, -height, 0);
+      vec3  oa = ro + ba;
+      float m1 = -height * oa.y;
+      if(m1 < 0.0){
+        float m3 = -height * rd.y;
+        if(dot2(oa*m3-rd*m1) < (radius*radius*m3*m3)){
+          return vec4(-oa.y/rd.y, vec3(0, 1, 0));
+        }
+      }
+      
+      float rh2 = (radius / height) * (radius / height);
+      
+      float a = (rd.x * rd.x) + (rd.z * rd.z) - (rh2*(rd.y * rd.y));
+      float b = (2.0*ro.x*rd.x) + (2.0*ro.z*rd.z) - (2.0*rh2*ro.y*rd.y);
+      float c = (ro.x * ro.x) + (ro.z * ro.z) - rh2*(ro.y * ro.y);
+      
+      float delta = b*b - 4.0*a*c;
+      if(delta >= 0.0 && delta < 0.00000001){
+        float t = -b/2.0/a;
+        return vec4(t, coneNormal(ro+t*rd, radius, height));
+      } 
+      if(delta < 0.0) return vec4(-1.0);
+      
+      float t1 = (-b - sqrt(delta))/(2.0*a);
+      float t2 = (-b + sqrt(delta))/(2.0*a);
+      float t = min(t1,t2);
+      float rayy = ro.y + t*rd.y;
+      if((rayy > 0.0) && (rayy < height)){
+        return vec4(t, coneNormal(ro+t*rd, radius, height));
+      }
+
+      return vec4(-1.0);
+    }
+
+    // -------------------------------------------------------------------------
+    
+    // ro is the ray origin, rd is the ray direction
+    vec4 getTnorm(vec3 ro, vec3 rd, out vec3 color, out int shape){
+      float t = 1.0e20; 
+      vec4 OUTPUT = vec4(t);
+      vec3 Mro; vec3 Mrd;
+      color = vec3(0.0);
+      float theta = anim ? iGlobalTime : time;
+      vec3 rro = rotate(ro, -theta, theta, theta);
+      vec3 rrd = rotate(rd, -theta, theta, theta);
+      vec4 tnorm;
+      shape = 1;
+      mat4 H;
+      for(int i = 0; i < 20; i++){
+        H = Ms[i];
+        H[3] = H[3] * vec4(HEIGHT, HEIGHT, HEIGHT, 1.0);
+        Mro = (H * vec4(rro,1)).xyz;
+        Mrd = mat3(Ms[i]) * rrd;
+        tnorm = iTorus(Mro, Mrd, RADIUS, radius);
+        if(tnorm.x > 0.0){
+          tnorm.yzw = invrotate(MMs[i] * tnorm.yzw, -theta, theta, theta);
+          OUTPUT = tnorm.x < t ? tnorm : OUTPUT;
+          color = tnorm.x < t ? colors[i] : color;
+          t = min(t, tnorm.x);
+        }
+      }
+      float t_torus = t;
+      for(int i = 0; i < 20; i++){
+        Mro = Rs[i] * rro;
+        Mrd = Rs[i] * rrd;
+        tnorm = intersCone(Mro, Mrd, RADIUS, HEIGHT);
+        if(tnorm.x > 0.0){
+          tnorm.yzw = invrotate(RRs[i] * tnorm.yzw, -theta, theta, theta);
+          OUTPUT = tnorm.x < t ? tnorm : OUTPUT;
+          t = min(t, tnorm.x);
+        }
+      }
+      if(t < t_torus) shape = 2;
+      return OUTPUT;
+    }
+
+    
+    void main(void){
+      float aspectRatio = iResolution.x/iResolution.y;
+      vec2 uv = vec2(
+        ((xmax - xmin) * gl_FragCoord.x/iResolution.x + xmin) * aspectRatio, 
+        (ymax - ymin) * gl_FragCoord.y/iResolution.y + ymin
+      );
+
+      // Cast a ray out from the eye position into the scene
+      vec3 ro = vec3(uv, 2); 
+      vec3 rd = normalize(vec3(uv, -1));
+
+      // Default color if we don't intersect with anything
+      vec3 rayColor = vec3(54.0, 57.0, 64.0) / 255.0;
+      // Direction the lighting is coming from
+      vec3 lightDir = normalize(vec3(0.0, 0.0, 1.0));
+      // Ambient light color
+      vec3 ambient = vec3(0.05, 0.1, 0.1);
+      // See if the ray intesects with any objects.
+      vec3 color; int shape;
+      vec4 tnorm = getTnorm(ro, rd, color, shape);
+      if(!(tnorm.x == 1.0e20)){
+        vec3 nrml = tnorm.yzw;
+        vec3 objColor = shape == 1 ? color : vec3(0.5, 0, 0.5);
+        vec3 toEye = -rd;
+        vec3 r_m = normalize(-reflect(lightDir, nrml));
+        float specular = 0.72 * pow(max(dot(r_m, toEye), 0.0), 8.0);
+        float diffuse = max(dot(nrml, lightDir), 0.0); // diffuse factor
+        rayColor = objColor * (diffuse + ambient) + specular;
+      }
+      gl_FragColor = vec4(rayColor, 1.0);
+    }
+  </script>
+
+  <script>
+
+    // ROTATION FROM TWO VECTORS -----------------------------------------------
+    function quatfromtwovectors(u, v) {
+      var norm_u_norm_v =
+        Math.sqrt((u[0] * u[0] + u[1] * u[1] + u[2] * u[2]) * (v[0] * v[0] + v[1] * v[1] + v[2] * v[2]));
+      var cos_theta = math.dot(u, v) / norm_u_norm_v;
+      var half_cos = Math.sqrt(0.5 * (1 + cos_theta));
+      var w = math.divide(math.cross(u, v), norm_u_norm_v * 2 * half_cos);
+      return [half_cos, w[0], w[1], w[2]];
+    }
+
+    function matrixfromquat(q) {
+      let a = q[0], b = q[1], c = q[2], d = q[3];
+      return [
+        a * a + b * b - c * c - d * d, 2 * a * d + 2 * b * c, 2 * b * d - 2 * a * c,
+        2 * b * c - 2 * a * d, a * a - b * b + c * c - d * d, 2 * a * b + 2 * c * d,
+        2 * a * c + 2 * b * d, 2 * c * d - 2 * a * b, a * a - b * b - c * c + d * d
+      ];
+    }
+
+    function matrixfromtwovectors(u, v) {
+      return matrixfromquat(quatfromtwovectors(u, v));
+    }
+
+    function transpose(M) {
+      return [
+        M[0], M[3], M[6],
+        M[1], M[4], M[7],
+        M[2], M[5], M[8]
+      ];
+    }
+
+    // transformation matrix to reorient and translate -------------------------
+
+    function inverseTransfoMatrix(M){ // inverse 4x4 transformation matrix
+      var B = math.transpose(math.subset(M, math.index([0, 1, 2], [0, 1, 2])));
+      var v = math.multiply(B, math.subset(M, math.index([0, 1, 2], 3)));
+      return math.concat(math.concat(B,math.multiply(v,-1)), math.matrix([[0.0, 0.0, 0.0, 1.0]]), 0);
+    }
+
+    function T(axis, vertex){ // returns transformation matrix 
+      var vX1 = math.divide(axis, math.norm(axis));
+      var vX2 = math.divide(vertex, math.norm(vertex));
+      var Y = math.cross(vX1, vX2);
+      var vY = math.divide(Y, math.norm(Y));
+      var Z1 = math.cross(vX1, vY);
+      var vZ1 = math.divide(Z1, math.norm(Z1));
+      var Z2 = math.cross(vX2, vY);
+      var vZ2 = math.divide(Z2, math.norm(Z2));
+      var M1 = math.transpose(math.matrix([vX1, vY, vZ1]));
+      var M2 = math.matrix([vX2, vY, vZ2]);
+      var M = math.transpose(math.multiply(M1, M2));
+      var MM = math.concat(math.concat(M, math.transpose([vertex])), math.matrix([[0.0, 0.0, 0.0, 1.0]]), 0);
+      return {
+        transfo: M, 
+        itransfo: inverseTransfoMatrix(MM)
+      }; 
+    }
+
+    function transfo2uniform(M){ // flatten the matrix to pass it as uniform for the shader
+      return math.flatten(math.transpose(M))._data;
+    }
+
+    // make transformations ----------------------------------------------------
+    const phi = (1 + Math.sqrt(5)) / 2;
+    const a = 1 / Math.sqrt(3);
+    const b = a / phi;
+    const c = a * phi;
+    const points = [
+      [a, a, a],
+      [a, a, -a],
+      [a, -a, a],
+      [-a, -a, a],
+      [-a, a, -a],
+      [-a, a, a],
+      [0, b, -c],
+      [0, -b, -c],
+      [0, -b, c],
+      [c, 0, -b],
+      [-c, 0, -b],
+      [-c, 0, b],
+      [b, c, 0],
+      [b, -c, 0],
+      [-b, -c, 0],
+      [-b, c, 0],
+      [0, b, c],
+      [a, -a, -a],
+      [c, 0, b],
+      [-a, -a, -a]
+    ];
+
+    var Ms = [], MMs = [], Rs = [], RRs = [];
+    for(let i = 0; i < 20; i++){
+      var transfos = T([0,0,1], points[i]);
+      Ms = Ms.concat(transfo2uniform(transfos.itransfo));
+      MMs = MMs.concat(transfo2uniform(transfos.transfo));
+      var M = matrixfromtwovectors([0, 1, 0], points[i]);
+      Rs = Rs.concat(transpose(M));
+      RRs = RRs.concat(M);
+    }
+
+
+    // AUDIO -------------------------------------------------------------------
+    let factor = 1;
+
+    navigator.getUserMedia =
+      navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+
+    if (navigator.getUserMedia) {
+      navigator.getUserMedia(
+        {
+          audio: true
+        },
+        function (stream) {
+          audioContext = new AudioContext(
+            {
+              sampleRate: 44000
+            }
+          );
+          analyser = audioContext.createAnalyser();
+          microphone = audioContext.createMediaStreamSource(stream);
+          javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
+
+          analyser.smoothingTimeConstant = 0.9;
+          analyser.fftSize = 1024;
+
+          microphone.connect(analyser);
+          analyser.connect(javascriptNode);
+          javascriptNode.connect(audioContext.destination);
+
+          javascriptNode.onaudioprocess = function (xx) {
+            var array = new Uint8Array(analyser.frequencyBinCount);
+            analyser.getByteFrequencyData(array);
+            var values = 0;
+            var length = array.length;
+            for (var i = 0; i < length; i++) {
+              values += (array[i]);
+            }
+            var average = values / length;
+
+            console.log(Math.round(average));
+
+            factor = 1 + average/100;
+
+          } // end onaudioprocess
+        }, // end fn stream
+
+        function (err) {
+          console.log("The following error occured: " + err.name);
+        }
+      );
+    } else {
+      console.log("getUserMedia not supported");
+    }
+
+
+    // PIXI --------------------------------------------------------------------
+    let xmin = -0.6, xmax = 0.6, ymin = -0.6, ymax = 0.6; 
+
+    var app = new PIXI.Application({
+      width: 512,
+      height: 512, 
+      antialiasing: false
+    });
+//    app.resizeTo = window;
+
+    let fragmentShader = document.getElementById('fragmentShader').textContent;
+    let filter = new PIXI.Filter(null, fragmentShader);
+    filter.uniforms.iResolution = {x: app.screen.width, y: app.screen.height};
+    filter.uniforms.xmin = xmin;
+    filter.uniforms.xmax = xmax;
+    filter.uniforms.ymin = ymin;
+    filter.uniforms.ymax = ymax;
+    filter.uniforms.iGlobalTime = 0;
+    filter.uniforms.anim = true;
+    filter.uniforms.time = 0;
+    filter.uniforms.Rs = new Float32Array(Rs);
+    filter.uniforms.RRs = new Float32Array(RRs);
+    filter.uniforms.Ms = new Float32Array(Ms);
+    filter.uniforms.MMs = new Float32Array(MMs);
+    filter.uniforms.colors = new Float32Array([
+      0.267, 0.004, 0.329, 
+      0.282, 0.082, 0.408, 
+      0.282, 0.149, 0.467,
+      0.271, 0.216, 0.506, 
+      0.247, 0.278, 0.533, 
+      0.224, 0.333, 0.549,
+      0.196, 0.392, 0.557, 
+      0.176, 0.443, 0.557, 
+      0.157, 0.49, 0.557,
+      0.137, 0.541, 0.553, 
+      0.122, 0.588, 0.545, 
+      0.125, 0.639, 0.525,
+      0.161, 0.686, 0.498, 
+      0.235, 0.737, 0.459, 
+      0.337, 0.776, 0.404,
+      0.455, 0.816, 0.333, 
+      0.58, 0.847, 0.251, 
+      0.722, 0.871, 0.161,
+      0.863, 0.89, 0.094, 
+      0.992, 0.906, 0.145
+    ]);
+    filter.uniforms.factor = 1;
+
+    document.getElementById("container").onclick = function(evt){
+      filter.uniforms.anim = !filter.uniforms.anim;
+      filter.uniforms.time = filter.uniforms.iGlobalTime;
+    };
+
+    let zoom0 = 1.001;
+    let hamster = Hamster(document.body);
+    hamster.wheel(function(event, delta, deltaX, deltaY){
+      let ex = event.originalEvent.clientX;
+      let ey = event.originalEvent.clientY;
+      let zoom = Math.pow(zoom0, deltaY);
+      let sx = (filter.uniforms.xmax - filter.uniforms.xmin) / filter.uniforms.iResolution.x;
+      let sy = (filter.uniforms.ymax - filter.uniforms.ymin) / filter.uniforms.iResolution.y;
+      let dx = ex - filter.uniforms.iResolution.x / 2;
+      let dy = filter.uniforms.iResolution.y / 2 - ey;
+      sx /= zoom;
+      sy /= zoom;
+      let midx = (filter.uniforms.xmin + filter.uniforms.xmax) / 2 + (zoom - 1) * dx * sx;
+      let midy = (filter.uniforms.ymin + filter.uniforms.ymax) / 2 + (zoom - 1) * dy * sy;
+      let rangex = (filter.uniforms.xmax - filter.uniforms.xmin) / zoom;
+      let rangey = (filter.uniforms.ymax - filter.uniforms.ymin) / zoom;
+      filter.uniforms.xmax = (rangex + 2 * midx) / 2;
+      filter.uniforms.ymax = (rangey + 2 * midy) / 2;
+      filter.uniforms.xmin = filter.uniforms.xmax - rangex;
+      filter.uniforms.ymin = filter.uniforms.ymax - rangey;
+    });
+
+    let container = new PIXI.Container();
+    container.filterArea = app.screen;
+    container.filters = [filter];
+    app.stage.addChild(container);
+    
+    document.getElementById('container').appendChild(app.view);
+
+    function onresize(event){
+      if(app.resize)
+        app.resize();
+      container.filterArea = app.screen;
+      filter.uniforms.iResolution = {x: app.screen.width, y: app.screen.height};
+    }
+    window.addEventListener('resize', onresize, false);
+
+    let startTime = Date.now();
+    app.ticker.add(function(delta){
+      var currentTime = Date.now();
+      filter.uniforms.iGlobalTime = (currentTime - startTime) * 0.0005;
+      filter.uniforms.factor = factor;
+    }); 
+
+  </script>
+</body>
+
+</html>
