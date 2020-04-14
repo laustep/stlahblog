@@ -396,14 +396,14 @@
     // AUDIO -------------------------------------------------------------------
     let factor = 1;
 
-    navigator.getUserMedia =
-      navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+//    navigator.getUserMedia =
+//      navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
-    if (navigator.getUserMedia) {
-      navigator.getUserMedia(
+    if (navigator.mediaDevices) {
+      navigator.mediaDevices.getUserMedia(
         {
           audio: true
-        },
+        }).then(
         function (stream) {
           audioContext = new AudioContext(
             {
@@ -436,16 +436,17 @@
             factor = 1 + average/100;
 
           } // end onaudioprocess
-        }, // end fn stream
+        }); // end fn stream
+      }
 
-        function (err) {
+/*         function (err) {
           console.log("The following error occured: " + err.name);
         }
       );
     } else {
       console.log("getUserMedia not supported");
     }
-
+ */
 
     // PIXI --------------------------------------------------------------------
     let xmin = -0.6, xmax = 0.6, ymin = -0.6, ymax = 0.6; 
