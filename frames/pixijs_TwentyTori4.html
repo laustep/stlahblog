@@ -436,8 +436,13 @@
             factor = 1 + average/100;
 
           } // end onaudioprocess
-        }); // end fn stream
-      }
+        } // end fn stream
+      ).catch(function(err){
+          console.log(err.name + ": " + err.message); 
+        });
+    } else {
+      console.log("getUserMedia not supported");
+    }
 
 /*         function (err) {
           console.log("The following error occured: " + err.name);
