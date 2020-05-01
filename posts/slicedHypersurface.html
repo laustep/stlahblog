@@ -1,0 +1,315 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Drawing slices of a hypersurface with R</title>
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/pandoc-solarized.css" />  
+  <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+</head>
+
+<body>
+  <!-- Sidebar. -->
+  <div class="sidebar">
+    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+      <a href="https://www.r-bloggers.com/">
+        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+      </a>
+      <br />
+      <a href="http://t-redactyl.io/">
+        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
+      </a>
+      <a href="http://timelyportfolio.blogspot.be/">
+        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
+      </a>
+      <br />
+      <a href="https://antoineguillot.wordpress.com/blog/">
+        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+      </a>
+      <br />
+      <a href="https://fronkonstin.com/">
+        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="header">
+      <div id="logo" style="position:absolute;">
+        <a href="../">
+          <img src="../images/stla.jpg" alt="stla" width="100px" />
+        </a>
+      </div>
+      <div id="navigation" style="margin-top:50px;">
+        <a href="../">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../archive.html">Archive</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Drawing slices of a hypersurface with R</h1> <div class="info">
+    Posted on May  1, 2020
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="../tags/R.html">R</a>, <a href="../tags/graphics.html">graphics</a>, <a href="../tags/rgl.html">rgl</a>, <a href="../tags/geometry.html">geometry</a>, <a href="../tags/maths.html">maths</a>
+    
+</div>
+
+<p>Let <span class="math inline">\(s \colon I \times J \times K \to \mathbb{R}^4\)</span> be a parameterization of a hypersurface <span class="math inline">\(\mathcal{S}\)</span>, where <span class="math inline">\(I,J,K \subset \mathbb{R}\)</span> are some intervals. I’m going to show how to draw the cross-section of <span class="math inline">\(\mathcal{S}\)</span> by a hyperplane with R.</p>
+<p>For the illustration, we consider the <a href="http://hi.gher.space/wiki/Tiger"><em>tiger</em></a>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">R1 =<span class="st"> </span><span class="dv">2</span>; R2 =<span class="st"> </span><span class="dv">2</span>; r =<span class="st"> </span><span class="fl">0.5</span></a>
+<a class="sourceLine" id="cb1-2" title="2">s &lt;-<span class="st"> </span><span class="cf">function</span>(u, v, w){</a>
+<a class="sourceLine" id="cb1-3" title="3">  <span class="kw">rbind</span>(</a>
+<a class="sourceLine" id="cb1-4" title="4">    <span class="kw">cos</span>(u) <span class="op">*</span><span class="st"> </span>(R1 <span class="op">+</span><span class="st"> </span>r<span class="op">*</span><span class="kw">cos</span>(w)),</a>
+<a class="sourceLine" id="cb1-5" title="5">    <span class="kw">sin</span>(u) <span class="op">*</span><span class="st"> </span>(R1 <span class="op">+</span><span class="st"> </span>r<span class="op">*</span><span class="kw">cos</span>(w)),</a>
+<a class="sourceLine" id="cb1-6" title="6">    <span class="kw">cos</span>(v) <span class="op">*</span><span class="st"> </span>(R2 <span class="op">+</span><span class="st"> </span>r<span class="op">*</span><span class="kw">sin</span>(w)),</a>
+<a class="sourceLine" id="cb1-7" title="7">    <span class="kw">sin</span>(v) <span class="op">*</span><span class="st"> </span>(R2 <span class="op">+</span><span class="st"> </span>r<span class="op">*</span><span class="kw">sin</span>(w))</a>
+<a class="sourceLine" id="cb1-8" title="8">  )</a>
+<a class="sourceLine" id="cb1-9" title="9">}</a></code></pre></div>
+<p>Take a hyperplane: <span class="math display">\[
+\mathcal{P}\colon \quad \langle \mathbf{a}, \mathbf{x} \rangle = b,
+\]</span> let <span class="math inline">\(\vec{\mathbf{n}} = \frac{\mathbf{a}}{\Vert\mathbf{a}\Vert}\)</span> be a unit normal vector of <span class="math inline">\(\mathcal{P}\)</span>, and <span class="math inline">\(\mathbf{x}_0\)</span> be an arbitrary point in <span class="math inline">\(\mathcal{P}\)</span>.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">a =<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>); b =<span class="st"> </span><span class="dv">2</span>        <span class="co"># plane x+y+z+w = 2</span></a>
+<a class="sourceLine" id="cb2-2" title="2">x0 =<span class="st"> </span><span class="kw">c</span>(b, b, b, b)<span class="op">/</span><span class="dv">4</span>            <span class="co"># a point in this plane</span></a>
+<a class="sourceLine" id="cb2-3" title="3">nrml &lt;-<span class="st"> </span>a<span class="op">/</span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(a))) <span class="co"># unit normal</span></a></code></pre></div>
+<p>Compute a mesh <span class="math inline">\(\mathcal{M}_0\)</span> of the isosurface <span class="math display">\[
+\bigl(s(u,v,w) - \mathbf{x}_0\bigr) \cdot \vec{\mathbf{n}} = 0.
+\]</span></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw">library</span>(misc3d)</a>
+<a class="sourceLine" id="cb3-2" title="2">f &lt;-<span class="st"> </span><span class="cf">function</span>(u, v, w){</a>
+<a class="sourceLine" id="cb3-3" title="3">  <span class="kw">c</span>(<span class="kw">crossprod</span>(<span class="kw">s</span>(u, v, w), nrml))</a>
+<a class="sourceLine" id="cb3-4" title="4">}</a>
+<a class="sourceLine" id="cb3-5" title="5">u_ &lt;-<span class="st"> </span>v_ &lt;-<span class="st"> </span>w_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> 100L)</a>
+<a class="sourceLine" id="cb3-6" title="6">g &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">u =</span> u_, <span class="dt">v =</span> v_, <span class="dt">w =</span> w_)</a>
+<a class="sourceLine" id="cb3-7" title="7">voxel &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="kw">with</span>(g, <span class="kw">f</span>(u,v,w)), <span class="dt">dim =</span> <span class="kw">c</span>(100L,100L,100L))</a>
+<a class="sourceLine" id="cb3-8" title="8">surf &lt;-<span class="st"> </span><span class="kw">computeContour3d</span>(voxel, <span class="dt">level =</span> <span class="kw">sum</span>(x0<span class="op">*</span>nrml), </a>
+<a class="sourceLine" id="cb3-9" title="9">                         <span class="dt">x =</span> u_, <span class="dt">y =</span> v_, <span class="dt">z =</span> w_)</a>
+<a class="sourceLine" id="cb3-10" title="10">trgls &lt;-<span class="st"> </span><span class="kw">makeTriangles</span>(surf)</a>
+<a class="sourceLine" id="cb3-11" title="11">mesh0 &lt;-<span class="st"> </span>misc3d<span class="op">:::</span><span class="kw">t2ve</span>(trgls)</a></code></pre></div>
+<p>Denote by <span class="math inline">\(\mathcal{V}\mathcal{S}_0 \subset I \times J \times K\)</span> the set of vertices of <span class="math inline">\(\mathcal{M}_0\)</span>, and set <span class="math inline">\(\mathcal{V}\mathcal{S} = s(\mathcal{V}\mathcal{S}_0) \subset \mathbb{R}^4\)</span>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">VS0 &lt;-<span class="st"> </span>mesh0<span class="op">$</span>vb</a>
+<a class="sourceLine" id="cb4-2" title="2">VS &lt;-<span class="st"> </span><span class="kw">s</span>(VS0[1L,], VS0[2L,], VS0[3L,]) </a></code></pre></div>
+<p>Let <span class="math inline">\(R\)</span> be a rotation in <span class="math inline">\(\mathbb{R}^4\)</span> which sends <span class="math inline">\(\vec{\mathbf{n}} =: \vec{\mathbf{v}}_1\)</span> to the vector <span class="math inline">\((0,0,0,1) =: \vec{\mathbf{v}}_2\)</span>. One can take <span class="math inline">\(R\)</span> corresponding to the matrix <span class="math display">\[
+\frac{2}{{(\vec{\mathbf{v}}_1+\vec{\mathbf{v}}_2)}'
+(\vec{\mathbf{v}}_1+\vec{\mathbf{v}}_2)}
+(\vec{\mathbf{v}}_1+\vec{\mathbf{v}}_2)
+{(\vec{\mathbf{v}}_1+\vec{\mathbf{v}}_2)}' - I_4.
+\]</span></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">rotationMatrix4D &lt;-<span class="st"> </span><span class="cf">function</span>(v1, v2){</a>
+<a class="sourceLine" id="cb5-2" title="2">  v1 &lt;-<span class="st"> </span>v1 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(v1)))</a>
+<a class="sourceLine" id="cb5-3" title="3">  v2 &lt;-<span class="st"> </span>v2 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(v2)))</a>
+<a class="sourceLine" id="cb5-4" title="4">  <span class="dv">2</span><span class="op">*</span><span class="kw">tcrossprod</span>(v1<span class="op">+</span>v2)<span class="op">/</span><span class="kw">c</span>(<span class="kw">crossprod</span>(v1<span class="op">+</span>v2)) <span class="op">-</span><span class="st"> </span><span class="kw">diag</span>(4L)</a>
+<a class="sourceLine" id="cb5-5" title="5">}</a>
+<a class="sourceLine" id="cb5-6" title="6">Rot &lt;-<span class="st"> </span><span class="kw">rotationMatrix4D</span>(nrml, <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>))</a></code></pre></div>
+<p>Now define <span class="math inline">\(\mathcal{V}\mathcal{S}' = R(\mathcal{V}\mathcal{S}) \subset \mathbb{R}^4\)</span>. Then all points in <span class="math inline">\(\mathcal{V}\mathcal{S}'\)</span> are equal on their fourth coordinate (up to numerical errors in R):</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">VSprime &lt;-<span class="st"> </span>Rot <span class="op">%*%</span><span class="st"> </span>VS</a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="kw">head</span>(<span class="kw">t</span>(VSprime))</a>
+<a class="sourceLine" id="cb6-3" title="3"><span class="co">##           [,1]      [,2]      [,3]      [,4]</span></a>
+<a class="sourceLine" id="cb6-4" title="4"><span class="co">## [1,]  2.203740 -1.329658 -1.620365 0.9999785</span></a>
+<a class="sourceLine" id="cb6-5" title="5"><span class="co">## [2,] -1.324840  2.206491 -1.657871 1.0002417</span></a>
+<a class="sourceLine" id="cb6-6" title="6"><span class="co">## [3,] -1.320131  2.212244 -1.636339 0.9999972</span></a>
+<a class="sourceLine" id="cb6-7" title="7"><span class="co">## [4,] -1.417790  2.116178 -1.698381 0.9999926</span></a>
+<a class="sourceLine" id="cb6-8" title="8"><span class="co">## [5,]  2.219859 -1.310784 -1.651340 0.9999841</span></a>
+<a class="sourceLine" id="cb6-9" title="9"><span class="co">## [6,]  2.253515 -1.275147 -1.633245 1.0005005</span></a></code></pre></div>
+<p>Finally, define <span class="math inline">\(\mathcal{V}\mathcal{S}'' \subset \mathbb{R}^3\)</span> as the set obtained by removing the fourth coordinates of the elements of <span class="math inline">\(\mathcal{V}\mathcal{S}'\)</span>, and define the mesh <span class="math inline">\(\mathcal{M}\)</span> whose set of vertices is <span class="math inline">\(\mathcal{V}\mathcal{S}''\)</span> and with the same edges as <span class="math inline">\(\mathcal{M}_0\)</span>:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="kw">library</span>(rgl)</a>
+<a class="sourceLine" id="cb7-2" title="2">mesh &lt;-<span class="st"> </span><span class="kw">tmesh3d</span>(</a>
+<a class="sourceLine" id="cb7-3" title="3">  <span class="dt">vertices =</span> VSprime[<span class="op">-</span>4L,],</a>
+<a class="sourceLine" id="cb7-4" title="4">  <span class="dt">indices =</span> mesh0<span class="op">$</span>ib,</a>
+<a class="sourceLine" id="cb7-5" title="5">  <span class="dt">homogeneous =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb7-6" title="6">  <span class="dt">normals =</span> ?</a>
+<a class="sourceLine" id="cb7-7" title="7">)</a></code></pre></div>
+<p>What about the normals? If you have an implicit equation defining <span class="math inline">\(\mathcal{S}\)</span>, that is, <span class="math inline">\(\mathcal{S} = \iota^{-1}(0)\)</span> with <span class="math inline">\(\iota\colon \mathbb{R}^4 \to \mathbb{R}\)</span>, then a normal to <span class="math inline">\(\mathcal{S}\)</span> at a point <span class="math inline">\(\mathbf{x} \in \mathbb{R}^4\)</span> is given by the gradient of <span class="math inline">\(\iota\)</span> at <span class="math inline">\(\mathbf{x}\)</span>. For the tiger, we know an implicit equation, and it is not difficult to get the gradient:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">sNormal &lt;-<span class="st"> </span><span class="cf">function</span>(XYZT){</a>
+<a class="sourceLine" id="cb8-2" title="2">  x &lt;-<span class="st"> </span>XYZT[1L,]; y &lt;-<span class="st"> </span>XYZT[2L,]; z &lt;-<span class="st"> </span>XYZT[3L,]; t &lt;-<span class="st"> </span>XYZT[4L,]</a>
+<a class="sourceLine" id="cb8-3" title="3">  <span class="kw">rbind</span>(</a>
+<a class="sourceLine" id="cb8-4" title="4">    x <span class="op">*</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>R1<span class="op">/</span><span class="kw">sqrt</span>(x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span>)),</a>
+<a class="sourceLine" id="cb8-5" title="5">    y <span class="op">*</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>R1<span class="op">/</span><span class="kw">sqrt</span>(x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span>)),</a>
+<a class="sourceLine" id="cb8-6" title="6">    z <span class="op">*</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>R2<span class="op">/</span><span class="kw">sqrt</span>(z<span class="op">^</span><span class="dv">2</span><span class="op">+</span>t<span class="op">^</span><span class="dv">2</span>)),</a>
+<a class="sourceLine" id="cb8-7" title="7">    t <span class="op">*</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>R2<span class="op">/</span><span class="kw">sqrt</span>(z<span class="op">^</span><span class="dv">2</span><span class="op">+</span>t<span class="op">^</span><span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb8-8" title="8">  )</a>
+<a class="sourceLine" id="cb8-9" title="9">}</a>
+<a class="sourceLine" id="cb8-10" title="10">Normals &lt;-<span class="st"> </span><span class="kw">sNormal</span>(VS)</a></code></pre></div>
+<p>Once you get the normals:</p>
+<ul>
+<li><p>project them to the hyperplane <span class="math inline">\(\mathcal{P}\)</span>;</p></li>
+<li><p>apply the rotation <span class="math inline">\(R\)</span> to the projected normals;</p></li>
+<li><p>remove the fourth coordinates (all equal);</p></li>
+<li><p>if necessary, negate the normals.</p></li>
+</ul>
+<p>The projection of <span class="math inline">\(\mathbf{x} \in \mathbb{R}^4\)</span> to the hyperplane <span class="math inline">\(\mathcal{P}\)</span> is given by <span class="math display">\[
+\mathbf{x} - 
+\frac{\langle \mathbf{a}, \mathbf{x} \rangle - b}{\Vert \mathbf{a} \Vert^2} 
+\mathbf{a}.
+\]</span></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="co"># projection onto hyperplane &lt;a,x&gt; = b</span></a>
+<a class="sourceLine" id="cb9-2" title="2">projection &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, X){</a>
+<a class="sourceLine" id="cb9-3" title="3">  X <span class="op">-</span><span class="st"> </span><span class="kw">tcrossprod</span>(a<span class="op">/</span><span class="kw">c</span>(<span class="kw">crossprod</span>(a)), <span class="kw">colSums</span>(a<span class="op">*</span>X)<span class="op">-</span>b)</a>
+<a class="sourceLine" id="cb9-4" title="4">}</a>
+<a class="sourceLine" id="cb9-5" title="5">mesh &lt;-<span class="st"> </span><span class="kw">tmesh3d</span>(</a>
+<a class="sourceLine" id="cb9-6" title="6">  <span class="dt">vertices =</span> VSprime[<span class="op">-</span>4L,], </a>
+<a class="sourceLine" id="cb9-7" title="7">  <span class="dt">indices =</span> mesh0<span class="op">$</span>ib, </a>
+<a class="sourceLine" id="cb9-8" title="8">  <span class="dt">homogeneous =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb9-9" title="9">  <span class="dt">normals =</span> <span class="op">-</span><span class="kw">t</span>((Rot <span class="op">%*%</span><span class="st"> </span><span class="kw">projection</span>(a, b, Normals))[<span class="op">-</span>4L,])</a>
+<a class="sourceLine" id="cb9-10" title="10">)</a></code></pre></div>
+<p>This works:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">&quot;darkmagenta&quot;</span>)</a></code></pre></div>
+<p><img src="figures/tiger1.png" /></p>
+<p>Here is another way to get the normals. The normal at the point <span class="math inline">\(s(u,v,w)\)</span> is <span class="math display">\[
+\frac{\partial s}{\partial u}(u,v,w) \times
+\frac{\partial s}{\partial v}(u,v,w) \times
+\frac{\partial s}{\partial w}(u,v,w) 
+\]</span> where <span class="math inline">\(\cdot \times \cdot \times \cdot\)</span> is the <em>ternary cross-product</em> in <span class="math inline">\(\mathbb{R}^4\)</span>, defined by <span class="math display">\[
+\vec v_1 \times \vec v_2 \times \vec v_3 = 
+\left\vert\begin{matrix}
+\vec i &amp; \vec j &amp; \vec k &amp; \vec l \\ 
+v_{1x} &amp; v_{1y} &amp; v_{1z} &amp; v_{1t} \\ 
+v_{2x} &amp; v_{2y} &amp; v_{2z} &amp; v_{2t} \\ 
+v_{3x} &amp; v_{3y} &amp; v_{3z} &amp; v_{3t} 
+\end{matrix}\right\vert.
+\]</span></p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">crossProd4D &lt;-<span class="st"> </span><span class="cf">function</span>(v1, v2, v3){</a>
+<a class="sourceLine" id="cb11-2" title="2">  M &lt;-<span class="st"> </span><span class="kw">rbind</span>(v1, v2, v3)</a>
+<a class="sourceLine" id="cb11-3" title="3">  <span class="kw">c</span>(<span class="kw">det</span>(M[,<span class="op">-</span>1L]), <span class="op">-</span><span class="kw">det</span>(M[,<span class="op">-</span>2L]), <span class="kw">det</span>(M[,<span class="op">-</span>3L]), <span class="op">-</span><span class="kw">det</span>(M[,<span class="op">-</span>4L]))</a>
+<a class="sourceLine" id="cb11-4" title="4">}</a>
+<a class="sourceLine" id="cb11-5" title="5">sNormal &lt;-<span class="st"> </span><span class="cf">function</span>(uvw){</a>
+<a class="sourceLine" id="cb11-6" title="6">  u &lt;-<span class="st"> </span>uvw[1L]; v &lt;-<span class="st"> </span>uvw[2L]; w &lt;-<span class="st"> </span>uvw[3L]</a>
+<a class="sourceLine" id="cb11-7" title="7">  Du &lt;-<span class="st"> </span><span class="kw">c</span>((R1 <span class="op">+</span><span class="st"> </span>r<span class="op">*</span><span class="kw">cos</span>(w))<span class="op">*</span><span class="kw">c</span>(<span class="op">-</span><span class="kw">sin</span>(u),<span class="kw">cos</span>(u)), <span class="dv">0</span>, <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb11-8" title="8">  Dv &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, (R2 <span class="op">+</span><span class="st"> </span>r<span class="op">*</span><span class="kw">sin</span>(w))<span class="op">*</span><span class="kw">c</span>(<span class="op">-</span><span class="kw">sin</span>(v),<span class="kw">cos</span>(v)))</a>
+<a class="sourceLine" id="cb11-9" title="9">  Dw &lt;-<span class="st"> </span>r <span class="op">*</span><span class="st"> </span><span class="kw">c</span>(<span class="op">-</span><span class="kw">sin</span>(w)<span class="op">*</span><span class="kw">c</span>(<span class="kw">cos</span>(u),<span class="kw">sin</span>(u)), <span class="kw">cos</span>(w)<span class="op">*</span><span class="kw">c</span>(<span class="kw">cos</span>(v),<span class="kw">sin</span>(v)))</a>
+<a class="sourceLine" id="cb11-10" title="10">  <span class="kw">crossProd4D</span>(Du, Dv, Dw)</a>
+<a class="sourceLine" id="cb11-11" title="11">}</a>
+<a class="sourceLine" id="cb11-12" title="12">Normals &lt;-<span class="st"> </span><span class="kw">apply</span>(VS0, 2L, sNormal)</a></code></pre></div>
+<p>Then you can calculate the normals in this way and proceed as before:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1">mesh &lt;-<span class="st"> </span><span class="kw">tmesh3d</span>(</a>
+<a class="sourceLine" id="cb12-2" title="2">  <span class="dt">vertices =</span> VSprime[<span class="op">-</span>4L,], </a>
+<a class="sourceLine" id="cb12-3" title="3">  <span class="dt">indices =</span> mesh0<span class="op">$</span>ib, </a>
+<a class="sourceLine" id="cb12-4" title="4">  <span class="dt">homogeneous =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb12-5" title="5">  <span class="dt">normals =</span> <span class="kw">t</span>((Rot <span class="op">%*%</span><span class="st"> </span><span class="kw">projection</span>(a, b, Normals))[<span class="op">-</span>4L,])</a>
+<a class="sourceLine" id="cb12-6" title="6">)</a></code></pre></div>
+<p>Here is how to do an animation:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1">b_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="fl">11.5</span>, <span class="fl">11.5</span>, <span class="dt">length.out =</span> 60L)</a>
+<a class="sourceLine" id="cb13-2" title="2"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">100</span>, <span class="dv">100</span>, <span class="dv">612</span>, <span class="dv">612</span>), <span class="dt">zoom =</span> <span class="fl">0.8</span>)</a>
+<a class="sourceLine" id="cb13-3" title="3"><span class="kw">bg3d</span>(<span class="kw">rgb</span>(<span class="dv">54</span>, <span class="dv">57</span>, <span class="dv">64</span>, <span class="dt">maxColorValue =</span> <span class="dv">255</span>))</a>
+<a class="sourceLine" id="cb13-4" title="4"><span class="kw">view3d</span>(<span class="dv">45</span>, <span class="dv">40</span>)</a>
+<a class="sourceLine" id="cb13-5" title="5"><span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span><span class="kw">length</span>(b_)){</a>
+<a class="sourceLine" id="cb13-6" title="6">  x0 &lt;-<span class="st"> </span><span class="kw">rep</span>(b_[i]<span class="op">/</span><span class="dv">4</span>, 4L) </a>
+<a class="sourceLine" id="cb13-7" title="7">  surf &lt;-<span class="st"> </span><span class="kw">computeContour3d</span>(voxel, <span class="dt">level =</span> <span class="kw">sum</span>(x0<span class="op">*</span>nrml), </a>
+<a class="sourceLine" id="cb13-8" title="8">                           <span class="dt">x =</span> u_, <span class="dt">y =</span> v_, <span class="dt">z =</span> w_)</a>
+<a class="sourceLine" id="cb13-9" title="9">  trgls &lt;-<span class="st"> </span><span class="kw">makeTriangles</span>(surf)</a>
+<a class="sourceLine" id="cb13-10" title="10">  mesh0 &lt;-<span class="st"> </span>misc3d<span class="op">:::</span><span class="kw">t2ve</span>(trgls)</a>
+<a class="sourceLine" id="cb13-11" title="11">  VS0 &lt;-<span class="st"> </span>mesh0<span class="op">$</span>vb</a>
+<a class="sourceLine" id="cb13-12" title="12">  VS &lt;-<span class="st"> </span><span class="kw">s</span>(VS0[1L,], VS0[2L,], VS0[3L,])</a>
+<a class="sourceLine" id="cb13-13" title="13">  Normals &lt;-<span class="st"> </span><span class="kw">sNormal</span>(VS)</a>
+<a class="sourceLine" id="cb13-14" title="14">  mesh &lt;-<span class="st"> </span><span class="kw">tmesh3d</span>(</a>
+<a class="sourceLine" id="cb13-15" title="15">    <span class="dt">vertices =</span> (Rot <span class="op">%*%</span><span class="st"> </span>VS)[<span class="op">-</span>4L,], </a>
+<a class="sourceLine" id="cb13-16" title="16">    <span class="dt">indices =</span> mesh0<span class="op">$</span>ib, </a>
+<a class="sourceLine" id="cb13-17" title="17">    <span class="dt">homogeneous =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb13-18" title="18">    <span class="dt">normals =</span> <span class="op">-</span><span class="kw">t</span>((Rot <span class="op">%*%</span><span class="st"> </span><span class="kw">projection</span>(a, b_[i], Normals))[<span class="op">-</span>4L,])</a>
+<a class="sourceLine" id="cb13-19" title="19">  )</a>
+<a class="sourceLine" id="cb13-20" title="20">  <span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">&quot;firebrick3&quot;</span>)</a>
+<a class="sourceLine" id="cb13-21" title="21">  <span class="kw">snapshot3d</span>(<span class="kw">sprintf</span>(<span class="st">&quot;pic%03d.png&quot;</span>, i))</a>
+<a class="sourceLine" id="cb13-22" title="22">  <span class="kw">clear3d</span>()</a>
+<a class="sourceLine" id="cb13-23" title="23">}</a>
+<a class="sourceLine" id="cb13-24" title="24"><span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span>59L){</a>
+<a class="sourceLine" id="cb13-25" title="25">  <span class="kw">file.copy</span>(<span class="kw">sprintf</span>(<span class="st">&quot;pic%03d.png&quot;</span>, <span class="dv">60</span><span class="op">-</span>i), <span class="kw">sprintf</span>(<span class="st">&quot;pic%03d.png&quot;</span>, <span class="dv">60</span><span class="op">+</span>i))</a>
+<a class="sourceLine" id="cb13-26" title="26">}</a>
+<a class="sourceLine" id="cb13-27" title="27"><span class="co"># run gifski</span></a>
+<a class="sourceLine" id="cb13-28" title="28">command &lt;-<span class="st"> &quot;gifski --fps 12 pic*.png -o slicedTiger.gif&quot;</span></a>
+<a class="sourceLine" id="cb13-29" title="29"><span class="kw">system</span>(command)</a>
+<a class="sourceLine" id="cb13-30" title="30"><span class="co"># cleaning</span></a>
+<a class="sourceLine" id="cb13-31" title="31">pngfiles &lt;-<span class="st"> </span><span class="kw">list.files</span>(<span class="dt">pattern =</span> <span class="st">&quot;^pic.*png$&quot;</span>)</a>
+<a class="sourceLine" id="cb13-32" title="32"><span class="kw">file.remove</span>(pngfiles)</a></code></pre></div>
+<p><img src="figures/tiger2.gif" /></p>
+<h2 id="toroidal-hyperboloid">Toroidal hyperboloid</h2>
+<p>Let’s give another example, a <em>toroidal hyperboloid</em>. This is a quadric with implicit equation <span class="math display">\[
+\frac{x^2}{a^2} + \frac{y^2}{b^2} - \frac{z^2}{c^2} - \frac{t^2}{d^2} = 1,
+\]</span> and a parameterization of this quadric is <span class="math display">\[
+\begin{array}{ccc}
+s \colon &amp; (0,2\pi) \times (0,2\pi) \times (0, +\infty[ &amp; 
+\longrightarrow &amp; \mathbb{R}^4 \\
+ &amp; (u,v,w) &amp; \longmapsto &amp; 
+\begin{pmatrix}
+a \cos u \cosh w \\ 
+b \sin u \cosh w \\
+c \cos v \sinh w \\
+d \sin v \sinh w 
+\end{pmatrix}
+\end{array}.
+\]</span></p>
+<p><img src="figures/toroidalHyperboloid.gif" /></p>
+
+    </div>
+
+
+    <div id="footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </div>
+
+  </div>
+
+  <div id="disqus_thread"></div>
+  <div class="pagination">
+    <ul>
+      <li>
+        <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+      </li>
+    </ul>
+  </div>
+</body>
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+<!-- Google Prettify -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+<script>
+  var pres = document.getElementsByTagName("pre");
+  for (var i = 0; i < pres.length; ++i) {
+    
+    pres[i].className = pres[i].className + " prettyprint linenums";
+    
+  }
+  prettyPrint();
+</script> 
+
+</html>

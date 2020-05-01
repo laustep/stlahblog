@@ -90,8 +90,8 @@
       );
     }
 
-    const float THETA = 0.8;
-    const float PHI = 0.8;
+    const float THETA = 5.88;
+    const float PHI = 2.56;
 
     const int RTYPE = 0;
 
@@ -188,12 +188,12 @@
       for(int i = 0; i < 4; i++){
         vec3 vi = RTYPE == 0 ? 
           stereog(rotation4D(AX1, AX2, xi, vertices[i])) : 
-          stereog(rotation4DR(vertices[i], xi, PHI, xi)); 
+          stereog(rotation4DR(vertices[i], THETA, PHI, xi)); 
         for(int j = 1; j < 5; j++){
           if(j > i){
             vec3 vj = RTYPE == 0 ? 
               stereog(rotation4D(AX1, AX2, xi, vertices[j])) :
-              stereog(rotation4DR(vertices[j], xi, PHI, xi)); 
+              stereog(rotation4DR(vertices[j], THETA, PHI, xi)); 
             tnorm = iCappedCone(rro, rrd, vi, vj, CRADIUS, CRADIUS, false);
             if(tnorm.x > 0.0){
               tnorm.yzw = invrotate(tnorm.yzw, -theta, theta, theta);
@@ -208,7 +208,7 @@
       for(int i = 0; i < 5; i++){
         vec3 vi = RTYPE == 0 ? 
           stereog(rotation4D(AX1, AX2, xi, vertices[i])) : 
-          stereog(rotation4DR(vertices[i], xi, PHI, xi)); 
+          stereog(rotation4DR(vertices[i], THETA, PHI, xi)); 
         tnorm = iSphere(rro - vi, rrd, SRADIUS);
         if(tnorm.x > 0.0){
           tnorm.yzw = invrotate(tnorm.yzw, -theta, theta, theta);
