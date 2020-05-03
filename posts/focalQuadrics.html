@@ -1,0 +1,671 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Focal quadrics and their lines of curvature</title>
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  <link rel="stylesheet" href="../css/pandoc-solarized.css" />  
+  <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+</head>
+
+<body>
+  <!-- Sidebar. -->
+  <div class="sidebar">
+    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+      <a href="https://www.r-bloggers.com/">
+        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+      </a>
+      <br />
+      <a href="http://t-redactyl.io/">
+        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
+      </a>
+      <a href="http://timelyportfolio.blogspot.be/">
+        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
+      </a>
+      <br />
+      <a href="https://antoineguillot.wordpress.com/blog/">
+        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+      </a>
+      <br />
+      <a href="https://fronkonstin.com/">
+        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="header">
+      <div id="logo" style="position:absolute;">
+        <a href="../">
+          <img src="../images/stla.jpg" alt="stla" width="100px" />
+        </a>
+      </div>
+      <div id="navigation" style="margin-top:50px;">
+        <a href="../">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../archive.html">Archive</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Focal quadrics and their lines of curvature</h1> <div class="info">
+    Posted on May  3, 2020
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="../tags/R.html">R</a>, <a href="../tags/graphics.html">graphics</a>, <a href="../tags/rgl.html">rgl</a>, <a href="../tags/geometry.html">geometry</a>, <a href="../tags/maths.html">maths</a>
+    
+</div>
+
+<p>This blog post provides some R code for drawing focal quadrics and their curvatures lines with the <code>rgl</code> package.</p>
+<h1 id="ellipsoid">Ellipsoid</h1>
+<p>The <code>ellipsoidMesh</code> function below generates a mesh of the ellipsoid of equation <span class="math display">\[
+\frac{x^2}{a^2} + \frac{y^2}{b^2} + \frac{z^2}{c^2} = 1.
+\]</span></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">library</span>(rgl)</a>
+<a class="sourceLine" id="cb1-2" title="2">ellipsoidMesh &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, <span class="dt">smoothness =</span> <span class="dv">5</span>){</a>
+<a class="sourceLine" id="cb1-3" title="3">  <span class="kw">stopifnot</span>(a <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, b <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, c <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb1-4" title="4">  sphere &lt;-<span class="st"> </span><span class="kw">subdivision3d</span>(<span class="kw">icosahedron3d</span>(), <span class="dt">depth =</span> smoothness)</a>
+<a class="sourceLine" id="cb1-5" title="5">  sphere<span class="op">$</span>vb[4L,] &lt;-<span class="st"> </span></a>
+<a class="sourceLine" id="cb1-6" title="6"><span class="st">    </span><span class="kw">apply</span>(sphere<span class="op">$</span>vb[1L<span class="op">:</span>3L,], 2L, <span class="cf">function</span>(x) <span class="kw">sqrt</span>(<span class="kw">sum</span>(x<span class="op">*</span>x)))</a>
+<a class="sourceLine" id="cb1-7" title="7">  sphere<span class="op">$</span>normals &lt;-<span class="st"> </span>sphere<span class="op">$</span>vb</a>
+<a class="sourceLine" id="cb1-8" title="8">  <span class="kw">scale3d</span>(sphere, a, b, c)</a>
+<a class="sourceLine" id="cb1-9" title="9">}</a></code></pre></div>
+<p>The curvature lines of this ellipsoid are generated by the function <code>curvatureLinesE</code> given below. There are two families of curvature lines. The arguments <code>nu</code> and <code>nv</code> control the numbers of curvature lines in these two families. When the ellipsoid is tri-axial, <em>i.e.</em> when <span class="math inline">\(a\)</span>, <span class="math inline">\(b\)</span>, <span class="math inline">\(c\)</span> are distinct, the arguments <code>du</code> and <code>dv</code> must be positive and they control the size of the smallest curvature lines (if they were <span class="math inline">\(0\)</span>, the smallest curvature lines would degenerate to segments). When the ellipsoid is an ellipsoid of revolution, <em>i.e.</em> when two values of <span class="math inline">\(a\)</span>, <span class="math inline">\(b\)</span>, <span class="math inline">\(c\)</span> are equal, the curvature lines are the meridians and the parallels; in this case, <code>du</code> is ignored, and <code>dv</code>, which must be positive and strictly smaller than <span class="math inline">\(\frac{\pi}{2}\)</span>, control the size of the smallest parallel.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">curvatureLinesE &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, nu, nv, du, dv, <span class="dt">npoints =</span> <span class="dv">100</span>){</a>
+<a class="sourceLine" id="cb2-2" title="2">  <span class="kw">stopifnot</span>(a <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, b <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, c <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb2-3" title="3">  <span class="cf">if</span>((a <span class="op">!=</span><span class="st"> </span>b <span class="op">&amp;&amp;</span><span class="st"> </span>b <span class="op">!=</span><span class="st"> </span>c) <span class="op">&amp;&amp;</span><span class="st"> </span>(a <span class="op">&lt;</span><span class="st"> </span>b <span class="op">||</span><span class="st"> </span>b <span class="op">&lt;</span><span class="st"> </span>c)){</a>
+<a class="sourceLine" id="cb2-4" title="4">    perm &lt;-<span class="st"> </span><span class="kw">order</span>(<span class="kw">c</span>(a,b,c), <span class="dt">decreasing =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb2-5" title="5">    abc &lt;-<span class="st"> </span><span class="kw">c</span>(a,b,c)[perm]</a>
+<a class="sourceLine" id="cb2-6" title="6">    clines &lt;-<span class="st"> </span></a>
+<a class="sourceLine" id="cb2-7" title="7"><span class="st">      </span><span class="kw">curvatureLinesE</span>(abc[1L], abc[2L], abc[3L], nu, nv, du, dv, npoints)</a>
+<a class="sourceLine" id="cb2-8" title="8">    <span class="kw">return</span>(<span class="kw">lapply</span>(clines, <span class="cf">function</span>(l) l[, perm]))</a>
+<a class="sourceLine" id="cb2-9" title="9">  }</a>
+<a class="sourceLine" id="cb2-10" title="10">  <span class="cf">if</span>(a <span class="op">!=</span><span class="st"> </span>b <span class="op">&amp;&amp;</span><span class="st"> </span>b <span class="op">!=</span><span class="st"> </span>c){</a>
+<a class="sourceLine" id="cb2-11" title="11">    <span class="kw">stopifnot</span>(du <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, dv <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb2-12" title="12">    a2 &lt;-<span class="st"> </span>a<span class="op">^</span><span class="dv">2</span>; b2 &lt;-<span class="st"> </span>b<span class="op">^</span><span class="dv">2</span>; c2 &lt;-<span class="st"> </span>c<span class="op">^</span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb2-13" title="13">    h2ab &lt;-<span class="st"> </span>a2 <span class="op">-</span><span class="st"> </span>b2; h2ac &lt;-<span class="st"> </span>a2 <span class="op">-</span><span class="st"> </span>c2; h2bc &lt;-<span class="st"> </span>b2 <span class="op">-</span><span class="st"> </span>c2</a>
+<a class="sourceLine" id="cb2-14" title="14">    <span class="cf">if</span>(du <span class="op">&gt;=</span><span class="st"> </span>h2ab) <span class="kw">stop</span>(<span class="st">&quot;`du` is too large.&quot;</span>)</a>
+<a class="sourceLine" id="cb2-15" title="15">    <span class="cf">if</span>(dv <span class="op">&gt;=</span><span class="st"> </span>h2bc) <span class="kw">stop</span>(<span class="st">&quot;`dv` is too large.&quot;</span>)</a>
+<a class="sourceLine" id="cb2-16" title="16">    out &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;list&quot;</span>, <span class="dv">2</span><span class="op">*</span>nv<span class="dv">-1</span> <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>nu<span class="dv">-1</span>)</a>
+<a class="sourceLine" id="cb2-17" title="17">    u_ &lt;-<span class="st"> </span><span class="kw">seq</span>(b2<span class="op">+</span>du, a2, <span class="dt">length.out =</span> nu)</a>
+<a class="sourceLine" id="cb2-18" title="18">    s_ &lt;-<span class="st"> </span><span class="kw">seq</span>(b2, a2, <span class="dt">length.out =</span> npoints)</a>
+<a class="sourceLine" id="cb2-19" title="19">    v_ &lt;-<span class="st"> </span><span class="kw">seq</span>(c2, b2<span class="op">-</span>dv, <span class="dt">length.out =</span> nv) </a>
+<a class="sourceLine" id="cb2-20" title="20">    t_ &lt;-<span class="st"> </span><span class="kw">seq</span>(c2, b2, <span class="dt">length.out =</span> npoints)</a>
+<a class="sourceLine" id="cb2-21" title="21">    mx &lt;-<span class="st"> </span>a <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2ac<span class="op">*</span>h2ab)</a>
+<a class="sourceLine" id="cb2-22" title="22">    my &lt;-<span class="st"> </span>b <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2bc<span class="op">*</span>h2ab)</a>
+<a class="sourceLine" id="cb2-23" title="23">    mz &lt;-<span class="st"> </span>c <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2bc<span class="op">*</span>h2ac)</a>
+<a class="sourceLine" id="cb2-24" title="24">    <span class="cf">for</span>(j <span class="cf">in</span> 1L<span class="op">:</span>nv){</a>
+<a class="sourceLine" id="cb2-25" title="25">      x &lt;-<span class="st"> </span>mx <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((a2<span class="op">-</span>s_)<span class="op">*</span>(a2<span class="op">-</span>v_[j]))</a>
+<a class="sourceLine" id="cb2-26" title="26">      y &lt;-<span class="st"> </span>my <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((s_<span class="op">-</span>b2)<span class="op">*</span>(b2<span class="op">-</span>v_[j]))</a>
+<a class="sourceLine" id="cb2-27" title="27">      z &lt;-<span class="st"> </span>mz <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((s_<span class="op">-</span>c2)<span class="op">*</span>(v_[j]<span class="op">-</span>c2))</a>
+<a class="sourceLine" id="cb2-28" title="28">      M &lt;-<span class="st"> </span><span class="kw">rbind</span>(<span class="kw">cbind</span>(x, y, z), <span class="kw">cbind</span>(<span class="op">-</span>x, y, z)[(npoints<span class="dv">-1</span>)<span class="op">:</span>1L,])</a>
+<a class="sourceLine" id="cb2-29" title="29">      M &lt;-<span class="st"> </span><span class="kw">rbind</span>(M, <span class="kw">cbind</span>(M[,1L], <span class="op">-</span>M[,2L], M[,3L])[(<span class="dv">2</span><span class="op">*</span>npoints<span class="dv">-2</span>)<span class="op">:</span>1L,])</a>
+<a class="sourceLine" id="cb2-30" title="30">      out[[j]] &lt;-<span class="st"> </span>M</a>
+<a class="sourceLine" id="cb2-31" title="31">      <span class="cf">if</span>(j <span class="op">&gt;</span><span class="st"> </span>1L){</a>
+<a class="sourceLine" id="cb2-32" title="32">        out[[nv<span class="op">+</span>j<span class="dv">-1</span>]] &lt;-<span class="st"> </span><span class="kw">cbind</span>(M[,<span class="kw">c</span>(1L,2L)], <span class="op">-</span>M[,3L])</a>
+<a class="sourceLine" id="cb2-33" title="33">      }</a>
+<a class="sourceLine" id="cb2-34" title="34">    }</a>
+<a class="sourceLine" id="cb2-35" title="35">    <span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span>nu){</a>
+<a class="sourceLine" id="cb2-36" title="36">      x &lt;-<span class="st"> </span>mx <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((a2<span class="op">-</span>u_[i])<span class="op">*</span>(a2<span class="op">-</span>t_))</a>
+<a class="sourceLine" id="cb2-37" title="37">      y &lt;-<span class="st"> </span>my <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((u_[i]<span class="op">-</span>b2)<span class="op">*</span>(b2<span class="op">-</span>t_))</a>
+<a class="sourceLine" id="cb2-38" title="38">      z &lt;-<span class="st"> </span>mz <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((u_[i]<span class="op">-</span>c2)<span class="op">*</span>(t_<span class="op">-</span>c2))</a>
+<a class="sourceLine" id="cb2-39" title="39">      M &lt;-<span class="st"> </span><span class="kw">rbind</span>(<span class="kw">cbind</span>(x, y, z), <span class="kw">cbind</span>(x, <span class="op">-</span>y, z)[(npoints<span class="dv">-1</span>)<span class="op">:</span>1L,])</a>
+<a class="sourceLine" id="cb2-40" title="40">      M &lt;-<span class="st"> </span><span class="kw">rbind</span>(M, <span class="kw">cbind</span>(M[,<span class="kw">c</span>(1L,2L)], <span class="op">-</span>M[,3L])[(<span class="dv">2</span><span class="op">*</span>npoints<span class="dv">-2</span>)<span class="op">:</span>1L,])</a>
+<a class="sourceLine" id="cb2-41" title="41">      out[[<span class="dv">2</span><span class="op">*</span>nv<span class="dv">-1</span><span class="op">+</span>i]] &lt;-<span class="st"> </span>M</a>
+<a class="sourceLine" id="cb2-42" title="42">      <span class="cf">if</span>(i <span class="op">&lt;</span><span class="st"> </span>nu){</a>
+<a class="sourceLine" id="cb2-43" title="43">        out[[<span class="dv">2</span><span class="op">*</span>nv<span class="dv">-1</span><span class="op">+</span>nu<span class="op">+</span>i]] &lt;-<span class="st"> </span><span class="kw">cbind</span>(<span class="op">-</span>M[,1L], M[,<span class="kw">c</span>(2L,3L)])</a>
+<a class="sourceLine" id="cb2-44" title="44">      }</a>
+<a class="sourceLine" id="cb2-45" title="45">    }</a>
+<a class="sourceLine" id="cb2-46" title="46">  }<span class="cf">else</span>{ <span class="co"># a == b || b == c </span></a>
+<a class="sourceLine" id="cb2-47" title="47">    <span class="co"># surface of revolution =&gt; curvature lines are meridians and parallels</span></a>
+<a class="sourceLine" id="cb2-48" title="48">    <span class="kw">stopifnot</span>(dv <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, dv <span class="op">&lt;</span><span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb2-49" title="49">    out &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;list&quot;</span>, nu <span class="op">+</span><span class="st"> </span>nv)</a>
+<a class="sourceLine" id="cb2-50" title="50">    u_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> nu<span class="op">+</span><span class="dv">1</span>)[<span class="op">-</span>1L]</a>
+<a class="sourceLine" id="cb2-51" title="51">    s_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> npoints)</a>
+<a class="sourceLine" id="cb2-52" title="52">    v_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span>pi<span class="op">/</span><span class="dv">2</span><span class="op">+</span>dv, pi<span class="op">/</span><span class="dv">2</span><span class="op">-</span>dv, <span class="dt">length.out =</span> nv) </a>
+<a class="sourceLine" id="cb2-53" title="53">    t_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span>pi, pi, <span class="dt">length.out =</span> npoints)</a>
+<a class="sourceLine" id="cb2-54" title="54">    coss_ &lt;-<span class="st"> </span><span class="kw">cos</span>(s_); sins_ &lt;-<span class="st"> </span><span class="kw">sin</span>(s_)</a>
+<a class="sourceLine" id="cb2-55" title="55">    cost_ &lt;-<span class="st"> </span><span class="kw">cos</span>(t_); sint_ &lt;-<span class="st"> </span><span class="kw">sin</span>(t_)</a>
+<a class="sourceLine" id="cb2-56" title="56">    <span class="cf">for</span>(j <span class="cf">in</span> 1L<span class="op">:</span>nv){</a>
+<a class="sourceLine" id="cb2-57" title="57">      x &lt;-<span class="st"> </span>a <span class="op">*</span><span class="st"> </span>coss_ <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(v_[j])</a>
+<a class="sourceLine" id="cb2-58" title="58">      y &lt;-<span class="st"> </span>b <span class="op">*</span><span class="st"> </span>sins_ <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(v_[j])</a>
+<a class="sourceLine" id="cb2-59" title="59">      z &lt;-<span class="st"> </span>c <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(v_[j])</a>
+<a class="sourceLine" id="cb2-60" title="60">      out[[j]] &lt;-<span class="st"> </span><span class="kw">cbind</span>(x, y, z)</a>
+<a class="sourceLine" id="cb2-61" title="61">    }</a>
+<a class="sourceLine" id="cb2-62" title="62">    <span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span>nu){</a>
+<a class="sourceLine" id="cb2-63" title="63">      x &lt;-<span class="st"> </span>a <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(u_[i]) <span class="op">*</span><span class="st"> </span>cost_</a>
+<a class="sourceLine" id="cb2-64" title="64">      y &lt;-<span class="st"> </span>b <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(u_[i]) <span class="op">*</span><span class="st"> </span>cost_</a>
+<a class="sourceLine" id="cb2-65" title="65">      z &lt;-<span class="st"> </span>c <span class="op">*</span><span class="st"> </span>sint_</a>
+<a class="sourceLine" id="cb2-66" title="66">      out[[nv<span class="op">+</span>i]] &lt;-<span class="st"> </span><span class="kw">cbind</span>(x, y, z)</a>
+<a class="sourceLine" id="cb2-67" title="67">    }</a>
+<a class="sourceLine" id="cb2-68" title="68">  }</a>
+<a class="sourceLine" id="cb2-69" title="69">  out</a>
+<a class="sourceLine" id="cb2-70" title="70">}</a></code></pre></div>
+<p>Here is an example:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">a =<span class="st"> </span><span class="dv">7</span>; b =<span class="st"> </span><span class="dv">5</span>; c =<span class="st"> </span><span class="dv">3</span></a>
+<a class="sourceLine" id="cb3-2" title="2">mesh &lt;-<span class="st"> </span><span class="kw">ellipsoidMesh</span>(a, b, c)</a>
+<a class="sourceLine" id="cb3-3" title="3">clines &lt;-<span class="st"> </span><span class="kw">curvatureLinesE</span>(a, b, c, <span class="dt">nu =</span> <span class="dv">5</span>, <span class="dt">nv =</span> <span class="dv">5</span>, <span class="dt">du =</span> <span class="fl">0.4</span>, <span class="dt">dv =</span> <span class="dv">1</span>, </a>
+<a class="sourceLine" id="cb3-4" title="4">                          <span class="dt">npoints =</span> <span class="dv">300</span>)</a>
+<a class="sourceLine" id="cb3-5" title="5"><span class="kw">shade3d</span>(mesh, <span class="dt">col =</span> <span class="st">&quot;springgreen&quot;</span>)</a>
+<a class="sourceLine" id="cb3-6" title="6"><span class="kw">invisible</span>(<span class="kw">lapply</span>(clines, <span class="cf">function</span>(l){</a>
+<a class="sourceLine" id="cb3-7" title="7">  <span class="kw">shade3d</span>(<span class="kw">cylinder3d</span>(l, <span class="dt">radius =</span> <span class="fl">0.08</span>, <span class="dt">sides =</span> <span class="dv">30</span>))</a>
+<a class="sourceLine" id="cb3-8" title="8">}))</a></code></pre></div>
+<p><img src="figures/quadrics_E.png" /></p>
+<h1 id="one-sheeted-hyperboloid">One-sheeted hyperboloid</h1>
+<p>There are three types of one-sheeted hyperboloids, corresponding to these equations: <span class="math display">\[
+\frac{x^2}{a^2} + \frac{y^2}{b^2} - \frac{z^2}{c^2} = 1 \\
+\frac{x^2}{a^2} - \frac{y^2}{b^2} + \frac{z^2}{c^2} = 1 \\
+-\frac{x^2}{a^2} + \frac{y^2}{b^2} + \frac{z^2}{c^2} = 1.
+\]</span> The <code>hyperboloidMesh</code> function below generates a mesh of the one-sheeted hyperboloid; the <code>signature</code> argument corresponds to one of the above equations, it must be <code>"++-"</code>, <code>"+-+"</code> or <code>"-++"</code>. The mesh is made of quadrilaterals and their number is controlled by the arguments <code>nu</code> and <code>nv</code>. The hyperboloid is infinite along the direction corresponding to the minus sign, and the argument <code>vmin</code> controls the truncation of the hyperboloid in this direction.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">hyperboloidMesh &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, signature, nu, nv, vmin){</a>
+<a class="sourceLine" id="cb4-2" title="2">  <span class="kw">stopifnot</span>(signature <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;++-&quot;</span>, <span class="st">&quot;+-+&quot;</span>, <span class="st">&quot;-++&quot;</span>))</a>
+<a class="sourceLine" id="cb4-3" title="3">  <span class="kw">stopifnot</span>(vmin <span class="op">&lt;</span><span class="st"> </span><span class="dv">1</span>, a <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, b <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, c <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb4-4" title="4">  <span class="cf">if</span>(signature <span class="op">==</span><span class="st"> &quot;+-+&quot;</span>){</a>
+<a class="sourceLine" id="cb4-5" title="5">    mesh &lt;-<span class="st"> </span><span class="kw">hyperboloidMesh</span>(a, c, b, <span class="st">&quot;++-&quot;</span>, nu, nv, vmin)</a>
+<a class="sourceLine" id="cb4-6" title="6">    mesh<span class="op">$</span>vb &lt;-<span class="st"> </span>mesh<span class="op">$</span>vb[<span class="kw">c</span>(1L,3L,2L,4L),]</a>
+<a class="sourceLine" id="cb4-7" title="7">    mesh<span class="op">$</span>normals &lt;-<span class="st"> </span>mesh<span class="op">$</span>normals[<span class="kw">c</span>(1L,3L,2L),]</a>
+<a class="sourceLine" id="cb4-8" title="8">    mesh<span class="op">$</span>ib &lt;-<span class="st"> </span>mesh<span class="op">$</span>ib[4L<span class="op">:</span>1L,]</a>
+<a class="sourceLine" id="cb4-9" title="9">    <span class="kw">return</span>(mesh)</a>
+<a class="sourceLine" id="cb4-10" title="10">  }<span class="cf">else</span> <span class="cf">if</span>(signature <span class="op">==</span><span class="st"> &quot;-++&quot;</span>){</a>
+<a class="sourceLine" id="cb4-11" title="11">    mesh &lt;-<span class="st"> </span><span class="kw">hyperboloidMesh</span>(c, b, a, <span class="st">&quot;++-&quot;</span>, nu, nv, vmin)</a>
+<a class="sourceLine" id="cb4-12" title="12">    mesh<span class="op">$</span>vb &lt;-<span class="st"> </span>mesh<span class="op">$</span>vb[<span class="kw">c</span>(3L,2L,1L,4L),]</a>
+<a class="sourceLine" id="cb4-13" title="13">    mesh<span class="op">$</span>normals &lt;-<span class="st"> </span>mesh<span class="op">$</span>normals[<span class="kw">c</span>(3L,2L,1L),]</a>
+<a class="sourceLine" id="cb4-14" title="14">    mesh<span class="op">$</span>ib &lt;-<span class="st"> </span>mesh<span class="op">$</span>ib[4L<span class="op">:</span>1L,]</a>
+<a class="sourceLine" id="cb4-15" title="15">    <span class="kw">return</span>(mesh)</a>
+<a class="sourceLine" id="cb4-16" title="16">  }</a>
+<a class="sourceLine" id="cb4-17" title="17">  c0 &lt;-<span class="st"> </span>c</a>
+<a class="sourceLine" id="cb4-18" title="18">  <span class="cf">if</span>(b <span class="op">&gt;</span><span class="st"> </span>a){</a>
+<a class="sourceLine" id="cb4-19" title="19">    exchange &lt;-<span class="st"> </span><span class="ot">TRUE</span></a>
+<a class="sourceLine" id="cb4-20" title="20">    a0 &lt;-<span class="st"> </span>b; b0 &lt;-<span class="st"> </span>a</a>
+<a class="sourceLine" id="cb4-21" title="21">  }<span class="cf">else</span>{</a>
+<a class="sourceLine" id="cb4-22" title="22">    exchange &lt;-<span class="st"> </span><span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb4-23" title="23">    a0 &lt;-<span class="st"> </span>a; b0 &lt;-<span class="st"> </span>b</a>
+<a class="sourceLine" id="cb4-24" title="24">  }</a>
+<a class="sourceLine" id="cb4-25" title="25">  Mu2 &lt;-<span class="st"> </span>a0<span class="op">^</span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb4-26" title="26">  h2ab &lt;-<span class="st"> </span>Mu2 <span class="op">-</span><span class="st"> </span>b0<span class="op">^</span><span class="dv">2</span>; h2ac &lt;-<span class="st"> </span>c0<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>Mu2</a>
+<a class="sourceLine" id="cb4-27" title="27">  c2 &lt;-<span class="st"> </span><span class="dv">1</span>; a2 &lt;-<span class="st"> </span>c2 <span class="op">+</span><span class="st"> </span>h2ac; b2 &lt;-<span class="st"> </span>a2 <span class="op">-</span><span class="st"> </span>h2ab</a>
+<a class="sourceLine" id="cb4-28" title="28">  h2bc &lt;-<span class="st"> </span>b2 <span class="op">-</span><span class="st"> </span>c2</a>
+<a class="sourceLine" id="cb4-29" title="29">  <span class="co">#</span></a>
+<a class="sourceLine" id="cb4-30" title="30">  vertices &lt;-<span class="st"> </span>Normals &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="ot">NA_real_</span>, <span class="dt">nrow =</span> 3L, <span class="dt">ncol =</span> nu<span class="op">*</span>nv)</a>
+<a class="sourceLine" id="cb4-31" title="31">  indices &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="ot">NA_integer_</span>, <span class="dt">nrow =</span> 4L, <span class="dt">ncol =</span> (nu<span class="dv">-1</span>)<span class="op">*</span>(nv<span class="dv">-1</span>))</a>
+<a class="sourceLine" id="cb4-32" title="32">  v_ &lt;-<span class="st"> </span><span class="kw">seq</span>(vmin, c2, <span class="dt">length.out =</span> nv)</a>
+<a class="sourceLine" id="cb4-33" title="33">  <span class="co">#</span></a>
+<a class="sourceLine" id="cb4-34" title="34">  <span class="cf">if</span>(a0 <span class="op">!=</span><span class="st"> </span>b0){</a>
+<a class="sourceLine" id="cb4-35" title="35">    u_ &lt;-<span class="st"> </span><span class="kw">seq</span>(b2, a2, <span class="dt">length.out =</span> nu)</a>
+<a class="sourceLine" id="cb4-36" title="36">    x &lt;-<span class="st"> </span>a0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2ac<span class="op">*</span>h2ab) <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(a2<span class="op">-</span>u_)</a>
+<a class="sourceLine" id="cb4-37" title="37">    y &lt;-<span class="st"> </span>b0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2bc<span class="op">*</span>h2ab) <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(u_<span class="op">-</span>b2)</a>
+<a class="sourceLine" id="cb4-38" title="38">    z &lt;-<span class="st"> </span>c0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2bc<span class="op">*</span>h2ac) <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(u_<span class="op">-</span>c2)</a>
+<a class="sourceLine" id="cb4-39" title="39">  }<span class="cf">else</span>{</a>
+<a class="sourceLine" id="cb4-40" title="40">    u_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> nu<span class="op">+</span><span class="dv">1</span>)[<span class="op">-</span>1L]</a>
+<a class="sourceLine" id="cb4-41" title="41">    z &lt;-<span class="st"> </span><span class="kw">rep</span>(c0<span class="op">/</span><span class="kw">sqrt</span>(h2ac), nu)</a>
+<a class="sourceLine" id="cb4-42" title="42">    mxy &lt;-<span class="st"> </span>a0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2ac)</a>
+<a class="sourceLine" id="cb4-43" title="43">    x &lt;-<span class="st"> </span>mxy <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(u_)</a>
+<a class="sourceLine" id="cb4-44" title="44">    y &lt;-<span class="st"> </span>mxy <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(u_)</a>
+<a class="sourceLine" id="cb4-45" title="45">  }</a>
+<a class="sourceLine" id="cb4-46" title="46">  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>nu){</a>
+<a class="sourceLine" id="cb4-47" title="47">    <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>nv){</a>
+<a class="sourceLine" id="cb4-48" title="48">      P &lt;-<span class="st"> </span>vertices[, (i<span class="dv">-1</span>)<span class="op">*</span>nv<span class="op">+</span>j] &lt;-<span class="st"> </span><span class="kw">c</span>(</a>
+<a class="sourceLine" id="cb4-49" title="49">        x[i] <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(a2<span class="op">-</span>v_[j]),</a>
+<a class="sourceLine" id="cb4-50" title="50">        y[i] <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(b2<span class="op">-</span>v_[j]),</a>
+<a class="sourceLine" id="cb4-51" title="51">        z[i] <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(c2<span class="op">-</span>v_[j])</a>
+<a class="sourceLine" id="cb4-52" title="52">      )</a>
+<a class="sourceLine" id="cb4-53" title="53">      Normals[, (i<span class="dv">-1</span>)<span class="op">*</span>nv<span class="op">+</span>j] &lt;-<span class="st"> </span><span class="kw">c</span>(P[1L]<span class="op">/</span>a0<span class="op">^</span><span class="dv">2</span>, P[2L]<span class="op">/</span>b0<span class="op">^</span><span class="dv">2</span>, <span class="op">-</span>P[3L]<span class="op">/</span>c0<span class="op">^</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb4-54" title="54">    }</a>
+<a class="sourceLine" id="cb4-55" title="55">  }</a>
+<a class="sourceLine" id="cb4-56" title="56">  <span class="co"># quads</span></a>
+<a class="sourceLine" id="cb4-57" title="57">  <span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span>(nu<span class="dv">-1</span>)){</a>
+<a class="sourceLine" id="cb4-58" title="58">    im1 &lt;-<span class="st"> </span>i<span class="op">-</span>1L</a>
+<a class="sourceLine" id="cb4-59" title="59">    <span class="cf">for</span>(j <span class="cf">in</span> 1L<span class="op">:</span>(nv<span class="dv">-1</span>)){</a>
+<a class="sourceLine" id="cb4-60" title="60">      jp1 &lt;-<span class="st"> </span>j<span class="op">+</span>1L</a>
+<a class="sourceLine" id="cb4-61" title="61">      quad &lt;-<span class="st"> </span><span class="kw">c</span>(im1<span class="op">*</span>nv<span class="op">+</span>j, im1<span class="op">*</span>nv<span class="op">+</span>jp1, i<span class="op">*</span>nv<span class="op">+</span>jp1, i<span class="op">*</span>nv<span class="op">+</span>j)</a>
+<a class="sourceLine" id="cb4-62" title="62">      indices[, im1<span class="op">*</span>(nv<span class="dv">-1</span>)<span class="op">+</span>j] &lt;-<span class="st"> </span><span class="cf">if</span>(exchange) <span class="kw">rev</span>(quad) <span class="cf">else</span> quad</a>
+<a class="sourceLine" id="cb4-63" title="63">    }</a>
+<a class="sourceLine" id="cb4-64" title="64">  }</a>
+<a class="sourceLine" id="cb4-65" title="65">  vertices &lt;-<span class="st"> </span><span class="kw">cbind</span>(vertices, <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>vertices)</a>
+<a class="sourceLine" id="cb4-66" title="66">  indices &lt;-<span class="st"> </span><span class="kw">cbind</span>(indices, indices[4L<span class="op">:</span>1L,] <span class="op">+</span><span class="st"> </span>nu<span class="op">*</span>nv)</a>
+<a class="sourceLine" id="cb4-67" title="67">  Normals &lt;-<span class="st"> </span><span class="kw">cbind</span>(Normals, <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>Normals)</a>
+<a class="sourceLine" id="cb4-68" title="68">  vertices &lt;-<span class="st"> </span><span class="kw">cbind</span>(vertices, <span class="kw">c</span>(<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>vertices)</a>
+<a class="sourceLine" id="cb4-69" title="69">  indices &lt;-<span class="st"> </span><span class="kw">cbind</span>(indices, indices[4L<span class="op">:</span>1L,] <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>nu<span class="op">*</span>nv)</a>
+<a class="sourceLine" id="cb4-70" title="70">  Normals &lt;-<span class="st"> </span><span class="kw">cbind</span>(Normals, <span class="kw">c</span>(<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>Normals)</a>
+<a class="sourceLine" id="cb4-71" title="71">  vertices &lt;-<span class="st"> </span><span class="kw">cbind</span>(vertices, <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>vertices)</a>
+<a class="sourceLine" id="cb4-72" title="72">  indices &lt;-<span class="st"> </span><span class="kw">cbind</span>(indices, indices[4L<span class="op">:</span>1L,] <span class="op">+</span><span class="st"> </span><span class="dv">4</span><span class="op">*</span>nu<span class="op">*</span>nv)</a>
+<a class="sourceLine" id="cb4-73" title="73">  Normals &lt;-<span class="st"> </span><span class="kw">cbind</span>(Normals, <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>Normals)</a>
+<a class="sourceLine" id="cb4-74" title="74">  mesh &lt;-<span class="st"> </span><span class="kw">qmesh3d</span>(</a>
+<a class="sourceLine" id="cb4-75" title="75">    <span class="dt">vertices =</span> <span class="cf">if</span>(exchange) vertices[<span class="kw">c</span>(2L,1L,3L),] <span class="cf">else</span> vertices,</a>
+<a class="sourceLine" id="cb4-76" title="76">    <span class="dt">indices =</span> indices,</a>
+<a class="sourceLine" id="cb4-77" title="77">    <span class="dt">homogeneous =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb4-78" title="78">    <span class="dt">normals =</span> <span class="kw">t</span>(<span class="cf">if</span>(exchange) Normals[<span class="kw">c</span>(2L,1L,3L),] <span class="cf">else</span> Normals)</a>
+<a class="sourceLine" id="cb4-79" title="79">  )</a>
+<a class="sourceLine" id="cb4-80" title="80">  mesh</a>
+<a class="sourceLine" id="cb4-81" title="81">}</a></code></pre></div>
+<p>The <code>curvatureLinesH1</code> function below generates some curvature lines of the one-sheeted hyperboloid. There are two families of curvature lines and the desired numbers of lines in them are controlled by the arguments <code>nu</code> and <code>nv</code>.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">curvatureLinesH1 &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, <span class="dt">signature =</span> <span class="st">&quot;++-&quot;</span>, nu, nv, vmin,  </a>
+<a class="sourceLine" id="cb5-2" title="2">                             <span class="dt">npoints =</span> <span class="dv">100</span>){</a>
+<a class="sourceLine" id="cb5-3" title="3">  <span class="kw">stopifnot</span>(signature <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;++-&quot;</span>, <span class="st">&quot;+-+&quot;</span>, <span class="st">&quot;-++&quot;</span>))</a>
+<a class="sourceLine" id="cb5-4" title="4">  <span class="kw">stopifnot</span>(vmin <span class="op">&lt;</span><span class="st"> </span><span class="dv">1</span>, a <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, b <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, c <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb5-5" title="5">  <span class="cf">if</span>(signature <span class="op">==</span><span class="st"> &quot;+-+&quot;</span>){</a>
+<a class="sourceLine" id="cb5-6" title="6">    clines &lt;-<span class="st"> </span><span class="kw">curvatureLinesH1</span>(a, c, b, <span class="st">&quot;++-&quot;</span>, nu, nv, vmin, npoints)</a>
+<a class="sourceLine" id="cb5-7" title="7">    <span class="kw">return</span>(<span class="kw">lapply</span>(clines, <span class="cf">function</span>(l) l[,<span class="kw">c</span>(1L,3L,2L)]))</a>
+<a class="sourceLine" id="cb5-8" title="8">  }<span class="cf">else</span> <span class="cf">if</span>(signature <span class="op">==</span><span class="st"> &quot;-++&quot;</span>){</a>
+<a class="sourceLine" id="cb5-9" title="9">    clines &lt;-<span class="st"> </span><span class="kw">curvatureLinesH1</span>(c, b, a, <span class="st">&quot;++-&quot;</span>, nu, nv, vmin, npoints)</a>
+<a class="sourceLine" id="cb5-10" title="10">    <span class="kw">return</span>(<span class="kw">lapply</span>(clines, <span class="cf">function</span>(l) l[,<span class="kw">c</span>(3L,2L,1L)]))</a>
+<a class="sourceLine" id="cb5-11" title="11">  }</a>
+<a class="sourceLine" id="cb5-12" title="12">  c0 &lt;-<span class="st"> </span>c</a>
+<a class="sourceLine" id="cb5-13" title="13">  <span class="cf">if</span>(b <span class="op">&gt;</span><span class="st"> </span>a){</a>
+<a class="sourceLine" id="cb5-14" title="14">    exchange &lt;-<span class="st"> </span><span class="ot">TRUE</span></a>
+<a class="sourceLine" id="cb5-15" title="15">    a0 &lt;-<span class="st"> </span>b; b0 &lt;-<span class="st"> </span>a</a>
+<a class="sourceLine" id="cb5-16" title="16">  }<span class="cf">else</span>{</a>
+<a class="sourceLine" id="cb5-17" title="17">    exchange &lt;-<span class="st"> </span><span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb5-18" title="18">    a0 &lt;-<span class="st"> </span>a; b0 &lt;-<span class="st"> </span>b</a>
+<a class="sourceLine" id="cb5-19" title="19">  }</a>
+<a class="sourceLine" id="cb5-20" title="20">  Mu2 &lt;-<span class="st"> </span>a0<span class="op">^</span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb5-21" title="21">  h2ab &lt;-<span class="st"> </span>Mu2 <span class="op">-</span><span class="st"> </span>b0<span class="op">^</span><span class="dv">2</span>; h2ac &lt;-<span class="st"> </span>c0<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>Mu2</a>
+<a class="sourceLine" id="cb5-22" title="22">  c2 &lt;-<span class="st"> </span><span class="dv">1</span>; a2 &lt;-<span class="st"> </span>c2 <span class="op">+</span><span class="st"> </span>h2ac; b2 &lt;-<span class="st"> </span>a2 <span class="op">-</span><span class="st"> </span>h2ab</a>
+<a class="sourceLine" id="cb5-23" title="23">  h2bc &lt;-<span class="st"> </span>b2 <span class="op">-</span><span class="st"> </span>c2</a>
+<a class="sourceLine" id="cb5-24" title="24">  <span class="co">#  </span></a>
+<a class="sourceLine" id="cb5-25" title="25">  v_ &lt;-<span class="st"> </span><span class="kw">seq</span>(vmin, c2, <span class="dt">length.out =</span> nv)</a>
+<a class="sourceLine" id="cb5-26" title="26">  t_ &lt;-<span class="st"> </span><span class="kw">seq</span>(vmin, c2, <span class="dt">length.out =</span> npoints)</a>
+<a class="sourceLine" id="cb5-27" title="27">  <span class="co">#</span></a>
+<a class="sourceLine" id="cb5-28" title="28">  <span class="cf">if</span>(a0 <span class="op">!=</span><span class="st"> </span>b0){</a>
+<a class="sourceLine" id="cb5-29" title="29">    u_ &lt;-<span class="st"> </span><span class="kw">seq</span>(b2, a2, <span class="dt">length.out =</span> nu)</a>
+<a class="sourceLine" id="cb5-30" title="30">    s_ &lt;-<span class="st"> </span><span class="kw">seq</span>(b2, a2, <span class="dt">length.out =</span> npoints)</a>
+<a class="sourceLine" id="cb5-31" title="31">    mx &lt;-<span class="st"> </span>a0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2ac<span class="op">*</span>h2ab)</a>
+<a class="sourceLine" id="cb5-32" title="32">    my &lt;-<span class="st"> </span>b0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2bc<span class="op">*</span>h2ab)</a>
+<a class="sourceLine" id="cb5-33" title="33">    mz &lt;-<span class="st"> </span>c0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2bc<span class="op">*</span>h2ac)</a>
+<a class="sourceLine" id="cb5-34" title="34">    out &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;list&quot;</span>, <span class="dv">2</span><span class="op">*</span>nv <span class="op">+</span><span class="st"> </span><span class="dv">4</span><span class="op">*</span>nu <span class="op">-</span><span class="st"> </span><span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb5-35" title="35">    <span class="cf">for</span>(j <span class="cf">in</span> 1L<span class="op">:</span>nv){</a>
+<a class="sourceLine" id="cb5-36" title="36">      x &lt;-<span class="st"> </span>mx <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((a2<span class="op">-</span>s_)<span class="op">*</span>(a2<span class="op">-</span>v_[j]))</a>
+<a class="sourceLine" id="cb5-37" title="37">      y &lt;-<span class="st"> </span>my <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((s_<span class="op">-</span>b2)<span class="op">*</span>(b2<span class="op">-</span>v_[j]))</a>
+<a class="sourceLine" id="cb5-38" title="38">      z &lt;-<span class="st"> </span>mz <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((s_<span class="op">-</span>c2)<span class="op">*</span>(c2<span class="op">-</span>v_[j]))</a>
+<a class="sourceLine" id="cb5-39" title="39">      M &lt;-<span class="st"> </span><span class="kw">rbind</span>(<span class="kw">cbind</span>(x, y, z), <span class="kw">cbind</span>(<span class="op">-</span>x, y, z)[(npoints<span class="dv">-1</span>)<span class="op">:</span>1L,])</a>
+<a class="sourceLine" id="cb5-40" title="40">      M &lt;-<span class="st"> </span><span class="kw">rbind</span>(M, <span class="kw">cbind</span>(M[,1L], <span class="op">-</span>M[,2L], M[,3L])[(<span class="dv">2</span><span class="op">*</span>npoints<span class="dv">-2</span>)<span class="op">:</span>1L,])</a>
+<a class="sourceLine" id="cb5-41" title="41">      out[[j]] &lt;-<span class="st"> </span>M</a>
+<a class="sourceLine" id="cb5-42" title="42">      <span class="cf">if</span>(j <span class="op">&lt;</span><span class="st"> </span>nv){</a>
+<a class="sourceLine" id="cb5-43" title="43">        out[[nv<span class="op">+</span>j]] &lt;-<span class="st"> </span><span class="kw">cbind</span>(M[,<span class="kw">c</span>(1L,2L)], <span class="op">-</span>M[,3L])</a>
+<a class="sourceLine" id="cb5-44" title="44">      }</a>
+<a class="sourceLine" id="cb5-45" title="45">    }</a>
+<a class="sourceLine" id="cb5-46" title="46">    <span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span>nu){</a>
+<a class="sourceLine" id="cb5-47" title="47">      x &lt;-<span class="st"> </span>mx <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((a2<span class="op">-</span>u_[i])<span class="op">*</span>(a2<span class="op">-</span>t_))</a>
+<a class="sourceLine" id="cb5-48" title="48">      y &lt;-<span class="st"> </span>my <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((u_[i]<span class="op">-</span>b2)<span class="op">*</span>(b2<span class="op">-</span>t_))</a>
+<a class="sourceLine" id="cb5-49" title="49">      z &lt;-<span class="st"> </span>mz <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((u_[i]<span class="op">-</span>c2)<span class="op">*</span>(c2<span class="op">-</span>t_))</a>
+<a class="sourceLine" id="cb5-50" title="50">      M &lt;-<span class="st"> </span><span class="kw">rbind</span>(<span class="kw">cbind</span>(x, y, z), <span class="kw">cbind</span>(x, y, <span class="op">-</span>z)[(npoints<span class="dv">-1</span>)<span class="op">:</span>1L,])</a>
+<a class="sourceLine" id="cb5-51" title="51">      out[[<span class="dv">2</span><span class="op">*</span>nv<span class="dv">-1</span><span class="op">+</span>i]] &lt;-<span class="st"> </span>M</a>
+<a class="sourceLine" id="cb5-52" title="52">      <span class="cf">if</span>(i <span class="op">&lt;</span><span class="st"> </span>nu){</a>
+<a class="sourceLine" id="cb5-53" title="53">        out[[<span class="dv">2</span><span class="op">*</span>nv<span class="dv">-1</span><span class="op">+</span>nu<span class="op">+</span>i]] &lt;-<span class="st"> </span><span class="kw">cbind</span>(<span class="op">-</span>M[,1L], M[,<span class="kw">c</span>(2L,3L)])</a>
+<a class="sourceLine" id="cb5-54" title="54">        <span class="cf">if</span>(i<span class="op">&gt;</span>1L) out[[<span class="dv">2</span><span class="op">*</span>nv<span class="op">+</span><span class="dv">3</span><span class="op">*</span>nu<span class="op">+</span>i<span class="dv">-4</span>]] &lt;-<span class="st"> </span><span class="kw">cbind</span>(<span class="op">-</span>M[,<span class="kw">c</span>(1L,2L)], M[,3L])</a>
+<a class="sourceLine" id="cb5-55" title="55">      }</a>
+<a class="sourceLine" id="cb5-56" title="56">      <span class="cf">if</span>(i <span class="op">&gt;</span><span class="st"> </span>1L){</a>
+<a class="sourceLine" id="cb5-57" title="57">        out[[<span class="dv">2</span><span class="op">*</span>nv<span class="op">+</span><span class="dv">2</span><span class="op">*</span>nu<span class="op">+</span>i<span class="dv">-3</span>]] &lt;-<span class="st"> </span><span class="kw">cbind</span>(M[,1L], <span class="op">-</span>M[,2L], M[,3L])</a>
+<a class="sourceLine" id="cb5-58" title="58">      }</a>
+<a class="sourceLine" id="cb5-59" title="59">    }</a>
+<a class="sourceLine" id="cb5-60" title="60">  }<span class="cf">else</span>{ <span class="co"># a0 = b0</span></a>
+<a class="sourceLine" id="cb5-61" title="61">    u_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> nu<span class="op">+</span><span class="dv">1</span>)[<span class="op">-</span>1L]</a>
+<a class="sourceLine" id="cb5-62" title="62">    s_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> npoints)</a>
+<a class="sourceLine" id="cb5-63" title="63">    coss_ &lt;-<span class="st"> </span><span class="kw">cos</span>(s_); sins_ &lt;-<span class="st"> </span><span class="kw">sin</span>(s_)</a>
+<a class="sourceLine" id="cb5-64" title="64">    mxy &lt;-<span class="st"> </span>a0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2ac)</a>
+<a class="sourceLine" id="cb5-65" title="65">    mz &lt;-<span class="st"> </span>c0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2bc)</a>
+<a class="sourceLine" id="cb5-66" title="66">    out &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;list&quot;</span>, <span class="dv">2</span><span class="op">*</span>nv <span class="op">+</span><span class="st"> </span><span class="dv">4</span><span class="op">*</span>nu <span class="op">-</span><span class="st"> </span><span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb5-67" title="67">    <span class="cf">for</span>(j <span class="cf">in</span> 1L<span class="op">:</span>nv){</a>
+<a class="sourceLine" id="cb5-68" title="68">      x &lt;-<span class="st"> </span>mxy <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(a2<span class="op">-</span>v_[j]) <span class="op">*</span><span class="st"> </span>coss_</a>
+<a class="sourceLine" id="cb5-69" title="69">      y &lt;-<span class="st"> </span>mxy <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(b2<span class="op">-</span>v_[j]) <span class="op">*</span><span class="st"> </span>sins_</a>
+<a class="sourceLine" id="cb5-70" title="70">      z &lt;-<span class="st"> </span>mz <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(c2<span class="op">-</span>v_[j]) </a>
+<a class="sourceLine" id="cb5-71" title="71">      M &lt;-<span class="st"> </span><span class="kw">cbind</span>(x, y, z)</a>
+<a class="sourceLine" id="cb5-72" title="72">      out[[j]] &lt;-<span class="st"> </span>M</a>
+<a class="sourceLine" id="cb5-73" title="73">      <span class="cf">if</span>(j <span class="op">&lt;</span><span class="st"> </span>nv){</a>
+<a class="sourceLine" id="cb5-74" title="74">        out[[nv<span class="op">+</span>j]] &lt;-<span class="st"> </span><span class="kw">cbind</span>(M[,<span class="kw">c</span>(1L,2L)], <span class="op">-</span>M[,3L])</a>
+<a class="sourceLine" id="cb5-75" title="75">      }</a>
+<a class="sourceLine" id="cb5-76" title="76">    }</a>
+<a class="sourceLine" id="cb5-77" title="77">    r &lt;-<span class="st"> </span>mxy <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(a2<span class="op">-</span>t_)</a>
+<a class="sourceLine" id="cb5-78" title="78">    z &lt;-<span class="st"> </span>mz <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(c2<span class="op">-</span>t_)</a>
+<a class="sourceLine" id="cb5-79" title="79">    <span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span>nu){</a>
+<a class="sourceLine" id="cb5-80" title="80">      x &lt;-<span class="st"> </span>r <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(u_[i])</a>
+<a class="sourceLine" id="cb5-81" title="81">      y &lt;-<span class="st"> </span>r <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(u_[i])</a>
+<a class="sourceLine" id="cb5-82" title="82">      M &lt;-<span class="st"> </span><span class="kw">rbind</span>(<span class="kw">cbind</span>(x, y, z), <span class="kw">cbind</span>(x, y, <span class="op">-</span>z)[(npoints<span class="dv">-1</span>)<span class="op">:</span>1L,])</a>
+<a class="sourceLine" id="cb5-83" title="83">      out[[<span class="dv">2</span><span class="op">*</span>nv<span class="dv">-1</span><span class="op">+</span>i]] &lt;-<span class="st"> </span>M</a>
+<a class="sourceLine" id="cb5-84" title="84">      <span class="cf">if</span>(i <span class="op">&lt;</span><span class="st"> </span>nu){</a>
+<a class="sourceLine" id="cb5-85" title="85">        out[[<span class="dv">2</span><span class="op">*</span>nv<span class="dv">-1</span><span class="op">+</span>nu<span class="op">+</span>i]] &lt;-<span class="st"> </span><span class="kw">cbind</span>(<span class="op">-</span>M[,1L], M[,<span class="kw">c</span>(2L,3L)])</a>
+<a class="sourceLine" id="cb5-86" title="86">        <span class="cf">if</span>(i<span class="op">&gt;</span>1L) out[[<span class="dv">2</span><span class="op">*</span>nv<span class="op">+</span><span class="dv">3</span><span class="op">*</span>nu<span class="op">+</span>i<span class="dv">-4</span>]] &lt;-<span class="st"> </span><span class="kw">cbind</span>(<span class="op">-</span>M[,<span class="kw">c</span>(1L,2L)], M[,3L])</a>
+<a class="sourceLine" id="cb5-87" title="87">      }</a>
+<a class="sourceLine" id="cb5-88" title="88">      <span class="cf">if</span>(i <span class="op">&gt;</span><span class="st"> </span>1L){</a>
+<a class="sourceLine" id="cb5-89" title="89">        out[[<span class="dv">2</span><span class="op">*</span>nv<span class="op">+</span><span class="dv">2</span><span class="op">*</span>nu<span class="op">+</span>i<span class="dv">-3</span>]] &lt;-<span class="st"> </span><span class="kw">cbind</span>(M[,1L], <span class="op">-</span>M[,2L], M[,3L])</a>
+<a class="sourceLine" id="cb5-90" title="90">      }</a>
+<a class="sourceLine" id="cb5-91" title="91">    }</a>
+<a class="sourceLine" id="cb5-92" title="92">  }</a>
+<a class="sourceLine" id="cb5-93" title="93">  <span class="cf">if</span>(exchange){</a>
+<a class="sourceLine" id="cb5-94" title="94">    out &lt;-<span class="st"> </span><span class="kw">lapply</span>(out, <span class="cf">function</span>(M){</a>
+<a class="sourceLine" id="cb5-95" title="95">      M[, <span class="kw">c</span>(2L,1L,3L)]</a>
+<a class="sourceLine" id="cb5-96" title="96">    })</a>
+<a class="sourceLine" id="cb5-97" title="97">  }</a>
+<a class="sourceLine" id="cb5-98" title="98">  out</a>
+<a class="sourceLine" id="cb5-99" title="99">}</a></code></pre></div>
+<p>Here is an example:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">sgntr =<span class="st"> &quot;++-&quot;</span></a>
+<a class="sourceLine" id="cb6-2" title="2">a =<span class="st"> </span><span class="dv">4</span>; b =<span class="st"> </span><span class="dv">6</span>; c =<span class="st"> </span><span class="dv">5</span></a>
+<a class="sourceLine" id="cb6-3" title="3">mesh &lt;-<span class="st"> </span><span class="kw">hyperboloidMesh</span>(a, b, c, sgntr, <span class="dt">nu =</span> <span class="dv">100</span>, <span class="dt">nv =</span> <span class="dv">100</span>, <span class="dt">vmin =</span> <span class="dv">-150</span>)</a>
+<a class="sourceLine" id="cb6-4" title="4">clines &lt;-<span class="st"> </span><span class="kw">curvatureLinesH1</span>(a, b, c, sgntr, <span class="dt">nu =</span> <span class="dv">5</span>, <span class="dt">nv =</span> <span class="dv">5</span>, <span class="dt">vmin =</span> <span class="dv">-150</span>)</a>
+<a class="sourceLine" id="cb6-5" title="5"><span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">&quot;chartreuse4&quot;</span>, <span class="dt">back =</span> <span class="st">&quot;culled&quot;</span>) </a>
+<a class="sourceLine" id="cb6-6" title="6"><span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">&quot;yellow&quot;</span>, <span class="dt">front =</span> <span class="st">&quot;culled&quot;</span>) </a>
+<a class="sourceLine" id="cb6-7" title="7"><span class="kw">invisible</span>(<span class="kw">lapply</span>(clines, <span class="cf">function</span>(l){</a>
+<a class="sourceLine" id="cb6-8" title="8">  <span class="kw">shade3d</span>(<span class="kw">cylinder3d</span>(l, <span class="dt">radius =</span> <span class="fl">0.1</span>, <span class="dt">sides =</span> <span class="dv">30</span>))</a>
+<a class="sourceLine" id="cb6-9" title="9">}))</a></code></pre></div>
+<p><img src="figures/quadrics_H1.png" /></p>
+<h1 id="two-sheeted-hyperboloid">Two-sheeted hyperboloid</h1>
+<p>There are three types of two-sheeted hyperboloids, corresponding to these equations: <span class="math display">\[
+\frac{x^2}{a^2} - \frac{y^2}{b^2} - \frac{z^2}{c^2} = 1 \\
+-\frac{x^2}{a^2} - \frac{y^2}{b^2} + \frac{z^2}{c^2} = 1 \\
+-\frac{x^2}{a^2} + \frac{y^2}{b^2} - \frac{z^2}{c^2} = 1.
+\]</span> The <code>twoSheetsHyperboloidMesh</code> function below generates a mesh of the two-sheeted hyperboloid; the <code>signature</code> argument corresponds to one of the above equations, it must be <code>"+--"</code>, <code>"--+"</code> or <code>"-+-"</code>. The mesh is made of quadrilaterals and their number is controlled by the arguments <code>nu</code> and <code>nv</code>. The two-sheeted hyperboloid is infinite and the argument <code>vmin</code> is here to control its truncation.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">twoSheetsHyperboloidMesh &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, signature, nu, nv, vmin){</a>
+<a class="sourceLine" id="cb7-2" title="2">  <span class="kw">stopifnot</span>(signature <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;+--&quot;</span>, <span class="st">&quot;--+&quot;</span>, <span class="st">&quot;-+-&quot;</span>))</a>
+<a class="sourceLine" id="cb7-3" title="3">  <span class="kw">stopifnot</span>(vmin <span class="op">&lt;</span><span class="st"> </span><span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb7-4" title="4">  <span class="cf">if</span>(signature <span class="op">==</span><span class="st"> &quot;--+&quot;</span>){</a>
+<a class="sourceLine" id="cb7-5" title="5">    mesh &lt;-<span class="st"> </span><span class="kw">twoSheetsHyperboloidMesh</span>(c, b, a, <span class="st">&quot;+--&quot;</span>, nu, nv, vmin)</a>
+<a class="sourceLine" id="cb7-6" title="6">    mesh<span class="op">$</span>vb &lt;-<span class="st"> </span>mesh<span class="op">$</span>vb[<span class="kw">c</span>(3L,2L,1L,4L),]</a>
+<a class="sourceLine" id="cb7-7" title="7">    mesh<span class="op">$</span>normals &lt;-<span class="st"> </span>mesh<span class="op">$</span>normals[<span class="kw">c</span>(3L,2L,1L),]</a>
+<a class="sourceLine" id="cb7-8" title="8">    mesh<span class="op">$</span>ib &lt;-<span class="st"> </span>mesh<span class="op">$</span>ib[4L<span class="op">:</span>1L,]</a>
+<a class="sourceLine" id="cb7-9" title="9">    <span class="kw">return</span>(mesh)</a>
+<a class="sourceLine" id="cb7-10" title="10">  }<span class="cf">else</span> <span class="cf">if</span>(signature <span class="op">==</span><span class="st"> &quot;-+-&quot;</span>){</a>
+<a class="sourceLine" id="cb7-11" title="11">    mesh &lt;-<span class="st"> </span><span class="kw">twoSheetsHyperboloidMesh</span>(b, a, c, <span class="st">&quot;+--&quot;</span>, nu, nv, vmin)</a>
+<a class="sourceLine" id="cb7-12" title="12">    mesh<span class="op">$</span>vb &lt;-<span class="st"> </span>mesh<span class="op">$</span>vb[<span class="kw">c</span>(2L,1L,3L,4L),]</a>
+<a class="sourceLine" id="cb7-13" title="13">    mesh<span class="op">$</span>normals &lt;-<span class="st"> </span>mesh<span class="op">$</span>normals[<span class="kw">c</span>(2L,1L,3L),]</a>
+<a class="sourceLine" id="cb7-14" title="14">    mesh<span class="op">$</span>ib &lt;-<span class="st"> </span>mesh<span class="op">$</span>ib[4L<span class="op">:</span>1L,]</a>
+<a class="sourceLine" id="cb7-15" title="15">    <span class="kw">return</span>(mesh)</a>
+<a class="sourceLine" id="cb7-16" title="16">  }</a>
+<a class="sourceLine" id="cb7-17" title="17">  a0 &lt;-<span class="st"> </span>a</a>
+<a class="sourceLine" id="cb7-18" title="18">  <span class="cf">if</span>(b <span class="op">&gt;</span><span class="st"> </span>c){</a>
+<a class="sourceLine" id="cb7-19" title="19">    exchange &lt;-<span class="st"> </span><span class="ot">TRUE</span></a>
+<a class="sourceLine" id="cb7-20" title="20">    b0 &lt;-<span class="st"> </span>c; c0 &lt;-<span class="st"> </span>b</a>
+<a class="sourceLine" id="cb7-21" title="21">  }<span class="cf">else</span>{</a>
+<a class="sourceLine" id="cb7-22" title="22">    exchange &lt;-<span class="st"> </span><span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb7-23" title="23">    b0 &lt;-<span class="st"> </span>b; c0 &lt;-<span class="st"> </span>c</a>
+<a class="sourceLine" id="cb7-24" title="24">  }</a>
+<a class="sourceLine" id="cb7-25" title="25">  Nu2 &lt;-<span class="st"> </span>a0<span class="op">^</span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb7-26" title="26">  h2ab &lt;-<span class="st"> </span>b0<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>Nu2; h2ac &lt;-<span class="st"> </span>c0<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>Nu2</a>
+<a class="sourceLine" id="cb7-27" title="27">  c2 &lt;-<span class="st"> </span><span class="dv">1</span>; a2 &lt;-<span class="st"> </span>c2 <span class="op">+</span><span class="st"> </span>h2ac; b2 &lt;-<span class="st"> </span>a2 <span class="op">-</span><span class="st"> </span>h2ab</a>
+<a class="sourceLine" id="cb7-28" title="28">  h2bc &lt;-<span class="st"> </span>b2 <span class="op">-</span><span class="st"> </span>c2</a>
+<a class="sourceLine" id="cb7-29" title="29">  <span class="co">#</span></a>
+<a class="sourceLine" id="cb7-30" title="30">  vertices &lt;-<span class="st"> </span>Normals &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="ot">NA_real_</span>, <span class="dt">nrow =</span> 3L, <span class="dt">ncol =</span> nu<span class="op">*</span>nv)</a>
+<a class="sourceLine" id="cb7-31" title="31">  indices &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="ot">NA_integer_</span>, <span class="dt">nrow =</span> 4L, <span class="dt">ncol =</span> (nu<span class="dv">-1</span>)<span class="op">*</span>(nv<span class="dv">-1</span>))</a>
+<a class="sourceLine" id="cb7-32" title="32">  v_ &lt;-<span class="st"> </span><span class="kw">seq</span>(vmin, c2, <span class="dt">length.out =</span> nv)</a>
+<a class="sourceLine" id="cb7-33" title="33">  <span class="co">#</span></a>
+<a class="sourceLine" id="cb7-34" title="34">  <span class="cf">if</span>(b0 <span class="op">!=</span><span class="st"> </span>c0){</a>
+<a class="sourceLine" id="cb7-35" title="35">    u_ &lt;-<span class="st"> </span><span class="kw">seq</span>(c2, b2, <span class="dt">length.out =</span> nu)</a>
+<a class="sourceLine" id="cb7-36" title="36">    x &lt;-<span class="st"> </span>a0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2ac<span class="op">*</span>h2ab) <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(a2<span class="op">-</span>u_)</a>
+<a class="sourceLine" id="cb7-37" title="37">    y &lt;-<span class="st"> </span>b0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2bc<span class="op">*</span>h2ab) <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(b2<span class="op">-</span>u_)</a>
+<a class="sourceLine" id="cb7-38" title="38">    z &lt;-<span class="st"> </span>c0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2bc<span class="op">*</span>h2ac) <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(u_<span class="op">-</span>c2)</a>
+<a class="sourceLine" id="cb7-39" title="39">  }<span class="cf">else</span>{</a>
+<a class="sourceLine" id="cb7-40" title="40">    u_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> nu<span class="op">+</span><span class="dv">1</span>)[<span class="op">-</span>1L]</a>
+<a class="sourceLine" id="cb7-41" title="41">    x &lt;-<span class="st"> </span><span class="kw">rep</span>(a0<span class="op">/</span><span class="kw">sqrt</span>(h2ac), nu)</a>
+<a class="sourceLine" id="cb7-42" title="42">    myz &lt;-<span class="st"> </span>b0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2ab)</a>
+<a class="sourceLine" id="cb7-43" title="43">    y &lt;-<span class="st"> </span>myz <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(u_)</a>
+<a class="sourceLine" id="cb7-44" title="44">    z &lt;-<span class="st"> </span>myz <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(u_)</a>
+<a class="sourceLine" id="cb7-45" title="45">  }</a>
+<a class="sourceLine" id="cb7-46" title="46">  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>nu){</a>
+<a class="sourceLine" id="cb7-47" title="47">    <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>nv){</a>
+<a class="sourceLine" id="cb7-48" title="48">      P &lt;-<span class="st"> </span>vertices[, (i<span class="dv">-1</span>)<span class="op">*</span>nv<span class="op">+</span>j] &lt;-<span class="st"> </span><span class="kw">c</span>(</a>
+<a class="sourceLine" id="cb7-49" title="49">        x[i] <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(a2<span class="op">-</span>v_[j]),</a>
+<a class="sourceLine" id="cb7-50" title="50">        y[i] <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(b2<span class="op">-</span>v_[j]),</a>
+<a class="sourceLine" id="cb7-51" title="51">        z[i] <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(c2<span class="op">-</span>v_[j])</a>
+<a class="sourceLine" id="cb7-52" title="52">      )</a>
+<a class="sourceLine" id="cb7-53" title="53">      Normals[, (i<span class="dv">-1</span>)<span class="op">*</span>nv<span class="op">+</span>j] &lt;-<span class="st"> </span><span class="kw">c</span>(P[1L]<span class="op">/</span>a0<span class="op">^</span><span class="dv">2</span>, <span class="op">-</span>P[2L]<span class="op">/</span>b0<span class="op">^</span><span class="dv">2</span>, <span class="op">-</span>P[3L]<span class="op">/</span>c0<span class="op">^</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb7-54" title="54">    }</a>
+<a class="sourceLine" id="cb7-55" title="55">  }</a>
+<a class="sourceLine" id="cb7-56" title="56">  <span class="co"># quads</span></a>
+<a class="sourceLine" id="cb7-57" title="57">  <span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span>(nu<span class="dv">-1</span>)){</a>
+<a class="sourceLine" id="cb7-58" title="58">    im1 &lt;-<span class="st"> </span>i<span class="op">-</span>1L</a>
+<a class="sourceLine" id="cb7-59" title="59">    <span class="cf">for</span>(j <span class="cf">in</span> 1L<span class="op">:</span>(nv<span class="dv">-1</span>)){</a>
+<a class="sourceLine" id="cb7-60" title="60">      jp1 &lt;-<span class="st"> </span>j<span class="op">+</span>1L</a>
+<a class="sourceLine" id="cb7-61" title="61">      quad &lt;-<span class="st"> </span><span class="kw">c</span>(im1<span class="op">*</span>nv<span class="op">+</span>j, im1<span class="op">*</span>nv<span class="op">+</span>jp1, i<span class="op">*</span>nv<span class="op">+</span>jp1, i<span class="op">*</span>nv<span class="op">+</span>j)</a>
+<a class="sourceLine" id="cb7-62" title="62">      indices[, im1<span class="op">*</span>(nv<span class="dv">-1</span>)<span class="op">+</span>j] &lt;-<span class="st"> </span><span class="cf">if</span>(exchange) <span class="kw">rev</span>(quad) <span class="cf">else</span> quad</a>
+<a class="sourceLine" id="cb7-63" title="63">    }</a>
+<a class="sourceLine" id="cb7-64" title="64">  }</a>
+<a class="sourceLine" id="cb7-65" title="65">  vertices &lt;-<span class="st"> </span><span class="kw">cbind</span>(vertices, <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>vertices)</a>
+<a class="sourceLine" id="cb7-66" title="66">  indices &lt;-<span class="st"> </span><span class="kw">cbind</span>(indices, indices[4L<span class="op">:</span>1L,] <span class="op">+</span><span class="st"> </span>nu<span class="op">*</span>nv)</a>
+<a class="sourceLine" id="cb7-67" title="67">  Normals &lt;-<span class="st"> </span><span class="kw">cbind</span>(Normals, <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>Normals)</a>
+<a class="sourceLine" id="cb7-68" title="68">  vertices &lt;-<span class="st"> </span><span class="kw">cbind</span>(vertices, <span class="kw">c</span>(<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>vertices)</a>
+<a class="sourceLine" id="cb7-69" title="69">  indices &lt;-<span class="st"> </span><span class="kw">cbind</span>(indices, indices[4L<span class="op">:</span>1L,] <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>nu<span class="op">*</span>nv)</a>
+<a class="sourceLine" id="cb7-70" title="70">  Normals &lt;-<span class="st"> </span><span class="kw">cbind</span>(Normals, <span class="kw">c</span>(<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>Normals)</a>
+<a class="sourceLine" id="cb7-71" title="71">  vertices &lt;-<span class="st"> </span><span class="kw">cbind</span>(vertices, <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>vertices)</a>
+<a class="sourceLine" id="cb7-72" title="72">  indices &lt;-<span class="st"> </span><span class="kw">cbind</span>(indices, indices[4L<span class="op">:</span>1L,] <span class="op">+</span><span class="st"> </span><span class="dv">4</span><span class="op">*</span>nu<span class="op">*</span>nv)</a>
+<a class="sourceLine" id="cb7-73" title="73">  Normals &lt;-<span class="st"> </span><span class="kw">cbind</span>(Normals, <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>Normals)</a>
+<a class="sourceLine" id="cb7-74" title="74">  mesh &lt;-<span class="st"> </span><span class="kw">qmesh3d</span>(</a>
+<a class="sourceLine" id="cb7-75" title="75">    <span class="dt">vertices =</span> <span class="cf">if</span>(exchange) vertices[<span class="kw">c</span>(1L,3L,2L),] <span class="cf">else</span> vertices,</a>
+<a class="sourceLine" id="cb7-76" title="76">    <span class="dt">indices =</span> indices,</a>
+<a class="sourceLine" id="cb7-77" title="77">    <span class="dt">homogeneous =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb7-78" title="78">    <span class="dt">normals =</span> <span class="op">-</span><span class="kw">t</span>(<span class="cf">if</span>(exchange) Normals[<span class="kw">c</span>(1L,3L,2L),] <span class="cf">else</span> Normals)</a>
+<a class="sourceLine" id="cb7-79" title="79">  )</a>
+<a class="sourceLine" id="cb7-80" title="80">  mesh</a>
+<a class="sourceLine" id="cb7-81" title="81">}</a></code></pre></div>
+<p>The <code>curvatureLinesH2</code> function below generates some curvature lines of the two-sheeted hyperboloid. The role of the arguments <code>du</code> and <code>dv</code> is similar to the role of the arguments <code>du</code> and <code>dv</code> in <code>curvatureLinesE</code>.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">curvatureLinesH2 &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, signature, nu, nv, vmin, du, dv, </a>
+<a class="sourceLine" id="cb8-2" title="2">                             <span class="dt">npoints =</span> <span class="dv">100</span>){</a>
+<a class="sourceLine" id="cb8-3" title="3">  <span class="kw">stopifnot</span>(signature <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;+--&quot;</span>, <span class="st">&quot;--+&quot;</span>, <span class="st">&quot;-+-&quot;</span>))</a>
+<a class="sourceLine" id="cb8-4" title="4">  <span class="kw">stopifnot</span>(du <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, dv <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, vmin <span class="op">&lt;</span><span class="st"> </span><span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb8-5" title="5">  <span class="cf">if</span>(signature <span class="op">==</span><span class="st"> &quot;--+&quot;</span>){</a>
+<a class="sourceLine" id="cb8-6" title="6">    clines &lt;-<span class="st"> </span></a>
+<a class="sourceLine" id="cb8-7" title="7"><span class="st">      </span><span class="kw">curvatureLinesH2</span>(c, b, a, <span class="st">&quot;+--&quot;</span>, nu, nv, vmin, du, dv, npoints)</a>
+<a class="sourceLine" id="cb8-8" title="8">    <span class="kw">return</span>(<span class="kw">lapply</span>(clines, <span class="cf">function</span>(l) l[, <span class="kw">c</span>(3L,2L,1L)]))</a>
+<a class="sourceLine" id="cb8-9" title="9">  }<span class="cf">else</span> <span class="cf">if</span>(signature <span class="op">==</span><span class="st"> &quot;-+-&quot;</span>){</a>
+<a class="sourceLine" id="cb8-10" title="10">    clines &lt;-<span class="st"> </span></a>
+<a class="sourceLine" id="cb8-11" title="11"><span class="st">      </span><span class="kw">curvatureLinesH2</span>(b, a, c, <span class="st">&quot;+--&quot;</span>, nu, nv, vmin, du, dv, npoints)</a>
+<a class="sourceLine" id="cb8-12" title="12">    <span class="kw">return</span>(<span class="kw">lapply</span>(clines, <span class="cf">function</span>(l) l[, <span class="kw">c</span>(2L,1L,3L)]))</a>
+<a class="sourceLine" id="cb8-13" title="13">  }</a>
+<a class="sourceLine" id="cb8-14" title="14">  a0 &lt;-<span class="st"> </span>a</a>
+<a class="sourceLine" id="cb8-15" title="15">  <span class="cf">if</span>(b <span class="op">&gt;</span><span class="st"> </span>c){</a>
+<a class="sourceLine" id="cb8-16" title="16">    exchange &lt;-<span class="st"> </span><span class="ot">TRUE</span></a>
+<a class="sourceLine" id="cb8-17" title="17">    b0 &lt;-<span class="st"> </span>c; c0 &lt;-<span class="st"> </span>b</a>
+<a class="sourceLine" id="cb8-18" title="18">  }<span class="cf">else</span>{</a>
+<a class="sourceLine" id="cb8-19" title="19">    exchange &lt;-<span class="st"> </span><span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb8-20" title="20">    b0 &lt;-<span class="st"> </span>b; c0 &lt;-<span class="st"> </span>c</a>
+<a class="sourceLine" id="cb8-21" title="21">  }</a>
+<a class="sourceLine" id="cb8-22" title="22">  Nu2 &lt;-<span class="st"> </span>a0<span class="op">^</span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb8-23" title="23">  h2ab &lt;-<span class="st"> </span>b0<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>Nu2; h2ac &lt;-<span class="st"> </span>c0<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>Nu2</a>
+<a class="sourceLine" id="cb8-24" title="24">  c2 &lt;-<span class="st"> </span><span class="dv">1</span>; a2 &lt;-<span class="st"> </span>c2 <span class="op">+</span><span class="st"> </span>h2ac; b2 &lt;-<span class="st"> </span>a2 <span class="op">-</span><span class="st"> </span>h2ab</a>
+<a class="sourceLine" id="cb8-25" title="25">  h2bc &lt;-<span class="st"> </span>b2 <span class="op">-</span><span class="st"> </span>c2</a>
+<a class="sourceLine" id="cb8-26" title="26">  <span class="co">#</span></a>
+<a class="sourceLine" id="cb8-27" title="27">  <span class="cf">if</span>(b0 <span class="op">!=</span><span class="st"> </span>c0 <span class="op">&amp;&amp;</span><span class="st"> </span>c2<span class="op">+</span>du <span class="op">&gt;=</span><span class="st"> </span>b2){</a>
+<a class="sourceLine" id="cb8-28" title="28">    <span class="kw">stop</span>(<span class="st">&quot;`du` is too large.&quot;</span>)</a>
+<a class="sourceLine" id="cb8-29" title="29">  }</a>
+<a class="sourceLine" id="cb8-30" title="30">  <span class="cf">if</span>(vmin <span class="op">&gt;=</span><span class="st"> </span>c2<span class="op">-</span>dv){</a>
+<a class="sourceLine" id="cb8-31" title="31">    <span class="kw">stop</span>(<span class="st">&quot;`dv` is too large&quot;</span>)</a>
+<a class="sourceLine" id="cb8-32" title="32">  }</a>
+<a class="sourceLine" id="cb8-33" title="33">  v_ &lt;-<span class="st"> </span><span class="kw">seq</span>(vmin, c2<span class="op">-</span>dv, <span class="dt">length.out =</span> nv)</a>
+<a class="sourceLine" id="cb8-34" title="34">  t_ &lt;-<span class="st"> </span><span class="kw">seq</span>(vmin, c2, <span class="dt">length.out =</span> npoints)</a>
+<a class="sourceLine" id="cb8-35" title="35">  out &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;list&quot;</span>, <span class="dv">2</span><span class="op">*</span>nv <span class="op">+</span><span class="st"> </span><span class="dv">4</span><span class="op">*</span>nu <span class="op">-</span><span class="st"> </span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb8-36" title="36">  <span class="co">#</span></a>
+<a class="sourceLine" id="cb8-37" title="37">  <span class="cf">if</span>(b0 <span class="op">!=</span><span class="st"> </span>c0){</a>
+<a class="sourceLine" id="cb8-38" title="38">    u_ &lt;-<span class="st"> </span><span class="kw">seq</span>(c2<span class="op">+</span>du, b2, <span class="dt">length.out =</span> nu)</a>
+<a class="sourceLine" id="cb8-39" title="39">    s_ &lt;-<span class="st"> </span><span class="kw">seq</span>(c2, b2, <span class="dt">length.out =</span> npoints)</a>
+<a class="sourceLine" id="cb8-40" title="40">    mx &lt;-<span class="st"> </span>a0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2ac<span class="op">*</span>h2ab)</a>
+<a class="sourceLine" id="cb8-41" title="41">    my &lt;-<span class="st"> </span>b0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2bc<span class="op">*</span>h2ab)</a>
+<a class="sourceLine" id="cb8-42" title="42">    mz &lt;-<span class="st"> </span>c0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2bc<span class="op">*</span>h2ac)</a>
+<a class="sourceLine" id="cb8-43" title="43">    <span class="cf">for</span>(j <span class="cf">in</span> 1L<span class="op">:</span>nv){</a>
+<a class="sourceLine" id="cb8-44" title="44">      x &lt;-<span class="st"> </span>mx <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((a2<span class="op">-</span>s_)<span class="op">*</span>(a2<span class="op">-</span>v_[j]))</a>
+<a class="sourceLine" id="cb8-45" title="45">      y &lt;-<span class="st"> </span>my <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((b2<span class="op">-</span>s_)<span class="op">*</span>(b2<span class="op">-</span>v_[j]))</a>
+<a class="sourceLine" id="cb8-46" title="46">      z &lt;-<span class="st"> </span>mz <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((s_<span class="op">-</span>c2)<span class="op">*</span>(c2<span class="op">-</span>v_[j]))</a>
+<a class="sourceLine" id="cb8-47" title="47">      M1 &lt;-<span class="st"> </span><span class="kw">rbind</span>(<span class="kw">cbind</span>(x, y, z), <span class="kw">cbind</span>(x, <span class="op">-</span>y, z)[(npoints<span class="dv">-1</span>)<span class="op">:</span>1L,])</a>
+<a class="sourceLine" id="cb8-48" title="48">      M2 &lt;-<span class="st"> </span><span class="kw">cbind</span>(M1[,<span class="kw">c</span>(1L,2L)], <span class="op">-</span>M1[,3L])</a>
+<a class="sourceLine" id="cb8-49" title="49">      M &lt;-<span class="st"> </span><span class="kw">rbind</span>(M1, M2[(<span class="dv">2</span><span class="op">*</span>npoints<span class="dv">-2</span>)<span class="op">:</span>1L,])</a>
+<a class="sourceLine" id="cb8-50" title="50">      out[[j]] &lt;-<span class="st"> </span><span class="cf">if</span>(exchange) M[,<span class="kw">c</span>(1L,3L,2L)] <span class="cf">else</span> M</a>
+<a class="sourceLine" id="cb8-51" title="51">      out[[nv<span class="op">+</span>j]] &lt;-<span class="st"> </span></a>
+<a class="sourceLine" id="cb8-52" title="52"><span class="st">        </span><span class="kw">cbind</span>(<span class="op">-</span>M[,1L], <span class="cf">if</span>(exchange) M[,<span class="kw">c</span>(3L,2L)] <span class="cf">else</span> M[,<span class="kw">c</span>(2L,3L)])</a>
+<a class="sourceLine" id="cb8-53" title="53">    }</a>
+<a class="sourceLine" id="cb8-54" title="54">    <span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span>nu){</a>
+<a class="sourceLine" id="cb8-55" title="55">      x &lt;-<span class="st"> </span>mx <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((a2<span class="op">-</span>u_[i])<span class="op">*</span>(a2<span class="op">-</span>t_))</a>
+<a class="sourceLine" id="cb8-56" title="56">      y &lt;-<span class="st"> </span>my <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((b2<span class="op">-</span>u_[i])<span class="op">*</span>(b2<span class="op">-</span>t_))</a>
+<a class="sourceLine" id="cb8-57" title="57">      z &lt;-<span class="st"> </span>mz <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((u_[i]<span class="op">-</span>c2)<span class="op">*</span>(c2<span class="op">-</span>t_))</a>
+<a class="sourceLine" id="cb8-58" title="58">      M &lt;-<span class="st"> </span><span class="kw">rbind</span>(<span class="kw">cbind</span>(x, y, z), <span class="kw">cbind</span>(x, y, <span class="op">-</span>z)[(npoints<span class="dv">-1</span>)<span class="op">:</span>1L,])</a>
+<a class="sourceLine" id="cb8-59" title="59">      out[[<span class="dv">2</span><span class="op">*</span>nv<span class="op">+</span>i]] &lt;-<span class="st"> </span><span class="cf">if</span>(exchange) M[,<span class="kw">c</span>(1L,3L,2L)] <span class="cf">else</span> M</a>
+<a class="sourceLine" id="cb8-60" title="60">      <span class="cf">if</span>(i <span class="op">&lt;</span><span class="st"> </span>nu){</a>
+<a class="sourceLine" id="cb8-61" title="61">        out[[<span class="dv">2</span><span class="op">*</span>nv<span class="op">+</span>nu<span class="op">+</span>i]] &lt;-<span class="st"> </span><span class="cf">if</span>(exchange) </a>
+<a class="sourceLine" id="cb8-62" title="62">          <span class="kw">cbind</span>(M[,<span class="kw">c</span>(1L,3L)], <span class="op">-</span>M[,2L]) </a>
+<a class="sourceLine" id="cb8-63" title="63">        <span class="cf">else</span> </a>
+<a class="sourceLine" id="cb8-64" title="64">          <span class="kw">cbind</span>(M[,1L], <span class="op">-</span>M[,2L], M[,3L])</a>
+<a class="sourceLine" id="cb8-65" title="65">      }</a>
+<a class="sourceLine" id="cb8-66" title="66">    }</a>
+<a class="sourceLine" id="cb8-67" title="67">  }<span class="cf">else</span>{ <span class="co"># b0 = c0</span></a>
+<a class="sourceLine" id="cb8-68" title="68">    u_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> nu<span class="op">+</span><span class="dv">1</span>)[<span class="op">-</span>1L] </a>
+<a class="sourceLine" id="cb8-69" title="69">    s_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> npoints)</a>
+<a class="sourceLine" id="cb8-70" title="70">    mx &lt;-<span class="st"> </span>a0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2ac)</a>
+<a class="sourceLine" id="cb8-71" title="71">    myz &lt;-<span class="st"> </span>b0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2ab)</a>
+<a class="sourceLine" id="cb8-72" title="72">    <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>nv){</a>
+<a class="sourceLine" id="cb8-73" title="73">      x &lt;-<span class="st"> </span>mx <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(a2<span class="op">-</span>v_[j])</a>
+<a class="sourceLine" id="cb8-74" title="74">      y &lt;-<span class="st"> </span>myz <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(b2<span class="op">-</span>v_[j]) <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(s_)</a>
+<a class="sourceLine" id="cb8-75" title="75">      z &lt;-<span class="st"> </span>myz <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(c2<span class="op">-</span>v_[j]) <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(s_)</a>
+<a class="sourceLine" id="cb8-76" title="76">      M &lt;-<span class="st"> </span><span class="kw">cbind</span>(x, y, z)</a>
+<a class="sourceLine" id="cb8-77" title="77">      out[[j]] &lt;-<span class="st"> </span><span class="cf">if</span>(exchange) M[,<span class="kw">c</span>(1L,3L,2L)] <span class="cf">else</span> M</a>
+<a class="sourceLine" id="cb8-78" title="78">      out[[nv<span class="op">+</span>j]] &lt;-<span class="st"> </span></a>
+<a class="sourceLine" id="cb8-79" title="79"><span class="st">        </span><span class="kw">cbind</span>(<span class="op">-</span>M[,1L], <span class="cf">if</span>(exchange) M[,<span class="kw">c</span>(3L,2L)] <span class="cf">else</span> M[,<span class="kw">c</span>(2L,3L)])</a>
+<a class="sourceLine" id="cb8-80" title="80">    }</a>
+<a class="sourceLine" id="cb8-81" title="81">    <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>nu){</a>
+<a class="sourceLine" id="cb8-82" title="82">      x &lt;-<span class="st"> </span>mx <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(a2<span class="op">-</span>t_)</a>
+<a class="sourceLine" id="cb8-83" title="83">      y &lt;-<span class="st"> </span>myz <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(b2<span class="op">-</span>t_) <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(u_[i])</a>
+<a class="sourceLine" id="cb8-84" title="84">      z &lt;-<span class="st"> </span>myz <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(c2<span class="op">-</span>t_) <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(u_[i])</a>
+<a class="sourceLine" id="cb8-85" title="85">      M &lt;-<span class="st"> </span><span class="kw">rbind</span>(<span class="kw">cbind</span>(x, y, z), <span class="kw">cbind</span>(x, <span class="op">-</span>y, <span class="op">-</span>z)[(npoints<span class="dv">-1</span>)<span class="op">:</span>1L,])</a>
+<a class="sourceLine" id="cb8-86" title="86">      out[[<span class="dv">2</span><span class="op">*</span>nv<span class="op">+</span>i]] &lt;-<span class="st"> </span><span class="cf">if</span>(exchange) M[,<span class="kw">c</span>(1L,3L,2L)] <span class="cf">else</span> M</a>
+<a class="sourceLine" id="cb8-87" title="87">      <span class="cf">if</span>(i <span class="op">&lt;</span><span class="st"> </span>nu){</a>
+<a class="sourceLine" id="cb8-88" title="88">        out[[<span class="dv">2</span><span class="op">*</span>nv<span class="op">+</span>nu<span class="op">+</span>i]] &lt;-<span class="st"> </span><span class="cf">if</span>(exchange) </a>
+<a class="sourceLine" id="cb8-89" title="89">          <span class="kw">cbind</span>(M[,<span class="kw">c</span>(1L,3L)], <span class="op">-</span>M[,2L]) </a>
+<a class="sourceLine" id="cb8-90" title="90">        <span class="cf">else</span> </a>
+<a class="sourceLine" id="cb8-91" title="91">          <span class="kw">cbind</span>(M[,1L], <span class="op">-</span>M[,2L], M[,3L])</a>
+<a class="sourceLine" id="cb8-92" title="92">      }</a>
+<a class="sourceLine" id="cb8-93" title="93">    }</a>
+<a class="sourceLine" id="cb8-94" title="94">  }</a>
+<a class="sourceLine" id="cb8-95" title="95">  <span class="co">#</span></a>
+<a class="sourceLine" id="cb8-96" title="96">  out[(<span class="dv">2</span><span class="op">*</span>nv<span class="op">+</span><span class="dv">2</span><span class="op">*</span>nu)<span class="op">:</span>(<span class="dv">2</span><span class="op">*</span>nv<span class="op">+</span><span class="dv">4</span><span class="op">*</span>nu<span class="dv">-2</span>)] &lt;-<span class="st"> </span></a>
+<a class="sourceLine" id="cb8-97" title="97"><span class="st">    </span><span class="kw">lapply</span>(out[(<span class="dv">2</span><span class="op">*</span>nv<span class="op">+</span><span class="dv">1</span>)<span class="op">:</span>(<span class="dv">2</span><span class="op">*</span>nv<span class="op">+</span><span class="dv">2</span><span class="op">*</span>nu<span class="dv">-1</span>)], <span class="cf">function</span>(M){</a>
+<a class="sourceLine" id="cb8-98" title="98">      <span class="kw">cbind</span>(<span class="op">-</span>M[,1L], M[,<span class="kw">c</span>(2L,3L)])</a>
+<a class="sourceLine" id="cb8-99" title="99">    })</a>
+<a class="sourceLine" id="cb8-100" title="100">  out</a>
+<a class="sourceLine" id="cb8-101" title="101">}</a></code></pre></div>
+<p>An example:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">a =<span class="st"> </span><span class="dv">6</span>; b =<span class="st"> </span><span class="dv">5</span>; c =<span class="st"> </span><span class="dv">3</span></a>
+<a class="sourceLine" id="cb9-2" title="2">sgntr =<span class="st"> &quot;-+-&quot;</span></a>
+<a class="sourceLine" id="cb9-3" title="3">mesh &lt;-<span class="st"> </span><span class="kw">twoSheetsHyperboloidMesh</span>(a, b, c, sgntr, <span class="dv">100</span>, <span class="dv">100</span>, <span class="dt">vmin =</span> <span class="dv">-500</span>)</a>
+<a class="sourceLine" id="cb9-4" title="4">clines &lt;-<span class="st"> </span><span class="kw">curvatureLinesH2</span>(a, b, c, sgntr, <span class="dt">nu =</span> <span class="dv">5</span>, <span class="dt">nv =</span> <span class="dv">5</span>, <span class="dt">vmin =</span> <span class="dv">-500</span>, </a>
+<a class="sourceLine" id="cb9-5" title="5">                           <span class="dt">du =</span> <span class="dv">1</span>, <span class="dt">dv =</span> <span class="dv">20</span>, <span class="dt">npoints =</span> <span class="dv">300</span>)</a>
+<a class="sourceLine" id="cb9-6" title="6"><span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">&quot;navyblue&quot;</span>, <span class="dt">back =</span> <span class="st">&quot;culled&quot;</span>) </a>
+<a class="sourceLine" id="cb9-7" title="7"><span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">&quot;goldenrod&quot;</span>, <span class="dt">front =</span> <span class="st">&quot;culled&quot;</span>)</a>
+<a class="sourceLine" id="cb9-8" title="8"><span class="kw">invisible</span>(<span class="kw">lapply</span>(clines, <span class="cf">function</span>(l){</a>
+<a class="sourceLine" id="cb9-9" title="9">  <span class="kw">shade3d</span>(<span class="kw">cylinder3d</span>(l, <span class="dt">radius =</span> <span class="fl">0.2</span>, <span class="dt">sides =</span> <span class="dv">30</span>))</a>
+<a class="sourceLine" id="cb9-10" title="10">}))</a></code></pre></div>
+<p><img src="figures/quadrics_H2.png" /></p>
+<h1 id="general-quadric">General quadric</h1>
+<p>A general quadric in <span class="math inline">\(\mathbb{R}^3\)</span> has equation <span class="math display">\[
+(x \quad y \quad z)\, A 
+\begin{pmatrix} x \\ y \\ z \end{pmatrix} 
++ J' \begin{pmatrix} x \\ y \\ z \end{pmatrix}
++ K = 0,
+\]</span> where <span class="math inline">\(A\)</span> is a symmetric <span class="math inline">\((3\times 3)\)</span>-matrix, <span class="math inline">\(J \in \mathbb{R}^3\)</span>, and <span class="math inline">\(K \in \mathbb{R}\)</span>. Let’s treat an example. We follow the strategy given at page 45 of Brannan &amp; al’s book <em>Geometry</em> (<a href="http://math.haifa.ac.il/ROVENSKI/B2.pdf">pdf</a>).</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">A =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(</a>
+<a class="sourceLine" id="cb10-2" title="2">   <span class="dv">5</span>, <span class="dv">-1</span>, <span class="dv">-1</span>, </a>
+<a class="sourceLine" id="cb10-3" title="3">  <span class="dv">-1</span>,  <span class="dv">3</span>,  <span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb10-4" title="4">  <span class="dv">-1</span>,  <span class="dv">1</span>, <span class="dv">-3</span></a>
+<a class="sourceLine" id="cb10-5" title="5">  ), <span class="dt">nrow =</span> 3L, <span class="dt">ncol =</span> 3L)</a>
+<a class="sourceLine" id="cb10-6" title="6">J =<span class="st"> </span><span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">6</span>, <span class="dv">8</span>)</a>
+<a class="sourceLine" id="cb10-7" title="7">K =<span class="st"> </span><span class="dv">-10</span></a>
+<a class="sourceLine" id="cb10-8" title="8"><span class="co"># computes spectral decomposition of A</span></a>
+<a class="sourceLine" id="cb10-9" title="9">eig &lt;-<span class="st"> </span><span class="kw">eigen</span>(A)</a>
+<a class="sourceLine" id="cb10-10" title="10">P &lt;-<span class="st"> </span>eig<span class="op">$</span>vectors</a>
+<a class="sourceLine" id="cb10-11" title="11">( evalues &lt;-<span class="st"> </span>eig<span class="op">$</span>values )</a>
+<a class="sourceLine" id="cb10-12" title="12"><span class="co">## [1]  5.614627  2.632676 -3.247303</span></a></code></pre></div>
+<p>There is no eigenvalue equal to <span class="math inline">\(0\)</span>; this is the first necessary condition in order for the solution of the equation to be a focal quadric.</p>
+<p>Now we write the equation in the form <span class="math display">\[
+\lambda_1 {(x'')}^2 + \lambda_2 {(y'')}^2 + \lambda_3 {(z'')}^2 = 
+\mathrm{rhs}
+\]</span> where <span class="math inline">\(\lambda_1\)</span>, <span class="math inline">\(\lambda_2\)</span>, <span class="math inline">\(\lambda_3\)</span> are the eigenvalues of <span class="math inline">\(A\)</span>, and <span class="math inline">\((x'',y'',z'')\)</span> is a new coordinate system.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">center &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">t</span>(J) <span class="op">%*%</span><span class="st"> </span>P) <span class="op">/</span><span class="st"> </span>evalues <span class="op">/</span><span class="st"> </span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb11-2" title="2">( rhs &lt;-<span class="st"> </span><span class="kw">sum</span>(evalues <span class="op">*</span><span class="st"> </span>center<span class="op">^</span><span class="dv">2</span>) <span class="op">-</span><span class="st"> </span>K )</a>
+<a class="sourceLine" id="cb11-3" title="3"><span class="co">## [1] 11.5</span></a>
+<a class="sourceLine" id="cb11-4" title="4">( sgntr &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="kw">ifelse</span>(rhs<span class="op">*</span>evalues <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, <span class="st">&quot;+&quot;</span>, <span class="st">&quot;-&quot;</span>), <span class="dt">collapse =</span> <span class="st">&quot;&quot;</span>) )</a>
+<a class="sourceLine" id="cb11-5" title="5"><span class="co">## [1] &quot;++-&quot;</span></a></code></pre></div>
+<p>We find <span class="math inline">\(\mathrm{rhs} \neq 0\)</span>, so the solution of the equation is a focal quadric. If <span class="math inline">\(\mathrm{rhs} = 0\)</span>, the solution is a cone.</p>
+<p>The signature is <span class="math inline">\(++-\)</span>, so the solution of the equation is a one-sheeted hyperboloid. By dividing both members of the previous equality by <span class="math inline">\(\mathrm{rhs}\)</span>, we get its equation in standard form.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1">abc &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">abs</span>(rhs<span class="op">/</span>evalues))</a>
+<a class="sourceLine" id="cb12-2" title="2">a &lt;-<span class="st"> </span>abc[<span class="dv">1</span>]; b &lt;-<span class="st"> </span>abc[<span class="dv">2</span>]; c &lt;-<span class="st"> </span>abc[<span class="dv">3</span>]</a>
+<a class="sourceLine" id="cb12-3" title="3">mesh0 &lt;-<span class="st"> </span><span class="kw">hyperboloidMesh</span>(a, b, c, sgntr, <span class="dv">100</span>, <span class="dv">100</span>, <span class="dv">-5</span>)</a>
+<a class="sourceLine" id="cb12-4" title="4"><span class="co"># final quadric mesh:</span></a>
+<a class="sourceLine" id="cb12-5" title="5">mesh &lt;-<span class="st"> </span><span class="kw">rotate3d</span>(</a>
+<a class="sourceLine" id="cb12-6" title="6">  <span class="kw">translate3d</span>(mesh0, <span class="op">-</span>center[<span class="dv">1</span>], <span class="op">-</span>center[<span class="dv">2</span>], <span class="op">-</span>center[<span class="dv">3</span>]), </a>
+<a class="sourceLine" id="cb12-7" title="7">  <span class="dt">matrix =</span> <span class="kw">t</span>(P)</a>
+<a class="sourceLine" id="cb12-8" title="8">)</a></code></pre></div>
+<p>We can check that the equation is fulfilled for some vertices of the final mesh:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1"><span class="kw">apply</span>(mesh<span class="op">$</span>vb[<span class="op">-</span><span class="dv">4</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>], 2L, <span class="cf">function</span>(x){</a>
+<a class="sourceLine" id="cb13-2" title="2">  <span class="kw">c</span>(<span class="kw">t</span>(x) <span class="op">%*%</span><span class="st"> </span>A <span class="op">%*%</span><span class="st"> </span>x <span class="op">+</span><span class="st"> </span><span class="kw">t</span>(J) <span class="op">%*%</span><span class="st"> </span>x) <span class="op">+</span><span class="st"> </span>K</a>
+<a class="sourceLine" id="cb13-3" title="3">})</a>
+<a class="sourceLine" id="cb13-4" title="4"><span class="co">## [1] 5.684342e-14 7.105427e-14 4.973799e-14 4.973799e-14 4.263256e-14</span></a></code></pre></div>
+<p>Up to small numerical errors, we indeed get <span class="math inline">\(0\)</span> for each of the five vertices.</p>
+
+    </div>
+
+
+    <div id="footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </div>
+
+  </div>
+
+  <div id="disqus_thread"></div>
+  <div class="pagination">
+    <ul>
+      <li>
+        <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+      </li>
+    </ul>
+  </div>
+</body>
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+<!-- Google Prettify -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+<script>
+  var pres = document.getElementsByTagName("pre");
+  for (var i = 0; i < pres.length; ++i) {
+    
+    pres[i].className = pres[i].className + " prettyprint linenums";
+    
+  }
+  prettyPrint();
+</script> 
+
+</html>
