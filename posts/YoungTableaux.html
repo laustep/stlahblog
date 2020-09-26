@@ -6,60 +6,67 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - Young Tableaux from Haskell to R</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../css/post.css" />
   <link rel="stylesheet" href="../css/misc.css" /> 
-  <link rel="stylesheet" href="../css/pandoc-solarized.css" />  
-  <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+    <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
-  </script>
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 
 <body>
-  <!-- Sidebar. -->
-  <div class="sidebar">
-    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
-      <a href="https://www.r-bloggers.com/">
-        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
-      </a>
-      <br />
-      <a href="http://t-redactyl.io/">
-        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
-      </a>
-      <a href="http://timelyportfolio.blogspot.be/">
-        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
-      </a>
-      <br />
-      <a href="https://antoineguillot.wordpress.com/blog/">
-        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
-      </a>
-      <br />
-      <a href="https://fronkonstin.com/">
-        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
-      </a>
-    </div>
-  </div>
-
-  <div class="main">
-    <div id="header">
-      <div id="logo" style="position:absolute;">
-        <a href="../">
-          <img src="../images/stla.jpg" alt="stla" width="100px" />
-        </a>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-3">
+        <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+          <a href="https://www.r-bloggers.com/">
+            <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+          </a>
+          <br />
+          <a href="http://t-redactyl.io/">
+            <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
+          </a>
+          <a href="http://timelyportfolio.blogspot.be/">
+            <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
+          </a>
+          <br />
+          <a href="https://antoineguillot.wordpress.com/blog/">
+            <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+          </a>
+          <br />
+          <a href="https://fronkonstin.com/">
+            <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+          </a>
+        </div>
       </div>
-      <div id="navigation" style="margin-top:50px;">
-        <a href="../">Home</a>
-        <a href="../about.html">About</a>
-        <a href="../contact.html">Contact</a>
-        <a href="../archive.html">Archive</a>
-      </div>
-    </div>
 
-    <div class="content">
-      <h1>Young Tableaux from Haskell to R</h1> <div class="info">
+      <div class="main col-sm-9">
+        <div id="header">
+          <div id="logo" style="position:absolute;">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Young Tableaux from Haskell to R</h1> 
+          <div class="info">
     Posted on September  9, 2017
     
         by Stéphane Laurent
@@ -73,153 +80,157 @@
 
 <p>The goal of this article is to show how to do a Haskell DLL for R with functions returning an arbitrary number of vectors (atomic vectors or lists). For the basics of exporting a Haskell function to R with the help of a DLL, we refer the reader to <a href="https://laustep.github.io/stlahblog/posts/FloatExpansionHaskell.html">the previous article</a>.</p>
 <p>For the illustration, we will deal with Young tableaux with the help of the <a href="https://hackage.haskell.org/package/combinat-0.2.8.2/docs/Math-Combinat-Tableaux.html">combinat</a> library.</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="dt">Prelude</span><span class="fu">&gt;</span> <span class="kw">import </span><span class="dt">Math.Combinat.Tableaux</span> <span class="kw">as</span> <span class="dt">T</span>
-<span class="dt">Prelude</span> <span class="dt">T</span><span class="fu">&gt;</span> tableau <span class="fu">=</span> [[<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">5</span>],[<span class="dv">3</span>,<span class="dv">4</span>]]
-<span class="dt">Prelude</span> <span class="dt">T</span><span class="fu">&gt;</span> asciiTableau tableau
-<span class="dv">1</span> <span class="dv">2</span> <span class="dv">5</span> 
-<span class="dv">3</span> <span class="dv">4</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb1-1" title="1"><span class="dt">Prelude</span><span class="op">&gt;</span> <span class="kw">import</span> <span class="dt">Math.Combinat.Tableaux</span> <span class="kw">as</span> <span class="dt">T</span></a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="dt">Prelude</span> <span class="dt">T</span><span class="op">&gt;</span> tableau <span class="ot">=</span> [[<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">5</span>],[<span class="dv">3</span>,<span class="dv">4</span>]]</a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="dt">Prelude</span> <span class="dt">T</span><span class="op">&gt;</span> asciiTableau tableau</a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="dv">1</span> <span class="dv">2</span> <span class="dv">5</span> </a>
+<a class="sourceLine" id="cb1-5" title="5"><span class="dv">3</span> <span class="dv">4</span></a></code></pre></div>
 <p>We will firstly port the <code>dualTableau</code> function to R.</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="dt">Prelude</span> <span class="dt">T</span><span class="fu">&gt;</span> dualTableau tableau
-[[<span class="dv">1</span>,<span class="dv">3</span>],[<span class="dv">2</span>,<span class="dv">4</span>],[<span class="dv">5</span>]]</code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb2-1" title="1"><span class="dt">Prelude</span> <span class="dt">T</span><span class="op">&gt;</span> dualTableau tableau</a>
+<a class="sourceLine" id="cb2-2" title="2">[[<span class="dv">1</span>,<span class="dv">3</span>],[<span class="dv">2</span>,<span class="dv">4</span>],[<span class="dv">5</span>]]</a></code></pre></div>
 <p>Thus, we want a R function that takes as input <code>list(c(1L,2L,5L),c(3L,4L))</code> and returns <code>list(c(1L,3L),c(2L,4L),5L)</code>.</p>
 <p>Below is a first way to do so. To import the input list in Haskell, we use <code>peekArray</code>, which requires to enter the length of the input list. To export the output list, we use <code>pokeArray</code>.</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE ForeignFunctionInterface #-}</span>
-<span class="ot">{-# LANGUAGE DataKinds #-}</span>
-<span class="kw">module</span> <span class="dt">Lib</span> <span class="kw">where</span>
-<span class="kw">import </span><span class="dt">Foreign</span>
-<span class="kw">import </span><span class="dt">Foreign.C</span>
-<span class="kw">import </span><span class="dt">Foreign.R</span> (<span class="dt">SEXP</span>)
-<span class="kw">import qualified</span> <span class="dt">Foreign.R.Type</span> <span class="kw">as</span> <span class="dt">R</span>
-<span class="kw">import qualified</span> <span class="dt">Data.Vector.SEXP</span> <span class="kw">as</span> <span class="dt">VS</span>
-<span class="kw">import </span><span class="dt">Math.Combinat.Tableaux</span>
-
-foreign export ccall<span class="ot"> dualTableauR1 ::</span> <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="dt">R.Int</span>) <span class="ot">-&gt;</span> <span class="dt">Ptr</span> <span class="dt">CInt</span> <span class="ot">-&gt;</span>
-                                                     <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="dt">R.Int</span>) <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
-<span class="ot">dualTableauR1 ::</span> <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="dt">R.Int</span>) <span class="ot">-&gt;</span> <span class="dt">Ptr</span> <span class="dt">CInt</span> <span class="ot">-&gt;</span> <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="dt">R.Int</span>) <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
-dualTableauR1 _tableau l result <span class="fu">=</span> <span class="kw">do</span>
-  l <span class="ot">&lt;-</span> peek l
-  _tableau <span class="ot">&lt;-</span> peekArray (fromIntegral<span class="ot"> l ::</span> <span class="dt">Int</span>) _tableau
-  <span class="kw">let</span> tableau <span class="fu">=</span> map (VS.toList <span class="fu">.</span> VS.fromSEXP) _tableau
-  <span class="kw">let</span> dtableau <span class="fu">=</span> dualTableau tableau
-  pokeArray result <span class="fu">$</span> map (VS.toSEXP <span class="fu">.</span> VS.fromList) dtableau</code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb3-1" title="1"><span class="ot">{-# LANGUAGE ForeignFunctionInterface #-}</span></a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="ot">{-# LANGUAGE DataKinds #-}</span></a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="kw">module</span> <span class="dt">Lib</span> <span class="kw">where</span></a>
+<a class="sourceLine" id="cb3-4" title="4"><span class="kw">import</span> <span class="dt">Foreign</span></a>
+<a class="sourceLine" id="cb3-5" title="5"><span class="kw">import</span> <span class="dt">Foreign.C</span></a>
+<a class="sourceLine" id="cb3-6" title="6"><span class="kw">import</span> <span class="dt">Foreign.R</span> (<span class="dt">SEXP</span>)</a>
+<a class="sourceLine" id="cb3-7" title="7"><span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Foreign.R.Type</span> <span class="kw">as</span> <span class="dt">R</span></a>
+<a class="sourceLine" id="cb3-8" title="8"><span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.Vector.SEXP</span> <span class="kw">as</span> <span class="dt">VS</span></a>
+<a class="sourceLine" id="cb3-9" title="9"><span class="kw">import</span> <span class="dt">Math.Combinat.Tableaux</span></a>
+<a class="sourceLine" id="cb3-10" title="10"></a>
+<a class="sourceLine" id="cb3-11" title="11">foreign export ccall<span class="ot"> dualTableauR1 ::</span> <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="dt">R.Int</span>) <span class="ot">-&gt;</span> <span class="dt">Ptr</span> <span class="dt">CInt</span> <span class="ot">-&gt;</span></a>
+<a class="sourceLine" id="cb3-12" title="12">                                                     <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="dt">R.Int</span>) <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</a>
+<a class="sourceLine" id="cb3-13" title="13"><span class="ot">dualTableauR1 ::</span> <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="dt">R.Int</span>) <span class="ot">-&gt;</span> <span class="dt">Ptr</span> <span class="dt">CInt</span> <span class="ot">-&gt;</span> <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="dt">R.Int</span>) <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</a>
+<a class="sourceLine" id="cb3-14" title="14">dualTableauR1 _tableau l result <span class="ot">=</span> <span class="kw">do</span></a>
+<a class="sourceLine" id="cb3-15" title="15">  l <span class="ot">&lt;-</span> peek l</a>
+<a class="sourceLine" id="cb3-16" title="16">  _tableau <span class="ot">&lt;-</span> peekArray (<span class="fu">fromIntegral</span><span class="ot"> l ::</span> <span class="dt">Int</span>) _tableau</a>
+<a class="sourceLine" id="cb3-17" title="17">  <span class="kw">let</span> tableau <span class="ot">=</span> <span class="fu">map</span> (VS.toList <span class="op">.</span> VS.fromSEXP) _tableau</a>
+<a class="sourceLine" id="cb3-18" title="18">  <span class="kw">let</span> dtableau <span class="ot">=</span> dualTableau tableau</a>
+<a class="sourceLine" id="cb3-19" title="19">  pokeArray result <span class="op">$</span> <span class="fu">map</span> (VS.toSEXP <span class="op">.</span> VS.fromList) dtableau</a></code></pre></div>
 <p>This way has an inconvenient: in order to use the function in R, we need to give the length of the output list. But this is not a problem for this example: the length of the output list is the length of the first vector (the first “row”) of the input list.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span>tableau &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="kw">c</span>(1L, 2L, 5L), <span class="kw">c</span>(3L, 4L))
-<span class="op">&gt;</span><span class="st"> </span><span class="kw">.C</span>(<span class="st">&quot;dualTableauR1&quot;</span>, <span class="dt">tableau=</span>tableau, <span class="dt">l=</span><span class="kw">length</span>(tableau), 
-<span class="op">+</span><span class="st">           </span><span class="dt">result=</span><span class="kw">as.list</span>(<span class="kw">integer</span>(<span class="kw">length</span>(tableau[[<span class="dv">1</span>]]))))<span class="op">$</span>result
-[[<span class="dv">1</span>]]
-[<span class="dv">1</span>] <span class="dv">1</span> <span class="dv">3</span>
-
-[[<span class="dv">2</span>]]
-[<span class="dv">1</span>] <span class="dv">2</span> <span class="dv">4</span>
-
-[[<span class="dv">3</span>]]
-[<span class="dv">1</span>] <span class="dv">5</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="op">&gt;</span><span class="st"> </span>tableau &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="kw">c</span>(1L, 2L, 5L), <span class="kw">c</span>(3L, 4L))</a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="op">&gt;</span><span class="st"> </span><span class="kw">.C</span>(<span class="st">&quot;dualTableauR1&quot;</span>, <span class="dt">tableau=</span>tableau, <span class="dt">l=</span><span class="kw">length</span>(tableau), </a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="op">+</span><span class="st">           </span><span class="dt">result=</span><span class="kw">as.list</span>(<span class="kw">integer</span>(<span class="kw">length</span>(tableau[[<span class="dv">1</span>]]))))<span class="op">$</span>result</a>
+<a class="sourceLine" id="cb4-4" title="4">[[<span class="dv">1</span>]]</a>
+<a class="sourceLine" id="cb4-5" title="5">[<span class="dv">1</span>] <span class="dv">1</span> <span class="dv">3</span></a>
+<a class="sourceLine" id="cb4-6" title="6"></a>
+<a class="sourceLine" id="cb4-7" title="7">[[<span class="dv">2</span>]]</a>
+<a class="sourceLine" id="cb4-8" title="8">[<span class="dv">1</span>] <span class="dv">2</span> <span class="dv">4</span></a>
+<a class="sourceLine" id="cb4-9" title="9"></a>
+<a class="sourceLine" id="cb4-10" title="10">[[<span class="dv">3</span>]]</a>
+<a class="sourceLine" id="cb4-11" title="11">[<span class="dv">1</span>] <span class="dv">5</span></a></code></pre></div>
 <p>The second way we give below overcomes this inconvenient:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="fu">...</span>
-<span class="kw">import </span><span class="dt">Language.R.Literal</span> (mkProtectedSEXPVector)
-<span class="kw">import </span><span class="dt">Data.Singletons</span> (sing)
-
-foreign export ccall<span class="ot"> dualTableauR2 ::</span> <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="dt">R.Int</span>) <span class="ot">-&gt;</span> <span class="dt">Ptr</span> <span class="dt">CInt</span> <span class="ot">-&gt;</span>
-                                                  <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="dt">R.Vector</span>) <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
-<span class="ot">dualTableauR2 ::</span> <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="dt">R.Int</span>) <span class="ot">-&gt;</span> <span class="dt">Ptr</span> <span class="dt">CInt</span> <span class="ot">-&gt;</span> <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="dt">R.Vector</span>) <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
-dualTableauR2 _tableau l result <span class="fu">=</span> <span class="kw">do</span>
-  l <span class="ot">&lt;-</span> peek l
-  _tableau <span class="ot">&lt;-</span> peekArray (fromIntegral<span class="ot"> l ::</span> <span class="dt">Int</span>) _tableau
-  <span class="kw">let</span> tableau <span class="fu">=</span> map (VS.toList <span class="fu">.</span> VS.fromSEXP) _tableau
-  poke result <span class="fu">$</span> mkProtectedSEXPVector sing <span class="fu">$</span>
-    (map (VS.toSEXP <span class="fu">.</span> VS.fromList) (dualTableau tableau)<span class="ot"> ::</span> [<span class="dt">SEXP</span> s <span class="dt">R.Int</span>])</code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb5-1" title="1"><span class="op">...</span></a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="kw">import</span> <span class="dt">Language.R.Literal</span> (mkProtectedSEXPVector)</a>
+<a class="sourceLine" id="cb5-3" title="3"><span class="kw">import</span> <span class="dt">Data.Singletons</span> (sing)</a>
+<a class="sourceLine" id="cb5-4" title="4"></a>
+<a class="sourceLine" id="cb5-5" title="5">foreign export ccall<span class="ot"> dualTableauR2 ::</span> <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="dt">R.Int</span>) <span class="ot">-&gt;</span> <span class="dt">Ptr</span> <span class="dt">CInt</span> <span class="ot">-&gt;</span></a>
+<a class="sourceLine" id="cb5-6" title="6">                                                  <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="dt">R.Vector</span>) <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</a>
+<a class="sourceLine" id="cb5-7" title="7"><span class="ot">dualTableauR2 ::</span> <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="dt">R.Int</span>) <span class="ot">-&gt;</span> <span class="dt">Ptr</span> <span class="dt">CInt</span> <span class="ot">-&gt;</span> <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="dt">R.Vector</span>) <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</a>
+<a class="sourceLine" id="cb5-8" title="8">dualTableauR2 _tableau l result <span class="ot">=</span> <span class="kw">do</span></a>
+<a class="sourceLine" id="cb5-9" title="9">  l <span class="ot">&lt;-</span> peek l</a>
+<a class="sourceLine" id="cb5-10" title="10">  _tableau <span class="ot">&lt;-</span> peekArray (<span class="fu">fromIntegral</span><span class="ot"> l ::</span> <span class="dt">Int</span>) _tableau</a>
+<a class="sourceLine" id="cb5-11" title="11">  <span class="kw">let</span> tableau <span class="ot">=</span> <span class="fu">map</span> (VS.toList <span class="op">.</span> VS.fromSEXP) _tableau</a>
+<a class="sourceLine" id="cb5-12" title="12">  poke result <span class="op">$</span> mkProtectedSEXPVector sing <span class="op">$</span></a>
+<a class="sourceLine" id="cb5-13" title="13">    (<span class="fu">map</span> (VS.toSEXP <span class="op">.</span> VS.fromList) (dualTableau tableau)<span class="ot"> ::</span> [<span class="dt">SEXP</span> s <span class="dt">R.Int</span>])</a></code></pre></div>
 <p>Indeed, we don’t need to enter the length of the output list:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span>tableau &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="kw">c</span>(1L, 2L, 5L), <span class="kw">c</span>(3L, 4L))
-<span class="op">&gt;</span><span class="st"> </span><span class="kw">.C</span>(<span class="st">&quot;dualTableauR2&quot;</span>, <span class="dt">tableau=</span>tableau, <span class="dt">l=</span><span class="kw">length</span>(tableau), 
-<span class="op">+</span><span class="st">           </span><span class="dt">result=</span><span class="kw">list</span>(0L))<span class="op">$</span>result[[<span class="dv">1</span>]]
-[[<span class="dv">1</span>]]
-[<span class="dv">1</span>] <span class="dv">1</span> <span class="dv">3</span>
-
-[[<span class="dv">2</span>]]
-[<span class="dv">1</span>] <span class="dv">2</span> <span class="dv">4</span>
-
-[[<span class="dv">3</span>]]
-[<span class="dv">1</span>] <span class="dv">5</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="op">&gt;</span><span class="st"> </span>tableau &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="kw">c</span>(1L, 2L, 5L), <span class="kw">c</span>(3L, 4L))</a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="op">&gt;</span><span class="st"> </span><span class="kw">.C</span>(<span class="st">&quot;dualTableauR2&quot;</span>, <span class="dt">tableau=</span>tableau, <span class="dt">l=</span><span class="kw">length</span>(tableau), </a>
+<a class="sourceLine" id="cb6-3" title="3"><span class="op">+</span><span class="st">           </span><span class="dt">result=</span><span class="kw">list</span>(0L))<span class="op">$</span>result[[<span class="dv">1</span>]]</a>
+<a class="sourceLine" id="cb6-4" title="4">[[<span class="dv">1</span>]]</a>
+<a class="sourceLine" id="cb6-5" title="5">[<span class="dv">1</span>] <span class="dv">1</span> <span class="dv">3</span></a>
+<a class="sourceLine" id="cb6-6" title="6"></a>
+<a class="sourceLine" id="cb6-7" title="7">[[<span class="dv">2</span>]]</a>
+<a class="sourceLine" id="cb6-8" title="8">[<span class="dv">1</span>] <span class="dv">2</span> <span class="dv">4</span></a>
+<a class="sourceLine" id="cb6-9" title="9"></a>
+<a class="sourceLine" id="cb6-10" title="10">[[<span class="dv">3</span>]]</a>
+<a class="sourceLine" id="cb6-11" title="11">[<span class="dv">1</span>] <span class="dv">5</span></a></code></pre></div>
 <p>These two ways to export the <code>dualTableau</code> function achieve a comparable performance:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span>tableau &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="kw">c</span>(1L, 3L, 4L, 6L, 7L), <span class="kw">c</span>(2L, 5L, 8L, 10L), 9L)
-<span class="op">&gt;</span><span class="st"> </span><span class="kw">library</span>(microbenchmark)
-<span class="op">&gt;</span><span class="st"> </span><span class="kw">microbenchmark</span>(
-<span class="op">+</span><span class="st">   </span><span class="dt">R1 =</span> <span class="kw">.C</span>(<span class="st">&quot;dualTableauR1&quot;</span>, <span class="dt">tableau=</span>tableau, <span class="dt">l=</span><span class="kw">length</span>(tableau), 
-<span class="op">+</span><span class="st">           </span><span class="dt">result=</span><span class="kw">as.list</span>(<span class="kw">integer</span>(<span class="kw">length</span>(tableau[[<span class="dv">1</span>]]))))<span class="op">$</span>result,
-<span class="op">+</span><span class="st">   </span><span class="dt">R2 =</span> <span class="kw">.C</span>(<span class="st">&quot;dualTableauR2&quot;</span>, <span class="dt">tableau=</span>tableau, <span class="dt">l=</span><span class="kw">length</span>(tableau), 
-<span class="op">+</span><span class="st">           </span><span class="dt">result=</span><span class="kw">list</span>(0L))<span class="op">$</span>result[[<span class="dv">1</span>]]
-<span class="op">+</span><span class="st"> </span>) 
-Unit<span class="op">:</span><span class="st"> </span>microseconds
- expr    min      lq     mean  median      uq      max neval
-   R1 <span class="fl">35.253</span> <span class="fl">51.5410</span> <span class="fl">256.2568</span> <span class="fl">58.9040</span> <span class="fl">74.2990</span> <span class="fl">9919.870</span>   <span class="dv">100</span>
-   R2 <span class="fl">30.791</span> <span class="fl">36.1455</span> <span class="fl">351.1271</span> <span class="fl">41.5005</span> <span class="fl">48.8635</span> <span class="fl">8978.753</span>   <span class="dv">100</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="op">&gt;</span><span class="st"> </span>tableau &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="kw">c</span>(1L, 3L, 4L, 6L, 7L), <span class="kw">c</span>(2L, 5L, 8L, 10L), 9L)</a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="op">&gt;</span><span class="st"> </span><span class="kw">library</span>(microbenchmark)</a>
+<a class="sourceLine" id="cb7-3" title="3"><span class="op">&gt;</span><span class="st"> </span><span class="kw">microbenchmark</span>(</a>
+<a class="sourceLine" id="cb7-4" title="4"><span class="op">+</span><span class="st">   </span><span class="dt">R1 =</span> <span class="kw">.C</span>(<span class="st">&quot;dualTableauR1&quot;</span>, <span class="dt">tableau=</span>tableau, <span class="dt">l=</span><span class="kw">length</span>(tableau), </a>
+<a class="sourceLine" id="cb7-5" title="5"><span class="op">+</span><span class="st">           </span><span class="dt">result=</span><span class="kw">as.list</span>(<span class="kw">integer</span>(<span class="kw">length</span>(tableau[[<span class="dv">1</span>]]))))<span class="op">$</span>result,</a>
+<a class="sourceLine" id="cb7-6" title="6"><span class="op">+</span><span class="st">   </span><span class="dt">R2 =</span> <span class="kw">.C</span>(<span class="st">&quot;dualTableauR2&quot;</span>, <span class="dt">tableau=</span>tableau, <span class="dt">l=</span><span class="kw">length</span>(tableau), </a>
+<a class="sourceLine" id="cb7-7" title="7"><span class="op">+</span><span class="st">           </span><span class="dt">result=</span><span class="kw">list</span>(0L))<span class="op">$</span>result[[<span class="dv">1</span>]]</a>
+<a class="sourceLine" id="cb7-8" title="8"><span class="op">+</span><span class="st"> </span>) </a>
+<a class="sourceLine" id="cb7-9" title="9">Unit<span class="op">:</span><span class="st"> </span>microseconds</a>
+<a class="sourceLine" id="cb7-10" title="10"> expr    min      lq     mean  median      uq      max neval</a>
+<a class="sourceLine" id="cb7-11" title="11">   R1 <span class="fl">35.253</span> <span class="fl">51.5410</span> <span class="fl">256.2568</span> <span class="fl">58.9040</span> <span class="fl">74.2990</span> <span class="fl">9919.870</span>   <span class="dv">100</span></a>
+<a class="sourceLine" id="cb7-12" title="12">   R2 <span class="fl">30.791</span> <span class="fl">36.1455</span> <span class="fl">351.1271</span> <span class="fl">41.5005</span> <span class="fl">48.8635</span> <span class="fl">8978.753</span>   <span class="dv">100</span></a></code></pre></div>
 <p>Thus, using the second way, we are able to get an arbitrary number of atomic vectors, without knowing in advance this number.</p>
 <p>Now, in order to show how to get an arbitrary number of lists, we will export the <code>standardYoungTableaux</code> functions, which returns the list of standard Young tableaux whose shape is a given partition.</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="fu">...</span>
-<span class="kw">import </span><span class="dt">Math.Combinat.Partitions.Integer</span>
-
-foreign export ccall<span class="ot"> standardYoungTableauxR ::</span> <span class="dt">Ptr</span> <span class="dt">CInt</span> <span class="ot">-&gt;</span> <span class="dt">Ptr</span> <span class="dt">CInt</span> <span class="ot">-&gt;</span>
-                                                   <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="dt">R.Vector</span>) <span class="ot">-&gt;</span> <span class="dt">IO</span>()
-<span class="ot">standardYoungTableauxR ::</span> <span class="dt">Ptr</span> <span class="dt">CInt</span> <span class="ot">-&gt;</span> <span class="dt">Ptr</span> <span class="dt">CInt</span> <span class="ot">-&gt;</span> <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="dt">R.Vector</span>) <span class="ot">-&gt;</span> <span class="dt">IO</span>()
-standardYoungTableauxR partition l result <span class="fu">=</span> <span class="kw">do</span>
-  l <span class="ot">&lt;-</span> peek l
-  partition <span class="ot">&lt;-</span> peekArray (fromIntegral<span class="ot"> l ::</span> <span class="dt">Int</span>) partition
-  <span class="kw">let</span> tableaux <span class="fu">=</span> standardYoungTableaux (mkPartition <span class="fu">$</span> map fromIntegral partition)
-  <span class="kw">let</span> tableaux32 <span class="fu">=</span> map (map (map fromIntegral))<span class="ot"> tableaux ::</span> [[[<span class="dt">Int32</span>]]]
-  <span class="kw">let</span> tableauxAsSEXP <span class="fu">=</span> map (\x <span class="ot">-&gt;</span> (mkProtectedSEXPVector sing <span class="fu">$</span>
-                            (map (VS.toSEXP <span class="fu">.</span> VS.fromList)<span class="ot"> x ::</span> [<span class="dt">SEXP</span> s <span class="dt">R.Int</span>]))
-<span class="ot">                              ::</span> <span class="dt">SEXP</span> s <span class="dt">R.Vector</span>) tableaux32
-  poke result <span class="fu">$</span> mkProtectedSEXPVector sing tableauxAsSEXP</code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb8-1" title="1"><span class="op">...</span></a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="kw">import</span> <span class="dt">Math.Combinat.Partitions.Integer</span></a>
+<a class="sourceLine" id="cb8-3" title="3"></a>
+<a class="sourceLine" id="cb8-4" title="4">foreign export ccall<span class="ot"> standardYoungTableauxR ::</span> <span class="dt">Ptr</span> <span class="dt">CInt</span> <span class="ot">-&gt;</span> <span class="dt">Ptr</span> <span class="dt">CInt</span> <span class="ot">-&gt;</span></a>
+<a class="sourceLine" id="cb8-5" title="5">                                                   <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="dt">R.Vector</span>) <span class="ot">-&gt;</span> <span class="dt">IO</span>()</a>
+<a class="sourceLine" id="cb8-6" title="6"><span class="ot">standardYoungTableauxR ::</span> <span class="dt">Ptr</span> <span class="dt">CInt</span> <span class="ot">-&gt;</span> <span class="dt">Ptr</span> <span class="dt">CInt</span> <span class="ot">-&gt;</span> <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="dt">R.Vector</span>) <span class="ot">-&gt;</span> <span class="dt">IO</span>()</a>
+<a class="sourceLine" id="cb8-7" title="7">standardYoungTableauxR partition l result <span class="ot">=</span> <span class="kw">do</span></a>
+<a class="sourceLine" id="cb8-8" title="8">  l <span class="ot">&lt;-</span> peek l</a>
+<a class="sourceLine" id="cb8-9" title="9">  partition <span class="ot">&lt;-</span> peekArray (<span class="fu">fromIntegral</span><span class="ot"> l ::</span> <span class="dt">Int</span>) partition</a>
+<a class="sourceLine" id="cb8-10" title="10">  <span class="kw">let</span> tableaux <span class="ot">=</span> standardYoungTableaux (mkPartition <span class="op">$</span> <span class="fu">map</span> <span class="fu">fromIntegral</span> partition)</a>
+<a class="sourceLine" id="cb8-11" title="11">  <span class="kw">let</span> tableaux32 <span class="ot">=</span> <span class="fu">map</span> (<span class="fu">map</span> (<span class="fu">map</span> <span class="fu">fromIntegral</span>))<span class="ot"> tableaux ::</span> [[[<span class="dt">Int32</span>]]]</a>
+<a class="sourceLine" id="cb8-12" title="12">  <span class="kw">let</span> tableauxAsSEXP <span class="ot">=</span> <span class="fu">map</span> (\x <span class="ot">-&gt;</span> (mkProtectedSEXPVector sing <span class="op">$</span></a>
+<a class="sourceLine" id="cb8-13" title="13">                            (<span class="fu">map</span> (VS.toSEXP <span class="op">.</span> VS.fromList)<span class="ot"> x ::</span> [<span class="dt">SEXP</span> s <span class="dt">R.Int</span>]))</a>
+<a class="sourceLine" id="cb8-14" title="14"><span class="ot">                              ::</span> <span class="dt">SEXP</span> s <span class="dt">R.Vector</span>) tableaux32</a>
+<a class="sourceLine" id="cb8-15" title="15">  poke result <span class="op">$</span> mkProtectedSEXPVector sing tableauxAsSEXP</a></code></pre></div>
 <p>Here is an example of a call:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span>shape &lt;-<span class="st"> </span><span class="kw">c</span>(3L, 2L)
-<span class="op">&gt;</span><span class="st"> </span><span class="kw">.C</span>(<span class="st">&quot;standardYoungTableauxR&quot;</span>, <span class="dt">partition=</span>shape, <span class="dt">l=</span><span class="kw">length</span>(partition), 
-<span class="op">+</span><span class="st">    </span><span class="dt">result=</span><span class="kw">list</span>(0L))<span class="op">$</span>result[[<span class="dv">1</span>]]
-[[<span class="dv">1</span>]]
-[[<span class="dv">1</span>]][[<span class="dv">1</span>]]
-[<span class="dv">1</span>] <span class="dv">1</span> <span class="dv">3</span> <span class="dv">5</span>
-
-[[<span class="dv">1</span>]][[<span class="dv">2</span>]]
-[<span class="dv">1</span>] <span class="dv">2</span> <span class="dv">4</span>
-
-
-[[<span class="dv">2</span>]]
-[[<span class="dv">2</span>]][[<span class="dv">1</span>]]
-[<span class="dv">1</span>] <span class="dv">1</span> <span class="dv">2</span> <span class="dv">5</span>
-
-[[<span class="dv">2</span>]][[<span class="dv">2</span>]]
-[<span class="dv">1</span>] <span class="dv">3</span> <span class="dv">4</span>
-
-
-[[<span class="dv">3</span>]]
-[[<span class="dv">3</span>]][[<span class="dv">1</span>]]
-[<span class="dv">1</span>] <span class="dv">1</span> <span class="dv">3</span> <span class="dv">4</span>
-
-[[<span class="dv">3</span>]][[<span class="dv">2</span>]]
-[<span class="dv">1</span>] <span class="dv">2</span> <span class="dv">5</span>
-
-
-[[<span class="dv">4</span>]]
-[[<span class="dv">4</span>]][[<span class="dv">1</span>]]
-[<span class="dv">1</span>] <span class="dv">1</span> <span class="dv">2</span> <span class="dv">4</span>
-
-[[<span class="dv">4</span>]][[<span class="dv">2</span>]]
-[<span class="dv">1</span>] <span class="dv">3</span> <span class="dv">5</span>
-
-
-[[<span class="dv">5</span>]]
-[[<span class="dv">5</span>]][[<span class="dv">1</span>]]
-[<span class="dv">1</span>] <span class="dv">1</span> <span class="dv">2</span> <span class="dv">3</span>
-
-[[<span class="dv">5</span>]][[<span class="dv">2</span>]]
-[<span class="dv">1</span>] <span class="dv">4</span> <span class="dv">5</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="op">&gt;</span><span class="st"> </span>shape &lt;-<span class="st"> </span><span class="kw">c</span>(3L, 2L)</a>
+<a class="sourceLine" id="cb9-2" title="2"><span class="op">&gt;</span><span class="st"> </span><span class="kw">.C</span>(<span class="st">&quot;standardYoungTableauxR&quot;</span>, <span class="dt">partition=</span>shape, <span class="dt">l=</span><span class="kw">length</span>(partition), </a>
+<a class="sourceLine" id="cb9-3" title="3"><span class="op">+</span><span class="st">    </span><span class="dt">result=</span><span class="kw">list</span>(0L))<span class="op">$</span>result[[<span class="dv">1</span>]]</a>
+<a class="sourceLine" id="cb9-4" title="4">[[<span class="dv">1</span>]]</a>
+<a class="sourceLine" id="cb9-5" title="5">[[<span class="dv">1</span>]][[<span class="dv">1</span>]]</a>
+<a class="sourceLine" id="cb9-6" title="6">[<span class="dv">1</span>] <span class="dv">1</span> <span class="dv">3</span> <span class="dv">5</span></a>
+<a class="sourceLine" id="cb9-7" title="7"></a>
+<a class="sourceLine" id="cb9-8" title="8">[[<span class="dv">1</span>]][[<span class="dv">2</span>]]</a>
+<a class="sourceLine" id="cb9-9" title="9">[<span class="dv">1</span>] <span class="dv">2</span> <span class="dv">4</span></a>
+<a class="sourceLine" id="cb9-10" title="10"></a>
+<a class="sourceLine" id="cb9-11" title="11"></a>
+<a class="sourceLine" id="cb9-12" title="12">[[<span class="dv">2</span>]]</a>
+<a class="sourceLine" id="cb9-13" title="13">[[<span class="dv">2</span>]][[<span class="dv">1</span>]]</a>
+<a class="sourceLine" id="cb9-14" title="14">[<span class="dv">1</span>] <span class="dv">1</span> <span class="dv">2</span> <span class="dv">5</span></a>
+<a class="sourceLine" id="cb9-15" title="15"></a>
+<a class="sourceLine" id="cb9-16" title="16">[[<span class="dv">2</span>]][[<span class="dv">2</span>]]</a>
+<a class="sourceLine" id="cb9-17" title="17">[<span class="dv">1</span>] <span class="dv">3</span> <span class="dv">4</span></a>
+<a class="sourceLine" id="cb9-18" title="18"></a>
+<a class="sourceLine" id="cb9-19" title="19"></a>
+<a class="sourceLine" id="cb9-20" title="20">[[<span class="dv">3</span>]]</a>
+<a class="sourceLine" id="cb9-21" title="21">[[<span class="dv">3</span>]][[<span class="dv">1</span>]]</a>
+<a class="sourceLine" id="cb9-22" title="22">[<span class="dv">1</span>] <span class="dv">1</span> <span class="dv">3</span> <span class="dv">4</span></a>
+<a class="sourceLine" id="cb9-23" title="23"></a>
+<a class="sourceLine" id="cb9-24" title="24">[[<span class="dv">3</span>]][[<span class="dv">2</span>]]</a>
+<a class="sourceLine" id="cb9-25" title="25">[<span class="dv">1</span>] <span class="dv">2</span> <span class="dv">5</span></a>
+<a class="sourceLine" id="cb9-26" title="26"></a>
+<a class="sourceLine" id="cb9-27" title="27"></a>
+<a class="sourceLine" id="cb9-28" title="28">[[<span class="dv">4</span>]]</a>
+<a class="sourceLine" id="cb9-29" title="29">[[<span class="dv">4</span>]][[<span class="dv">1</span>]]</a>
+<a class="sourceLine" id="cb9-30" title="30">[<span class="dv">1</span>] <span class="dv">1</span> <span class="dv">2</span> <span class="dv">4</span></a>
+<a class="sourceLine" id="cb9-31" title="31"></a>
+<a class="sourceLine" id="cb9-32" title="32">[[<span class="dv">4</span>]][[<span class="dv">2</span>]]</a>
+<a class="sourceLine" id="cb9-33" title="33">[<span class="dv">1</span>] <span class="dv">3</span> <span class="dv">5</span></a>
+<a class="sourceLine" id="cb9-34" title="34"></a>
+<a class="sourceLine" id="cb9-35" title="35"></a>
+<a class="sourceLine" id="cb9-36" title="36">[[<span class="dv">5</span>]]</a>
+<a class="sourceLine" id="cb9-37" title="37">[[<span class="dv">5</span>]][[<span class="dv">1</span>]]</a>
+<a class="sourceLine" id="cb9-38" title="38">[<span class="dv">1</span>] <span class="dv">1</span> <span class="dv">2</span> <span class="dv">3</span></a>
+<a class="sourceLine" id="cb9-39" title="39"></a>
+<a class="sourceLine" id="cb9-40" title="40">[[<span class="dv">5</span>]][[<span class="dv">2</span>]]</a>
+<a class="sourceLine" id="cb9-41" title="41">[<span class="dv">1</span>] <span class="dv">4</span> <span class="dv">5</span></a></code></pre></div>
 <p>I’ve included these functions and more in a R package. It will soon be available in <a href="https://stlarepo.github.io/drat/">my drat repo</a>, and the source code is available in <a href="https://github.com/stla/tableaux">my Github repo</a>.</p>
 
-    </div>
+        </div>
 
 
-    <div id="footer">
-      Site proudly generated by
-      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
     </div>
 
   </div>
@@ -257,18 +268,19 @@ standardYoungTableauxR partition l result <span class="fu">=</span> <span class=
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
 
-<!-- Google Prettify -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
-<script>
-  var pres = document.getElementsByTagName("pre");
-  for (var i = 0; i < pres.length; ++i) {
-    
-    pres[i].className = pres[i].className + " prettyprint";
-    
-  }
-  prettyPrint();
-</script> 
+  <!-- Google Prettify -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+  <script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+  <script>
+    var pres = document.getElementsByTagName("pre");
+    for (var i = 0; i < pres.length; ++i) {
+      
+        pres[i].className = pres[i].className + " prettyprint";
+      
+    }
+    prettyPrint();
+  </script> 
+
 
 </html>

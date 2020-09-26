@@ -6,60 +6,67 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - An orbit of the modular tessellation</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../css/post.css" />
   <link rel="stylesheet" href="../css/misc.css" /> 
-  <link rel="stylesheet" href="../css/pandoc-solarized.css" />  
-  <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+    <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
-  </script>
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 
 <body>
-  <!-- Sidebar. -->
-  <div class="sidebar">
-    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
-      <a href="https://www.r-bloggers.com/">
-        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
-      </a>
-      <br />
-      <a href="http://t-redactyl.io/">
-        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
-      </a>
-      <a href="http://timelyportfolio.blogspot.be/">
-        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
-      </a>
-      <br />
-      <a href="https://antoineguillot.wordpress.com/blog/">
-        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
-      </a>
-      <br />
-      <a href="https://fronkonstin.com/">
-        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
-      </a>
-    </div>
-  </div>
-
-  <div class="main">
-    <div id="header">
-      <div id="logo" style="position:absolute;">
-        <a href="../">
-          <img src="../images/stla.jpg" alt="stla" width="100px" />
-        </a>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-3">
+        <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+          <a href="https://www.r-bloggers.com/">
+            <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+          </a>
+          <br />
+          <a href="http://t-redactyl.io/">
+            <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
+          </a>
+          <a href="http://timelyportfolio.blogspot.be/">
+            <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
+          </a>
+          <br />
+          <a href="https://antoineguillot.wordpress.com/blog/">
+            <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+          </a>
+          <br />
+          <a href="https://fronkonstin.com/">
+            <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+          </a>
+        </div>
       </div>
-      <div id="navigation" style="margin-top:50px;">
-        <a href="../">Home</a>
-        <a href="../about.html">About</a>
-        <a href="../contact.html">Contact</a>
-        <a href="../archive.html">Archive</a>
-      </div>
-    </div>
 
-    <div class="content">
-      <h1>An orbit of the modular tessellation</h1> <div class="info">
+      <div class="main col-sm-9">
+        <div id="header">
+          <div id="logo" style="position:absolute;">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>An orbit of the modular tessellation</h1> 
+          <div class="info">
     Posted on February 19, 2020
     
         by Stéphane Laurent
@@ -194,12 +201,16 @@
 <a class="sourceLine" id="cb1-117" title="117">}, <span class="st">&quot;ModularTessellation.gif&quot;</span>, <span class="dv">512</span>, <span class="dv">512</span>, <span class="dt">delay =</span> <span class="dv">1</span><span class="op">/</span><span class="dv">12</span>, <span class="dt">res =</span> <span class="dv">144</span>)</a></code></pre></div>
 <p><img src="./figures/ModularTessellationOrbit.gif" /></p>
 
-    </div>
+        </div>
 
 
-    <div id="footer">
-      Site proudly generated by
-      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
     </div>
 
   </div>
@@ -237,18 +248,19 @@
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
 
-<!-- Google Prettify -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
-<script>
-  var pres = document.getElementsByTagName("pre");
-  for (var i = 0; i < pres.length; ++i) {
-    
-    pres[i].className = pres[i].className + " prettyprint linenums";
-    
-  }
-  prettyPrint();
-</script> 
+  <!-- Google Prettify -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+  <script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+  <script>
+    var pres = document.getElementsByTagName("pre");
+    for (var i = 0; i < pres.length; ++i) {
+      
+        pres[i].className = pres[i].className + " prettyprint linenums";
+      
+    }
+    prettyPrint();
+  </script> 
+
 
 </html>

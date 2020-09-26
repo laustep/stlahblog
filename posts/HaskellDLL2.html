@@ -6,60 +6,67 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - Very smaller Haskell DLLs</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../css/post.css" />
   <link rel="stylesheet" href="../css/misc.css" /> 
-  <link rel="stylesheet" href="../css/kate.css" />  
-  <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
+  
+    <link rel="stylesheet" href="../css/kate.css" /> 
+   
+  
+    <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
+  
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
-  </script>
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 
 <body>
-  <!-- Sidebar. -->
-  <div class="sidebar">
-    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
-      <a href="https://www.r-bloggers.com/">
-        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
-      </a>
-      <br />
-      <a href="http://t-redactyl.io/">
-        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
-      </a>
-      <a href="http://timelyportfolio.blogspot.be/">
-        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
-      </a>
-      <br />
-      <a href="https://antoineguillot.wordpress.com/blog/">
-        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
-      </a>
-      <br />
-      <a href="https://fronkonstin.com/">
-        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
-      </a>
-    </div>
-  </div>
-
-  <div class="main">
-    <div id="header">
-      <div id="logo" style="position:absolute;">
-        <a href="../">
-          <img src="../images/stla.jpg" alt="stla" width="100px" />
-        </a>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-3">
+        <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+          <a href="https://www.r-bloggers.com/">
+            <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+          </a>
+          <br />
+          <a href="http://t-redactyl.io/">
+            <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
+          </a>
+          <a href="http://timelyportfolio.blogspot.be/">
+            <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
+          </a>
+          <br />
+          <a href="https://antoineguillot.wordpress.com/blog/">
+            <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+          </a>
+          <br />
+          <a href="https://fronkonstin.com/">
+            <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+          </a>
+        </div>
       </div>
-      <div id="navigation" style="margin-top:50px;">
-        <a href="../">Home</a>
-        <a href="../about.html">About</a>
-        <a href="../contact.html">Contact</a>
-        <a href="../archive.html">Archive</a>
-      </div>
-    </div>
 
-    <div class="content">
-      <h1>Very smaller Haskell DLLs</h1> <div class="info">
+      <div class="main col-sm-9">
+        <div id="header">
+          <div id="logo" style="position:absolute;">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Very smaller Haskell DLLs</h1> 
+          <div class="info">
     Posted on December 18, 2017
     
         by Stéphane Laurent
@@ -75,20 +82,24 @@
 <p>Well, more exactly, I should say that <em>my</em> DLL works… Unfortunately, I have tried this method on a minimal example and the DLL does not work anymore after the UPX compression. That’s strange.</p>
 <p>Let me share now. If you pass the verbose option <code>-v</code> to <code>ghc -shared</code>, you can see that there are two linker phases. The first one generates the <code>o</code> file. The second one generates the DLL. When I pass the option <code>-s</code> to this second phase, the size of my DLL is 4.7 MB, while it is 12.8 MB without the <code>-s</code> option.</p>
 <p>You can pass the <code>-s</code> option to the linker like this:</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">ghc</span> -shared -optl-s ...</code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="ex">ghc</span> -shared -optl-s ...</a></code></pre></div>
 <p>But if I do like this, the compilation does not work. This command passes the <code>-s</code> option to the two linker phases. In order to pass this option to the second phase only, I proceed in two steps. I firstly run this command:</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">ghc</span> -c myhaskellscript.hs</code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="ex">ghc</span> -c myhaskellscript.hs</a></code></pre></div>
 <p>This generates the file <code>myhaskellscript.o</code>. Then I run this command:</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">ghc</span> -shared -optl-s myhaskellscript.hs StartEnd.c -o mydll.dll</code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="ex">ghc</span> -shared -optl-s myhaskellscript.hs StartEnd.c -o mydll.dll</a></code></pre></div>
 <p>In this way, since <code>myhaskellscript.o</code> already exists, the first linker phase is skipped, and thus the <code>-s</code> option is passed to the second phase only.</p>
 <p>Then I can compress the DLL with the UPX program. As I previously said, the <code>-s</code> linking option has a role here: without this option, I can compress the DLL with UPX but the DLL does not work.</p>
 
-    </div>
+        </div>
 
 
-    <div id="footer">
-      Site proudly generated by
-      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
     </div>
 
   </div>
@@ -126,18 +137,19 @@
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
 
-<!-- Google Prettify -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
-<script>
-  var pres = document.getElementsByTagName("pre");
-  for (var i = 0; i < pres.length; ++i) {
-    
-    pres[i].className = pres[i].className + " prettyprint";
-    
-  }
-  prettyPrint();
-</script> 
+  <!-- Google Prettify -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+  <script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+  <script>
+    var pres = document.getElementsByTagName("pre");
+    for (var i = 0; i < pres.length; ++i) {
+      
+        pres[i].className = pres[i].className + " prettyprint";
+      
+    }
+    prettyPrint();
+  </script> 
+
 
 </html>

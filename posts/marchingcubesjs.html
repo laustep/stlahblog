@@ -6,60 +6,67 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - Marching cubes with Javascript</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../css/post.css" />
   <link rel="stylesheet" href="../css/misc.css" /> 
-  <link rel="stylesheet" href="../css/pandoc-solarized.css" />  
-  <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+    <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
-  </script>
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 
 <body>
-  <!-- Sidebar. -->
-  <div class="sidebar">
-    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
-      <a href="https://www.r-bloggers.com/">
-        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
-      </a>
-      <br />
-      <a href="http://t-redactyl.io/">
-        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
-      </a>
-      <a href="http://timelyportfolio.blogspot.be/">
-        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
-      </a>
-      <br />
-      <a href="https://antoineguillot.wordpress.com/blog/">
-        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
-      </a>
-      <br />
-      <a href="https://fronkonstin.com/">
-        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
-      </a>
-    </div>
-  </div>
-
-  <div class="main">
-    <div id="header">
-      <div id="logo" style="position:absolute;">
-        <a href="../">
-          <img src="../images/stla.jpg" alt="stla" width="100px" />
-        </a>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-3">
+        <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+          <a href="https://www.r-bloggers.com/">
+            <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+          </a>
+          <br />
+          <a href="http://t-redactyl.io/">
+            <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
+          </a>
+          <a href="http://timelyportfolio.blogspot.be/">
+            <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
+          </a>
+          <br />
+          <a href="https://antoineguillot.wordpress.com/blog/">
+            <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+          </a>
+          <br />
+          <a href="https://fronkonstin.com/">
+            <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+          </a>
+        </div>
       </div>
-      <div id="navigation" style="margin-top:50px;">
-        <a href="../">Home</a>
-        <a href="../about.html">About</a>
-        <a href="../contact.html">Contact</a>
-        <a href="../archive.html">Archive</a>
-      </div>
-    </div>
 
-    <div class="content">
-      <h1>Marching cubes with Javascript</h1> <div class="info">
+      <div class="main col-sm-9">
+        <div id="header">
+          <div id="logo" style="position:absolute;">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Marching cubes with Javascript</h1> 
+          <div class="info">
     Posted on June 25, 2018
     
         by Stéphane Laurent
@@ -76,7 +83,7 @@
 f(x,y,z) = \ell.
 \]</span></p>
 <p>The triangulation is returned by</p>
-<div class="sourceCode"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="at">marchingCubes</span>(f<span class="op">,</span> l<span class="op">,</span> xmin<span class="op">,</span> xmax<span class="op">,</span> ymin<span class="op">,</span> ymax<span class="op">,</span> zmin<span class="op">,</span> zmax<span class="op">,</span> nx<span class="op">,</span> ny<span class="op">,</span> nz)</code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode javascript"><code class="sourceCode javascript"><a class="sourceLine" id="cb1-1" title="1"><span class="at">marchingCubes</span>(f<span class="op">,</span> l<span class="op">,</span> xmin<span class="op">,</span> xmax<span class="op">,</span> ymin<span class="op">,</span> ymax<span class="op">,</span> zmin<span class="op">,</span> zmax<span class="op">,</span> nx<span class="op">,</span> ny<span class="op">,</span> nz)</a></code></pre></div>
 <p>where <code>xmin</code> and <code>xmax</code> are the bounds of the <span class="math inline">\(x\)</span> variable and <code>nx</code> is the number of subdivisions between <code>xmin</code> and <code>xmax</code>, and similarly for the <span class="math inline">\(y\)</span> and <span class="math inline">\(z\)</span> variables.</p>
 <p>The output is a <span class="math inline">\((n \times 3)\)</span>-array of vertices. Grouping the rows by chunks of three provides the triangles.</p>
 <p>As an illustration, below is a Dupin cyclide triangulated by the marching cubes algorithm and rendered with <code>three.js</code>. The full code is available in the source. Go <a href="https://laustep.github.io/stlahblog/frames/threejs_cyclide.html">here</a> for a full-page rendering.</p>
@@ -86,12 +93,16 @@ f(x,y,z) = \ell.
 <iframe src="../frames/threejs_cyclideByMarchingCubes.html" width="100%" height="500px" scrolling="no" frameborder="0">
 </iframe>
 
-    </div>
+        </div>
 
 
-    <div id="footer">
-      Site proudly generated by
-      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
     </div>
 
   </div>
@@ -129,18 +140,19 @@ f(x,y,z) = \ell.
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
 
-<!-- Google Prettify -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
-<script>
-  var pres = document.getElementsByTagName("pre");
-  for (var i = 0; i < pres.length; ++i) {
-    
-    pres[i].className = pres[i].className + " prettyprint";
-    
-  }
-  prettyPrint();
-</script> 
+  <!-- Google Prettify -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+  <script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+  <script>
+    var pres = document.getElementsByTagName("pre");
+    for (var i = 0; i < pres.length; ++i) {
+      
+        pres[i].className = pres[i].className + " prettyprint";
+      
+    }
+    prettyPrint();
+  </script> 
+
 
 </html>

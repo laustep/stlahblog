@@ -6,60 +6,67 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - A R matrix to a Haskell list, with the `clipr` package</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../css/post.css" />
   <link rel="stylesheet" href="../css/misc.css" /> 
-  <link rel="stylesheet" href="../css/kate.css" />  
-  <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
+  
+    <link rel="stylesheet" href="../css/kate.css" /> 
+   
+  
+    <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
+  
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
-  </script>
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 
 <body>
-  <!-- Sidebar. -->
-  <div class="sidebar">
-    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
-      <a href="https://www.r-bloggers.com/">
-        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
-      </a>
-      <br />
-      <a href="http://t-redactyl.io/">
-        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
-      </a>
-      <a href="http://timelyportfolio.blogspot.be/">
-        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
-      </a>
-      <br />
-      <a href="https://antoineguillot.wordpress.com/blog/">
-        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
-      </a>
-      <br />
-      <a href="https://fronkonstin.com/">
-        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
-      </a>
-    </div>
-  </div>
-
-  <div class="main">
-    <div id="header">
-      <div id="logo" style="position:absolute;">
-        <a href="../">
-          <img src="../images/stla.jpg" alt="stla" width="100px" />
-        </a>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-3">
+        <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+          <a href="https://www.r-bloggers.com/">
+            <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+          </a>
+          <br />
+          <a href="http://t-redactyl.io/">
+            <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
+          </a>
+          <a href="http://timelyportfolio.blogspot.be/">
+            <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
+          </a>
+          <br />
+          <a href="https://antoineguillot.wordpress.com/blog/">
+            <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+          </a>
+          <br />
+          <a href="https://fronkonstin.com/">
+            <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+          </a>
+        </div>
       </div>
-      <div id="navigation" style="margin-top:50px;">
-        <a href="../">Home</a>
-        <a href="../about.html">About</a>
-        <a href="../contact.html">Contact</a>
-        <a href="../archive.html">Archive</a>
-      </div>
-    </div>
 
-    <div class="content">
-      <h1>A R matrix to a Haskell list, with the `clipr` package</h1> <div class="info">
+      <div class="main col-sm-9">
+        <div id="header">
+          <div id="logo" style="position:absolute;">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>A R matrix to a Haskell list, with the `clipr` package</h1> 
+          <div class="info">
     Posted on March 13, 2018
     
         by Stéphane Laurent
@@ -73,67 +80,71 @@
 
 <p>Assume you have a matrix in R, and you want to use it in Haskell as a list. Here is a way to go.</p>
 <p>I will take a small matrix for the illustration.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">M &lt;-<span class="st"> </span><span class="kw">rbind</span>(
-  <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="fl">1.5</span>),
-  <span class="kw">c</span>(<span class="fl">0.5</span>,<span class="dv">2</span>,<span class="dv">3</span>),
-  <span class="kw">c</span>(<span class="dv">5</span>,<span class="fl">4.3</span>,<span class="dv">7</span>)
-)
-M
-##      [,1] [,2] [,3]
-## [1,]  1.0  2.0  1.5
-## [2,]  0.5  2.0  3.0
-## [3,]  5.0  4.3  7.0</code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">M &lt;-<span class="st"> </span><span class="kw">rbind</span>(</a>
+<a class="sourceLine" id="cb1-2" title="2">  <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="fl">1.5</span>),</a>
+<a class="sourceLine" id="cb1-3" title="3">  <span class="kw">c</span>(<span class="fl">0.5</span>,<span class="dv">2</span>,<span class="dv">3</span>),</a>
+<a class="sourceLine" id="cb1-4" title="4">  <span class="kw">c</span>(<span class="dv">5</span>,<span class="fl">4.3</span>,<span class="dv">7</span>)</a>
+<a class="sourceLine" id="cb1-5" title="5">)</a>
+<a class="sourceLine" id="cb1-6" title="6">M</a>
+<a class="sourceLine" id="cb1-7" title="7"><span class="co">##      [,1] [,2] [,3]</span></a>
+<a class="sourceLine" id="cb1-8" title="8"><span class="co">## [1,]  1.0  2.0  1.5</span></a>
+<a class="sourceLine" id="cb1-9" title="9"><span class="co">## [2,]  0.5  2.0  3.0</span></a>
+<a class="sourceLine" id="cb1-10" title="10"><span class="co">## [3,]  5.0  4.3  7.0</span></a></code></pre></div>
 <p>So, for Haskell, you want:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">[ [<span class="fl">1.0</span>,  <span class="fl">2.0</span>,  <span class="fl">1.5</span>]
- ,[<span class="fl">0.5</span>,  <span class="fl">2.0</span>,  <span class="fl">3.0</span>]
- ,[<span class="fl">5.0</span>,  <span class="fl">4.3</span>,  <span class="fl">7.0</span>] ]</code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb2-1" title="1">[ [<span class="fl">1.0</span>,  <span class="fl">2.0</span>,  <span class="fl">1.5</span>]</a>
+<a class="sourceLine" id="cb2-2" title="2"> ,[<span class="fl">0.5</span>,  <span class="fl">2.0</span>,  <span class="fl">3.0</span>]</a>
+<a class="sourceLine" id="cb2-3" title="3"> ,[<span class="fl">5.0</span>,  <span class="fl">4.3</span>,  <span class="fl">7.0</span>] ]</a></code></pre></div>
 <p>It would be very painful to do it by hands. But the <code>clipr</code> package is your friend. First, write the matrix in the clipboard, like this:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(clipr)
-<span class="kw">write_clip</span>(M, <span class="dt">breaks=</span><span class="st">&quot;],</span><span class="ch">\n</span><span class="st">&quot;</span>, <span class="dt">sep=</span><span class="st">&quot;, &quot;</span>)</code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw">library</span>(clipr)</a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="kw">write_clip</span>(M, <span class="dt">breaks=</span><span class="st">&quot;],</span><span class="ch">\n</span><span class="st">&quot;</span>, <span class="dt">sep=</span><span class="st">&quot;, &quot;</span>)</a></code></pre></div>
 <p>No we will use <code>cat</code> to write the output to a file.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(magrittr)
-myfile &lt;-<span class="st"> &quot;matrix.txt&quot;</span>
-<span class="kw">paste0</span>(<span class="st">&quot;[&quot;</span>, <span class="kw">read_clip</span>()) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">cat</span>(<span class="dt">sep=</span><span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>, <span class="dt">file=</span>myfile) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">    </span><span class="kw">cat</span>(<span class="st">&quot;]&quot;</span>, <span class="dt">sep=</span><span class="st">&quot;&quot;</span>, <span class="dt">file=</span>myfile, <span class="dt">append=</span><span class="ot">TRUE</span>)</code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="kw">library</span>(magrittr)</a>
+<a class="sourceLine" id="cb4-2" title="2">myfile &lt;-<span class="st"> &quot;matrix.txt&quot;</span></a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="kw">paste0</span>(<span class="st">&quot;[&quot;</span>, <span class="kw">read_clip</span>()) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="st">  </span><span class="kw">cat</span>(<span class="dt">sep=</span><span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>, <span class="dt">file=</span>myfile) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-5" title="5"><span class="st">    </span><span class="kw">cat</span>(<span class="st">&quot;]&quot;</span>, <span class="dt">sep=</span><span class="st">&quot;&quot;</span>, <span class="dt">file=</span>myfile, <span class="dt">append=</span><span class="ot">TRUE</span>)</a></code></pre></div>
 <p>And then, here is the content of <code>matrix.txt</code>:</p>
-<pre class="txt"><code>[1, 2, 1.5],
-[0.5, 2, 3],
-[5, 4.3, 7
-
-]</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode txt"><code class="sourceCode default"><a class="sourceLine" id="cb5-1" title="1">[1, 2, 1.5],</a>
+<a class="sourceLine" id="cb5-2" title="2">[0.5, 2, 3],</a>
+<a class="sourceLine" id="cb5-3" title="3">[5, 4.3, 7</a>
+<a class="sourceLine" id="cb5-4" title="4"></a>
+<a class="sourceLine" id="cb5-5" title="5">]</a></code></pre></div>
 <p>Well, not totally perfect. But now it’s a child game to complete the output before copying it to Haskell:</p>
-<pre class="txt"><code>[
-[1, 2, 1.5],
-[0.5, 2, 3],
-[5, 4.3, 7]
-]</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode txt"><code class="sourceCode default"><a class="sourceLine" id="cb6-1" title="1">[</a>
+<a class="sourceLine" id="cb6-2" title="2">[1, 2, 1.5],</a>
+<a class="sourceLine" id="cb6-3" title="3">[0.5, 2, 3],</a>
+<a class="sourceLine" id="cb6-4" title="4">[5, 4.3, 7]</a>
+<a class="sourceLine" id="cb6-5" title="5">]</a></code></pre></div>
 <h3 id="update-2018-03-29">Update 2018-03-29</h3>
 <p>I’ve written a function which gives a better result:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(clipr)
-<span class="kw">library</span>(magrittr)
-matrix2list &lt;-<span class="st"> </span><span class="cf">function</span>(M, <span class="dt">outfile=</span><span class="st">&quot;haskell.txt&quot;</span>){
-  <span class="kw">write_clip</span>(M, <span class="dt">sep=</span><span class="st">&quot;, &quot;</span>) 
-  clipboard &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">sprintf</span>(<span class="st">&quot;%s],&quot;</span>, <span class="kw">head</span>(<span class="kw">read_clip</span>(),<span class="op">-</span><span class="dv">1</span>)), 
-                 <span class="kw">sprintf</span>(<span class="st">&quot;%s]&quot;</span>, <span class="kw">tail</span>(<span class="kw">read_clip</span>(),<span class="dv">1</span>)))
-  <span class="kw">paste0</span>(<span class="kw">c</span>(<span class="st">&quot;[&quot;</span>, <span class="kw">paste0</span>(<span class="st">&quot; [&quot;</span>, clipboard))) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">    </span><span class="kw">cat</span>(<span class="dt">sep=</span><span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>, <span class="dt">file=</span>outfile) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">    </span><span class="kw">cat</span>(<span class="st">&quot;]&quot;</span>, <span class="dt">sep=</span><span class="st">&quot;&quot;</span>, <span class="dt">file=</span>outfile, <span class="dt">append=</span><span class="ot">TRUE</span>)
-}</code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="kw">library</span>(clipr)</a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="kw">library</span>(magrittr)</a>
+<a class="sourceLine" id="cb7-3" title="3">matrix2list &lt;-<span class="st"> </span><span class="cf">function</span>(M, <span class="dt">outfile=</span><span class="st">&quot;haskell.txt&quot;</span>){</a>
+<a class="sourceLine" id="cb7-4" title="4">  <span class="kw">write_clip</span>(M, <span class="dt">sep=</span><span class="st">&quot;, &quot;</span>) </a>
+<a class="sourceLine" id="cb7-5" title="5">  clipboard &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">sprintf</span>(<span class="st">&quot;%s],&quot;</span>, <span class="kw">head</span>(<span class="kw">read_clip</span>(),<span class="op">-</span><span class="dv">1</span>)), </a>
+<a class="sourceLine" id="cb7-6" title="6">                 <span class="kw">sprintf</span>(<span class="st">&quot;%s]&quot;</span>, <span class="kw">tail</span>(<span class="kw">read_clip</span>(),<span class="dv">1</span>)))</a>
+<a class="sourceLine" id="cb7-7" title="7">  <span class="kw">paste0</span>(<span class="kw">c</span>(<span class="st">&quot;[&quot;</span>, <span class="kw">paste0</span>(<span class="st">&quot; [&quot;</span>, clipboard))) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-8" title="8"><span class="st">    </span><span class="kw">cat</span>(<span class="dt">sep=</span><span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>, <span class="dt">file=</span>outfile) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-9" title="9"><span class="st">    </span><span class="kw">cat</span>(<span class="st">&quot;]&quot;</span>, <span class="dt">sep=</span><span class="st">&quot;&quot;</span>, <span class="dt">file=</span>outfile, <span class="dt">append=</span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb7-10" title="10">}</a></code></pre></div>
 <p>For example, <code>matrix2list(M)</code> generates the text file</p>
-<pre class="txt"><code>[
- [1, 2, 1.5],
- [0.5, 2, 3],
- [5, 4.3, 7]
-]</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode txt"><code class="sourceCode default"><a class="sourceLine" id="cb8-1" title="1">[</a>
+<a class="sourceLine" id="cb8-2" title="2"> [1, 2, 1.5],</a>
+<a class="sourceLine" id="cb8-3" title="3"> [0.5, 2, 3],</a>
+<a class="sourceLine" id="cb8-4" title="4"> [5, 4.3, 7]</a>
+<a class="sourceLine" id="cb8-5" title="5">]</a></code></pre></div>
 <p>Nothing to change manually now. Just copy-paste.</p>
 
-    </div>
+        </div>
 
 
-    <div id="footer">
-      Site proudly generated by
-      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
     </div>
 
   </div>
@@ -171,18 +182,19 @@ matrix2list &lt;-<span class="st"> </span><span class="cf">function</span>(M, <s
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
 
-<!-- Google Prettify -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
-<script>
-  var pres = document.getElementsByTagName("pre");
-  for (var i = 0; i < pres.length; ++i) {
-    
-    pres[i].className = pres[i].className + " prettyprint linenums";
-    
-  }
-  prettyPrint();
-</script> 
+  <!-- Google Prettify -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+  <script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+  <script>
+    var pres = document.getElementsByTagName("pre");
+    for (var i = 0; i < pres.length; ++i) {
+      
+        pres[i].className = pres[i].className + " prettyprint linenums";
+      
+    }
+    prettyPrint();
+  </script> 
+
 
 </html>

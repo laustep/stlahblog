@@ -7,61 +7,68 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - The binary splitting with the R `gmp` package - Application to the Gauss
 hypergeometric function</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../css/post.css" />
   <link rel="stylesheet" href="../css/misc.css" /> 
-  <link rel="stylesheet" href="../css/kate.css" />  
-  <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
+  
+    <link rel="stylesheet" href="../css/kate.css" /> 
+   
+  
+    <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
+  
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
-  </script>
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 
 <body>
-  <!-- Sidebar. -->
-  <div class="sidebar">
-    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
-      <a href="https://www.r-bloggers.com/">
-        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
-      </a>
-      <br />
-      <a href="http://t-redactyl.io/">
-        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
-      </a>
-      <a href="http://timelyportfolio.blogspot.be/">
-        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
-      </a>
-      <br />
-      <a href="https://antoineguillot.wordpress.com/blog/">
-        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
-      </a>
-      <br />
-      <a href="https://fronkonstin.com/">
-        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
-      </a>
-    </div>
-  </div>
-
-  <div class="main">
-    <div id="header">
-      <div id="logo" style="position:absolute;">
-        <a href="../">
-          <img src="../images/stla.jpg" alt="stla" width="100px" />
-        </a>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-3">
+        <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+          <a href="https://www.r-bloggers.com/">
+            <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+          </a>
+          <br />
+          <a href="http://t-redactyl.io/">
+            <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
+          </a>
+          <a href="http://timelyportfolio.blogspot.be/">
+            <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
+          </a>
+          <br />
+          <a href="https://antoineguillot.wordpress.com/blog/">
+            <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+          </a>
+          <br />
+          <a href="https://fronkonstin.com/">
+            <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+          </a>
+        </div>
       </div>
-      <div id="navigation" style="margin-top:50px;">
-        <a href="../">Home</a>
-        <a href="../about.html">About</a>
-        <a href="../contact.html">Contact</a>
-        <a href="../archive.html">Archive</a>
-      </div>
-    </div>
 
-    <div class="content">
-      <h1>The binary splitting with the R `gmp` package - Application to the Gauss
-hypergeometric function</h1> <div class="info">
+      <div class="main col-sm-9">
+        <div id="header">
+          <div id="logo" style="position:absolute;">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>The binary splitting with the R `gmp` package - Application to the Gauss
+hypergeometric function</h1> 
+          <div class="info">
     Posted on June  4, 2017
     
         by Stéphane Laurent
@@ -110,7 +117,7 @@ S_n - 1 =  \frac{\alpha'_1}{\beta'_1} + \frac{\delta'_1 \alpha'_2}{\beta'_1\beta
 S_n - 1 = \frac{\alpha^{(m)}}{\beta^{(m)}}
 \]</span> where <span class="math inline">\(\alpha^{(m)}\)</span> and <span class="math inline">\(\beta^{(m)}\)</span> are integer numbers obtained by applying above formulas</p>
 <p>The above method is the <em>binary splitting algorithm</em> for evaluating <span class="math inline">\(S_n\)</span> with <span class="math inline">\(n=2^m\)</span>, summarized as follows:</p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li><p>Initialization: put <span class="math inline">\(\alpha^{(0)}_i = \delta^{(0)}_i = u_i\)</span> and <span class="math inline">\(\beta^{(0)}_i=v_i\)</span> for <span class="math inline">\(i \in \{1,n\}\)</span>;</p></li>
 <li><p>Compute recursively for <span class="math inline">\(k\)</span> going from <span class="math inline">\(1\)</span> to <span class="math inline">\(m\)</span> <span class="math display">\[
 \begin{aligned}
@@ -127,29 +134,29 @@ S_n - 1 = \frac{\alpha^{(m)}}{\beta^{(m)}}
 <li>the binary splitting only performs operations on integer numbers;</li>
 <li>it returns an exact expression of <span class="math inline">\(S_n\)</span> as a ratio of two integer numbers.</li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## example: rational approximation of pi ##
-bs.pi &lt;-<span class="st"> </span><span class="cf">function</span>(m){
-  u &lt;-<span class="st"> </span><span class="cf">function</span>(i) <span class="kw">as.numeric</span>(i)
-  v &lt;-<span class="st"> </span><span class="cf">function</span>(i) <span class="dv">2</span><span class="op">*</span>i<span class="op">+</span><span class="dv">1</span>
-  n &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">^</span>m
-  indexes &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span>n)
-  delta &lt;-<span class="st"> </span>alpha &lt;-<span class="st"> </span><span class="kw">u</span>(indexes)
-  beta &lt;-<span class="st"> </span><span class="kw">v</span>(indexes)
-  j &lt;-<span class="st"> </span><span class="dv">1</span>; l &lt;-<span class="st"> </span>n
-  <span class="cf">while</span>(j<span class="op">&lt;</span>n){
-    l &lt;-<span class="st"> </span>l<span class="op">/</span><span class="dv">2</span>
-    odd &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span>l); even &lt;-<span class="st"> </span>odd<span class="op">-</span><span class="dv">1</span>
-    alpha &lt;-<span class="st"> </span>beta[odd]<span class="op">*</span>alpha[even] <span class="op">+</span><span class="st"> </span>delta[even]<span class="op">*</span>alpha[odd]
-    j &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span>j
-    beta &lt;-<span class="st"> </span>beta[odd]<span class="op">*</span>beta[even]
-    delta &lt;-<span class="st"> </span>delta[even]<span class="op">*</span>delta[odd]
-  }
-  Sn &lt;-<span class="st"> </span>alpha<span class="op">/</span>beta <span class="op">+</span><span class="st"> </span><span class="dv">1</span>
-  out &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">alpha=</span>alpha, <span class="dt">beta=</span>beta, <span class="dt">Sn=</span>Sn)
-  <span class="kw">return</span>(out)
-}</code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="co">## example: rational approximation of pi ##</span></a>
+<a class="sourceLine" id="cb1-2" title="2">bs.pi &lt;-<span class="st"> </span><span class="cf">function</span>(m){</a>
+<a class="sourceLine" id="cb1-3" title="3">  u &lt;-<span class="st"> </span><span class="cf">function</span>(i) <span class="kw">as.numeric</span>(i)</a>
+<a class="sourceLine" id="cb1-4" title="4">  v &lt;-<span class="st"> </span><span class="cf">function</span>(i) <span class="dv">2</span><span class="op">*</span>i<span class="op">+</span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb1-5" title="5">  n &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">^</span>m</a>
+<a class="sourceLine" id="cb1-6" title="6">  indexes &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span>n)</a>
+<a class="sourceLine" id="cb1-7" title="7">  delta &lt;-<span class="st"> </span>alpha &lt;-<span class="st"> </span><span class="kw">u</span>(indexes)</a>
+<a class="sourceLine" id="cb1-8" title="8">  beta &lt;-<span class="st"> </span><span class="kw">v</span>(indexes)</a>
+<a class="sourceLine" id="cb1-9" title="9">  j &lt;-<span class="st"> </span><span class="dv">1</span>; l &lt;-<span class="st"> </span>n</a>
+<a class="sourceLine" id="cb1-10" title="10">  <span class="cf">while</span>(j<span class="op">&lt;</span>n){</a>
+<a class="sourceLine" id="cb1-11" title="11">    l &lt;-<span class="st"> </span>l<span class="op">/</span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb1-12" title="12">    odd &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span>l); even &lt;-<span class="st"> </span>odd<span class="dv">-1</span></a>
+<a class="sourceLine" id="cb1-13" title="13">    alpha &lt;-<span class="st"> </span>beta[odd]<span class="op">*</span>alpha[even] <span class="op">+</span><span class="st"> </span>delta[even]<span class="op">*</span>alpha[odd]</a>
+<a class="sourceLine" id="cb1-14" title="14">    j &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span>j</a>
+<a class="sourceLine" id="cb1-15" title="15">    beta &lt;-<span class="st"> </span>beta[odd]<span class="op">*</span>beta[even]</a>
+<a class="sourceLine" id="cb1-16" title="16">    delta &lt;-<span class="st"> </span>delta[even]<span class="op">*</span>delta[odd]</a>
+<a class="sourceLine" id="cb1-17" title="17">  }</a>
+<a class="sourceLine" id="cb1-18" title="18">  Sn &lt;-<span class="st"> </span>alpha<span class="op">/</span>beta <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb1-19" title="19">  out &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">alpha=</span>alpha, <span class="dt">beta=</span>beta, <span class="dt">Sn=</span>Sn)</a>
+<a class="sourceLine" id="cb1-20" title="20">  <span class="kw">return</span>(out)</a>
+<a class="sourceLine" id="cb1-21" title="21">}</a></code></pre></div>
 <p>The method very well performs while <span class="math inline">\(m\leq 7\)</span> :</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(<span class="kw">bs.pi</span>(<span class="dv">7</span>),<span class="dt">digits=</span><span class="dv">22</span>)</code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">print</span>(<span class="kw">bs.pi</span>(<span class="dv">7</span>),<span class="dt">digits=</span><span class="dv">22</span>)</a></code></pre></div>
 <pre><code>## $alpha
 ## [1] 9.589805429639700552285e+254
 ## 
@@ -158,10 +165,10 @@ bs.pi &lt;-<span class="st"> </span><span class="cf">function</span>(m){
 ## 
 ## $Sn
 ## [1] 1.570796326794896557999</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(pi<span class="op">/</span><span class="dv">2</span>,<span class="dt">digits=</span><span class="dv">22</span>)</code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="kw">print</span>(pi<span class="op">/</span><span class="dv">2</span>,<span class="dt">digits=</span><span class="dv">22</span>)</a></code></pre></div>
 <pre><code>## [1] 1.570796326794896557999</code></pre>
 <p>But the numerator and the denominator become too gigantic when <span class="math inline">\(m=8\)</span>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">bs.pi</span>(<span class="dv">8</span>)</code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="kw">bs.pi</span>(<span class="dv">8</span>)</a></code></pre></div>
 <pre><code>## $alpha
 ## [1] Inf
 ## 
@@ -174,28 +181,28 @@ bs.pi &lt;-<span class="st"> </span><span class="cf">function</span>(m){
 <p>It is well known that <span class="math inline">\(\exp(x)=\lim S_n(x)\)</span> where <span class="math inline">\(S_n(x)=\sum_{k=0}^n\frac{x^n}{n!}\)</span>. Thus, when <span class="math inline">\(x=p/q\)</span> for some integers <span class="math inline">\(p\)</span> and <span class="math inline">\(q\)</span>, we can write as before <span class="math display">\[
 S_n(x) = 1 + \sum_{k=1}^n \prod_{i=1}^k\frac{u_i}{v_i}
 \]</span> where <span class="math inline">\(u_i \equiv p\)</span> and <span class="math inline">\(v_i= i q\)</span> are integer numbers. Thus, we can use the binary splitting algorithm to compute <span class="math inline">\(S_{2^m}\)</span>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## example: rational approximation of exp(p/q) ##
-bs.exp &lt;-<span class="st"> </span><span class="cf">function</span>(p,q,m){
-  v &lt;-<span class="st"> </span><span class="cf">function</span>(i) i<span class="op">*</span>q
-  n &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">^</span>m
-  indexes &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span>n
-  delta &lt;-<span class="st"> </span>alpha &lt;-<span class="st"> </span><span class="kw">rep</span>(p,n)
-  beta &lt;-<span class="st"> </span><span class="kw">v</span>(indexes)
-  j &lt;-<span class="st"> </span><span class="dv">1</span>; l &lt;-<span class="st"> </span>n
-  <span class="cf">while</span>(j<span class="op">&lt;</span>n){
-    l &lt;-<span class="st"> </span>l<span class="op">/</span><span class="dv">2</span>
-    odd &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span>l); even &lt;-<span class="st"> </span>odd<span class="op">-</span><span class="dv">1</span>
-    alpha &lt;-<span class="st"> </span>beta[odd]<span class="op">*</span>alpha[even] <span class="op">+</span><span class="st"> </span>delta[even]<span class="op">*</span>alpha[odd]
-    j &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span>j
-    beta &lt;-<span class="st"> </span>beta[odd]<span class="op">*</span>beta[even]
-    delta &lt;-<span class="st"> </span>delta[even]<span class="op">*</span>delta[odd]
-  }
-  Sn &lt;-<span class="st"> </span>alpha<span class="op">/</span>beta <span class="op">+</span><span class="st"> </span><span class="dv">1</span>
-  out &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">alpha=</span>alpha, <span class="dt">beta=</span>beta, <span class="dt">Sn=</span>Sn)
-  <span class="kw">return</span>(out)
-}</code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="co">## example: rational approximation of exp(p/q) ##</span></a>
+<a class="sourceLine" id="cb8-2" title="2">bs.exp &lt;-<span class="st"> </span><span class="cf">function</span>(p,q,m){</a>
+<a class="sourceLine" id="cb8-3" title="3">  v &lt;-<span class="st"> </span><span class="cf">function</span>(i) i<span class="op">*</span>q</a>
+<a class="sourceLine" id="cb8-4" title="4">  n &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">^</span>m</a>
+<a class="sourceLine" id="cb8-5" title="5">  indexes &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span>n</a>
+<a class="sourceLine" id="cb8-6" title="6">  delta &lt;-<span class="st"> </span>alpha &lt;-<span class="st"> </span><span class="kw">rep</span>(p,n)</a>
+<a class="sourceLine" id="cb8-7" title="7">  beta &lt;-<span class="st"> </span><span class="kw">v</span>(indexes)</a>
+<a class="sourceLine" id="cb8-8" title="8">  j &lt;-<span class="st"> </span><span class="dv">1</span>; l &lt;-<span class="st"> </span>n</a>
+<a class="sourceLine" id="cb8-9" title="9">  <span class="cf">while</span>(j<span class="op">&lt;</span>n){</a>
+<a class="sourceLine" id="cb8-10" title="10">    l &lt;-<span class="st"> </span>l<span class="op">/</span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb8-11" title="11">    odd &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span>l); even &lt;-<span class="st"> </span>odd<span class="dv">-1</span></a>
+<a class="sourceLine" id="cb8-12" title="12">    alpha &lt;-<span class="st"> </span>beta[odd]<span class="op">*</span>alpha[even] <span class="op">+</span><span class="st"> </span>delta[even]<span class="op">*</span>alpha[odd]</a>
+<a class="sourceLine" id="cb8-13" title="13">    j &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span>j</a>
+<a class="sourceLine" id="cb8-14" title="14">    beta &lt;-<span class="st"> </span>beta[odd]<span class="op">*</span>beta[even]</a>
+<a class="sourceLine" id="cb8-15" title="15">    delta &lt;-<span class="st"> </span>delta[even]<span class="op">*</span>delta[odd]</a>
+<a class="sourceLine" id="cb8-16" title="16">  }</a>
+<a class="sourceLine" id="cb8-17" title="17">  Sn &lt;-<span class="st"> </span>alpha<span class="op">/</span>beta <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb8-18" title="18">  out &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">alpha=</span>alpha, <span class="dt">beta=</span>beta, <span class="dt">Sn=</span>Sn)</a>
+<a class="sourceLine" id="cb8-19" title="19">  <span class="kw">return</span>(out)</a>
+<a class="sourceLine" id="cb8-20" title="20">}</a></code></pre></div>
 <p>Let us try to evaluate <span class="math inline">\(\exp(1)\)</span>. For <span class="math inline">\(m=7\)</span>, the approximation is not entirely satisfactory:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(<span class="kw">bs.exp</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">7</span>), <span class="dt">digits=</span><span class="dv">22</span>)</code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="kw">print</span>(<span class="kw">bs.exp</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">7</span>), <span class="dt">digits=</span><span class="dv">22</span>)</a></code></pre></div>
 <pre><code>## $alpha
 ## [1] 6.626046675252336548016e+215
 ## 
@@ -204,10 +211,10 @@ bs.exp &lt;-<span class="st"> </span><span class="cf">function</span>(p,q,m){
 ## 
 ## $Sn
 ## [1] 2.718281828459045534885</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(<span class="kw">exp</span>(<span class="dv">1</span>), <span class="dt">digits=</span><span class="dv">22</span>)</code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="kw">print</span>(<span class="kw">exp</span>(<span class="dv">1</span>), <span class="dt">digits=</span><span class="dv">22</span>)</a></code></pre></div>
 <pre><code>## [1] 2.718281828459045090796</code></pre>
 <p>And for <span class="math inline">\(m=8\)</span>, it crashes:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">bs.exp</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">8</span>)</code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1"><span class="kw">bs.exp</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">8</span>)</a></code></pre></div>
 <pre><code>## $alpha
 ## [1] Inf
 ## 
@@ -219,37 +226,37 @@ bs.exp &lt;-<span class="st"> </span><span class="cf">function</span>(p,q,m){
 <h2 id="the-gmp-package-comes-to-our-rescue">The <code>gmp</code> package comes to our rescue</h2>
 <p>As we noted above, the binary splitting manipulates only <em>integer</em> numbers. The evaluation of <span class="math inline">\(\exp(1)\)</span> has crashed because the numerator and the denominator were too big integers. The crantastic <a href="http://www.inside-r.org/packages/cran/gmp"><code>gmp</code></a> package overcomes this problem because it allows arithmetic without limitations using the <a href="http://gmplib.org/">C library GMP (GNU Multiple Precision Arithmetic)</a>.</p>
 <p>Let us show how the <code>gmp</code> works on the <span class="math inline">\(\pi\)</span> example. This is very easy: we only have to convert the two input sequences of integers <span class="math inline">\((u_i)\)</span> and <span class="math inline">\((v_i)\)</span> to sequences of <code>bigz</code> integers:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(gmp)
-## rational approximation of pi with gmp ##
-bs.pi.gmp &lt;-<span class="st"> </span><span class="cf">function</span>(m){
-  u &lt;-<span class="st"> </span><span class="cf">function</span>(i) <span class="kw">as.numeric</span>(i)
-  v &lt;-<span class="st"> </span><span class="cf">function</span>(i) <span class="dv">2</span><span class="op">*</span>i<span class="op">+</span><span class="dv">1</span>
-  n &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">^</span>m
-  indexes &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span>n
-  delta &lt;-<span class="st"> </span>alpha &lt;-<span class="st"> </span><span class="kw">as.bigz</span>(<span class="kw">u</span>(indexes))
-  beta &lt;-<span class="st"> </span><span class="kw">as.bigz</span>(<span class="kw">v</span>(indexes))
-  j &lt;-<span class="st"> </span><span class="dv">1</span>; l &lt;-<span class="st"> </span>n
-  <span class="cf">while</span>(j<span class="op">&lt;</span>n){
-    l &lt;-<span class="st"> </span>l<span class="op">/</span><span class="dv">2</span>
-    odd &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span>l); even &lt;-<span class="st"> </span>odd<span class="op">-</span><span class="dv">1</span>
-    alpha &lt;-<span class="st"> </span>beta[odd]<span class="op">*</span>alpha[even] <span class="op">+</span><span class="st"> </span>delta[even]<span class="op">*</span>alpha[odd]
-    j &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span>j
-    beta &lt;-<span class="st"> </span>beta[odd]<span class="op">*</span>beta[even]
-    delta &lt;-<span class="st"> </span>delta[even]<span class="op">*</span>delta[odd]
-  }
-  Sn &lt;-<span class="st"> </span>alpha<span class="op">/</span>beta <span class="op">+</span><span class="st"> </span><span class="dv">1</span>
-  out &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">Sn=</span>Sn, <span class="dt">eval.Sn=</span><span class="kw">format</span>(<span class="kw">as.numeric</span>(Sn),<span class="dt">digits=</span><span class="dv">22</span>))
-  <span class="kw">return</span>(out)
-}</code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1"><span class="kw">library</span>(gmp)</a>
+<a class="sourceLine" id="cb15-2" title="2"><span class="co">## rational approximation of pi with gmp ##</span></a>
+<a class="sourceLine" id="cb15-3" title="3">bs.pi.gmp &lt;-<span class="st"> </span><span class="cf">function</span>(m){</a>
+<a class="sourceLine" id="cb15-4" title="4">  u &lt;-<span class="st"> </span><span class="cf">function</span>(i) <span class="kw">as.numeric</span>(i)</a>
+<a class="sourceLine" id="cb15-5" title="5">  v &lt;-<span class="st"> </span><span class="cf">function</span>(i) <span class="dv">2</span><span class="op">*</span>i<span class="op">+</span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb15-6" title="6">  n &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">^</span>m</a>
+<a class="sourceLine" id="cb15-7" title="7">  indexes &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span>n</a>
+<a class="sourceLine" id="cb15-8" title="8">  delta &lt;-<span class="st"> </span>alpha &lt;-<span class="st"> </span><span class="kw">as.bigz</span>(<span class="kw">u</span>(indexes))</a>
+<a class="sourceLine" id="cb15-9" title="9">  beta &lt;-<span class="st"> </span><span class="kw">as.bigz</span>(<span class="kw">v</span>(indexes))</a>
+<a class="sourceLine" id="cb15-10" title="10">  j &lt;-<span class="st"> </span><span class="dv">1</span>; l &lt;-<span class="st"> </span>n</a>
+<a class="sourceLine" id="cb15-11" title="11">  <span class="cf">while</span>(j<span class="op">&lt;</span>n){</a>
+<a class="sourceLine" id="cb15-12" title="12">    l &lt;-<span class="st"> </span>l<span class="op">/</span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb15-13" title="13">    odd &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span>l); even &lt;-<span class="st"> </span>odd<span class="dv">-1</span></a>
+<a class="sourceLine" id="cb15-14" title="14">    alpha &lt;-<span class="st"> </span>beta[odd]<span class="op">*</span>alpha[even] <span class="op">+</span><span class="st"> </span>delta[even]<span class="op">*</span>alpha[odd]</a>
+<a class="sourceLine" id="cb15-15" title="15">    j &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span>j</a>
+<a class="sourceLine" id="cb15-16" title="16">    beta &lt;-<span class="st"> </span>beta[odd]<span class="op">*</span>beta[even]</a>
+<a class="sourceLine" id="cb15-17" title="17">    delta &lt;-<span class="st"> </span>delta[even]<span class="op">*</span>delta[odd]</a>
+<a class="sourceLine" id="cb15-18" title="18">  }</a>
+<a class="sourceLine" id="cb15-19" title="19">  Sn &lt;-<span class="st"> </span>alpha<span class="op">/</span>beta <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb15-20" title="20">  out &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">Sn=</span>Sn, <span class="dt">eval.Sn=</span><span class="kw">format</span>(<span class="kw">as.numeric</span>(Sn),<span class="dt">digits=</span><span class="dv">22</span>))</a>
+<a class="sourceLine" id="cb15-21" title="21">  <span class="kw">return</span>(out)</a>
+<a class="sourceLine" id="cb15-22" title="22">}</a></code></pre></div>
 <p>The evaluation of <span class="math inline">\(S_n\)</span> with <span class="math inline">\(n=2^3\)</span> illustrates the first advantage of the <code>gmp</code> package:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">bs.pi.gmp</span>(<span class="dv">3</span>)</code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1"><span class="kw">bs.pi.gmp</span>(<span class="dv">3</span>)</a></code></pre></div>
 <pre><code>## $Sn
 ## Big Rational ('bigq') :
 ## [1] 1202048/765765
 ## 
 ## $eval.Sn
 ## [1] &quot;1.569734840323075530932&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">bs.pi</span>(<span class="dv">3</span>)</code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1"><span class="kw">bs.pi</span>(<span class="dv">3</span>)</a></code></pre></div>
 <pre><code>## $alpha
 ## [1] 19632735
 ## 
@@ -259,7 +266,7 @@ bs.pi.gmp &lt;-<span class="st"> </span><span class="cf">function</span>(m){
 ## $Sn
 ## [1] 1.569735</code></pre>
 <p>As you can see, <span class="math inline">\(S_n\)</span> is written as an irreducible fraction with the <code>gmp</code> approach. But this is not the main strength of the <code>gmp</code> package. Now we have (almost) no limitation on <span class="math inline">\(m\)</span> for evaluating <span class="math inline">\(S_{2^m}\)</span>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">bs.pi.gmp</span>(<span class="dv">8</span>)</code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1"><span class="kw">bs.pi.gmp</span>(<span class="dv">8</span>)</a></code></pre></div>
 <pre><code>## $Sn
 ## Big Rational ('bigq') :
 ## [1] 115056663317199981372832786803399641133848259535718238578854114440177847232763528127119686643465544336537363974090559640151844992619459739337642897335661405374200830442503779326745081494631228217510085926896107230240702464/73247346810369298651903071099557979072216039642432949710389234675732768750102001285974817825809831148661290123993641325086924401900965008305646606428886048721946203288377842830920059623434101646117412656625454480462852875
@@ -268,27 +275,27 @@ bs.pi.gmp &lt;-<span class="st"> </span><span class="cf">function</span>(m){
 ## [1] &quot;1.570796326794896557999&quot;</code></pre>
 <p>Obviously the first limitation is the width of your screen. The more serious limitations of the <code>gmp</code> package are beyond the scope of this article.</p>
 <p>Let us come back to the exponential example:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## rational approximation of exp(p/q) with gmp ##
-bs.exp.gmp &lt;-<span class="st"> </span><span class="cf">function</span>(p,q,m){
-  v &lt;-<span class="st"> </span><span class="cf">function</span>(i) i<span class="op">*</span>q
-  n &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">^</span>m
-  indexes &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span>n
-  delta &lt;-<span class="st"> </span>alpha &lt;-<span class="st"> </span><span class="kw">as.bigz</span>(<span class="kw">rep</span>(p,n))
-  beta &lt;-<span class="st"> </span><span class="kw">as.bigz</span>(<span class="kw">v</span>(indexes))
-  j &lt;-<span class="st"> </span><span class="dv">1</span>; l &lt;-<span class="st"> </span>n
-  <span class="cf">while</span>(j<span class="op">&lt;</span>n){
-    l &lt;-<span class="st"> </span>l<span class="op">/</span><span class="dv">2</span>
-    odd &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span>l); even &lt;-<span class="st"> </span>odd<span class="op">-</span><span class="dv">1</span>
-    alpha &lt;-<span class="st"> </span>beta[odd]<span class="op">*</span>alpha[even] <span class="op">+</span><span class="st"> </span>delta[even]<span class="op">*</span>alpha[odd]
-    j &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span>j
-    beta &lt;-<span class="st"> </span>beta[odd]<span class="op">*</span>beta[even]
-    delta &lt;-<span class="st"> </span>delta[even]<span class="op">*</span>delta[odd]
-  }
-  Sn &lt;-<span class="st"> </span>alpha<span class="op">/</span>beta <span class="op">+</span><span class="st"> </span><span class="dv">1</span>
-  out &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">Sn=</span>Sn, <span class="dt">eval.Sn=</span><span class="kw">format</span>(<span class="kw">as.numeric</span>(Sn),<span class="dt">digits=</span><span class="dv">22</span>))
-  <span class="kw">return</span>(out)
-}</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">bs.exp.gmp</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">8</span>)</code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1"><span class="co">## rational approximation of exp(p/q) with gmp ##</span></a>
+<a class="sourceLine" id="cb22-2" title="2">bs.exp.gmp &lt;-<span class="st"> </span><span class="cf">function</span>(p,q,m){</a>
+<a class="sourceLine" id="cb22-3" title="3">  v &lt;-<span class="st"> </span><span class="cf">function</span>(i) i<span class="op">*</span>q</a>
+<a class="sourceLine" id="cb22-4" title="4">  n &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">^</span>m</a>
+<a class="sourceLine" id="cb22-5" title="5">  indexes &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span>n</a>
+<a class="sourceLine" id="cb22-6" title="6">  delta &lt;-<span class="st"> </span>alpha &lt;-<span class="st"> </span><span class="kw">as.bigz</span>(<span class="kw">rep</span>(p,n))</a>
+<a class="sourceLine" id="cb22-7" title="7">  beta &lt;-<span class="st"> </span><span class="kw">as.bigz</span>(<span class="kw">v</span>(indexes))</a>
+<a class="sourceLine" id="cb22-8" title="8">  j &lt;-<span class="st"> </span><span class="dv">1</span>; l &lt;-<span class="st"> </span>n</a>
+<a class="sourceLine" id="cb22-9" title="9">  <span class="cf">while</span>(j<span class="op">&lt;</span>n){</a>
+<a class="sourceLine" id="cb22-10" title="10">    l &lt;-<span class="st"> </span>l<span class="op">/</span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb22-11" title="11">    odd &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span>l); even &lt;-<span class="st"> </span>odd<span class="dv">-1</span></a>
+<a class="sourceLine" id="cb22-12" title="12">    alpha &lt;-<span class="st"> </span>beta[odd]<span class="op">*</span>alpha[even] <span class="op">+</span><span class="st"> </span>delta[even]<span class="op">*</span>alpha[odd]</a>
+<a class="sourceLine" id="cb22-13" title="13">    j &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span>j</a>
+<a class="sourceLine" id="cb22-14" title="14">    beta &lt;-<span class="st"> </span>beta[odd]<span class="op">*</span>beta[even]</a>
+<a class="sourceLine" id="cb22-15" title="15">    delta &lt;-<span class="st"> </span>delta[even]<span class="op">*</span>delta[odd]</a>
+<a class="sourceLine" id="cb22-16" title="16">  }</a>
+<a class="sourceLine" id="cb22-17" title="17">  Sn &lt;-<span class="st"> </span>alpha<span class="op">/</span>beta <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb22-18" title="18">  out &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">Sn=</span>Sn, <span class="dt">eval.Sn=</span><span class="kw">format</span>(<span class="kw">as.numeric</span>(Sn),<span class="dt">digits=</span><span class="dv">22</span>))</a>
+<a class="sourceLine" id="cb22-19" title="19">  <span class="kw">return</span>(out)</a>
+<a class="sourceLine" id="cb22-20" title="20">}</a></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" title="1"><span class="kw">bs.exp.gmp</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">8</span>)</a></code></pre></div>
 <pre><code>## $Sn
 ## Big Rational ('bigq') :
 ## [1] 63021364076854400517126597190157042974914655085470311494152999074896589361987361775329179623527760806690590676400388872831695705790559736341994225392293021235691155101792729596391087505487119686065032680426816409018591609682896947897581062232056198801713371950662092427153111247485380584396839593243205795931189046725531379112787311119506517584752693953099433873873085939642331053890371322719954788883613838912023544946108979472116077229049863887551154910123100635718060217444974605564852221865532212127661/23184264198455206868083304640033314193453554602148259996206909469655931150085069983174061928660848877037186090333421197463708022559289093927629440229660162856206414393604561795747978584507961086161320755987057927235191284503958147694842900705427915576370346458939828967066328925689811313743116731571304256245141968042147553432082017992236165926654195533967789698937870367867112218743295876678624370999142239502871990876622238944437605633097728000000000000000000000000000000000000000000000000000000000000000
@@ -298,55 +305,55 @@ bs.exp.gmp &lt;-<span class="st"> </span><span class="cf">function</span>(p,q,m)
 <p>Very well.</p>
 <h2 id="a-general-function-for-the-binary-splitting-algorithm">A general function for the binary splitting algorithm</h2>
 <p>Before turning to the Gauss hypergeometric function we write a general function for the binary splitting taking as arguments the two sequences <span class="math inline">\((u_i)\)</span> and <span class="math inline">\((v_i)\)</span>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bs.gmp &lt;-<span class="st"> </span><span class="cf">function</span>(u,v,<span class="dt">m=</span><span class="dv">7</span>,<span class="dt">value=</span><span class="st">&quot;eval&quot;</span>){
-  n &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">^</span>m
-  indexes &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span>n
-  delta &lt;-<span class="st"> </span>alpha &lt;-<span class="st"> </span><span class="kw">as.bigz</span>(<span class="kw">u</span>(indexes))
-  beta &lt;-<span class="st"> </span><span class="kw">as.bigz</span>(<span class="kw">v</span>(indexes))
-  j &lt;-<span class="st"> </span><span class="dv">1</span>; l &lt;-<span class="st"> </span>n
-  <span class="cf">while</span>(j<span class="op">&lt;</span>n){
-    l &lt;-<span class="st"> </span>l<span class="op">/</span><span class="dv">2</span>
-    odd &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span>l); even &lt;-<span class="st"> </span>odd<span class="op">-</span><span class="dv">1</span>
-    alpha &lt;-<span class="st"> </span>beta[odd]<span class="op">*</span>alpha[even] <span class="op">+</span><span class="st"> </span>delta[even]<span class="op">*</span>alpha[odd]
-    j &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span>j
-    beta &lt;-<span class="st"> </span>beta[odd]<span class="op">*</span>beta[even]
-    delta &lt;-<span class="st"> </span>delta[even]<span class="op">*</span>delta[odd]
-  }
-  Sn &lt;-<span class="st"> </span>alpha<span class="op">/</span>beta <span class="op">+</span><span class="st"> </span><span class="dv">1</span>
-  eval.Sn &lt;-<span class="st"> </span><span class="kw">format</span>(<span class="kw">as.numeric</span>(Sn) ,<span class="dt">digits=</span><span class="dv">22</span>)
-  out &lt;-<span class="st"> </span><span class="cf">switch</span>(value, 
-                <span class="st">&quot;eval&quot;</span>=eval.Sn, 
-                <span class="st">&quot;exact&quot;</span>=Sn, 
-                <span class="st">&quot;both&quot;</span>=<span class="kw">list</span>(<span class="dt">Sn=</span>Sn, <span class="dt">eval.Sn=</span>eval.Sn))
-  <span class="kw">return</span>(out)
-}</code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" title="1">bs.gmp &lt;-<span class="st"> </span><span class="cf">function</span>(u,v,<span class="dt">m=</span><span class="dv">7</span>,<span class="dt">value=</span><span class="st">&quot;eval&quot;</span>){</a>
+<a class="sourceLine" id="cb25-2" title="2">  n &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">^</span>m</a>
+<a class="sourceLine" id="cb25-3" title="3">  indexes &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span>n</a>
+<a class="sourceLine" id="cb25-4" title="4">  delta &lt;-<span class="st"> </span>alpha &lt;-<span class="st"> </span><span class="kw">as.bigz</span>(<span class="kw">u</span>(indexes))</a>
+<a class="sourceLine" id="cb25-5" title="5">  beta &lt;-<span class="st"> </span><span class="kw">as.bigz</span>(<span class="kw">v</span>(indexes))</a>
+<a class="sourceLine" id="cb25-6" title="6">  j &lt;-<span class="st"> </span><span class="dv">1</span>; l &lt;-<span class="st"> </span>n</a>
+<a class="sourceLine" id="cb25-7" title="7">  <span class="cf">while</span>(j<span class="op">&lt;</span>n){</a>
+<a class="sourceLine" id="cb25-8" title="8">    l &lt;-<span class="st"> </span>l<span class="op">/</span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb25-9" title="9">    odd &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span>l); even &lt;-<span class="st"> </span>odd<span class="dv">-1</span></a>
+<a class="sourceLine" id="cb25-10" title="10">    alpha &lt;-<span class="st"> </span>beta[odd]<span class="op">*</span>alpha[even] <span class="op">+</span><span class="st"> </span>delta[even]<span class="op">*</span>alpha[odd]</a>
+<a class="sourceLine" id="cb25-11" title="11">    j &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span>j</a>
+<a class="sourceLine" id="cb25-12" title="12">    beta &lt;-<span class="st"> </span>beta[odd]<span class="op">*</span>beta[even]</a>
+<a class="sourceLine" id="cb25-13" title="13">    delta &lt;-<span class="st"> </span>delta[even]<span class="op">*</span>delta[odd]</a>
+<a class="sourceLine" id="cb25-14" title="14">  }</a>
+<a class="sourceLine" id="cb25-15" title="15">  Sn &lt;-<span class="st"> </span>alpha<span class="op">/</span>beta <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb25-16" title="16">  eval.Sn &lt;-<span class="st"> </span><span class="kw">format</span>(<span class="kw">as.numeric</span>(Sn) ,<span class="dt">digits=</span><span class="dv">22</span>)</a>
+<a class="sourceLine" id="cb25-17" title="17">  out &lt;-<span class="st"> </span><span class="cf">switch</span>(value, </a>
+<a class="sourceLine" id="cb25-18" title="18">                <span class="st">&quot;eval&quot;</span>=eval.Sn, </a>
+<a class="sourceLine" id="cb25-19" title="19">                <span class="st">&quot;exact&quot;</span>=Sn, </a>
+<a class="sourceLine" id="cb25-20" title="20">                <span class="st">&quot;both&quot;</span>=<span class="kw">list</span>(<span class="dt">Sn=</span>Sn, <span class="dt">eval.Sn=</span>eval.Sn))</a>
+<a class="sourceLine" id="cb25-21" title="21">  <span class="kw">return</span>(out)</a>
+<a class="sourceLine" id="cb25-22" title="22">}</a></code></pre></div>
 <h2 id="the-gauss-hypergeometric-function">The Gauss hypergeometric function</h2>
 <p>Now consider the <em>Gauss hypergeometric function</em> <span class="math inline">\({}_2\!F_1\)</span>. This is the function <span class="math inline">\({}_2\!F_1(\alpha,\beta,\gamma; \cdot)\)</span><br />
 with complex parameters <span class="math inline">\(\alpha\)</span>, <span class="math inline">\(\beta\)</span>, <span class="math inline">\(\gamma \not\in \mathbb{Z}^-\)</span> and complex variable <span class="math inline">\(z\)</span> defined for <span class="math inline">\(|z|&lt;1\)</span> as the sum of an absolute convergent series <span class="math display">\[{}_2\!F_1(\alpha,\beta,\gamma; z) = \sum_{n=0}^{\infty}\frac{ {(\alpha)}_{n}{(\beta)}_n}{ {(\gamma)}_{n}}\frac{z^n}{n!},\]</span> and extended by analytical continuation in the complex plane with the cut along <span class="math inline">\((1,+\infty)\)</span>. Here <span class="math inline">\({(a)}_n:=a(a+1)\cdots(a+n-1)\)</span> denotes the Pochhammer symbol used to represent the <span class="math inline">\(n\)</span>-th ascending factorial of <span class="math inline">\(a\)</span>.</p>
 <p>The binary splitting allows to evaluate <span class="math inline">\({}_2\!F_1(\alpha,\beta,\gamma; z)\)</span> for rational values of <span class="math inline">\(\alpha,\beta,\gamma, z\)</span> by manipulating only integer numbers. This is performed by the R function below</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## rational approximation of  2F1(a1/a2, b1/b2, c1/c2; p/q) with gmp ##
-hypergeo_bs &lt;-<span class="st"> </span><span class="cf">function</span>(a1,a2, b1,b2, c1,c2, p,q, m){
-  u &lt;-<span class="st"> </span><span class="cf">function</span>(i) c2<span class="op">*</span>(a1<span class="op">+</span>(i<span class="op">-</span><span class="dv">1</span>)<span class="op">*</span>a2)<span class="op">*</span>(b1<span class="op">+</span>(i<span class="op">-</span><span class="dv">1</span>)<span class="op">*</span>b2)<span class="op">*</span>p
-  v &lt;-<span class="st"> </span><span class="cf">function</span>(i) a2<span class="op">*</span>b2<span class="op">*</span>i<span class="op">*</span>(c1<span class="op">+</span>(i<span class="op">-</span><span class="dv">1</span>)<span class="op">*</span>c2)<span class="op">*</span>q
-  <span class="kw">bs.gmp</span>(u,v,m)
-}</code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" title="1"><span class="co">## rational approximation of  2F1(a1/a2, b1/b2, c1/c2; p/q) with gmp ##</span></a>
+<a class="sourceLine" id="cb26-2" title="2">hypergeo_bs &lt;-<span class="st"> </span><span class="cf">function</span>(a1,a2, b1,b2, c1,c2, p,q, m){</a>
+<a class="sourceLine" id="cb26-3" title="3">  u &lt;-<span class="st"> </span><span class="cf">function</span>(i) c2<span class="op">*</span>(a1<span class="op">+</span>(i<span class="dv">-1</span>)<span class="op">*</span>a2)<span class="op">*</span>(b1<span class="op">+</span>(i<span class="dv">-1</span>)<span class="op">*</span>b2)<span class="op">*</span>p</a>
+<a class="sourceLine" id="cb26-4" title="4">  v &lt;-<span class="st"> </span><span class="cf">function</span>(i) a2<span class="op">*</span>b2<span class="op">*</span>i<span class="op">*</span>(c1<span class="op">+</span>(i<span class="dv">-1</span>)<span class="op">*</span>c2)<span class="op">*</span>q</a>
+<a class="sourceLine" id="cb26-5" title="5">  <span class="kw">bs.gmp</span>(u,v,m)</a>
+<a class="sourceLine" id="cb26-6" title="6">}</a></code></pre></div>
 <p>For more convenience I have firstly written the function below which returns the irreducible rational notation of a given number <span class="math inline">\(x\)</span>. The user can also specify a rounding order for <span class="math inline">\(x\)</span>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">n.decimals &lt;-<span class="st"> </span><span class="cf">function</span>(x, <span class="dt">tol=</span>.Machine<span class="op">$</span>double.eps){
-  <span class="kw">sapply</span>(x, <span class="cf">function</span>(x) {
-        i &lt;-<span class="st"> </span><span class="dv">0</span>
-        <span class="cf">while</span>(<span class="kw">abs</span>(x<span class="op">-</span><span class="kw">round</span>(x,i))<span class="op">&gt;</span>tol){i &lt;-<span class="st"> </span>i<span class="op">+</span><span class="dv">1</span>}
-    <span class="kw">return</span>(i)
-    })
-}
-irred.frac &lt;-<span class="st"> </span><span class="cf">function</span>(x, <span class="dt">rnd=</span><span class="kw">n.decimals</span>(x)){
-  b &lt;-<span class="st"> </span><span class="dv">10</span><span class="op">^</span>rnd
-  a &lt;-<span class="st"> </span><span class="kw">as.bigz</span>(b<span class="op">*</span><span class="kw">round</span>(x,rnd))
-  num &lt;-<span class="st"> </span>a<span class="op">/</span><span class="kw">gcd.bigz</span>(a,b)
-  den &lt;-<span class="st"> </span>b<span class="op">/</span><span class="kw">gcd.bigz</span>(a,b)
-  <span class="kw">return</span>(<span class="kw">list</span>(<span class="dt">num=</span>num, <span class="dt">den=</span>den))
-}</code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" title="1">n.decimals &lt;-<span class="st"> </span><span class="cf">function</span>(x, <span class="dt">tol=</span>.Machine<span class="op">$</span>double.eps){</a>
+<a class="sourceLine" id="cb27-2" title="2">  <span class="kw">sapply</span>(x, <span class="cf">function</span>(x) {</a>
+<a class="sourceLine" id="cb27-3" title="3">        i &lt;-<span class="st"> </span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb27-4" title="4">        <span class="cf">while</span>(<span class="kw">abs</span>(x<span class="op">-</span><span class="kw">round</span>(x,i))<span class="op">&gt;</span>tol){i &lt;-<span class="st"> </span>i<span class="op">+</span><span class="dv">1</span>}</a>
+<a class="sourceLine" id="cb27-5" title="5">    <span class="kw">return</span>(i)</a>
+<a class="sourceLine" id="cb27-6" title="6">    })</a>
+<a class="sourceLine" id="cb27-7" title="7">}</a>
+<a class="sourceLine" id="cb27-8" title="8">irred.frac &lt;-<span class="st"> </span><span class="cf">function</span>(x, <span class="dt">rnd=</span><span class="kw">n.decimals</span>(x)){</a>
+<a class="sourceLine" id="cb27-9" title="9">  b &lt;-<span class="st"> </span><span class="dv">10</span><span class="op">^</span>rnd</a>
+<a class="sourceLine" id="cb27-10" title="10">  a &lt;-<span class="st"> </span><span class="kw">as.bigz</span>(b<span class="op">*</span><span class="kw">round</span>(x,rnd))</a>
+<a class="sourceLine" id="cb27-11" title="11">  num &lt;-<span class="st"> </span>a<span class="op">/</span><span class="kw">gcd.bigz</span>(a,b)</a>
+<a class="sourceLine" id="cb27-12" title="12">  den &lt;-<span class="st"> </span>b<span class="op">/</span><span class="kw">gcd.bigz</span>(a,b)</a>
+<a class="sourceLine" id="cb27-13" title="13">  <span class="kw">return</span>(<span class="kw">list</span>(<span class="dt">num=</span>num, <span class="dt">den=</span>den))</a>
+<a class="sourceLine" id="cb27-14" title="14">}</a></code></pre></div>
 <p>For example:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">irred.frac</span>(pi)</code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" title="1"><span class="kw">irred.frac</span>(pi)</a></code></pre></div>
 <pre><code>## $num
 ## Big Rational ('bigq') :
 ## [1] 3141592653589793
@@ -354,7 +361,7 @@ irred.frac &lt;-<span class="st"> </span><span class="cf">function</span>(x, <sp
 ## $den
 ## Big Rational ('bigq') :
 ## [1] 1000000000000000</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">irred.frac</span>(pi, <span class="dt">rnd=</span><span class="dv">7</span>)</code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" title="1"><span class="kw">irred.frac</span>(pi, <span class="dt">rnd=</span><span class="dv">7</span>)</a></code></pre></div>
 <pre><code>## $num
 ## Big Rational ('bigq') :
 ## [1] 31415927
@@ -363,75 +370,79 @@ irred.frac &lt;-<span class="st"> </span><span class="cf">function</span>(x, <sp
 ## Big Rational ('bigq') :
 ## [1] 10000000</code></pre>
 <p>Finally, here is a user-friendly function for evaluating <span class="math inline">\({}_2\!F_1\)</span> with the binary splitting:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Hypergeometric2F1 &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, z, <span class="dt">m=</span><span class="dv">7</span>,
-                              <span class="dt">rnd.params=</span><span class="kw">max</span>(<span class="kw">n.decimals</span>(<span class="kw">c</span>(a,b,c))), 
-                              <span class="dt">rnd.z=</span><span class="kw">n.decimals</span>(z),
-                              <span class="dt">check.cv=</span><span class="ot">FALSE</span>){
-  frac.a &lt;-<span class="st"> </span><span class="kw">irred.frac</span>(a,rnd.params)
-  frac.b &lt;-<span class="st"> </span><span class="kw">irred.frac</span>(b,rnd.params)
-  frac.c &lt;-<span class="st"> </span><span class="kw">irred.frac</span>(c,rnd.params)
-  a1 &lt;-<span class="st"> </span>frac.a<span class="op">$</span>num; a2 &lt;-<span class="st"> </span>frac.a<span class="op">$</span>den
-  b1 &lt;-<span class="st"> </span>frac.b<span class="op">$</span>num; b2 &lt;-<span class="st"> </span>frac.b<span class="op">$</span>den
-  c1 &lt;-<span class="st"> </span>frac.c<span class="op">$</span>num; c2 &lt;-<span class="st"> </span>frac.c<span class="op">$</span>den
-  frac.z &lt;-<span class="st"> </span><span class="kw">irred.frac</span>(z,rnd.z)
-  p &lt;-<span class="st"> </span>frac.z<span class="op">$</span>num; q &lt;-<span class="st"> </span>frac.z<span class="op">$</span>den
-  out &lt;-<span class="st"> </span><span class="kw">hypergeo_bs</span>(a1,a2, b1,b2, c1,c2, p,q, m)
-  <span class="cf">if</span>(check.cv){
-    x &lt;-<span class="st"> </span><span class="kw">hypergeo_bs</span>(a1,a2, b1,b2, c1,c2, p,q, m<span class="op">+</span><span class="dv">1</span>)
-    cv &lt;-<span class="st"> </span>x<span class="op">==</span>out
-    out &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">result=</span>out, <span class="dt">convergence=</span>cv)
-    <span class="cf">if</span>(<span class="op">!</span>cv){
-      out<span class="op">$</span>convergence &lt;-<span class="st"> </span><span class="kw">paste</span>(out<span class="op">$</span>convergence, <span class="st">&quot; - m=&quot;</span>, m, <span class="st">&quot; need to be increased&quot;</span>, <span class="dt">sep=</span><span class="st">&quot;&quot;</span>)
-    }
-  }
-  <span class="kw">return</span>(out)
-}</code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" title="1">Hypergeometric2F1 &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, z, <span class="dt">m=</span><span class="dv">7</span>,</a>
+<a class="sourceLine" id="cb32-2" title="2">                              <span class="dt">rnd.params=</span><span class="kw">max</span>(<span class="kw">n.decimals</span>(<span class="kw">c</span>(a,b,c))), </a>
+<a class="sourceLine" id="cb32-3" title="3">                              <span class="dt">rnd.z=</span><span class="kw">n.decimals</span>(z),</a>
+<a class="sourceLine" id="cb32-4" title="4">                              <span class="dt">check.cv=</span><span class="ot">FALSE</span>){</a>
+<a class="sourceLine" id="cb32-5" title="5">  frac.a &lt;-<span class="st"> </span><span class="kw">irred.frac</span>(a,rnd.params)</a>
+<a class="sourceLine" id="cb32-6" title="6">  frac.b &lt;-<span class="st"> </span><span class="kw">irred.frac</span>(b,rnd.params)</a>
+<a class="sourceLine" id="cb32-7" title="7">  frac.c &lt;-<span class="st"> </span><span class="kw">irred.frac</span>(c,rnd.params)</a>
+<a class="sourceLine" id="cb32-8" title="8">  a1 &lt;-<span class="st"> </span>frac.a<span class="op">$</span>num; a2 &lt;-<span class="st"> </span>frac.a<span class="op">$</span>den</a>
+<a class="sourceLine" id="cb32-9" title="9">  b1 &lt;-<span class="st"> </span>frac.b<span class="op">$</span>num; b2 &lt;-<span class="st"> </span>frac.b<span class="op">$</span>den</a>
+<a class="sourceLine" id="cb32-10" title="10">  c1 &lt;-<span class="st"> </span>frac.c<span class="op">$</span>num; c2 &lt;-<span class="st"> </span>frac.c<span class="op">$</span>den</a>
+<a class="sourceLine" id="cb32-11" title="11">  frac.z &lt;-<span class="st"> </span><span class="kw">irred.frac</span>(z,rnd.z)</a>
+<a class="sourceLine" id="cb32-12" title="12">  p &lt;-<span class="st"> </span>frac.z<span class="op">$</span>num; q &lt;-<span class="st"> </span>frac.z<span class="op">$</span>den</a>
+<a class="sourceLine" id="cb32-13" title="13">  out &lt;-<span class="st"> </span><span class="kw">hypergeo_bs</span>(a1,a2, b1,b2, c1,c2, p,q, m)</a>
+<a class="sourceLine" id="cb32-14" title="14">  <span class="cf">if</span>(check.cv){</a>
+<a class="sourceLine" id="cb32-15" title="15">    x &lt;-<span class="st"> </span><span class="kw">hypergeo_bs</span>(a1,a2, b1,b2, c1,c2, p,q, m<span class="op">+</span><span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb32-16" title="16">    cv &lt;-<span class="st"> </span>x<span class="op">==</span>out</a>
+<a class="sourceLine" id="cb32-17" title="17">    out &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">result=</span>out, <span class="dt">convergence=</span>cv)</a>
+<a class="sourceLine" id="cb32-18" title="18">    <span class="cf">if</span>(<span class="op">!</span>cv){</a>
+<a class="sourceLine" id="cb32-19" title="19">      out<span class="op">$</span>convergence &lt;-<span class="st"> </span><span class="kw">paste</span>(out<span class="op">$</span>convergence, <span class="st">&quot; - m=&quot;</span>, m, <span class="st">&quot; need to be increased&quot;</span>, <span class="dt">sep=</span><span class="st">&quot;&quot;</span>)</a>
+<a class="sourceLine" id="cb32-20" title="20">    }</a>
+<a class="sourceLine" id="cb32-21" title="21">  }</a>
+<a class="sourceLine" id="cb32-22" title="22">  <span class="kw">return</span>(out)</a>
+<a class="sourceLine" id="cb32-23" title="23">}</a></code></pre></div>
 <p>For example:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a &lt;-<span class="st"> </span><span class="fl">20.5</span>; b &lt;-<span class="st"> </span><span class="fl">11.92</span>; c &lt;-<span class="st"> </span><span class="dv">19</span>
-z &lt;-<span class="st"> </span><span class="fl">0.5</span>
-<span class="kw">Hypergeometric2F1</span>(a,b,c,z)</code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" title="1">a &lt;-<span class="st"> </span><span class="fl">20.5</span>; b &lt;-<span class="st"> </span><span class="fl">11.92</span>; c &lt;-<span class="st"> </span><span class="dv">19</span></a>
+<a class="sourceLine" id="cb33-2" title="2">z &lt;-<span class="st"> </span><span class="fl">0.5</span></a>
+<a class="sourceLine" id="cb33-3" title="3"><span class="kw">Hypergeometric2F1</span>(a,b,c,z)</a></code></pre></div>
 <pre><code>## [1] &quot;8057.994139606238604756&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">Hypergeometric2F1</span>(a,b,c,z, <span class="dt">m=</span><span class="dv">3</span>, <span class="dt">check.cv=</span><span class="ot">TRUE</span>)</code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" title="1"><span class="kw">Hypergeometric2F1</span>(a,b,c,z, <span class="dt">m=</span><span class="dv">3</span>, <span class="dt">check.cv=</span><span class="ot">TRUE</span>)</a></code></pre></div>
 <pre><code>## $result
 ## [1] &quot;1522.06880440136683319&quot;
 ## 
 ## $convergence
 ## [1] &quot;FALSE - m=3 need to be increased&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">Hypergeometric2F1</span>(a,b,c,z, <span class="dt">m=</span><span class="dv">7</span>, <span class="dt">check.cv=</span><span class="ot">TRUE</span>)</code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" title="1"><span class="kw">Hypergeometric2F1</span>(a,b,c,z, <span class="dt">m=</span><span class="dv">7</span>, <span class="dt">check.cv=</span><span class="ot">TRUE</span>)</a></code></pre></div>
 <pre><code>## $result
 ## [1] &quot;8057.994139606238604756&quot;
 ## 
 ## $convergence
 ## [1] TRUE</code></pre>
 <p>Note that Robin Hankin’s <code>gsl</code> package does an excellent job:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(gsl)
-<span class="kw">hyperg_2F1</span>(a,b,c,z)</code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" title="1"><span class="kw">library</span>(gsl)</a>
+<a class="sourceLine" id="cb39-2" title="2"><span class="kw">hyperg_2F1</span>(a,b,c,z)</a></code></pre></div>
 <pre><code>## [1] 8057.994</code></pre>
 <h1 id="update-2018-11-13">Update 2018-11-13</h1>
 <ul>
 <li>Converting a <code>bigq</code> rational number to a decimal number with <code>as.numeric</code> is not a good idea. It is better to use the <code>mpfr</code> function of the <code>Rmpfr</code> package, or the <code>q2d</code> function of the package <code>rcdd</code>:</li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">halfpi_bigq &lt;-<span class="st"> </span><span class="kw">bs.pi.gmp</span>(<span class="dv">8</span>)<span class="op">$</span>Sn
-<span class="kw">library</span>(Rmpfr)
-<span class="kw">mpfr</span>(halfpi_bigq, <span class="dv">128</span>)</code></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" title="1">halfpi_bigq &lt;-<span class="st"> </span><span class="kw">bs.pi.gmp</span>(<span class="dv">8</span>)<span class="op">$</span>Sn</a>
+<a class="sourceLine" id="cb41-2" title="2"><span class="kw">library</span>(Rmpfr)</a>
+<a class="sourceLine" id="cb41-3" title="3"><span class="kw">mpfr</span>(halfpi_bigq, <span class="dv">128</span>)</a></code></pre></div>
 <pre><code>## 1 'mpfr' number of precision  128   bits 
 ## [1] 1.5707963267948966192313216916397514421</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(rcdd)
-<span class="kw">q2d</span>(<span class="kw">as.character</span>(halfpi_bigq))</code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" title="1"><span class="kw">library</span>(rcdd)</a>
+<a class="sourceLine" id="cb43-2" title="2"><span class="kw">q2d</span>(<span class="kw">as.character</span>(halfpi_bigq))</a></code></pre></div>
 <pre><code>## [1] 1.570796</code></pre>
 <ul>
 <li>My function <code>irred.frac</code> is not good. To convert a decimal number to a <code>bigq</code> rational number, it is better to use the <code>d2q</code> function of the <code>rcdd</code> package:</li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">as.bigq</span>(<span class="kw">d2q</span>(pi))</code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" title="1"><span class="kw">as.bigq</span>(<span class="kw">d2q</span>(pi))</a></code></pre></div>
 <pre><code>## Big Rational ('bigq') :
 ## [1] 884279719003555/281474976710656</code></pre>
 
-    </div>
+        </div>
 
 
-    <div id="footer">
-      Site proudly generated by
-      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
     </div>
 
   </div>
@@ -469,18 +480,19 @@ z &lt;-<span class="st"> </span><span class="fl">0.5</span>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
 
-<!-- Google Prettify -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
-<script>
-  var pres = document.getElementsByTagName("pre");
-  for (var i = 0; i < pres.length; ++i) {
-    
-    pres[i].className = pres[i].className + " prettyprint";
-    
-  }
-  prettyPrint();
-</script> 
+  <!-- Google Prettify -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+  <script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+  <script>
+    var pres = document.getElementsByTagName("pre");
+    for (var i = 0; i < pres.length; ++i) {
+      
+        pres[i].className = pres[i].className + " prettyprint";
+      
+    }
+    prettyPrint();
+  </script> 
+
 
 </html>

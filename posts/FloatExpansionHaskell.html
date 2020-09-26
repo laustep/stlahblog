@@ -6,60 +6,67 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - Calling a Haskell function in R - a float expansion example</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../css/post.css" />
   <link rel="stylesheet" href="../css/misc.css" /> 
-  <link rel="stylesheet" href="../css/pandoc-solarized.css" />  
-  <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+    <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
-  </script>
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 
 <body>
-  <!-- Sidebar. -->
-  <div class="sidebar">
-    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
-      <a href="https://www.r-bloggers.com/">
-        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
-      </a>
-      <br />
-      <a href="http://t-redactyl.io/">
-        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
-      </a>
-      <a href="http://timelyportfolio.blogspot.be/">
-        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
-      </a>
-      <br />
-      <a href="https://antoineguillot.wordpress.com/blog/">
-        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
-      </a>
-      <br />
-      <a href="https://fronkonstin.com/">
-        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
-      </a>
-    </div>
-  </div>
-
-  <div class="main">
-    <div id="header">
-      <div id="logo" style="position:absolute;">
-        <a href="../">
-          <img src="../images/stla.jpg" alt="stla" width="100px" />
-        </a>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-3">
+        <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+          <a href="https://www.r-bloggers.com/">
+            <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+          </a>
+          <br />
+          <a href="http://t-redactyl.io/">
+            <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
+          </a>
+          <a href="http://timelyportfolio.blogspot.be/">
+            <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
+          </a>
+          <br />
+          <a href="https://antoineguillot.wordpress.com/blog/">
+            <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+          </a>
+          <br />
+          <a href="https://fronkonstin.com/">
+            <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+          </a>
+        </div>
       </div>
-      <div id="navigation" style="margin-top:50px;">
-        <a href="../">Home</a>
-        <a href="../about.html">About</a>
-        <a href="../contact.html">Contact</a>
-        <a href="../archive.html">Archive</a>
-      </div>
-    </div>
 
-    <div class="content">
-      <h1>Calling a Haskell function in R - a float expansion example</h1> <div class="info">
+      <div class="main col-sm-9">
+        <div id="header">
+          <div id="logo" style="position:absolute;">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Calling a Haskell function in R - a float expansion example</h1> 
+          <div class="info">
     Posted on June  3, 2017
     
         by Stéphane Laurent
@@ -92,18 +99,18 @@
 <p>I learnt how to do such things with the help of <a href="http://neilmitchell.blogspot.be/2011/10/calling-haskell-from-r.html">this blog post by Neil Mitchell</a>.</p>
 <h2 id="binary-and-more-expansion-in-haskell">Binary (and more) expansion in Haskell</h2>
 <p>Let’s go to Haskell. The <code>floatExpansion</code> function below is obtained by a small modification of the <code>floatToDigits</code> function of the <code>Numeric</code> module. It returns the expansion of a real number <span class="math inline">\(u \in [0,1]\)</span> in a given integer base.</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Numeric</span> (floatToDigits)
-<span class="fu">:</span>{
-<span class="kw">let</span><span class="ot"> floatExpansion ::</span> <span class="dt">RealFloat</span> a <span class="ot">=&gt;</span> <span class="dt">Integer</span> <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> [<span class="dt">Int</span>];
-    floatExpansion base u <span class="fu">=</span> replicate (<span class="fu">-</span> snd expansion) <span class="dv">0</span> <span class="fu">++</span> fst expansion
-      <span class="kw">where</span> expansion <span class="fu">=</span> floatToDigits base u
-<span class="fu">:</span>}
-floatExpansion <span class="dv">2</span> <span class="fl">0.125</span>
-<span class="ot">## [0,0,1]</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">import</span> <span class="dt">Numeric</span> (floatToDigits)</a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="op">:</span>{</a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="kw">let</span><span class="ot"> floatExpansion ::</span> <span class="dt">RealFloat</span> a <span class="ot">=&gt;</span> <span class="dt">Integer</span> <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> [<span class="dt">Int</span>];</a>
+<a class="sourceLine" id="cb1-4" title="4">    floatExpansion base u <span class="ot">=</span> <span class="fu">replicate</span> (<span class="op">-</span> <span class="fu">snd</span> expansion) <span class="dv">0</span> <span class="op">++</span> <span class="fu">fst</span> expansion</a>
+<a class="sourceLine" id="cb1-5" title="5">      <span class="kw">where</span> expansion <span class="ot">=</span> floatToDigits base u</a>
+<a class="sourceLine" id="cb1-6" title="6"><span class="op">:</span>}</a>
+<a class="sourceLine" id="cb1-7" title="7">floatExpansion <span class="dv">2</span> <span class="fl">0.125</span></a>
+<a class="sourceLine" id="cb1-8" title="8"><span class="pp">## [0,0,1]</span></a></code></pre></div>
 <h2 id="first-dynamic-linker-string-output">First dynamic linker: string output</h2>
 <p>Firstly, I show how to make this function compatible with R when its output is a string instead of a list. It is easy to convert a list to a string in Haskell:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">show [<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>]
-<span class="ot">## &quot;[0,0,1]&quot;</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb2-1" title="1"><span class="fu">show</span> [<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>]</a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="pp">## &quot;[0,0,1]&quot;</span></a></code></pre></div>
 <p>To get the output as a vector in R, more work is needed, and I will do it in the next section.</p>
 <h3 id="make-the-function-compatible-with-r">Make the function compatible with R</h3>
 <p>To make the function compatible with R, there are two rules:</p>
@@ -113,50 +120,50 @@ floatExpansion <span class="dv">2</span> <span class="fl">0.125</span>
 </ul>
 <p>A value of type <code>Ptr</code> represents a pointer to an object. This type is provided by the <a href="https://hackage.haskell.org/package/base-4.9.0.0/docs/Foreign-Ptr.html"><code>Foreign.Ptr</code> module</a>, which is imported via the <code>Foreign</code> module. The types <code>CInt</code>, <code>CDouble</code> and <code>CString</code> are provided by the <a href="https://hackage.haskell.org/package/base-4.9.0.0/docs/Foreign-C.html"><code>Foreign.C</code> module</a>.</p>
 <p>We end up with this module:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- FloatExpansion1.hs</span>
-<span class="ot">{-# LANGUAGE ForeignFunctionInterface #-}</span>
-
-<span class="kw">module</span> <span class="dt">FloatExpansion</span> <span class="kw">where</span>
-
-<span class="kw">import </span><span class="dt">Foreign</span>
-<span class="kw">import </span><span class="dt">Foreign.C</span>
-<span class="kw">import </span><span class="dt">Numeric</span> (floatToDigits)
-
-foreign export ccall<span class="ot"> floatExpansion ::</span> <span class="dt">Ptr</span> <span class="dt">CInt</span> <span class="ot">-&gt;</span> <span class="dt">Ptr</span> <span class="dt">CDouble</span> <span class="ot">-&gt;</span> <span class="dt">Ptr</span> <span class="dt">CString</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
-
-<span class="ot">floatExpansion ::</span> <span class="dt">Ptr</span> <span class="dt">CInt</span> <span class="ot">-&gt;</span> <span class="dt">Ptr</span> <span class="dt">CDouble</span> <span class="ot">-&gt;</span> <span class="dt">Ptr</span> <span class="dt">CString</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
-floatExpansion base u result <span class="fu">=</span> <span class="kw">do</span>
-  base <span class="ot">&lt;-</span> peek base
-  u <span class="ot">&lt;-</span> peek u
-  expansion <span class="ot">&lt;-</span> newCString <span class="fu">$</span> show <span class="fu">$</span> floatExpansion' (toInteger base) u
-  poke result <span class="fu">$</span> expansion
-
-<span class="ot">floatExpansion' ::</span> <span class="dt">RealFloat</span> a <span class="ot">=&gt;</span> <span class="dt">Integer</span> <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> [<span class="dt">Int</span>]
-floatExpansion' base u <span class="fu">=</span> replicate (<span class="fu">-</span> snd expansion) <span class="dv">0</span> <span class="fu">++</span> fst expansion
-  <span class="kw">where</span> expansion <span class="fu">=</span> floatToDigits base u</code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb3-1" title="1"><span class="co">-- FloatExpansion1.hs</span></a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="ot">{-# LANGUAGE ForeignFunctionInterface #-}</span></a>
+<a class="sourceLine" id="cb3-3" title="3"></a>
+<a class="sourceLine" id="cb3-4" title="4"><span class="kw">module</span> <span class="dt">FloatExpansion</span> <span class="kw">where</span></a>
+<a class="sourceLine" id="cb3-5" title="5"></a>
+<a class="sourceLine" id="cb3-6" title="6"><span class="kw">import</span> <span class="dt">Foreign</span></a>
+<a class="sourceLine" id="cb3-7" title="7"><span class="kw">import</span> <span class="dt">Foreign.C</span></a>
+<a class="sourceLine" id="cb3-8" title="8"><span class="kw">import</span> <span class="dt">Numeric</span> (floatToDigits)</a>
+<a class="sourceLine" id="cb3-9" title="9"></a>
+<a class="sourceLine" id="cb3-10" title="10">foreign export ccall<span class="ot"> floatExpansion ::</span> <span class="dt">Ptr</span> <span class="dt">CInt</span> <span class="ot">-&gt;</span> <span class="dt">Ptr</span> <span class="dt">CDouble</span> <span class="ot">-&gt;</span> <span class="dt">Ptr</span> <span class="dt">CString</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</a>
+<a class="sourceLine" id="cb3-11" title="11"></a>
+<a class="sourceLine" id="cb3-12" title="12"><span class="ot">floatExpansion ::</span> <span class="dt">Ptr</span> <span class="dt">CInt</span> <span class="ot">-&gt;</span> <span class="dt">Ptr</span> <span class="dt">CDouble</span> <span class="ot">-&gt;</span> <span class="dt">Ptr</span> <span class="dt">CString</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</a>
+<a class="sourceLine" id="cb3-13" title="13">floatExpansion base u result <span class="ot">=</span> <span class="kw">do</span></a>
+<a class="sourceLine" id="cb3-14" title="14">  base <span class="ot">&lt;-</span> peek base</a>
+<a class="sourceLine" id="cb3-15" title="15">  u <span class="ot">&lt;-</span> peek u</a>
+<a class="sourceLine" id="cb3-16" title="16">  expansion <span class="ot">&lt;-</span> newCString <span class="op">$</span> <span class="fu">show</span> <span class="op">$</span> floatExpansion' (<span class="fu">toInteger</span> base) u</a>
+<a class="sourceLine" id="cb3-17" title="17">  poke result <span class="op">$</span> expansion</a>
+<a class="sourceLine" id="cb3-18" title="18"></a>
+<a class="sourceLine" id="cb3-19" title="19"><span class="ot">floatExpansion' ::</span> <span class="dt">RealFloat</span> a <span class="ot">=&gt;</span> <span class="dt">Integer</span> <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> [<span class="dt">Int</span>]</a>
+<a class="sourceLine" id="cb3-20" title="20">floatExpansion' base u <span class="ot">=</span> <span class="fu">replicate</span> (<span class="op">-</span> <span class="fu">snd</span> expansion) <span class="dv">0</span> <span class="op">++</span> <span class="fu">fst</span> expansion</a>
+<a class="sourceLine" id="cb3-21" title="21">  <span class="kw">where</span> expansion <span class="ot">=</span> floatToDigits base u</a></code></pre></div>
 <h3 id="compilation">Compilation</h3>
 <p>We need the following C file to do the compilation, as explained in the <a href="https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/win32-dlls.html#making-dlls-to-be-called-from-other-languages">GHC users guide</a>.</p>
-<div class="sourceCode"><pre class="sourceCode c"><code class="sourceCode c"><span class="co">// StartEnd.c</span>
-<span class="pp">#include </span><span class="im">&lt;Rts.h&gt;</span>
-
-<span class="dt">void</span> HsStart()
-{
-<span class="dt">int</span> argc = <span class="dv">1</span>;
-<span class="dt">char</span>* argv[] = {<span class="st">&quot;ghcDll&quot;</span>, NULL}; <span class="co">// argv must end with NULL</span>
-
-<span class="co">// Initialize Haskell runtime</span>
-<span class="dt">char</span>** args = argv;
-hs_init(&amp;argc, &amp;args);
-}
-
-<span class="dt">void</span> HsEnd()
-{
-hs_exit();
-}</code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb4-1" title="1"><span class="co">// StartEnd.c</span></a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="pp">#include </span><span class="im">&lt;Rts.h&gt;</span></a>
+<a class="sourceLine" id="cb4-3" title="3"></a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="dt">void</span> HsStart()</a>
+<a class="sourceLine" id="cb4-5" title="5">{</a>
+<a class="sourceLine" id="cb4-6" title="6"><span class="dt">int</span> argc = <span class="dv">1</span>;</a>
+<a class="sourceLine" id="cb4-7" title="7"><span class="dt">char</span>* argv[] = {<span class="st">&quot;ghcDll&quot;</span>, NULL}; <span class="co">// argv must end with NULL</span></a>
+<a class="sourceLine" id="cb4-8" title="8"></a>
+<a class="sourceLine" id="cb4-9" title="9"><span class="co">// Initialize Haskell runtime</span></a>
+<a class="sourceLine" id="cb4-10" title="10"><span class="dt">char</span>** args = argv;</a>
+<a class="sourceLine" id="cb4-11" title="11">hs_init(&amp;argc, &amp;args);</a>
+<a class="sourceLine" id="cb4-12" title="12">}</a>
+<a class="sourceLine" id="cb4-13" title="13"></a>
+<a class="sourceLine" id="cb4-14" title="14"><span class="dt">void</span> HsEnd()</a>
+<a class="sourceLine" id="cb4-15" title="15">{</a>
+<a class="sourceLine" id="cb4-16" title="16">hs_exit();</a>
+<a class="sourceLine" id="cb4-17" title="17">}</a></code></pre></div>
 <p>Then we compile the library with this command on Linux:</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">ghc</span> -shared -fPIC -dynamic -lHSrts-ghc8.0.2 FloatExpansion1.hs StartEnd.c -o FloatExpansion1.so</code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="ex">ghc</span> -shared -fPIC -dynamic -lHSrts-ghc8.0.2 FloatExpansion1.hs StartEnd.c -o FloatExpansion1.so</a></code></pre></div>
 <p>and this command on Windows:</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">ghc</span> -shared -fPIC FloatExpansion1.hs StartEnd.c -o FloatExpansion1.dll</code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="ex">ghc</span> -shared -fPIC FloatExpansion1.hs StartEnd.c -o FloatExpansion1.dll</a></code></pre></div>
 <p>This creates the dynamic linker <code>FloatExpansion1.so</code> on Linux, <code>FloatExpansion1.dll</code> on Windows.</p>
 <p>In a cabal file, assuming <code>StartEnd.c</code> is in the project directory, we can do:</p>
 <pre class="cabal"><code>library
@@ -171,82 +178,86 @@ hs_exit();
     extra-libraries:   HSrts-ghc8.0.2</code></pre>
 <h3 id="call-in-r">Call in R</h3>
 <p>We firstly load the library with:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dyn.load</span>(<span class="st">&quot;FloatExpansion1.dll&quot;</span>)
-<span class="kw">.C</span>(<span class="st">&quot;HsStart&quot;</span>)
-## list()</code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="kw">dyn.load</span>(<span class="st">&quot;FloatExpansion1.dll&quot;</span>)</a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="kw">.C</span>(<span class="st">&quot;HsStart&quot;</span>)</a>
+<a class="sourceLine" id="cb8-3" title="3"><span class="co">## list()</span></a></code></pre></div>
 <p>And we invoke the function with the help of the <code>.C</code> function, as follows:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">.C</span>(<span class="st">&quot;floatExpansion&quot;</span>, <span class="dt">base=</span>2L, <span class="dt">x=</span><span class="fl">0.125</span>, <span class="dt">result=</span><span class="st">&quot;&quot;</span>)<span class="op">$</span>result
-## [1] &quot;[0,0,1]&quot;</code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="kw">.C</span>(<span class="st">&quot;floatExpansion&quot;</span>, <span class="dt">base=</span>2L, <span class="dt">x=</span><span class="fl">0.125</span>, <span class="dt">result=</span><span class="st">&quot;&quot;</span>)<span class="op">$</span>result</a>
+<a class="sourceLine" id="cb9-2" title="2"><span class="co">## [1] &quot;[0,0,1]&quot;</span></a></code></pre></div>
 <p>It works. But it would be better to have a vector as output, rather than a string.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dyn.unload</span>(<span class="st">&quot;FloatExpansion1.dll&quot;</span>)</code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">dyn.unload</span>(<span class="st">&quot;FloatExpansion1.dll&quot;</span>)</a></code></pre></div>
 <h2 id="second-dynamic-linker-vector-output">Second dynamic linker: vector output</h2>
 <p>To get the output as a vector, the additional modules we need are: <code>Foreign.R</code>, <code>Foreign.R.Types</code> and <code>Data.Vector.SEXP</code>. They are provided by the <a href="https://hackage.haskell.org/package/inline-r"><code>inline-r</code> package</a>. The <code>[Int]</code> type of the output list of the <code>floatExpansion</code> function must be converted to <code>[Int32]</code>. We write a simple function <code>intToInt32</code> to help us to do the conversion. It works with the help of the <code>Data.Int</code> module which is imported via the <code>Foreign</code> module.</p>
 <p>We end up with this module:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- FloatExpansion2.hs</span>
-<span class="ot">{-# LANGUAGE ForeignFunctionInterface #-}</span>
-<span class="ot">{-# LANGUAGE DataKinds #-}</span>
-
-<span class="kw">module</span> <span class="dt">FloatExpansion</span> <span class="kw">where</span>
-
-<span class="kw">import </span><span class="dt">Foreign</span>
-<span class="kw">import </span><span class="dt">Foreign.C</span>
-<span class="kw">import </span><span class="dt">Foreign.R</span> (<span class="dt">SEXP</span>)
-<span class="kw">import qualified</span> <span class="dt">Foreign.R.Type</span> <span class="kw">as</span> <span class="dt">R</span>
-<span class="kw">import qualified</span> <span class="dt">Data.Vector.SEXP</span> <span class="kw">as</span> <span class="dt">DV</span>
-<span class="kw">import </span><span class="dt">Numeric</span> (floatToDigits)
-
-foreign export ccall<span class="ot"> floatExpansion ::</span> <span class="dt">Ptr</span> <span class="dt">CInt</span> <span class="ot">-&gt;</span> <span class="dt">Ptr</span> <span class="dt">CDouble</span> <span class="ot">-&gt;</span> <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="dt">R.Int</span>) <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
-
-<span class="ot">floatExpansion ::</span> <span class="dt">Ptr</span> <span class="dt">CInt</span> <span class="ot">-&gt;</span> <span class="dt">Ptr</span> <span class="dt">CDouble</span> <span class="ot">-&gt;</span> <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="dt">R.Int</span>) <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
-floatExpansion base u result <span class="fu">=</span> <span class="kw">do</span>
-  base <span class="ot">&lt;-</span> peek base
-  u <span class="ot">&lt;-</span> peek u
-  <span class="kw">let</span> expansion <span class="fu">=</span> map intToInt32 <span class="fu">$</span> floatExpansion' (toInteger base) u
-  poke result <span class="fu">$</span> DV.toSEXP <span class="fu">$</span> DV.fromList expansion
-
-<span class="ot">intToInt32 ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int32</span>
-intToInt32 <span class="fu">=</span> fromIntegral
-
-<span class="ot">floatExpansion' ::</span> <span class="dt">RealFloat</span> a <span class="ot">=&gt;</span> <span class="dt">Integer</span> <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> [<span class="dt">Int</span>]
-floatExpansion' base u <span class="fu">=</span> replicate (<span class="fu">-</span> snd expansion) <span class="dv">0</span> <span class="fu">++</span> fst expansion
-  <span class="kw">where</span> expansion <span class="fu">=</span> floatToDigits base u</code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb11-1" title="1"><span class="co">-- FloatExpansion2.hs</span></a>
+<a class="sourceLine" id="cb11-2" title="2"><span class="ot">{-# LANGUAGE ForeignFunctionInterface #-}</span></a>
+<a class="sourceLine" id="cb11-3" title="3"><span class="ot">{-# LANGUAGE DataKinds #-}</span></a>
+<a class="sourceLine" id="cb11-4" title="4"></a>
+<a class="sourceLine" id="cb11-5" title="5"><span class="kw">module</span> <span class="dt">FloatExpansion</span> <span class="kw">where</span></a>
+<a class="sourceLine" id="cb11-6" title="6"></a>
+<a class="sourceLine" id="cb11-7" title="7"><span class="kw">import</span> <span class="dt">Foreign</span></a>
+<a class="sourceLine" id="cb11-8" title="8"><span class="kw">import</span> <span class="dt">Foreign.C</span></a>
+<a class="sourceLine" id="cb11-9" title="9"><span class="kw">import</span> <span class="dt">Foreign.R</span> (<span class="dt">SEXP</span>)</a>
+<a class="sourceLine" id="cb11-10" title="10"><span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Foreign.R.Type</span> <span class="kw">as</span> <span class="dt">R</span></a>
+<a class="sourceLine" id="cb11-11" title="11"><span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.Vector.SEXP</span> <span class="kw">as</span> <span class="dt">DV</span></a>
+<a class="sourceLine" id="cb11-12" title="12"><span class="kw">import</span> <span class="dt">Numeric</span> (floatToDigits)</a>
+<a class="sourceLine" id="cb11-13" title="13"></a>
+<a class="sourceLine" id="cb11-14" title="14">foreign export ccall<span class="ot"> floatExpansion ::</span> <span class="dt">Ptr</span> <span class="dt">CInt</span> <span class="ot">-&gt;</span> <span class="dt">Ptr</span> <span class="dt">CDouble</span> <span class="ot">-&gt;</span> <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="dt">R.Int</span>) <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</a>
+<a class="sourceLine" id="cb11-15" title="15"></a>
+<a class="sourceLine" id="cb11-16" title="16"><span class="ot">floatExpansion ::</span> <span class="dt">Ptr</span> <span class="dt">CInt</span> <span class="ot">-&gt;</span> <span class="dt">Ptr</span> <span class="dt">CDouble</span> <span class="ot">-&gt;</span> <span class="dt">Ptr</span> (<span class="dt">SEXP</span> s <span class="dt">R.Int</span>) <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</a>
+<a class="sourceLine" id="cb11-17" title="17">floatExpansion base u result <span class="ot">=</span> <span class="kw">do</span></a>
+<a class="sourceLine" id="cb11-18" title="18">  base <span class="ot">&lt;-</span> peek base</a>
+<a class="sourceLine" id="cb11-19" title="19">  u <span class="ot">&lt;-</span> peek u</a>
+<a class="sourceLine" id="cb11-20" title="20">  <span class="kw">let</span> expansion <span class="ot">=</span> <span class="fu">map</span> intToInt32 <span class="op">$</span> floatExpansion' (<span class="fu">toInteger</span> base) u</a>
+<a class="sourceLine" id="cb11-21" title="21">  poke result <span class="op">$</span> DV.toSEXP <span class="op">$</span> DV.fromList expansion</a>
+<a class="sourceLine" id="cb11-22" title="22"></a>
+<a class="sourceLine" id="cb11-23" title="23"><span class="ot">intToInt32 ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int32</span></a>
+<a class="sourceLine" id="cb11-24" title="24">intToInt32 <span class="ot">=</span> <span class="fu">fromIntegral</span></a>
+<a class="sourceLine" id="cb11-25" title="25"></a>
+<a class="sourceLine" id="cb11-26" title="26"><span class="ot">floatExpansion' ::</span> <span class="dt">RealFloat</span> a <span class="ot">=&gt;</span> <span class="dt">Integer</span> <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> [<span class="dt">Int</span>]</a>
+<a class="sourceLine" id="cb11-27" title="27">floatExpansion' base u <span class="ot">=</span> <span class="fu">replicate</span> (<span class="op">-</span> <span class="fu">snd</span> expansion) <span class="dv">0</span> <span class="op">++</span> <span class="fu">fst</span> expansion</a>
+<a class="sourceLine" id="cb11-28" title="28">  <span class="kw">where</span> expansion <span class="ot">=</span> floatToDigits base u</a></code></pre></div>
 <p>We compile the library as before. And we load it in R as before:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dyn.load</span>(<span class="st">&quot;FloatExpansion2.dll&quot;</span>)
-<span class="kw">.C</span>(<span class="st">&quot;HsStart&quot;</span>)
-## list()</code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1"><span class="kw">dyn.load</span>(<span class="st">&quot;FloatExpansion2.dll&quot;</span>)</a>
+<a class="sourceLine" id="cb12-2" title="2"><span class="kw">.C</span>(<span class="st">&quot;HsStart&quot;</span>)</a>
+<a class="sourceLine" id="cb12-3" title="3"><span class="co">## list()</span></a></code></pre></div>
 <p>And we invoke the function with the help of the <code>.C</code> function, as follows:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">.C</span>(<span class="st">&quot;floatExpansion&quot;</span>, <span class="dt">base=</span>2L, <span class="dt">x=</span><span class="fl">0.125</span>, <span class="dt">result=</span><span class="kw">list</span>(0L))<span class="op">$</span>result
-## [[1]]
-## [1] 0 0 1</code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1"><span class="kw">.C</span>(<span class="st">&quot;floatExpansion&quot;</span>, <span class="dt">base=</span>2L, <span class="dt">x=</span><span class="fl">0.125</span>, <span class="dt">result=</span><span class="kw">list</span>(0L))<span class="op">$</span>result</a>
+<a class="sourceLine" id="cb13-2" title="2"><span class="co">## [[1]]</span></a>
+<a class="sourceLine" id="cb13-3" title="3"><span class="co">## [1] 0 0 1</span></a></code></pre></div>
 <p>In fact, the output is a list with one element, the desired vector.</p>
 <p>Let’s write a user-friendly function:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">floatExpand &lt;-<span class="st"> </span><span class="cf">function</span>(x, <span class="dt">base=</span>2L){
-  <span class="kw">.C</span>(<span class="st">&quot;floatExpansion&quot;</span>, <span class="dt">base=</span><span class="kw">as.integer</span>(base), <span class="dt">x=</span><span class="kw">as.double</span>(x), <span class="dt">result=</span><span class="kw">list</span>(<span class="kw">integer</span>(<span class="dv">1</span>)))<span class="op">$</span>result[[<span class="dv">1</span>]]  
-}</code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1">floatExpand &lt;-<span class="st"> </span><span class="cf">function</span>(x, <span class="dt">base=</span>2L){</a>
+<a class="sourceLine" id="cb14-2" title="2">  <span class="kw">.C</span>(<span class="st">&quot;floatExpansion&quot;</span>, <span class="dt">base=</span><span class="kw">as.integer</span>(base), <span class="dt">x=</span><span class="kw">as.double</span>(x), <span class="dt">result=</span><span class="kw">list</span>(<span class="kw">integer</span>(<span class="dv">1</span>)))<span class="op">$</span>result[[<span class="dv">1</span>]]  </a>
+<a class="sourceLine" id="cb14-3" title="3">}</a></code></pre></div>
 <p>Let’s compare it with my R function <code>num2dyadic</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(microbenchmark)
-<span class="kw">microbenchmark</span>(
-  <span class="dt">floatExpand =</span> <span class="kw">floatExpand</span>(<span class="kw">runif</span>(<span class="dv">1</span>)),
-  <span class="dt">num2dyadic  =</span> <span class="kw">num2dyadic</span>(<span class="kw">runif</span>(<span class="dv">1</span>)),
-  <span class="dt">times =</span> <span class="dv">5000</span>
-)
-## Unit: microseconds
-##         expr    min      lq      mean  median      uq      max neval cld
-##  floatExpand 12.049 16.9580  43.44155  23.205  35.253 8006.062  5000  a 
-##   num2dyadic 43.286 98.8435 150.81104 128.964 167.788 3451.697  5000   b</code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1"><span class="kw">library</span>(microbenchmark)</a>
+<a class="sourceLine" id="cb15-2" title="2"><span class="kw">microbenchmark</span>(</a>
+<a class="sourceLine" id="cb15-3" title="3">  <span class="dt">floatExpand =</span> <span class="kw">floatExpand</span>(<span class="kw">runif</span>(<span class="dv">1</span>)),</a>
+<a class="sourceLine" id="cb15-4" title="4">  <span class="dt">num2dyadic  =</span> <span class="kw">num2dyadic</span>(<span class="kw">runif</span>(<span class="dv">1</span>)),</a>
+<a class="sourceLine" id="cb15-5" title="5">  <span class="dt">times =</span> <span class="dv">5000</span></a>
+<a class="sourceLine" id="cb15-6" title="6">)</a>
+<a class="sourceLine" id="cb15-7" title="7"><span class="co">## Unit: microseconds</span></a>
+<a class="sourceLine" id="cb15-8" title="8"><span class="co">##         expr    min      lq      mean  median      uq      max neval cld</span></a>
+<a class="sourceLine" id="cb15-9" title="9"><span class="co">##  floatExpand 12.049 16.9580  43.44155  23.205  35.253 8006.062  5000  a </span></a>
+<a class="sourceLine" id="cb15-10" title="10"><span class="co">##   num2dyadic 43.286 98.8435 150.81104 128.964 167.788 3451.697  5000   b</span></a></code></pre></div>
 <p>It is faster. And I have checked that the two functions always return the same results.</p>
 <p>Moreover the “RHaskell” function allows more than the binary expansion, for example the ternary expansion:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">floatExpand</span>(<span class="dv">1</span><span class="op">/</span><span class="dv">3</span><span class="op">+</span><span class="dv">1</span><span class="op">/</span><span class="dv">27</span>, <span class="dt">base=</span><span class="dv">3</span>)
-## [1] 1 0 1</code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1"><span class="kw">floatExpand</span>(<span class="dv">1</span><span class="op">/</span><span class="dv">3</span><span class="op">+</span><span class="dv">1</span><span class="op">/</span><span class="dv">27</span>, <span class="dt">base=</span><span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb16-2" title="2"><span class="co">## [1] 1 0 1</span></a></code></pre></div>
 <p>Quite nice, isn’t it ?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dyn.unload</span>(<span class="st">&quot;FloatExpansion2.dll&quot;</span>)</code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1"><span class="kw">dyn.unload</span>(<span class="st">&quot;FloatExpansion2.dll&quot;</span>)</a></code></pre></div>
 
-    </div>
+        </div>
 
 
-    <div id="footer">
-      Site proudly generated by
-      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
     </div>
 
   </div>
@@ -284,18 +295,19 @@ floatExpansion' base u <span class="fu">=</span> replicate (<span class="fu">-</
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
 
-<!-- Google Prettify -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
-<script>
-  var pres = document.getElementsByTagName("pre");
-  for (var i = 0; i < pres.length; ++i) {
-    
-    pres[i].className = pres[i].className + " prettyprint";
-    
-  }
-  prettyPrint();
-</script> 
+  <!-- Google Prettify -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+  <script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+  <script>
+    var pres = document.getElementsByTagName("pre");
+    for (var i = 0; i < pres.length; ++i) {
+      
+        pres[i].className = pres[i].className + " prettyprint";
+      
+    }
+    prettyPrint();
+  </script> 
+
 
 </html>

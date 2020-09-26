@@ -6,60 +6,67 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - Generalized circles and Möbius transformations</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../css/post.css" />
   <link rel="stylesheet" href="../css/misc.css" /> 
-  <link rel="stylesheet" href="../css/pandoc-solarized.css" />  
-  <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+    <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
-  </script>
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 
 <body>
-  <!-- Sidebar. -->
-  <div class="sidebar">
-    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
-      <a href="https://www.r-bloggers.com/">
-        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
-      </a>
-      <br />
-      <a href="http://t-redactyl.io/">
-        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
-      </a>
-      <a href="http://timelyportfolio.blogspot.be/">
-        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
-      </a>
-      <br />
-      <a href="https://antoineguillot.wordpress.com/blog/">
-        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
-      </a>
-      <br />
-      <a href="https://fronkonstin.com/">
-        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
-      </a>
-    </div>
-  </div>
-
-  <div class="main">
-    <div id="header">
-      <div id="logo" style="position:absolute;">
-        <a href="../">
-          <img src="../images/stla.jpg" alt="stla" width="100px" />
-        </a>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-3">
+        <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+          <a href="https://www.r-bloggers.com/">
+            <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+          </a>
+          <br />
+          <a href="http://t-redactyl.io/">
+            <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
+          </a>
+          <a href="http://timelyportfolio.blogspot.be/">
+            <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
+          </a>
+          <br />
+          <a href="https://antoineguillot.wordpress.com/blog/">
+            <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+          </a>
+          <br />
+          <a href="https://fronkonstin.com/">
+            <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+          </a>
+        </div>
       </div>
-      <div id="navigation" style="margin-top:50px;">
-        <a href="../">Home</a>
-        <a href="../about.html">About</a>
-        <a href="../contact.html">Contact</a>
-        <a href="../archive.html">Archive</a>
-      </div>
-    </div>
 
-    <div class="content">
-      <h1>Generalized circles and Möbius transformations</h1> <div class="info">
+      <div class="main col-sm-9">
+        <div id="header">
+          <div id="logo" style="position:absolute;">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Generalized circles and Möbius transformations</h1> 
+          <div class="info">
     Posted on March 12, 2019
     
         by Stéphane Laurent
@@ -182,83 +189,83 @@ A w\bar{w} + \bar\gamma w + \gamma\bar{w} = D.
 \]</span></p>
 <p>If <span class="math inline">\(\boxed{A \neq 0}\)</span>, that is <span class="math inline">\(|d+c z_0| \neq R|c|\)</span>, this is the equation of the circle with center <span class="math inline">\(-\gamma/A\)</span> and radius <span class="math inline">\(\sqrt{\frac{{|\gamma|}^2}{A^2} + \frac{D}{A}}\)</span>.</p>
 <p>Let’s check with R. To do so, we use the <code>circumcircle</code> function below, which returns the center and the radius of the circle passing by <code>z1</code>, <code>z2</code>, <code>z3</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">circumcircle &lt;-<span class="st"> </span><span class="cf">function</span>(z1,z2,z3){
-  x1 &lt;-<span class="st"> </span><span class="kw">Re</span>(z1); y1 &lt;-<span class="st"> </span><span class="kw">Im</span>(z1); p1 &lt;-<span class="st"> </span><span class="kw">c</span>(x1,y1)
-  x2 &lt;-<span class="st"> </span><span class="kw">Re</span>(z2); y2 &lt;-<span class="st"> </span><span class="kw">Im</span>(z2); p2 &lt;-<span class="st"> </span><span class="kw">c</span>(x2,y2)
-  x3 &lt;-<span class="st"> </span><span class="kw">Re</span>(z3); y3 &lt;-<span class="st"> </span><span class="kw">Im</span>(z3); p3 &lt;-<span class="st"> </span><span class="kw">c</span>(x3,y3)
-  a &lt;-<span class="st"> </span><span class="kw">det</span>(<span class="kw">cbind</span>(<span class="kw">rbind</span>(p1,p2,p3),<span class="dv">1</span>))
-  q1 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">crossprod</span>(p1))
-  q2 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">crossprod</span>(p2))
-  q3 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">crossprod</span>(p3))
-  q &lt;-<span class="st"> </span><span class="kw">c</span>(q1,q2,q3)
-  x &lt;-<span class="st"> </span><span class="kw">c</span>(x1,x2,x3)
-  y &lt;-<span class="st"> </span><span class="kw">c</span>(y1,y2,y3)
-  Dx &lt;-<span class="st"> </span><span class="kw">det</span>(<span class="kw">cbind</span>(q,y,<span class="dv">1</span>))
-  Dy &lt;-<span class="st"> </span><span class="op">-</span><span class="kw">det</span>(<span class="kw">cbind</span>(q,x,<span class="dv">1</span>))
-  c &lt;-<span class="st"> </span><span class="kw">det</span>(<span class="kw">cbind</span>(q,x,y))
-  center &lt;-<span class="st"> </span><span class="kw">c</span>(Dx,Dy)<span class="op">/</span>a<span class="op">/</span><span class="dv">2</span>
-  r &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(center<span class="op">-</span>p1)))
-  <span class="kw">list</span>(<span class="dt">center =</span> center[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>center[<span class="dv">2</span>], <span class="dt">radius =</span> r)
-}</code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">circumcircle &lt;-<span class="st"> </span><span class="cf">function</span>(z1,z2,z3){</a>
+<a class="sourceLine" id="cb1-2" title="2">  x1 &lt;-<span class="st"> </span><span class="kw">Re</span>(z1); y1 &lt;-<span class="st"> </span><span class="kw">Im</span>(z1); p1 &lt;-<span class="st"> </span><span class="kw">c</span>(x1,y1)</a>
+<a class="sourceLine" id="cb1-3" title="3">  x2 &lt;-<span class="st"> </span><span class="kw">Re</span>(z2); y2 &lt;-<span class="st"> </span><span class="kw">Im</span>(z2); p2 &lt;-<span class="st"> </span><span class="kw">c</span>(x2,y2)</a>
+<a class="sourceLine" id="cb1-4" title="4">  x3 &lt;-<span class="st"> </span><span class="kw">Re</span>(z3); y3 &lt;-<span class="st"> </span><span class="kw">Im</span>(z3); p3 &lt;-<span class="st"> </span><span class="kw">c</span>(x3,y3)</a>
+<a class="sourceLine" id="cb1-5" title="5">  a &lt;-<span class="st"> </span><span class="kw">det</span>(<span class="kw">cbind</span>(<span class="kw">rbind</span>(p1,p2,p3),<span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb1-6" title="6">  q1 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">crossprod</span>(p1))</a>
+<a class="sourceLine" id="cb1-7" title="7">  q2 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">crossprod</span>(p2))</a>
+<a class="sourceLine" id="cb1-8" title="8">  q3 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">crossprod</span>(p3))</a>
+<a class="sourceLine" id="cb1-9" title="9">  q &lt;-<span class="st"> </span><span class="kw">c</span>(q1,q2,q3)</a>
+<a class="sourceLine" id="cb1-10" title="10">  x &lt;-<span class="st"> </span><span class="kw">c</span>(x1,x2,x3)</a>
+<a class="sourceLine" id="cb1-11" title="11">  y &lt;-<span class="st"> </span><span class="kw">c</span>(y1,y2,y3)</a>
+<a class="sourceLine" id="cb1-12" title="12">  Dx &lt;-<span class="st"> </span><span class="kw">det</span>(<span class="kw">cbind</span>(q,y,<span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb1-13" title="13">  Dy &lt;-<span class="st"> </span><span class="op">-</span><span class="kw">det</span>(<span class="kw">cbind</span>(q,x,<span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb1-14" title="14">  c &lt;-<span class="st"> </span><span class="kw">det</span>(<span class="kw">cbind</span>(q,x,y))</a>
+<a class="sourceLine" id="cb1-15" title="15">  center &lt;-<span class="st"> </span><span class="kw">c</span>(Dx,Dy)<span class="op">/</span>a<span class="op">/</span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb1-16" title="16">  r &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(center<span class="op">-</span>p1)))</a>
+<a class="sourceLine" id="cb1-17" title="17">  <span class="kw">list</span>(<span class="dt">center =</span> center[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>center[<span class="dv">2</span>], <span class="dt">radius =</span> r)</a>
+<a class="sourceLine" id="cb1-18" title="18">}</a></code></pre></div>
 <p>Let’s take an example:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Mobius &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, d){
-  <span class="cf">function</span>(z){
-    (a<span class="op">*</span>z<span class="op">+</span>b) <span class="op">/</span><span class="st"> </span>(c<span class="op">*</span>z<span class="op">+</span>d)
-  }
-}
-a &lt;-<span class="st"> </span><span class="dv">4</span>; b &lt;-<span class="st"> </span>1i; c &lt;-<span class="st"> </span>2i; d &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">+</span>3i
-M &lt;-<span class="st"> </span><span class="kw">Mobius</span>(a,b,c,d)
-<span class="co"># define circle C</span>
-z0 &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">+</span>1i; R &lt;-<span class="st"> </span><span class="dv">2</span>
-<span class="co"># three points on M(C)</span>
-z1 &lt;-<span class="st"> </span><span class="kw">M</span>(z0<span class="op">+</span>R); z2 &lt;-<span class="st"> </span><span class="kw">M</span>(z0<span class="op">-</span>R); z3 &lt;-<span class="st"> </span><span class="kw">M</span>(z0 <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>R)
-<span class="co"># circumcircle of z1, z2, z3</span>
-cc &lt;-<span class="st"> </span><span class="kw">circumcircle</span>(z1, z2, z3)
-<span class="co"># calculation of A, gamma, D</span>
-A &lt;-<span class="st"> </span><span class="kw">Mod</span>(d<span class="op">+</span>c<span class="op">*</span>z0)<span class="op">^</span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span>R<span class="op">^</span><span class="dv">2</span><span class="op">*</span><span class="kw">Mod</span>(c)<span class="op">^</span><span class="dv">2</span>
-gamma &lt;-<span class="st"> </span>R<span class="op">^</span><span class="dv">2</span><span class="op">*</span>a<span class="op">*</span><span class="kw">Conj</span>(c) <span class="op">-</span><span class="st"> </span>(a<span class="op">*</span>z0 <span class="op">+</span><span class="st"> </span>b) <span class="op">*</span><span class="st"> </span><span class="kw">Conj</span>(c<span class="op">*</span>z0 <span class="op">+</span><span class="st"> </span>d)
-D &lt;-<span class="st"> </span>R<span class="op">^</span><span class="dv">2</span><span class="op">*</span><span class="kw">Mod</span>(a)<span class="op">^</span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span><span class="kw">Mod</span>(b <span class="op">+</span><span class="st"> </span>a<span class="op">*</span>z0)<span class="op">^</span><span class="dv">2</span>
-<span class="co"># center</span>
-<span class="op">-</span>gamma<span class="op">/</span>A
-## [1] 0.7941176-0.8529412i
-cc<span class="op">$</span>center
-## [1] 0.7941176-0.8529412i
-<span class="co"># radius </span>
-<span class="kw">sqrt</span>(<span class="kw">Mod</span>(gamma)<span class="op">^</span><span class="dv">2</span><span class="op">/</span>A<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>D<span class="op">/</span>A)
-## [1] 0.7892005
-cc<span class="op">$</span>radius
-## [1] 0.7892005</code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">Mobius &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, d){</a>
+<a class="sourceLine" id="cb2-2" title="2">  <span class="cf">function</span>(z){</a>
+<a class="sourceLine" id="cb2-3" title="3">    (a<span class="op">*</span>z<span class="op">+</span>b) <span class="op">/</span><span class="st"> </span>(c<span class="op">*</span>z<span class="op">+</span>d)</a>
+<a class="sourceLine" id="cb2-4" title="4">  }</a>
+<a class="sourceLine" id="cb2-5" title="5">}</a>
+<a class="sourceLine" id="cb2-6" title="6">a &lt;-<span class="st"> </span><span class="dv">4</span>; b &lt;-<span class="st"> </span>1i; c &lt;-<span class="st"> </span>2i; d &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">+</span>3i</a>
+<a class="sourceLine" id="cb2-7" title="7">M &lt;-<span class="st"> </span><span class="kw">Mobius</span>(a,b,c,d)</a>
+<a class="sourceLine" id="cb2-8" title="8"><span class="co"># define circle C</span></a>
+<a class="sourceLine" id="cb2-9" title="9">z0 &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">+</span>1i; R &lt;-<span class="st"> </span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb2-10" title="10"><span class="co"># three points on M(C)</span></a>
+<a class="sourceLine" id="cb2-11" title="11">z1 &lt;-<span class="st"> </span><span class="kw">M</span>(z0<span class="op">+</span>R); z2 &lt;-<span class="st"> </span><span class="kw">M</span>(z0<span class="op">-</span>R); z3 &lt;-<span class="st"> </span><span class="kw">M</span>(z0 <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>R)</a>
+<a class="sourceLine" id="cb2-12" title="12"><span class="co"># circumcircle of z1, z2, z3</span></a>
+<a class="sourceLine" id="cb2-13" title="13">cc &lt;-<span class="st"> </span><span class="kw">circumcircle</span>(z1, z2, z3)</a>
+<a class="sourceLine" id="cb2-14" title="14"><span class="co"># calculation of A, gamma, D</span></a>
+<a class="sourceLine" id="cb2-15" title="15">A &lt;-<span class="st"> </span><span class="kw">Mod</span>(d<span class="op">+</span>c<span class="op">*</span>z0)<span class="op">^</span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span>R<span class="op">^</span><span class="dv">2</span><span class="op">*</span><span class="kw">Mod</span>(c)<span class="op">^</span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb2-16" title="16">gamma &lt;-<span class="st"> </span>R<span class="op">^</span><span class="dv">2</span><span class="op">*</span>a<span class="op">*</span><span class="kw">Conj</span>(c) <span class="op">-</span><span class="st"> </span>(a<span class="op">*</span>z0 <span class="op">+</span><span class="st"> </span>b) <span class="op">*</span><span class="st"> </span><span class="kw">Conj</span>(c<span class="op">*</span>z0 <span class="op">+</span><span class="st"> </span>d)</a>
+<a class="sourceLine" id="cb2-17" title="17">D &lt;-<span class="st"> </span>R<span class="op">^</span><span class="dv">2</span><span class="op">*</span><span class="kw">Mod</span>(a)<span class="op">^</span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span><span class="kw">Mod</span>(b <span class="op">+</span><span class="st"> </span>a<span class="op">*</span>z0)<span class="op">^</span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb2-18" title="18"><span class="co"># center</span></a>
+<a class="sourceLine" id="cb2-19" title="19"><span class="op">-</span>gamma<span class="op">/</span>A</a>
+<a class="sourceLine" id="cb2-20" title="20"><span class="co">## [1] 0.7941176-0.8529412i</span></a>
+<a class="sourceLine" id="cb2-21" title="21">cc<span class="op">$</span>center</a>
+<a class="sourceLine" id="cb2-22" title="22"><span class="co">## [1] 0.7941176-0.8529412i</span></a>
+<a class="sourceLine" id="cb2-23" title="23"><span class="co"># radius </span></a>
+<a class="sourceLine" id="cb2-24" title="24"><span class="kw">sqrt</span>(<span class="kw">Mod</span>(gamma)<span class="op">^</span><span class="dv">2</span><span class="op">/</span>A<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>D<span class="op">/</span>A)</a>
+<a class="sourceLine" id="cb2-25" title="25"><span class="co">## [1] 0.7892005</span></a>
+<a class="sourceLine" id="cb2-26" title="26">cc<span class="op">$</span>radius</a>
+<a class="sourceLine" id="cb2-27" title="27"><span class="co">## [1] 0.7892005</span></a></code></pre></div>
 <p>We have the following alternative expressions of the center and the radius: <span class="math display">\[
 w_0 = M\left(z_0 - R^2\overline{\left(\frac{d}{c}+z_0\right)} \right), \\
 R' = \bigl| w_0 - M(z_0+R) \bigr|.
 \]</span></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">z &lt;-<span class="st"> </span>z0 <span class="op">-</span><span class="st"> </span>R<span class="op">^</span><span class="dv">2</span><span class="op">/</span><span class="kw">Conj</span>(d<span class="op">/</span>c<span class="op">+</span>z0) 
-( w0 &lt;-<span class="st"> </span><span class="kw">M</span>(z) ) <span class="co"># center</span>
-## [1] 0.7941176-0.8529412i
-<span class="kw">Mod</span>(w0 <span class="op">-</span><span class="st"> </span><span class="kw">M</span>(z0<span class="op">+</span>R)) <span class="co"># radius</span>
-## [1] 0.7892005</code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">z &lt;-<span class="st"> </span>z0 <span class="op">-</span><span class="st"> </span>R<span class="op">^</span><span class="dv">2</span><span class="op">/</span><span class="kw">Conj</span>(d<span class="op">/</span>c<span class="op">+</span>z0) </a>
+<a class="sourceLine" id="cb3-2" title="2">( w0 &lt;-<span class="st"> </span><span class="kw">M</span>(z) ) <span class="co"># center</span></a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="co">## [1] 0.7941176-0.8529412i</span></a>
+<a class="sourceLine" id="cb3-4" title="4"><span class="kw">Mod</span>(w0 <span class="op">-</span><span class="st"> </span><span class="kw">M</span>(z0<span class="op">+</span>R)) <span class="co"># radius</span></a>
+<a class="sourceLine" id="cb3-5" title="5"><span class="co">## [1] 0.7892005</span></a></code></pre></div>
 <p>This code also works for <span class="math inline">\(c = 0\)</span>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">MC &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, d, z0, R){
-  M &lt;-<span class="st"> </span><span class="kw">Mobius</span>(a,b,c,d)
-  z &lt;-<span class="st"> </span>z0 <span class="op">-</span><span class="st"> </span>R<span class="op">^</span><span class="dv">2</span><span class="op">/</span><span class="kw">Conj</span>(d<span class="op">/</span>c<span class="op">+</span>z0) 
-  w0 &lt;-<span class="st"> </span><span class="kw">M</span>(z) 
-  <span class="kw">list</span>(<span class="dt">center =</span> w0, <span class="dt">radius =</span> <span class="kw">Mod</span>(w0 <span class="op">-</span><span class="st"> </span><span class="kw">M</span>(z0<span class="op">+</span>R)))
-}
-c &lt;-<span class="st"> </span><span class="dv">0</span>
-M &lt;-<span class="st"> </span><span class="kw">Mobius</span>(a,b,c,d)
-z1 &lt;-<span class="st"> </span><span class="kw">M</span>(z0<span class="op">+</span>R); z2 &lt;-<span class="st"> </span><span class="kw">M</span>(z0<span class="op">-</span>R); z3 &lt;-<span class="st"> </span><span class="kw">M</span>(z0 <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>R)
-<span class="kw">circumcircle</span>(z1, z2, z3)
-## $center
-## [1] 2.3-1.9i
-## 
-## $radius
-## [1] 2.529822
-<span class="kw">MC</span>(a, b, c, d, z0, R)
-## $center
-## [1] 2.3-1.9i
-## 
-## $radius
-## [1] 2.529822</code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">MC &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, d, z0, R){</a>
+<a class="sourceLine" id="cb4-2" title="2">  M &lt;-<span class="st"> </span><span class="kw">Mobius</span>(a,b,c,d)</a>
+<a class="sourceLine" id="cb4-3" title="3">  z &lt;-<span class="st"> </span>z0 <span class="op">-</span><span class="st"> </span>R<span class="op">^</span><span class="dv">2</span><span class="op">/</span><span class="kw">Conj</span>(d<span class="op">/</span>c<span class="op">+</span>z0) </a>
+<a class="sourceLine" id="cb4-4" title="4">  w0 &lt;-<span class="st"> </span><span class="kw">M</span>(z) </a>
+<a class="sourceLine" id="cb4-5" title="5">  <span class="kw">list</span>(<span class="dt">center =</span> w0, <span class="dt">radius =</span> <span class="kw">Mod</span>(w0 <span class="op">-</span><span class="st"> </span><span class="kw">M</span>(z0<span class="op">+</span>R)))</a>
+<a class="sourceLine" id="cb4-6" title="6">}</a>
+<a class="sourceLine" id="cb4-7" title="7">c &lt;-<span class="st"> </span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb4-8" title="8">M &lt;-<span class="st"> </span><span class="kw">Mobius</span>(a,b,c,d)</a>
+<a class="sourceLine" id="cb4-9" title="9">z1 &lt;-<span class="st"> </span><span class="kw">M</span>(z0<span class="op">+</span>R); z2 &lt;-<span class="st"> </span><span class="kw">M</span>(z0<span class="op">-</span>R); z3 &lt;-<span class="st"> </span><span class="kw">M</span>(z0 <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>R)</a>
+<a class="sourceLine" id="cb4-10" title="10"><span class="kw">circumcircle</span>(z1, z2, z3)</a>
+<a class="sourceLine" id="cb4-11" title="11"><span class="co">## $center</span></a>
+<a class="sourceLine" id="cb4-12" title="12"><span class="co">## [1] 2.3-1.9i</span></a>
+<a class="sourceLine" id="cb4-13" title="13"><span class="co">## </span></a>
+<a class="sourceLine" id="cb4-14" title="14"><span class="co">## $radius</span></a>
+<a class="sourceLine" id="cb4-15" title="15"><span class="co">## [1] 2.529822</span></a>
+<a class="sourceLine" id="cb4-16" title="16"><span class="kw">MC</span>(a, b, c, d, z0, R)</a>
+<a class="sourceLine" id="cb4-17" title="17"><span class="co">## $center</span></a>
+<a class="sourceLine" id="cb4-18" title="18"><span class="co">## [1] 2.3-1.9i</span></a>
+<a class="sourceLine" id="cb4-19" title="19"><span class="co">## </span></a>
+<a class="sourceLine" id="cb4-20" title="20"><span class="co">## $radius</span></a>
+<a class="sourceLine" id="cb4-21" title="21"><span class="co">## [1] 2.529822</span></a></code></pre></div>
 <p>Now, consider the case when <span class="math inline">\(\boxed{A=0}\)</span>, that is <span class="math inline">\(|d/c+z_0| = R\)</span>. The equation is <span class="math display">\[
 \bar\gamma w + \gamma\bar{w} = D.
 \]</span> And this is the equation of a line, whose direction and offset are given by the formulas we have previously seen.</p>
@@ -288,129 +295,133 @@ D = D_0{|a|}^2 + 2\;\Re(\gamma_0 \bar{b}a).
 \]</span></p>
 <p>Again, there are two cases. We get a circle if <span class="math inline">\(A \neq 0\)</span>, and a line otherwise.</p>
 <p>Let’s check an example with <span class="math inline">\(A=0\)</span>. Our current value of <span class="math inline">\(c\)</span> in R is <span class="math inline">\(0\)</span>, so we have <span class="math inline">\(A=0\)</span>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># define the line L</span>
-theta &lt;-<span class="st"> </span><span class="dv">1</span>
-offset &lt;-<span class="st"> </span><span class="dv">2</span>
-<span class="co"># three points on M(L)</span>
-x &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>)
-y &lt;-<span class="st"> </span>(offset <span class="op">-</span><span class="st"> </span><span class="kw">cos</span>(theta)<span class="op">*</span>x) <span class="op">/</span><span class="st"> </span><span class="kw">sin</span>(theta)
-z1 &lt;-<span class="st"> </span><span class="kw">M</span>(x[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>y[<span class="dv">1</span>]) 
-z2 &lt;-<span class="st"> </span><span class="kw">M</span>(x[<span class="dv">2</span>] <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>y[<span class="dv">2</span>]) 
-z3 &lt;-<span class="st"> </span><span class="kw">M</span>(x[<span class="dv">3</span>] <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>y[<span class="dv">3</span>])
-<span class="co"># these points are aligned:</span>
-<span class="kw">Im</span>((z2<span class="op">-</span>z1)<span class="op">/</span>(z3<span class="op">-</span>z1)) <span class="co"># aligned &lt;=&gt; 0</span>
-## [1] -7.157799e-17</code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="co"># define the line L</span></a>
+<a class="sourceLine" id="cb5-2" title="2">theta &lt;-<span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb5-3" title="3">offset &lt;-<span class="st"> </span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb5-4" title="4"><span class="co"># three points on M(L)</span></a>
+<a class="sourceLine" id="cb5-5" title="5">x &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb5-6" title="6">y &lt;-<span class="st"> </span>(offset <span class="op">-</span><span class="st"> </span><span class="kw">cos</span>(theta)<span class="op">*</span>x) <span class="op">/</span><span class="st"> </span><span class="kw">sin</span>(theta)</a>
+<a class="sourceLine" id="cb5-7" title="7">z1 &lt;-<span class="st"> </span><span class="kw">M</span>(x[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>y[<span class="dv">1</span>]) </a>
+<a class="sourceLine" id="cb5-8" title="8">z2 &lt;-<span class="st"> </span><span class="kw">M</span>(x[<span class="dv">2</span>] <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>y[<span class="dv">2</span>]) </a>
+<a class="sourceLine" id="cb5-9" title="9">z3 &lt;-<span class="st"> </span><span class="kw">M</span>(x[<span class="dv">3</span>] <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>y[<span class="dv">3</span>])</a>
+<a class="sourceLine" id="cb5-10" title="10"><span class="co"># these points are aligned:</span></a>
+<a class="sourceLine" id="cb5-11" title="11"><span class="kw">Im</span>((z2<span class="op">-</span>z1)<span class="op">/</span>(z3<span class="op">-</span>z1)) <span class="co"># aligned &lt;=&gt; 0</span></a>
+<a class="sourceLine" id="cb5-12" title="12"><span class="co">## [1] -7.157799e-17</span></a></code></pre></div>
 <p>Now let’s check an example with <span class="math inline">\(A \neq 0\)</span>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Mobius transformation</span>
-c &lt;-<span class="st"> </span><span class="dv">6</span> <span class="co"># don't take c = 0, otherwise A=0</span>
-M &lt;-<span class="st"> </span><span class="kw">Mobius</span>(a,b,c,d)
-<span class="co"># three points on M(L)</span>
-z1 &lt;-<span class="st"> </span><span class="kw">M</span>(x[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>y[<span class="dv">1</span>]) 
-z2 &lt;-<span class="st"> </span><span class="kw">M</span>(x[<span class="dv">2</span>] <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>y[<span class="dv">2</span>]) 
-z3 &lt;-<span class="st"> </span><span class="kw">M</span>(x[<span class="dv">3</span>] <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>y[<span class="dv">3</span>])
-<span class="co"># calculation of A, gamma, D</span>
-gamma0 &lt;-<span class="st"> </span><span class="kw">cos</span>(theta) <span class="op">+</span><span class="st"> </span>1i <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(theta)
-D0 &lt;-<span class="st"> </span><span class="dv">2</span> <span class="op">*</span><span class="st"> </span>offset
-A &lt;-<span class="st"> </span><span class="op">-</span><span class="dv">2</span> <span class="op">*</span><span class="st"> </span><span class="kw">Re</span>(gamma0<span class="op">*</span>c<span class="op">*</span><span class="kw">Conj</span>(d)) <span class="op">-</span><span class="st"> </span>D0<span class="op">*</span><span class="kw">Mod</span>(c)<span class="op">^</span><span class="dv">2</span> 
-gamma &lt;-<span class="st"> </span><span class="kw">Conj</span>(gamma0)<span class="op">*</span>b<span class="op">*</span><span class="kw">Conj</span>(c) <span class="op">+</span><span class="st"> </span>gamma0<span class="op">*</span><span class="kw">Conj</span>(d)<span class="op">*</span>a <span class="op">+</span><span class="st"> </span>D0<span class="op">*</span><span class="kw">Conj</span>(c)<span class="op">*</span>a
-D &lt;-<span class="st"> </span>D0 <span class="op">*</span><span class="st"> </span><span class="kw">Mod</span>(a)<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span><span class="kw">Re</span>(gamma0<span class="op">*</span><span class="kw">Conj</span>(b)<span class="op">*</span>a)
-<span class="co"># circumcircle</span>
-cc &lt;-<span class="st"> </span><span class="kw">circumcircle</span>(z1, z2, z3)
-<span class="co"># center</span>
-<span class="op">-</span>gamma<span class="op">/</span>A
-## [1] 0.626783+0.0006863i
-cc<span class="op">$</span>center
-## [1] 0.626783+0.0006863i
-<span class="co"># radius </span>
-<span class="kw">sqrt</span>(<span class="kw">Mod</span>(gamma)<span class="op">^</span><span class="dv">2</span><span class="op">/</span>A<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>D<span class="op">/</span>A)
-## [1] 0.03988958
-cc<span class="op">$</span>radius
-## [1] 0.03988958</code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="co"># Mobius transformation</span></a>
+<a class="sourceLine" id="cb6-2" title="2">c &lt;-<span class="st"> </span><span class="dv">6</span> <span class="co"># don't take c = 0, otherwise A=0</span></a>
+<a class="sourceLine" id="cb6-3" title="3">M &lt;-<span class="st"> </span><span class="kw">Mobius</span>(a,b,c,d)</a>
+<a class="sourceLine" id="cb6-4" title="4"><span class="co"># three points on M(L)</span></a>
+<a class="sourceLine" id="cb6-5" title="5">z1 &lt;-<span class="st"> </span><span class="kw">M</span>(x[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>y[<span class="dv">1</span>]) </a>
+<a class="sourceLine" id="cb6-6" title="6">z2 &lt;-<span class="st"> </span><span class="kw">M</span>(x[<span class="dv">2</span>] <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>y[<span class="dv">2</span>]) </a>
+<a class="sourceLine" id="cb6-7" title="7">z3 &lt;-<span class="st"> </span><span class="kw">M</span>(x[<span class="dv">3</span>] <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span>y[<span class="dv">3</span>])</a>
+<a class="sourceLine" id="cb6-8" title="8"><span class="co"># calculation of A, gamma, D</span></a>
+<a class="sourceLine" id="cb6-9" title="9">gamma0 &lt;-<span class="st"> </span><span class="kw">cos</span>(theta) <span class="op">+</span><span class="st"> </span>1i <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(theta)</a>
+<a class="sourceLine" id="cb6-10" title="10">D0 &lt;-<span class="st"> </span><span class="dv">2</span> <span class="op">*</span><span class="st"> </span>offset</a>
+<a class="sourceLine" id="cb6-11" title="11">A &lt;-<span class="st"> </span><span class="dv">-2</span> <span class="op">*</span><span class="st"> </span><span class="kw">Re</span>(gamma0<span class="op">*</span>c<span class="op">*</span><span class="kw">Conj</span>(d)) <span class="op">-</span><span class="st"> </span>D0<span class="op">*</span><span class="kw">Mod</span>(c)<span class="op">^</span><span class="dv">2</span> </a>
+<a class="sourceLine" id="cb6-12" title="12">gamma &lt;-<span class="st"> </span><span class="kw">Conj</span>(gamma0)<span class="op">*</span>b<span class="op">*</span><span class="kw">Conj</span>(c) <span class="op">+</span><span class="st"> </span>gamma0<span class="op">*</span><span class="kw">Conj</span>(d)<span class="op">*</span>a <span class="op">+</span><span class="st"> </span>D0<span class="op">*</span><span class="kw">Conj</span>(c)<span class="op">*</span>a</a>
+<a class="sourceLine" id="cb6-13" title="13">D &lt;-<span class="st"> </span>D0 <span class="op">*</span><span class="st"> </span><span class="kw">Mod</span>(a)<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span><span class="kw">Re</span>(gamma0<span class="op">*</span><span class="kw">Conj</span>(b)<span class="op">*</span>a)</a>
+<a class="sourceLine" id="cb6-14" title="14"><span class="co"># circumcircle</span></a>
+<a class="sourceLine" id="cb6-15" title="15">cc &lt;-<span class="st"> </span><span class="kw">circumcircle</span>(z1, z2, z3)</a>
+<a class="sourceLine" id="cb6-16" title="16"><span class="co"># center</span></a>
+<a class="sourceLine" id="cb6-17" title="17"><span class="op">-</span>gamma<span class="op">/</span>A</a>
+<a class="sourceLine" id="cb6-18" title="18"><span class="co">## [1] 0.626783+0.0006863i</span></a>
+<a class="sourceLine" id="cb6-19" title="19">cc<span class="op">$</span>center</a>
+<a class="sourceLine" id="cb6-20" title="20"><span class="co">## [1] 0.626783+0.0006863i</span></a>
+<a class="sourceLine" id="cb6-21" title="21"><span class="co"># radius </span></a>
+<a class="sourceLine" id="cb6-22" title="22"><span class="kw">sqrt</span>(<span class="kw">Mod</span>(gamma)<span class="op">^</span><span class="dv">2</span><span class="op">/</span>A<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>D<span class="op">/</span>A)</a>
+<a class="sourceLine" id="cb6-23" title="23"><span class="co">## [1] 0.03988958</span></a>
+<a class="sourceLine" id="cb6-24" title="24">cc<span class="op">$</span>radius</a>
+<a class="sourceLine" id="cb6-25" title="25"><span class="co">## [1] 0.03988958</span></a></code></pre></div>
 <h1 id="r-code">R code</h1>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Mobius &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, d){
-  <span class="cf">function</span>(z){
-    (a<span class="op">*</span>z<span class="op">+</span>b) <span class="op">/</span><span class="st"> </span>(c<span class="op">*</span>z<span class="op">+</span>d)
-  }
-}
-
-Mod2 &lt;-<span class="st"> </span><span class="cf">function</span>(z){
-  <span class="kw">Re</span>(z)<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="kw">Im</span>(z)<span class="op">^</span><span class="dv">2</span>
-}
-
-MobiusImageOfCircle &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, d, z0, R){
-  gamma &lt;-<span class="st"> </span>R<span class="op">*</span>R<span class="op">*</span>a<span class="op">*</span><span class="kw">Conj</span>(c) <span class="op">-</span><span class="st"> </span>(a<span class="op">*</span>z0 <span class="op">+</span><span class="st"> </span>b) <span class="op">*</span><span class="st"> </span><span class="kw">Conj</span>(c<span class="op">*</span>z0 <span class="op">+</span><span class="st"> </span>d)
-  D &lt;-<span class="st"> </span>R<span class="op">*</span>R<span class="op">*</span><span class="kw">Mod2</span>(a) <span class="op">-</span><span class="st"> </span><span class="kw">Mod2</span>(b <span class="op">+</span><span class="st"> </span>a<span class="op">*</span>z0)
-  x1 &lt;-<span class="st"> </span><span class="kw">Mod2</span>(d<span class="op">+</span>c<span class="op">*</span>z0)
-  x2 &lt;-<span class="st"> </span>R<span class="op">*</span>R<span class="op">*</span><span class="kw">Mod2</span>(c)
-  <span class="cf">if</span>(x1 <span class="op">!=</span><span class="st"> </span>x2){
-    A &lt;-<span class="st"> </span>x1 <span class="op">-</span><span class="st"> </span>x2
-    out &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">center =</span> <span class="op">-</span>gamma<span class="op">/</span>A, <span class="dt">radius =</span> <span class="kw">sqrt</span>(<span class="kw">Mod2</span>(gamma)<span class="op">/</span>A<span class="op">/</span>A <span class="op">+</span><span class="st"> </span>D<span class="op">/</span>A))
-    <span class="kw">attr</span>(out, <span class="st">&quot;type&quot;</span>) &lt;-<span class="st"> &quot;circle&quot;</span>
-  }<span class="cf">else</span>{
-    out &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">theta =</span> <span class="kw">Arg</span>(gamma) <span class="op">%%</span><span class="st"> </span>(<span class="dv">2</span><span class="op">*</span>pi), <span class="dt">offset =</span> D<span class="op">/</span><span class="dv">2</span><span class="op">/</span><span class="kw">Mod</span>(gamma))
-    <span class="kw">attr</span>(out, <span class="st">&quot;type&quot;</span>) &lt;-<span class="st"> &quot;line&quot;</span>
-  }
-  out
-}
-
-MobiusImageOfLine &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, d, theta, offset){
-  gamma0 &lt;-<span class="st"> </span><span class="kw">cos</span>(theta) <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span><span class="kw">sin</span>(theta)
-  D0 &lt;-<span class="st"> </span><span class="dv">2</span> <span class="op">*</span><span class="st"> </span>offset
-  A &lt;-<span class="st"> </span><span class="op">-</span><span class="dv">2</span> <span class="op">*</span><span class="st"> </span><span class="kw">Re</span>(gamma0<span class="op">*</span>c<span class="op">*</span><span class="kw">Conj</span>(d)) <span class="op">-</span><span class="st"> </span>D0<span class="op">*</span><span class="kw">Mod2</span>(c) 
-  gamma &lt;-<span class="st"> </span><span class="kw">Conj</span>(gamma0)<span class="op">*</span>b<span class="op">*</span><span class="kw">Conj</span>(c) <span class="op">+</span><span class="st"> </span>gamma0<span class="op">*</span><span class="kw">Conj</span>(d)<span class="op">*</span>a <span class="op">+</span><span class="st"> </span>D0<span class="op">*</span><span class="kw">Conj</span>(c)<span class="op">*</span>a
-  D &lt;-<span class="st"> </span>D0<span class="op">*</span><span class="kw">Mod2</span>(a) <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span><span class="kw">Re</span>(gamma0<span class="op">*</span><span class="kw">Conj</span>(b)<span class="op">*</span>a)
-  <span class="cf">if</span>(A <span class="op">!=</span><span class="st"> </span><span class="dv">0</span>){
-    out &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">center =</span> <span class="op">-</span>gamma<span class="op">/</span>A, <span class="dt">radius =</span> <span class="kw">sqrt</span>(<span class="kw">Mod2</span>(gamma)<span class="op">/</span>A<span class="op">/</span>A <span class="op">+</span><span class="st"> </span>D<span class="op">/</span>A))
-    <span class="kw">attr</span>(out, <span class="st">&quot;type&quot;</span>) &lt;-<span class="st"> &quot;circle&quot;</span>
-  }<span class="cf">else</span>{
-    out &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">theta =</span> <span class="kw">Arg</span>(gamma) <span class="op">%%</span><span class="st"> </span>(<span class="dv">2</span><span class="op">*</span>pi), <span class="dt">offset =</span> D<span class="op">/</span><span class="dv">2</span><span class="op">/</span><span class="kw">Mod</span>(gamma))
-    <span class="kw">attr</span>(out, <span class="st">&quot;type&quot;</span>) &lt;-<span class="st"> &quot;line&quot;</span>
-  }
-  out
-}
-
-MobiusImage &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, d, gcircle){
-  <span class="cf">if</span>(<span class="kw">attr</span>(gcircle, <span class="st">&quot;type&quot;</span>) <span class="op">==</span><span class="st"> &quot;circle&quot;</span>){
-    <span class="kw">MobiusImageOfCircle</span>(a, b, c, d, gcircle<span class="op">$</span>center, gcircle<span class="op">$</span>radius)
-  }<span class="cf">else</span>{
-    <span class="kw">MobiusImageOfLine</span>(a, b, c, d, gcircle<span class="op">$</span>theta, gcircle<span class="op">$</span>offset)
-  }
-}
-
-<span class="co"># plot ####</span>
-drawLine &lt;-<span class="st"> </span><span class="cf">function</span>(line, ...){
-  theta &lt;-<span class="st"> </span>line<span class="op">$</span>theta; offset &lt;-<span class="st"> </span>line<span class="op">$</span>offset
-  <span class="cf">if</span>(<span class="kw">sin</span>(theta) <span class="op">!=</span><span class="st"> </span><span class="dv">0</span>){
-    <span class="kw">abline</span>(<span class="dt">a =</span> offset<span class="op">/</span><span class="kw">sin</span>(theta), <span class="dt">b =</span> <span class="op">-</span><span class="dv">1</span><span class="op">/</span><span class="kw">tan</span>(theta), ...)
-  }<span class="cf">else</span>{
-    <span class="kw">abline</span>(<span class="dt">v =</span> offset<span class="op">/</span><span class="kw">cos</span>(theta), ...)
-  }
-}
-
-drawCircle &lt;-<span class="st"> </span><span class="cf">function</span>(circle, ...){
-  plotrix<span class="op">::</span><span class="kw">draw.circle</span>(<span class="kw">Re</span>(circle<span class="op">$</span>center), <span class="kw">Im</span>(circle<span class="op">$</span>center), 
-                       circle<span class="op">$</span>radius, ...)
-}
-
-drawGCircle &lt;-<span class="st"> </span><span class="cf">function</span>(gcircle, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>, ...){
-  <span class="cf">if</span>(<span class="kw">attr</span>(gcircle, <span class="st">&quot;type&quot;</span>) <span class="op">==</span><span class="st"> &quot;circle&quot;</span>){
-    <span class="kw">drawCircle</span>(gcircle, <span class="dt">border =</span> color, ...)
-  }<span class="cf">else</span>{
-    <span class="kw">drawLine</span>(gcircle, <span class="dt">col =</span> color, ...)
-  }
-}</code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">Mobius &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, d){</a>
+<a class="sourceLine" id="cb7-2" title="2">  <span class="cf">function</span>(z){</a>
+<a class="sourceLine" id="cb7-3" title="3">    (a<span class="op">*</span>z<span class="op">+</span>b) <span class="op">/</span><span class="st"> </span>(c<span class="op">*</span>z<span class="op">+</span>d)</a>
+<a class="sourceLine" id="cb7-4" title="4">  }</a>
+<a class="sourceLine" id="cb7-5" title="5">}</a>
+<a class="sourceLine" id="cb7-6" title="6"></a>
+<a class="sourceLine" id="cb7-7" title="7">Mod2 &lt;-<span class="st"> </span><span class="cf">function</span>(z){</a>
+<a class="sourceLine" id="cb7-8" title="8">  <span class="kw">Re</span>(z)<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="kw">Im</span>(z)<span class="op">^</span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb7-9" title="9">}</a>
+<a class="sourceLine" id="cb7-10" title="10"></a>
+<a class="sourceLine" id="cb7-11" title="11">MobiusImageOfCircle &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, d, z0, R){</a>
+<a class="sourceLine" id="cb7-12" title="12">  gamma &lt;-<span class="st"> </span>R<span class="op">*</span>R<span class="op">*</span>a<span class="op">*</span><span class="kw">Conj</span>(c) <span class="op">-</span><span class="st"> </span>(a<span class="op">*</span>z0 <span class="op">+</span><span class="st"> </span>b) <span class="op">*</span><span class="st"> </span><span class="kw">Conj</span>(c<span class="op">*</span>z0 <span class="op">+</span><span class="st"> </span>d)</a>
+<a class="sourceLine" id="cb7-13" title="13">  D &lt;-<span class="st"> </span>R<span class="op">*</span>R<span class="op">*</span><span class="kw">Mod2</span>(a) <span class="op">-</span><span class="st"> </span><span class="kw">Mod2</span>(b <span class="op">+</span><span class="st"> </span>a<span class="op">*</span>z0)</a>
+<a class="sourceLine" id="cb7-14" title="14">  x1 &lt;-<span class="st"> </span><span class="kw">Mod2</span>(d<span class="op">+</span>c<span class="op">*</span>z0)</a>
+<a class="sourceLine" id="cb7-15" title="15">  x2 &lt;-<span class="st"> </span>R<span class="op">*</span>R<span class="op">*</span><span class="kw">Mod2</span>(c)</a>
+<a class="sourceLine" id="cb7-16" title="16">  <span class="cf">if</span>(x1 <span class="op">!=</span><span class="st"> </span>x2){</a>
+<a class="sourceLine" id="cb7-17" title="17">    A &lt;-<span class="st"> </span>x1 <span class="op">-</span><span class="st"> </span>x2</a>
+<a class="sourceLine" id="cb7-18" title="18">    out &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">center =</span> <span class="op">-</span>gamma<span class="op">/</span>A, <span class="dt">radius =</span> <span class="kw">sqrt</span>(<span class="kw">Mod2</span>(gamma)<span class="op">/</span>A<span class="op">/</span>A <span class="op">+</span><span class="st"> </span>D<span class="op">/</span>A))</a>
+<a class="sourceLine" id="cb7-19" title="19">    <span class="kw">attr</span>(out, <span class="st">&quot;type&quot;</span>) &lt;-<span class="st"> &quot;circle&quot;</span></a>
+<a class="sourceLine" id="cb7-20" title="20">  }<span class="cf">else</span>{</a>
+<a class="sourceLine" id="cb7-21" title="21">    out &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">theta =</span> <span class="kw">Arg</span>(gamma) <span class="op">%%</span><span class="st"> </span>(<span class="dv">2</span><span class="op">*</span>pi), <span class="dt">offset =</span> D<span class="op">/</span><span class="dv">2</span><span class="op">/</span><span class="kw">Mod</span>(gamma))</a>
+<a class="sourceLine" id="cb7-22" title="22">    <span class="kw">attr</span>(out, <span class="st">&quot;type&quot;</span>) &lt;-<span class="st"> &quot;line&quot;</span></a>
+<a class="sourceLine" id="cb7-23" title="23">  }</a>
+<a class="sourceLine" id="cb7-24" title="24">  out</a>
+<a class="sourceLine" id="cb7-25" title="25">}</a>
+<a class="sourceLine" id="cb7-26" title="26"></a>
+<a class="sourceLine" id="cb7-27" title="27">MobiusImageOfLine &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, d, theta, offset){</a>
+<a class="sourceLine" id="cb7-28" title="28">  gamma0 &lt;-<span class="st"> </span><span class="kw">cos</span>(theta) <span class="op">+</span><span class="st"> </span>1i<span class="op">*</span><span class="kw">sin</span>(theta)</a>
+<a class="sourceLine" id="cb7-29" title="29">  D0 &lt;-<span class="st"> </span><span class="dv">2</span> <span class="op">*</span><span class="st"> </span>offset</a>
+<a class="sourceLine" id="cb7-30" title="30">  A &lt;-<span class="st"> </span><span class="dv">-2</span> <span class="op">*</span><span class="st"> </span><span class="kw">Re</span>(gamma0<span class="op">*</span>c<span class="op">*</span><span class="kw">Conj</span>(d)) <span class="op">-</span><span class="st"> </span>D0<span class="op">*</span><span class="kw">Mod2</span>(c) </a>
+<a class="sourceLine" id="cb7-31" title="31">  gamma &lt;-<span class="st"> </span><span class="kw">Conj</span>(gamma0)<span class="op">*</span>b<span class="op">*</span><span class="kw">Conj</span>(c) <span class="op">+</span><span class="st"> </span>gamma0<span class="op">*</span><span class="kw">Conj</span>(d)<span class="op">*</span>a <span class="op">+</span><span class="st"> </span>D0<span class="op">*</span><span class="kw">Conj</span>(c)<span class="op">*</span>a</a>
+<a class="sourceLine" id="cb7-32" title="32">  D &lt;-<span class="st"> </span>D0<span class="op">*</span><span class="kw">Mod2</span>(a) <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span><span class="kw">Re</span>(gamma0<span class="op">*</span><span class="kw">Conj</span>(b)<span class="op">*</span>a)</a>
+<a class="sourceLine" id="cb7-33" title="33">  <span class="cf">if</span>(A <span class="op">!=</span><span class="st"> </span><span class="dv">0</span>){</a>
+<a class="sourceLine" id="cb7-34" title="34">    out &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">center =</span> <span class="op">-</span>gamma<span class="op">/</span>A, <span class="dt">radius =</span> <span class="kw">sqrt</span>(<span class="kw">Mod2</span>(gamma)<span class="op">/</span>A<span class="op">/</span>A <span class="op">+</span><span class="st"> </span>D<span class="op">/</span>A))</a>
+<a class="sourceLine" id="cb7-35" title="35">    <span class="kw">attr</span>(out, <span class="st">&quot;type&quot;</span>) &lt;-<span class="st"> &quot;circle&quot;</span></a>
+<a class="sourceLine" id="cb7-36" title="36">  }<span class="cf">else</span>{</a>
+<a class="sourceLine" id="cb7-37" title="37">    out &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">theta =</span> <span class="kw">Arg</span>(gamma) <span class="op">%%</span><span class="st"> </span>(<span class="dv">2</span><span class="op">*</span>pi), <span class="dt">offset =</span> D<span class="op">/</span><span class="dv">2</span><span class="op">/</span><span class="kw">Mod</span>(gamma))</a>
+<a class="sourceLine" id="cb7-38" title="38">    <span class="kw">attr</span>(out, <span class="st">&quot;type&quot;</span>) &lt;-<span class="st"> &quot;line&quot;</span></a>
+<a class="sourceLine" id="cb7-39" title="39">  }</a>
+<a class="sourceLine" id="cb7-40" title="40">  out</a>
+<a class="sourceLine" id="cb7-41" title="41">}</a>
+<a class="sourceLine" id="cb7-42" title="42"></a>
+<a class="sourceLine" id="cb7-43" title="43">MobiusImage &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, d, gcircle){</a>
+<a class="sourceLine" id="cb7-44" title="44">  <span class="cf">if</span>(<span class="kw">attr</span>(gcircle, <span class="st">&quot;type&quot;</span>) <span class="op">==</span><span class="st"> &quot;circle&quot;</span>){</a>
+<a class="sourceLine" id="cb7-45" title="45">    <span class="kw">MobiusImageOfCircle</span>(a, b, c, d, gcircle<span class="op">$</span>center, gcircle<span class="op">$</span>radius)</a>
+<a class="sourceLine" id="cb7-46" title="46">  }<span class="cf">else</span>{</a>
+<a class="sourceLine" id="cb7-47" title="47">    <span class="kw">MobiusImageOfLine</span>(a, b, c, d, gcircle<span class="op">$</span>theta, gcircle<span class="op">$</span>offset)</a>
+<a class="sourceLine" id="cb7-48" title="48">  }</a>
+<a class="sourceLine" id="cb7-49" title="49">}</a>
+<a class="sourceLine" id="cb7-50" title="50"></a>
+<a class="sourceLine" id="cb7-51" title="51"><span class="co"># plot ####</span></a>
+<a class="sourceLine" id="cb7-52" title="52">drawLine &lt;-<span class="st"> </span><span class="cf">function</span>(line, ...){</a>
+<a class="sourceLine" id="cb7-53" title="53">  theta &lt;-<span class="st"> </span>line<span class="op">$</span>theta; offset &lt;-<span class="st"> </span>line<span class="op">$</span>offset</a>
+<a class="sourceLine" id="cb7-54" title="54">  <span class="cf">if</span>(<span class="kw">sin</span>(theta) <span class="op">!=</span><span class="st"> </span><span class="dv">0</span>){</a>
+<a class="sourceLine" id="cb7-55" title="55">    <span class="kw">abline</span>(<span class="dt">a =</span> offset<span class="op">/</span><span class="kw">sin</span>(theta), <span class="dt">b =</span> <span class="dv">-1</span><span class="op">/</span><span class="kw">tan</span>(theta), ...)</a>
+<a class="sourceLine" id="cb7-56" title="56">  }<span class="cf">else</span>{</a>
+<a class="sourceLine" id="cb7-57" title="57">    <span class="kw">abline</span>(<span class="dt">v =</span> offset<span class="op">/</span><span class="kw">cos</span>(theta), ...)</a>
+<a class="sourceLine" id="cb7-58" title="58">  }</a>
+<a class="sourceLine" id="cb7-59" title="59">}</a>
+<a class="sourceLine" id="cb7-60" title="60"></a>
+<a class="sourceLine" id="cb7-61" title="61">drawCircle &lt;-<span class="st"> </span><span class="cf">function</span>(circle, ...){</a>
+<a class="sourceLine" id="cb7-62" title="62">  plotrix<span class="op">::</span><span class="kw">draw.circle</span>(<span class="kw">Re</span>(circle<span class="op">$</span>center), <span class="kw">Im</span>(circle<span class="op">$</span>center), </a>
+<a class="sourceLine" id="cb7-63" title="63">                       circle<span class="op">$</span>radius, ...)</a>
+<a class="sourceLine" id="cb7-64" title="64">}</a>
+<a class="sourceLine" id="cb7-65" title="65"></a>
+<a class="sourceLine" id="cb7-66" title="66">drawGCircle &lt;-<span class="st"> </span><span class="cf">function</span>(gcircle, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>, ...){</a>
+<a class="sourceLine" id="cb7-67" title="67">  <span class="cf">if</span>(<span class="kw">attr</span>(gcircle, <span class="st">&quot;type&quot;</span>) <span class="op">==</span><span class="st"> &quot;circle&quot;</span>){</a>
+<a class="sourceLine" id="cb7-68" title="68">    <span class="kw">drawCircle</span>(gcircle, <span class="dt">border =</span> color, ...)</a>
+<a class="sourceLine" id="cb7-69" title="69">  }<span class="cf">else</span>{</a>
+<a class="sourceLine" id="cb7-70" title="70">    <span class="kw">drawLine</span>(gcircle, <span class="dt">col =</span> color, ...)</a>
+<a class="sourceLine" id="cb7-71" title="71">  }</a>
+<a class="sourceLine" id="cb7-72" title="72">}</a></code></pre></div>
 <h1 id="references">References</h1>
 <ul>
 <li><p>D. A. Brannan, M. F. Esplen, J. J. Gray. <em>Geometry</em>, second edition. Cambridge University Press, 2012.</p></li>
 <li><p>D. Mumford, C. Series, D. Wright. <em>Indra’s Pearls: The Vision of Felix Klein</em>. Cambridge University Press, 2002.</p></li>
 </ul>
 
-    </div>
+        </div>
 
 
-    <div id="footer">
-      Site proudly generated by
-      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
     </div>
 
   </div>
@@ -448,18 +459,19 @@ drawGCircle &lt;-<span class="st"> </span><span class="cf">function</span>(gcirc
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
 
-<!-- Google Prettify -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
-<script>
-  var pres = document.getElementsByTagName("pre");
-  for (var i = 0; i < pres.length; ++i) {
-    
-    pres[i].className = pres[i].className + " prettyprint linenums";
-    
-  }
-  prettyPrint();
-</script> 
+  <!-- Google Prettify -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+  <script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+  <script>
+    var pres = document.getElementsByTagName("pre");
+    for (var i = 0; i < pres.length; ++i) {
+      
+        pres[i].className = pres[i].className + " prettyprint linenums";
+      
+    }
+    prettyPrint();
+  </script> 
+
 
 </html>

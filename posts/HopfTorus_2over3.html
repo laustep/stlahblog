@@ -6,60 +6,67 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - Hopf Torus (2/3): the bent equatorial case</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../css/post.css" />
   <link rel="stylesheet" href="../css/misc.css" /> 
-  <link rel="stylesheet" href="../css/kate.css" />  
-  <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
+  
+    <link rel="stylesheet" href="../css/kate.css" /> 
+   
+  
+    <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
+  
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
-  </script>
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 
 <body>
-  <!-- Sidebar. -->
-  <div class="sidebar">
-    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
-      <a href="https://www.r-bloggers.com/">
-        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
-      </a>
-      <br />
-      <a href="http://t-redactyl.io/">
-        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
-      </a>
-      <a href="http://timelyportfolio.blogspot.be/">
-        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
-      </a>
-      <br />
-      <a href="https://antoineguillot.wordpress.com/blog/">
-        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
-      </a>
-      <br />
-      <a href="https://fronkonstin.com/">
-        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
-      </a>
-    </div>
-  </div>
-
-  <div class="main">
-    <div id="header">
-      <div id="logo" style="position:absolute;">
-        <a href="../">
-          <img src="../images/stla.jpg" alt="stla" width="100px" />
-        </a>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-3">
+        <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+          <a href="https://www.r-bloggers.com/">
+            <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+          </a>
+          <br />
+          <a href="http://t-redactyl.io/">
+            <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
+          </a>
+          <a href="http://timelyportfolio.blogspot.be/">
+            <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
+          </a>
+          <br />
+          <a href="https://antoineguillot.wordpress.com/blog/">
+            <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+          </a>
+          <br />
+          <a href="https://fronkonstin.com/">
+            <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+          </a>
+        </div>
       </div>
-      <div id="navigation" style="margin-top:50px;">
-        <a href="../">Home</a>
-        <a href="../about.html">About</a>
-        <a href="../contact.html">Contact</a>
-        <a href="../archive.html">Archive</a>
-      </div>
-    </div>
 
-    <div class="content">
-      <h1>Hopf Torus (2/3): the bent equatorial case</h1> <div class="info">
+      <div class="main col-sm-9">
+        <div id="header">
+          <div id="logo" style="position:absolute;">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Hopf Torus (2/3): the bent equatorial case</h1> 
+          <div class="info">
     Posted on May  1, 2018
     
         by Stéphane Laurent
@@ -72,20 +79,17 @@
 </div>
 
 <p>In this second part, we will see what happens when we map the points lying on a bent equator.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">hopfinverse &lt;-<span class="st"> </span><span class="cf">function</span>(q, t){ 
-  <span class="dv">1</span><span class="op">/</span><span class="kw">sqrt</span>(<span class="dv">2</span><span class="op">*</span>(<span class="dv">1</span><span class="op">+</span>q[<span class="dv">3</span>])) <span class="op">*</span><span class="st"> </span><span class="kw">c</span>(q[<span class="dv">1</span>]<span class="op">*</span><span class="kw">cos</span>(t)<span class="op">+</span>q[<span class="dv">2</span>]<span class="op">*</span><span class="kw">sin</span>(t),
-                         <span class="kw">sin</span>(t)<span class="op">*</span>(<span class="dv">1</span><span class="op">+</span>q[<span class="dv">3</span>]),
-                         <span class="kw">cos</span>(t)<span class="op">*</span>(<span class="dv">1</span><span class="op">+</span>q[<span class="dv">3</span>]),
-                         q[<span class="dv">1</span>]<span class="op">*</span><span class="kw">sin</span>(t)<span class="op">-</span>q[<span class="dv">2</span>]<span class="op">*</span><span class="kw">cos</span>(t)) 
-}
-stereog &lt;-<span class="st"> </span><span class="cf">function</span>(x){
-  <span class="kw">c</span>(x[<span class="dv">1</span>], x[<span class="dv">2</span>], x[<span class="dv">3</span>])<span class="op">/</span>(<span class="dv">1</span><span class="op">-</span>x[<span class="dv">4</span>])
-}</code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">hopfinverse &lt;-<span class="st"> </span><span class="cf">function</span>(q, t){ </a>
+<a class="sourceLine" id="cb1-2" title="2">  <span class="dv">1</span><span class="op">/</span><span class="kw">sqrt</span>(<span class="dv">2</span><span class="op">*</span>(<span class="dv">1</span><span class="op">+</span>q[<span class="dv">3</span>])) <span class="op">*</span><span class="st"> </span><span class="kw">c</span>(q[<span class="dv">1</span>]<span class="op">*</span><span class="kw">cos</span>(t)<span class="op">+</span>q[<span class="dv">2</span>]<span class="op">*</span><span class="kw">sin</span>(t),</a>
+<a class="sourceLine" id="cb1-3" title="3">                         <span class="kw">sin</span>(t)<span class="op">*</span>(<span class="dv">1</span><span class="op">+</span>q[<span class="dv">3</span>]),</a>
+<a class="sourceLine" id="cb1-4" title="4">                         <span class="kw">cos</span>(t)<span class="op">*</span>(<span class="dv">1</span><span class="op">+</span>q[<span class="dv">3</span>]),</a>
+<a class="sourceLine" id="cb1-5" title="5">                         q[<span class="dv">1</span>]<span class="op">*</span><span class="kw">sin</span>(t)<span class="op">-</span>q[<span class="dv">2</span>]<span class="op">*</span><span class="kw">cos</span>(t)) </a>
+<a class="sourceLine" id="cb1-6" title="6">}</a>
+<a class="sourceLine" id="cb1-7" title="7">stereog &lt;-<span class="st"> </span><span class="cf">function</span>(x){</a>
+<a class="sourceLine" id="cb1-8" title="8">  <span class="kw">c</span>(x[<span class="dv">1</span>], x[<span class="dv">2</span>], x[<span class="dv">3</span>])<span class="op">/</span>(<span class="dv">1</span><span class="op">-</span>x[<span class="dv">4</span>])</a>
+<a class="sourceLine" id="cb1-9" title="9">}</a></code></pre></div>
 <p>The sphere with the bent equator will be plotted thanks to the following functions.</p>
-<div class="figure">
-<img src="figures/SphereWithSlopedEquator.png" />
-
-</div>
+<p><img src="figures/SphereWithSlopedEquator.png" /></p>
 <p>To rotate the equator to the bent equator, we used the rotation matrix <span class="math display">\[
 R_x = \begin{pmatrix} 
 1 &amp; 0 &amp; 0 \\
@@ -93,26 +97,26 @@ R_x = \begin{pmatrix}
 0 &amp; \sin \alpha &amp; \cos \alpha
 \end{pmatrix}
 \]</span></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Rx &lt;-<span class="st"> </span><span class="cf">function</span>(alpha) {
-  <span class="kw">rbind</span>(<span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>),
-        <span class="kw">c</span>(<span class="dv">0</span>, <span class="kw">cos</span>(alpha), <span class="op">-</span><span class="kw">sin</span>(alpha)),
-        <span class="kw">c</span>(<span class="dv">0</span>, <span class="kw">sin</span>(alpha), <span class="kw">cos</span>(alpha)))
-}</code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">Rx &lt;-<span class="st"> </span><span class="cf">function</span>(alpha) {</a>
+<a class="sourceLine" id="cb2-2" title="2">  <span class="kw">rbind</span>(<span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>),</a>
+<a class="sourceLine" id="cb2-3" title="3">        <span class="kw">c</span>(<span class="dv">0</span>, <span class="kw">cos</span>(alpha), <span class="op">-</span><span class="kw">sin</span>(alpha)),</a>
+<a class="sourceLine" id="cb2-4" title="4">        <span class="kw">c</span>(<span class="dv">0</span>, <span class="kw">sin</span>(alpha), <span class="kw">cos</span>(alpha)))</a>
+<a class="sourceLine" id="cb2-5" title="5">}</a></code></pre></div>
 <p>Now, let’s see the Hopf torus.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">open3d</span>(<span class="dt">windowRect=</span><span class="kw">c</span>(<span class="dv">50</span>,<span class="dv">50</span>,<span class="dv">500</span>,<span class="dv">500</span>))
-<span class="kw">view3d</span>(<span class="dv">45</span>,<span class="dv">45</span>)
-t_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">len=</span><span class="dv">200</span>)
-theta_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">len=</span><span class="dv">300</span>)
-phi &lt;-<span class="st"> </span><span class="dv">0</span>
-<span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_along</span>(theta_)){
-  theta &lt;-<span class="st"> </span>theta_[i]
-  rotated &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">Rx</span>(<span class="op">-</span>pi<span class="op">/</span><span class="dv">8</span>) <span class="op">%*%</span><span class="st"> </span><span class="kw">c</span>(<span class="kw">cos</span>(theta)<span class="op">*</span><span class="kw">cos</span>(phi), <span class="kw">sin</span>(theta)<span class="op">*</span><span class="kw">cos</span>(phi), <span class="kw">sin</span>(phi)))
-  circle4d &lt;-<span class="st"> </span><span class="kw">sapply</span>(t_, <span class="cf">function</span>(t){
-    <span class="kw">hopfinverse</span>(rotated, t)
-  })
-  circle3d &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">apply</span>(circle4d, <span class="dv">2</span>, stereog))
-  <span class="kw">shade3d</span>(<span class="kw">cylinder3d</span>(circle3d, <span class="dt">radius=</span><span class="fl">0.1</span>), <span class="dt">color=</span><span class="st">&quot;purple&quot;</span>)
-}</code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw">open3d</span>(<span class="dt">windowRect=</span><span class="kw">c</span>(<span class="dv">50</span>,<span class="dv">50</span>,<span class="dv">500</span>,<span class="dv">500</span>))</a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="kw">view3d</span>(<span class="dv">45</span>,<span class="dv">45</span>)</a>
+<a class="sourceLine" id="cb3-3" title="3">t_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">len=</span><span class="dv">200</span>)</a>
+<a class="sourceLine" id="cb3-4" title="4">theta_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">len=</span><span class="dv">300</span>)</a>
+<a class="sourceLine" id="cb3-5" title="5">phi &lt;-<span class="st"> </span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb3-6" title="6"><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_along</span>(theta_)){</a>
+<a class="sourceLine" id="cb3-7" title="7">  theta &lt;-<span class="st"> </span>theta_[i]</a>
+<a class="sourceLine" id="cb3-8" title="8">  rotated &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">Rx</span>(<span class="op">-</span>pi<span class="op">/</span><span class="dv">8</span>) <span class="op">%*%</span><span class="st"> </span><span class="kw">c</span>(<span class="kw">cos</span>(theta)<span class="op">*</span><span class="kw">cos</span>(phi), <span class="kw">sin</span>(theta)<span class="op">*</span><span class="kw">cos</span>(phi), <span class="kw">sin</span>(phi)))</a>
+<a class="sourceLine" id="cb3-9" title="9">  circle4d &lt;-<span class="st"> </span><span class="kw">sapply</span>(t_, <span class="cf">function</span>(t){</a>
+<a class="sourceLine" id="cb3-10" title="10">    <span class="kw">hopfinverse</span>(rotated, t)</a>
+<a class="sourceLine" id="cb3-11" title="11">  })</a>
+<a class="sourceLine" id="cb3-12" title="12">  circle3d &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">apply</span>(circle4d, <span class="dv">2</span>, stereog))</a>
+<a class="sourceLine" id="cb3-13" title="13">  <span class="kw">shade3d</span>(<span class="kw">cylinder3d</span>(circle3d, <span class="dt">radius=</span><span class="fl">0.1</span>), <span class="dt">color=</span><span class="st">&quot;purple&quot;</span>)</a>
+<a class="sourceLine" id="cb3-14" title="14">}</a></code></pre></div>
 <p>We get a deformed torus, still made of circles:</p>
 <!-- ![](figures/hopftorus2.gif) -->
 <!-- ![](figures/hopftorus2_anim.gif) -->
@@ -121,12 +125,16 @@ phi &lt;-<span class="st"> </span><span class="dv">0</span>
 <p style="clear: both;">
 </div>
 
-    </div>
+        </div>
 
 
-    <div id="footer">
-      Site proudly generated by
-      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
     </div>
 
   </div>
@@ -164,18 +172,19 @@ phi &lt;-<span class="st"> </span><span class="dv">0</span>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
 
-<!-- Google Prettify -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
-<script>
-  var pres = document.getElementsByTagName("pre");
-  for (var i = 0; i < pres.length; ++i) {
-    
-    pres[i].className = pres[i].className + " prettyprint linenums";
-    
-  }
-  prettyPrint();
-</script> 
+  <!-- Google Prettify -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+  <script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+  <script>
+    var pres = document.getElementsByTagName("pre");
+    for (var i = 0; i < pres.length; ++i) {
+      
+        pres[i].className = pres[i].className + " prettyprint linenums";
+      
+    }
+    prettyPrint();
+  </script> 
+
 
 </html>

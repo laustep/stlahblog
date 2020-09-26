@@ -6,60 +6,67 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - File encoding detection in R</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../css/post.css" />
   <link rel="stylesheet" href="../css/misc.css" /> 
-  <link rel="stylesheet" href="../css/kate.css" />  
-  <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
+  
+    <link rel="stylesheet" href="../css/kate.css" /> 
+   
+  
+    <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
+  
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
-  </script>
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 
 <body>
-  <!-- Sidebar. -->
-  <div class="sidebar">
-    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
-      <a href="https://www.r-bloggers.com/">
-        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
-      </a>
-      <br />
-      <a href="http://t-redactyl.io/">
-        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
-      </a>
-      <a href="http://timelyportfolio.blogspot.be/">
-        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
-      </a>
-      <br />
-      <a href="https://antoineguillot.wordpress.com/blog/">
-        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
-      </a>
-      <br />
-      <a href="https://fronkonstin.com/">
-        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
-      </a>
-    </div>
-  </div>
-
-  <div class="main">
-    <div id="header">
-      <div id="logo" style="position:absolute;">
-        <a href="../">
-          <img src="../images/stla.jpg" alt="stla" width="100px" />
-        </a>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-3">
+        <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+          <a href="https://www.r-bloggers.com/">
+            <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+          </a>
+          <br />
+          <a href="http://t-redactyl.io/">
+            <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
+          </a>
+          <a href="http://timelyportfolio.blogspot.be/">
+            <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
+          </a>
+          <br />
+          <a href="https://antoineguillot.wordpress.com/blog/">
+            <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+          </a>
+          <br />
+          <a href="https://fronkonstin.com/">
+            <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+          </a>
+        </div>
       </div>
-      <div id="navigation" style="margin-top:50px;">
-        <a href="../">Home</a>
-        <a href="../about.html">About</a>
-        <a href="../contact.html">Contact</a>
-        <a href="../archive.html">Archive</a>
-      </div>
-    </div>
 
-    <div class="content">
-      <h1>File encoding detection in R</h1> <div class="info">
+      <div class="main col-sm-9">
+        <div id="header">
+          <div id="logo" style="position:absolute;">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>File encoding detection in R</h1> 
+          <div class="info">
     Posted on October 24, 2017
     
         by Stéphane Laurent
@@ -73,25 +80,29 @@
 
 <p>There is a Java port of <code>universalchardet</code>, the encoding detector library of Mozilla. It is called <code>juniversalchardet</code>. I’m going to show how to use it with the <code>rJava</code> package.</p>
 <p>Firstly, download the <code>jar</code> file here: <a href="https://code.google.com/archive/p/juniversalchardet/downloads" class="uri">https://code.google.com/archive/p/juniversalchardet/downloads</a>. Then, proceed as follows:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(rJava)
-<span class="kw">.jinit</span>()
-<span class="kw">.jaddClassPath</span>(<span class="st">&quot;path/to/juniversalchardet-1.0.3.jar&quot;</span>)
-detector &lt;-<span class="st"> </span><span class="kw">new</span>(<span class="kw">J</span>(<span class="st">&quot;org/mozilla/universalchardet/UniversalDetector&quot;</span>), <span class="ot">NULL</span>)
-f &lt;-<span class="st"> &quot;juniversalchardet.Rmd&quot;</span> <span class="co"># file whose encoding you want to know</span>
-flength &lt;-<span class="st"> </span><span class="kw">as.integer</span>(<span class="kw">file.size</span>(f))
-<span class="kw">.jcall</span>(detector, <span class="st">&quot;V&quot;</span>, <span class="st">&quot;handleData&quot;</span>,
-       <span class="kw">readBin</span>(f, <span class="dt">what=</span><span class="st">&quot;raw&quot;</span>, <span class="dt">n=</span>flength), 0L, flength)
-<span class="kw">.jcall</span>(detector, <span class="st">&quot;V&quot;</span>, <span class="st">&quot;dataEnd&quot;</span>)
-<span class="kw">.jcall</span>(detector, <span class="st">&quot;S&quot;</span>, <span class="st">&quot;getDetectedCharset&quot;</span>)
-## [1] &quot;UTF-8&quot;
-<span class="kw">.jcall</span>(detector, <span class="st">&quot;V&quot;</span>, <span class="st">&quot;reset&quot;</span>)</code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">library</span>(rJava)</a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="kw">.jinit</span>()</a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="kw">.jaddClassPath</span>(<span class="st">&quot;path/to/juniversalchardet-1.0.3.jar&quot;</span>)</a>
+<a class="sourceLine" id="cb1-4" title="4">detector &lt;-<span class="st"> </span><span class="kw">new</span>(<span class="kw">J</span>(<span class="st">&quot;org/mozilla/universalchardet/UniversalDetector&quot;</span>), <span class="ot">NULL</span>)</a>
+<a class="sourceLine" id="cb1-5" title="5">f &lt;-<span class="st"> &quot;juniversalchardet.Rmd&quot;</span> <span class="co"># file whose encoding you want to know</span></a>
+<a class="sourceLine" id="cb1-6" title="6">flength &lt;-<span class="st"> </span><span class="kw">as.integer</span>(<span class="kw">file.size</span>(f))</a>
+<a class="sourceLine" id="cb1-7" title="7"><span class="kw">.jcall</span>(detector, <span class="st">&quot;V&quot;</span>, <span class="st">&quot;handleData&quot;</span>,</a>
+<a class="sourceLine" id="cb1-8" title="8">       <span class="kw">readBin</span>(f, <span class="dt">what=</span><span class="st">&quot;raw&quot;</span>, <span class="dt">n=</span>flength), 0L, flength)</a>
+<a class="sourceLine" id="cb1-9" title="9"><span class="kw">.jcall</span>(detector, <span class="st">&quot;V&quot;</span>, <span class="st">&quot;dataEnd&quot;</span>)</a>
+<a class="sourceLine" id="cb1-10" title="10"><span class="kw">.jcall</span>(detector, <span class="st">&quot;S&quot;</span>, <span class="st">&quot;getDetectedCharset&quot;</span>)</a>
+<a class="sourceLine" id="cb1-11" title="11"><span class="co">## [1] &quot;UTF-8&quot;</span></a>
+<a class="sourceLine" id="cb1-12" title="12"><span class="kw">.jcall</span>(detector, <span class="st">&quot;V&quot;</span>, <span class="st">&quot;reset&quot;</span>)</a></code></pre></div>
 
-    </div>
+        </div>
 
 
-    <div id="footer">
-      Site proudly generated by
-      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
     </div>
 
   </div>
@@ -129,18 +140,19 @@ flength &lt;-<span class="st"> </span><span class="kw">as.integer</span>(<span c
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
 
-<!-- Google Prettify -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
-<script>
-  var pres = document.getElementsByTagName("pre");
-  for (var i = 0; i < pres.length; ++i) {
-    
-    pres[i].className = pres[i].className + " prettyprint";
-    
-  }
-  prettyPrint();
-</script> 
+  <!-- Google Prettify -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+  <script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+  <script>
+    var pres = document.getElementsByTagName("pre");
+    for (var i = 0; i < pres.length; ++i) {
+      
+        pres[i].className = pres[i].className + " prettyprint";
+      
+    }
+    prettyPrint();
+  </script> 
+
 
 </html>

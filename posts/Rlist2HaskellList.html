@@ -6,60 +6,67 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - A R list to a Haskell list, with the `clipr` package</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../css/post.css" />
   <link rel="stylesheet" href="../css/misc.css" /> 
-  <link rel="stylesheet" href="../css/kate.css" />  
-  <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
+  
+    <link rel="stylesheet" href="../css/kate.css" /> 
+   
+  
+    <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
+  
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
-  </script>
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 
 <body>
-  <!-- Sidebar. -->
-  <div class="sidebar">
-    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
-      <a href="https://www.r-bloggers.com/">
-        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
-      </a>
-      <br />
-      <a href="http://t-redactyl.io/">
-        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
-      </a>
-      <a href="http://timelyportfolio.blogspot.be/">
-        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
-      </a>
-      <br />
-      <a href="https://antoineguillot.wordpress.com/blog/">
-        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
-      </a>
-      <br />
-      <a href="https://fronkonstin.com/">
-        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
-      </a>
-    </div>
-  </div>
-
-  <div class="main">
-    <div id="header">
-      <div id="logo" style="position:absolute;">
-        <a href="../">
-          <img src="../images/stla.jpg" alt="stla" width="100px" />
-        </a>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-3">
+        <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+          <a href="https://www.r-bloggers.com/">
+            <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+          </a>
+          <br />
+          <a href="http://t-redactyl.io/">
+            <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
+          </a>
+          <a href="http://timelyportfolio.blogspot.be/">
+            <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
+          </a>
+          <br />
+          <a href="https://antoineguillot.wordpress.com/blog/">
+            <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+          </a>
+          <br />
+          <a href="https://fronkonstin.com/">
+            <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+          </a>
+        </div>
       </div>
-      <div id="navigation" style="margin-top:50px;">
-        <a href="../">Home</a>
-        <a href="../about.html">About</a>
-        <a href="../contact.html">Contact</a>
-        <a href="../archive.html">Archive</a>
-      </div>
-    </div>
 
-    <div class="content">
-      <h1>A R list to a Haskell list, with the `clipr` package</h1> <div class="info">
+      <div class="main col-sm-9">
+        <div id="header">
+          <div id="logo" style="position:absolute;">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>A R list to a Haskell list, with the `clipr` package</h1> 
+          <div class="info">
     Posted on March 14, 2018
     
         by Stéphane Laurent
@@ -73,67 +80,71 @@
 
 <p>In the <a href="https://laustep.github.io/stlahblog/posts/Rmatrix2HaskellList.html">previous post</a>, I have shown how to convert a R matrix to a Haskell list. Now I will show how to convert a R list to a Haskell list.</p>
 <p>Let’s take this list for illustration:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">L &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>), <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>), <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))
-L
-## [[1]]
-## [1] 1 2 3
-## 
-## [[2]]
-## [1] 1 2 3 4
-## 
-## [[3]]
-## [1] 1 2</code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">L &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>), <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>), <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb1-2" title="2">L</a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="co">## [[1]]</span></a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="co">## [1] 1 2 3</span></a>
+<a class="sourceLine" id="cb1-5" title="5"><span class="co">## </span></a>
+<a class="sourceLine" id="cb1-6" title="6"><span class="co">## [[2]]</span></a>
+<a class="sourceLine" id="cb1-7" title="7"><span class="co">## [1] 1 2 3 4</span></a>
+<a class="sourceLine" id="cb1-8" title="8"><span class="co">## </span></a>
+<a class="sourceLine" id="cb1-9" title="9"><span class="co">## [[3]]</span></a>
+<a class="sourceLine" id="cb1-10" title="10"><span class="co">## [1] 1 2</span></a></code></pre></div>
 <p>So, for Haskell, you want:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">[ [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]
- ,[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>]
- ,[<span class="dv">1</span>, <span class="dv">2</span>] 
-]</code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb2-1" title="1">[ [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]</a>
+<a class="sourceLine" id="cb2-2" title="2"> ,[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>]</a>
+<a class="sourceLine" id="cb2-3" title="3"> ,[<span class="dv">1</span>, <span class="dv">2</span>] </a>
+<a class="sourceLine" id="cb2-4" title="4">]</a></code></pre></div>
 <p>Again, the <code>clipr</code> package is your friend. First, write the matrix in the clipboard, like this:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(clipr)
-<span class="kw">write_clip</span>(L, <span class="dt">breaks=</span><span class="st">&quot;],</span><span class="ch">\n</span><span class="st">&quot;</span>, <span class="dt">sep=</span><span class="st">&quot;, &quot;</span>)
-## Warning in flat_str(content, breaks): Coercing content to character</code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw">library</span>(clipr)</a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="kw">write_clip</span>(L, <span class="dt">breaks=</span><span class="st">&quot;],</span><span class="ch">\n</span><span class="st">&quot;</span>, <span class="dt">sep=</span><span class="st">&quot;, &quot;</span>)</a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="co">## Warning in flat_str(content, breaks): Coercing content to character</span></a></code></pre></div>
 <p>No we will deal with <code>gsub</code>, <code>sub</code> and finally <code>cat</code> to write the output to a file.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">myfile &lt;-<span class="st"> &quot;list.txt&quot;</span>
-<span class="kw">cat</span>(<span class="st">&quot;[&quot;</span>,
-    <span class="kw">sub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">)&quot;</span>, <span class="st">&quot;]</span><span class="ch">\n</span><span class="st">]&quot;</span>, <span class="kw">gsub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">)]&quot;</span>, <span class="st">&quot;]&quot;</span>, <span class="kw">gsub</span>(<span class="st">&quot;c</span><span class="ch">\\</span><span class="st">(&quot;</span>, <span class="st">&quot;[&quot;</span> ,<span class="kw">read_clip</span>()))), 
-    <span class="dt">sep=</span><span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>, <span class="dt">file=</span>myfile)</code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">myfile &lt;-<span class="st"> &quot;list.txt&quot;</span></a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="kw">cat</span>(<span class="st">&quot;[&quot;</span>,</a>
+<a class="sourceLine" id="cb4-3" title="3">    <span class="kw">sub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">)&quot;</span>, <span class="st">&quot;]</span><span class="ch">\n</span><span class="st">]&quot;</span>, <span class="kw">gsub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">)]&quot;</span>, <span class="st">&quot;]&quot;</span>, <span class="kw">gsub</span>(<span class="st">&quot;c</span><span class="ch">\\</span><span class="st">(&quot;</span>, <span class="st">&quot;[&quot;</span> ,<span class="kw">read_clip</span>()))), </a>
+<a class="sourceLine" id="cb4-4" title="4">    <span class="dt">sep=</span><span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>, <span class="dt">file=</span>myfile)</a></code></pre></div>
 <p>And then, here is the content of <code>list.txt</code>:</p>
-<pre class="txt"><code>[
-[1, 2, 3],
-[1, 2, 3, 4],
-[1, 2]
-]</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode txt"><code class="sourceCode default"><a class="sourceLine" id="cb5-1" title="1">[</a>
+<a class="sourceLine" id="cb5-2" title="2">[1, 2, 3],</a>
+<a class="sourceLine" id="cb5-3" title="3">[1, 2, 3, 4],</a>
+<a class="sourceLine" id="cb5-4" title="4">[1, 2]</a>
+<a class="sourceLine" id="cb5-5" title="5">]</a></code></pre></div>
 <p>Now copy-paste to Haskell, it is ready.</p>
 <h3 id="update-2018-04-18">Update 2018-04-18</h3>
 <p>I’ve realized there is an issue in the case when some elements of the list are vectors of length one. It is fixed in the following function:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">list2list &lt;-<span class="st"> </span><span class="cf">function</span>(L, <span class="dt">outfile=</span><span class="st">&quot;list.txt&quot;</span>){
-  singletons_idxs &lt;-<span class="st"> </span><span class="kw">which</span>(<span class="kw">lapply</span>(L,length)<span class="op">==</span><span class="dv">1</span>)
-  singletons &lt;-<span class="st"> </span>L[singletons_idxs]
-  L &lt;-<span class="st"> </span><span class="kw">replace</span>(L, singletons_idxs, <span class="kw">sprintf</span>(<span class="st">&quot;c(%s)&quot;</span>, singletons))
-  <span class="kw">write_clip</span>(L, <span class="dt">breaks=</span><span class="st">&quot;],</span><span class="ch">\n</span><span class="st">&quot;</span>, <span class="dt">sep=</span><span class="st">&quot;, &quot;</span>)
-  <span class="kw">cat</span>(<span class="st">&quot;[&quot;</span>,
-      <span class="kw">sub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">)&quot;</span>, <span class="st">&quot;]</span><span class="ch">\n</span><span class="st">]&quot;</span>, <span class="kw">gsub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">)]&quot;</span>, <span class="st">&quot;]&quot;</span>, <span class="kw">gsub</span>(<span class="st">&quot;c</span><span class="ch">\\</span><span class="st">(&quot;</span>, <span class="st">&quot;[&quot;</span> ,<span class="kw">read_clip</span>()))), 
-      <span class="dt">sep=</span><span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>, <span class="dt">file=</span>outfile)
-}</code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">list2list &lt;-<span class="st"> </span><span class="cf">function</span>(L, <span class="dt">outfile=</span><span class="st">&quot;list.txt&quot;</span>){</a>
+<a class="sourceLine" id="cb6-2" title="2">  singletons_idxs &lt;-<span class="st"> </span><span class="kw">which</span>(<span class="kw">lapply</span>(L,length)<span class="op">==</span><span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb6-3" title="3">  singletons &lt;-<span class="st"> </span>L[singletons_idxs]</a>
+<a class="sourceLine" id="cb6-4" title="4">  L &lt;-<span class="st"> </span><span class="kw">replace</span>(L, singletons_idxs, <span class="kw">sprintf</span>(<span class="st">&quot;c(%s)&quot;</span>, singletons))</a>
+<a class="sourceLine" id="cb6-5" title="5">  <span class="kw">write_clip</span>(L, <span class="dt">breaks=</span><span class="st">&quot;],</span><span class="ch">\n</span><span class="st">&quot;</span>, <span class="dt">sep=</span><span class="st">&quot;, &quot;</span>)</a>
+<a class="sourceLine" id="cb6-6" title="6">  <span class="kw">cat</span>(<span class="st">&quot;[&quot;</span>,</a>
+<a class="sourceLine" id="cb6-7" title="7">      <span class="kw">sub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">)&quot;</span>, <span class="st">&quot;]</span><span class="ch">\n</span><span class="st">]&quot;</span>, <span class="kw">gsub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">)]&quot;</span>, <span class="st">&quot;]&quot;</span>, <span class="kw">gsub</span>(<span class="st">&quot;c</span><span class="ch">\\</span><span class="st">(&quot;</span>, <span class="st">&quot;[&quot;</span> ,<span class="kw">read_clip</span>()))), </a>
+<a class="sourceLine" id="cb6-8" title="8">      <span class="dt">sep=</span><span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>, <span class="dt">file=</span>outfile)</a>
+<a class="sourceLine" id="cb6-9" title="9">}</a></code></pre></div>
 <p>Let’s test it.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">L &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>), <span class="dv">0</span>, <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>), <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))
-<span class="kw">list2list</span>(L)
-## Warning in flat_str(content, breaks): Coercing content to character</code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">L &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>), <span class="dv">0</span>, <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>), <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="kw">list2list</span>(L)</a>
+<a class="sourceLine" id="cb7-3" title="3"><span class="co">## Warning in flat_str(content, breaks): Coercing content to character</span></a></code></pre></div>
 <p>Here is the content of <code>list.txt</code>:</p>
-<pre class="txt"><code>[
-[1, 2, 3],
-[0],
-[1, 2, 3, 4],
-[1, 2]
-]</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode txt"><code class="sourceCode default"><a class="sourceLine" id="cb8-1" title="1">[</a>
+<a class="sourceLine" id="cb8-2" title="2">[1, 2, 3],</a>
+<a class="sourceLine" id="cb8-3" title="3">[0],</a>
+<a class="sourceLine" id="cb8-4" title="4">[1, 2, 3, 4],</a>
+<a class="sourceLine" id="cb8-5" title="5">[1, 2]</a>
+<a class="sourceLine" id="cb8-6" title="6">]</a></code></pre></div>
 <p>Fine.</p>
 
-    </div>
+        </div>
 
 
-    <div id="footer">
-      Site proudly generated by
-      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
     </div>
 
   </div>
@@ -171,18 +182,19 @@ L
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
 
-<!-- Google Prettify -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
-<script>
-  var pres = document.getElementsByTagName("pre");
-  for (var i = 0; i < pres.length; ++i) {
-    
-    pres[i].className = pres[i].className + " prettyprint linenums";
-    
-  }
-  prettyPrint();
-</script> 
+  <!-- Google Prettify -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+  <script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+  <script>
+    var pres = document.getElementsByTagName("pre");
+    for (var i = 0; i < pres.length; ++i) {
+      
+        pres[i].className = pres[i].className + " prettyprint linenums";
+      
+    }
+    prettyPrint();
+  </script> 
+
 
 </html>

@@ -6,60 +6,67 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - All hypercubes with Haskell</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../css/post.css" />
   <link rel="stylesheet" href="../css/misc.css" /> 
-  <link rel="stylesheet" href="../css/kate.css" />  
-  <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
+  
+    <link rel="stylesheet" href="../css/kate.css" /> 
+   
+  
+    <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
+  
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
-  </script>
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 
 <body>
-  <!-- Sidebar. -->
-  <div class="sidebar">
-    <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
-      <a href="https://www.r-bloggers.com/">
-        <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
-      </a>
-      <br />
-      <a href="http://t-redactyl.io/">
-        <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:30px;">Standard error</span>
-      </a>
-      <a href="http://timelyportfolio.blogspot.be/">
-        <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:30px;">Timely portfolio</span>
-      </a>
-      <br />
-      <a href="https://antoineguillot.wordpress.com/blog/">
-        <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:28px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
-      </a>
-      <br />
-      <a href="https://fronkonstin.com/">
-        <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
-      </a>
-    </div>
-  </div>
-
-  <div class="main">
-    <div id="header">
-      <div id="logo" style="position:absolute;">
-        <a href="../">
-          <img src="../images/stla.jpg" alt="stla" width="100px" />
-        </a>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-3">
+        <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+          <a href="https://www.r-bloggers.com/">
+            <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+          </a>
+          <br />
+          <a href="http://t-redactyl.io/">
+            <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
+          </a>
+          <a href="http://timelyportfolio.blogspot.be/">
+            <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
+          </a>
+          <br />
+          <a href="https://antoineguillot.wordpress.com/blog/">
+            <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+          </a>
+          <br />
+          <a href="https://fronkonstin.com/">
+            <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+          </a>
+        </div>
       </div>
-      <div id="navigation" style="margin-top:50px;">
-        <a href="../">Home</a>
-        <a href="../about.html">About</a>
-        <a href="../contact.html">Contact</a>
-        <a href="../archive.html">Archive</a>
-      </div>
-    </div>
 
-    <div class="content">
-      <h1>All hypercubes with Haskell</h1> <div class="info">
+      <div class="main col-sm-9">
+        <div id="header">
+          <div id="logo" style="position:absolute;">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>All hypercubes with Haskell</h1> 
+          <div class="info">
     Posted on March 10, 2018
     
         by Stéphane Laurent
@@ -73,65 +80,69 @@
 
 <p><em>Nothing really exciting in this post. But these days I did some graphics dealing with hypercubes, and the functions I show below simplified my job. Perhaps it is worth to share.</em></p>
 <p>This Haskell function generates the vertices of the hypercube of a given dimension <span class="math inline">\(n\)</span>:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">ncube ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> [[<span class="dt">Int</span>]]
-ncube n <span class="fu">=</span> concatMap (mapM (\x <span class="ot">-&gt;</span> [x,<span class="fu">-</span>x])) [replicate n <span class="dv">1</span>]</code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb1-1" title="1"><span class="ot">ncube ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> [[<span class="dt">Int</span>]]</a>
+<a class="sourceLine" id="cb1-2" title="2">ncube n <span class="ot">=</span> <span class="fu">concatMap</span> (<span class="fu">mapM</span> (\x <span class="ot">-&gt;</span> [x,<span class="op">-</span>x])) [<span class="fu">replicate</span> n <span class="dv">1</span>]</a></code></pre></div>
 <p>For example:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="fu">&gt;</span> ncube <span class="dv">3</span> 
-[[<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>],[<span class="dv">1</span>,<span class="dv">1</span>,<span class="fu">-</span><span class="dv">1</span>],[<span class="dv">1</span>,<span class="fu">-</span><span class="dv">1</span>,<span class="dv">1</span>],[<span class="dv">1</span>,<span class="fu">-</span><span class="dv">1</span>,<span class="fu">-</span><span class="dv">1</span>],[<span class="fu">-</span><span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>],[<span class="fu">-</span><span class="dv">1</span>,<span class="dv">1</span>,<span class="fu">-</span><span class="dv">1</span>],[<span class="fu">-</span><span class="dv">1</span>,<span class="fu">-</span><span class="dv">1</span>,<span class="dv">1</span>],[<span class="fu">-</span><span class="dv">1</span>,<span class="fu">-</span><span class="dv">1</span>,<span class="fu">-</span><span class="dv">1</span>]]</code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb2-1" title="1"><span class="op">&gt;</span> ncube <span class="dv">3</span> </a>
+<a class="sourceLine" id="cb2-2" title="2">[[<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>],[<span class="dv">1</span>,<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>],[<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>],[<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>],[<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>],[<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>],[<span class="op">-</span><span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>],[<span class="op">-</span><span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>]]</a></code></pre></div>
 <p>It can be useful to have the indices of the vertices. The <code>indexed</code> function of the nice <code>Data.List.Index</code> package is appropriate for that. I also import <code>Text.Show.Pretty</code> to get a pretty output thanks to the <code>pPrint</code> function.</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">import           </span><span class="dt">Data.List.Index</span>              (indexed)
-<span class="kw">import           </span><span class="dt">Text.Show.Pretty</span></code></pre></div>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="fu">&gt;</span> pPrint <span class="fu">$</span> indexed <span class="fu">$</span> ncube <span class="dv">3</span>
-[ ( <span class="dv">0</span> , [ <span class="dv">1</span> , <span class="dv">1</span> , <span class="dv">1</span> ] )
-, ( <span class="dv">1</span> , [ <span class="dv">1</span> , <span class="dv">1</span> , <span class="fu">-</span><span class="dv">1</span> ] )
-, ( <span class="dv">2</span> , [ <span class="dv">1</span> , <span class="fu">-</span><span class="dv">1</span> , <span class="dv">1</span> ] )
-, ( <span class="dv">3</span> , [ <span class="dv">1</span> , <span class="fu">-</span><span class="dv">1</span> , <span class="fu">-</span><span class="dv">1</span> ] )
-, ( <span class="dv">4</span> , [ <span class="fu">-</span><span class="dv">1</span> , <span class="dv">1</span> , <span class="dv">1</span> ] )
-, ( <span class="dv">5</span> , [ <span class="fu">-</span><span class="dv">1</span> , <span class="dv">1</span> , <span class="fu">-</span><span class="dv">1</span> ] )
-, ( <span class="dv">6</span> , [ <span class="fu">-</span><span class="dv">1</span> , <span class="fu">-</span><span class="dv">1</span> , <span class="dv">1</span> ] )
-, ( <span class="dv">7</span> , [ <span class="fu">-</span><span class="dv">1</span> , <span class="fu">-</span><span class="dv">1</span> , <span class="fu">-</span><span class="dv">1</span> ] )</code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb3-1" title="1"><span class="kw">import</span>           <span class="dt">Data.List.Index</span>              (indexed)</a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="kw">import</span>           <span class="dt">Text.Show.Pretty</span></a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb4-1" title="1"><span class="op">&gt;</span> pPrint <span class="op">$</span> indexed <span class="op">$</span> ncube <span class="dv">3</span></a>
+<a class="sourceLine" id="cb4-2" title="2">[ ( <span class="dv">0</span> , [ <span class="dv">1</span> , <span class="dv">1</span> , <span class="dv">1</span> ] )</a>
+<a class="sourceLine" id="cb4-3" title="3">, ( <span class="dv">1</span> , [ <span class="dv">1</span> , <span class="dv">1</span> , <span class="op">-</span><span class="dv">1</span> ] )</a>
+<a class="sourceLine" id="cb4-4" title="4">, ( <span class="dv">2</span> , [ <span class="dv">1</span> , <span class="op">-</span><span class="dv">1</span> , <span class="dv">1</span> ] )</a>
+<a class="sourceLine" id="cb4-5" title="5">, ( <span class="dv">3</span> , [ <span class="dv">1</span> , <span class="op">-</span><span class="dv">1</span> , <span class="op">-</span><span class="dv">1</span> ] )</a>
+<a class="sourceLine" id="cb4-6" title="6">, ( <span class="dv">4</span> , [ <span class="op">-</span><span class="dv">1</span> , <span class="dv">1</span> , <span class="dv">1</span> ] )</a>
+<a class="sourceLine" id="cb4-7" title="7">, ( <span class="dv">5</span> , [ <span class="op">-</span><span class="dv">1</span> , <span class="dv">1</span> , <span class="op">-</span><span class="dv">1</span> ] )</a>
+<a class="sourceLine" id="cb4-8" title="8">, ( <span class="dv">6</span> , [ <span class="op">-</span><span class="dv">1</span> , <span class="op">-</span><span class="dv">1</span> , <span class="dv">1</span> ] )</a>
+<a class="sourceLine" id="cb4-9" title="9">, ( <span class="dv">7</span> , [ <span class="op">-</span><span class="dv">1</span> , <span class="op">-</span><span class="dv">1</span> , <span class="op">-</span><span class="dv">1</span> ] )</a></code></pre></div>
 <p>Sometimes I prefer to have the index at the second position. Then I use <code>swap</code>:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">import           </span><span class="dt">Data.Tuple.Extra</span>             (swap)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="fu">&gt;</span> pPrint <span class="fu">$</span> map swap <span class="fu">$</span> indexed <span class="fu">$</span> ncube <span class="dv">3</span>
-[ ( [ <span class="dv">1</span> , <span class="dv">1</span> , <span class="dv">1</span> ] , <span class="dv">0</span> )
-, ( [ <span class="dv">1</span> , <span class="dv">1</span> , <span class="fu">-</span><span class="dv">1</span> ] , <span class="dv">1</span> )
-, ( [ <span class="dv">1</span> , <span class="fu">-</span><span class="dv">1</span> , <span class="dv">1</span> ] , <span class="dv">2</span> )
-, ( [ <span class="dv">1</span> , <span class="fu">-</span><span class="dv">1</span> , <span class="fu">-</span><span class="dv">1</span> ] , <span class="dv">3</span> )
-, ( [ <span class="fu">-</span><span class="dv">1</span> , <span class="dv">1</span> , <span class="dv">1</span> ] , <span class="dv">4</span> )
-, ( [ <span class="fu">-</span><span class="dv">1</span> , <span class="dv">1</span> , <span class="fu">-</span><span class="dv">1</span> ] , <span class="dv">5</span> )
-, ( [ <span class="fu">-</span><span class="dv">1</span> , <span class="fu">-</span><span class="dv">1</span> , <span class="dv">1</span> ] , <span class="dv">6</span> )
-, ( [ <span class="fu">-</span><span class="dv">1</span> , <span class="fu">-</span><span class="dv">1</span> , <span class="fu">-</span><span class="dv">1</span> ] , <span class="dv">7</span> )</code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">import</span>           <span class="dt">Data.Tuple.Extra</span>             (swap)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb6-1" title="1"><span class="op">&gt;</span> pPrint <span class="op">$</span> <span class="fu">map</span> swap <span class="op">$</span> indexed <span class="op">$</span> ncube <span class="dv">3</span></a>
+<a class="sourceLine" id="cb6-2" title="2">[ ( [ <span class="dv">1</span> , <span class="dv">1</span> , <span class="dv">1</span> ] , <span class="dv">0</span> )</a>
+<a class="sourceLine" id="cb6-3" title="3">, ( [ <span class="dv">1</span> , <span class="dv">1</span> , <span class="op">-</span><span class="dv">1</span> ] , <span class="dv">1</span> )</a>
+<a class="sourceLine" id="cb6-4" title="4">, ( [ <span class="dv">1</span> , <span class="op">-</span><span class="dv">1</span> , <span class="dv">1</span> ] , <span class="dv">2</span> )</a>
+<a class="sourceLine" id="cb6-5" title="5">, ( [ <span class="dv">1</span> , <span class="op">-</span><span class="dv">1</span> , <span class="op">-</span><span class="dv">1</span> ] , <span class="dv">3</span> )</a>
+<a class="sourceLine" id="cb6-6" title="6">, ( [ <span class="op">-</span><span class="dv">1</span> , <span class="dv">1</span> , <span class="dv">1</span> ] , <span class="dv">4</span> )</a>
+<a class="sourceLine" id="cb6-7" title="7">, ( [ <span class="op">-</span><span class="dv">1</span> , <span class="dv">1</span> , <span class="op">-</span><span class="dv">1</span> ] , <span class="dv">5</span> )</a>
+<a class="sourceLine" id="cb6-8" title="8">, ( [ <span class="op">-</span><span class="dv">1</span> , <span class="op">-</span><span class="dv">1</span> , <span class="dv">1</span> ] , <span class="dv">6</span> )</a>
+<a class="sourceLine" id="cb6-9" title="9">, ( [ <span class="op">-</span><span class="dv">1</span> , <span class="op">-</span><span class="dv">1</span> , <span class="op">-</span><span class="dv">1</span> ] , <span class="dv">7</span> )</a></code></pre></div>
 <p>The vertices are not enough to get a graph. We need the hypercube graph <span class="math inline">\(Q_n\)</span>. It is available in the <code>HaskellForMaths</code> library:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">import           </span><span class="dt">Math.Combinatorics.Graph</span>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb7-1" title="1"><span class="kw">import</span>           <span class="dt">Math.Combinatorics.Graph</span></a>
+<a class="sourceLine" id="cb7-2" title="2"></a>
+<a class="sourceLine" id="cb7-3" title="3"><span class="ot">cubicalgraph ::</span> <span class="dt">Graph</span> <span class="dt">Int</span></a>
+<a class="sourceLine" id="cb7-4" title="4">cubicalgraph <span class="ot">=</span> q <span class="dv">3</span></a>
+<a class="sourceLine" id="cb7-5" title="5"></a>
+<a class="sourceLine" id="cb7-6" title="6"><span class="ot">edgesIdxs ::</span> [(<span class="dt">Int</span>,<span class="dt">Int</span>)]</a>
+<a class="sourceLine" id="cb7-7" title="7">edgesIdxs <span class="ot">=</span> <span class="fu">map</span> toPair <span class="op">$</span> edges cubicalgraph</a>
+<a class="sourceLine" id="cb7-8" title="8">  <span class="kw">where</span></a>
+<a class="sourceLine" id="cb7-9" title="9">  toPair x <span class="ot">=</span> (x<span class="op">!!</span><span class="dv">0</span>, x<span class="op">!!</span><span class="dv">1</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb8-1" title="1"><span class="op">&gt;</span> pPrint edgesIdxs</a>
+<a class="sourceLine" id="cb8-2" title="2">[ ( <span class="dv">0</span> , <span class="dv">1</span> )</a>
+<a class="sourceLine" id="cb8-3" title="3">, ( <span class="dv">0</span> , <span class="dv">2</span> )</a>
+<a class="sourceLine" id="cb8-4" title="4">, ( <span class="dv">0</span> , <span class="dv">4</span> )</a>
+<a class="sourceLine" id="cb8-5" title="5">, ( <span class="dv">1</span> , <span class="dv">3</span> )</a>
+<a class="sourceLine" id="cb8-6" title="6">, ( <span class="dv">1</span> , <span class="dv">5</span> )</a>
+<a class="sourceLine" id="cb8-7" title="7">, ( <span class="dv">2</span> , <span class="dv">3</span> )</a>
+<a class="sourceLine" id="cb8-8" title="8">, ( <span class="dv">2</span> , <span class="dv">6</span> )</a>
+<a class="sourceLine" id="cb8-9" title="9">, ( <span class="dv">3</span> , <span class="dv">7</span> )</a>
+<a class="sourceLine" id="cb8-10" title="10">, ( <span class="dv">4</span> , <span class="dv">5</span> )</a>
+<a class="sourceLine" id="cb8-11" title="11">, ( <span class="dv">4</span> , <span class="dv">6</span> )</a>
+<a class="sourceLine" id="cb8-12" title="12">, ( <span class="dv">5</span> , <span class="dv">7</span> )</a>
+<a class="sourceLine" id="cb8-13" title="13">, ( <span class="dv">6</span> , <span class="dv">7</span> )</a>
+<a class="sourceLine" id="cb8-14" title="14">]</a></code></pre></div>
 
-<span class="ot">cubicalgraph ::</span> <span class="dt">Graph</span> <span class="dt">Int</span>
-cubicalgraph <span class="fu">=</span> q <span class="dv">3</span>
-
-<span class="ot">edgesIdxs ::</span> [(<span class="dt">Int</span>,<span class="dt">Int</span>)]
-edgesIdxs <span class="fu">=</span> map toPair <span class="fu">$</span> edges cubicalgraph
-  <span class="kw">where</span>
-  toPair x <span class="fu">=</span> (x<span class="fu">!!</span><span class="dv">0</span>, x<span class="fu">!!</span><span class="dv">1</span>)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="fu">&gt;</span> pPrint edgesIdxs
-[ ( <span class="dv">0</span> , <span class="dv">1</span> )
-, ( <span class="dv">0</span> , <span class="dv">2</span> )
-, ( <span class="dv">0</span> , <span class="dv">4</span> )
-, ( <span class="dv">1</span> , <span class="dv">3</span> )
-, ( <span class="dv">1</span> , <span class="dv">5</span> )
-, ( <span class="dv">2</span> , <span class="dv">3</span> )
-, ( <span class="dv">2</span> , <span class="dv">6</span> )
-, ( <span class="dv">3</span> , <span class="dv">7</span> )
-, ( <span class="dv">4</span> , <span class="dv">5</span> )
-, ( <span class="dv">4</span> , <span class="dv">6</span> )
-, ( <span class="dv">5</span> , <span class="dv">7</span> )
-, ( <span class="dv">6</span> , <span class="dv">7</span> )
-]</code></pre></div>
-
-    </div>
+        </div>
 
 
-    <div id="footer">
-      Site proudly generated by
-      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
     </div>
 
   </div>
@@ -169,18 +180,19 @@ edgesIdxs <span class="fu">=</span> map toPair <span class="fu">$</span> edges c
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
 
-<!-- Google Prettify -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-<script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
-<script>
-  var pres = document.getElementsByTagName("pre");
-  for (var i = 0; i < pres.length; ++i) {
-    
-    pres[i].className = pres[i].className + " prettyprint";
-    
-  }
-  prettyPrint();
-</script> 
+  <!-- Google Prettify -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
+  <script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
+  <script>
+    var pres = document.getElementsByTagName("pre");
+    for (var i = 0; i < pres.length; ++i) {
+      
+        pres[i].className = pres[i].className + " prettyprint";
+      
+    }
+    prettyPrint();
+  </script> 
+
 
 </html>
