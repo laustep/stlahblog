@@ -1,0 +1,244 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Probabilities on a Lusin space</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+    <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-3">
+        <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+          <a href="https://www.r-bloggers.com/">
+            <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+          </a>
+          <br />
+          <a href="http://t-redactyl.io/">
+            <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
+          </a>
+          <a href="http://timelyportfolio.blogspot.be/">
+            <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
+          </a>
+          <br />
+          <a href="https://antoineguillot.wordpress.com/blog/">
+            <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+          </a>
+          <br />
+          <a href="https://fronkonstin.com/">
+            <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="main col-sm-9">
+        <div id="header">
+          <div id="logo" style="position:absolute;">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Probabilities on a Lusin space</h1> 
+          <div class="info">
+    Posted on May 13, 2020
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="../tags/maths.html">maths</a>
+    
+</div>
+
+<p>We prove Prohorov’s theorem for a Lusin space, and we prove that the space of probability measures on a Lusin space is Lusin.</p>
+<h1 id="space-of-probability-measures">Space of probability measures</h1>
+<p>For a topological space <span class="math inline">\(E\)</span>, we denote by <span class="math inline">\(\mathcal{B}_E\)</span> the Borel <span class="math inline">\(\sigma\)</span>-field on <span class="math inline">\(E\)</span>, by <span class="math inline">\(C_b(E)\)</span> the space of real-valued bounded continuous functions on <span class="math inline">\(E\)</span> and by <span class="math inline">\(\Pr(E)\)</span> the topological space of probabilities on <span class="math inline">\(E\)</span> equipped with the narrow topology.</p>
+<p>The <em>canonical basis of neighborhoods</em> at <span class="math inline">\(\mu \in \Pr(E)\)</span> is the family of open sets <span class="math display">\[
+\Bigl\{\nu\in\Pr(E) \mid
+\bigl|\nu(f_i)-\mu(f_i)\bigl| &lt; \epsilon, i\in [\![1,k]\!]\Bigr\}
+\]</span> for <span class="math inline">\(\epsilon&gt;0\)</span>, <span class="math inline">\(k \geqslant 1\)</span> and <span class="math inline">\(f_i \in C_b(E)\)</span>.</p>
+<p>In the next section, we will use the fact that a net <span class="math inline">\((\mu_\lambda)\)</span> in <span class="math inline">\(\Pr(E)\)</span> converges to <span class="math inline">\(\mu_\infty \in \Pr(E)\)</span> if and only if <span class="math inline">\(\mu_\lambda(f) \to \mu_\infty(f)\)</span> for every <span class="math inline">\(f \in C_b(E)\)</span>.</p>
+<p><strong>Proposition 1.</strong> <em>Let <span class="math inline">\(\mu\in\Pr(E)\)</span> and <span class="math inline">\((\mu_n)\)</span> be a sequence in <span class="math inline">\(\Pr(E)\)</span>. If <span class="math inline">\(\limsup \mu_n(F) \leqslant \mu(F)\)</span> for all closed sets <span class="math inline">\(F\subset E\)</span>, then <span class="math inline">\((\mu_n)\)</span> converges to <span class="math inline">\(\mu\)</span>. The converse is true if <span class="math inline">\(E\)</span> is metrizable.</em></p>
+<p><em>Proof.</em> See <a href="./conditionalLaw.html">The conditional law as a random probability</a>. □</p>
+<p><strong>Lemma 2.</strong> <em>Let <span class="math inline">\(E\)</span> be a metrizable space, and <span class="math inline">\(A \in \mathcal{B}_E\)</span>. The map <span class="math inline">\(\Pr(E) \ni \mu \mapsto \mu(A) \in [0,1]\)</span> is Borel measurable.</em></p>
+<p><em>Proof.</em> Let <span class="math inline">\(\mathcal{D}\)</span> be the class of <span class="math inline">\(A \in \mathcal{B}_E\)</span> such that the map <span class="math inline">\(\mu \mapsto \mu(A)\)</span> is measurable. For every <span class="math inline">\(f \in C_b(E)\)</span>, the map <span class="math inline">\(\mu \mapsto \mu(f)\)</span> is continuous, hence it is measurable. Let <span class="math inline">\(F \subset E\)</span> be closed. For every integer <span class="math inline">\(n\geqslant 1\)</span> define <span class="math inline">\(f_n\in C_b(E)\)</span> by <span class="math inline">\(f_n(x)=\max\bigl\{0,1-n d(x,F)\bigr\}\)</span> where <span class="math inline">\(d\)</span> is a metric on <span class="math inline">\(E\)</span> compatible with the topology. Then <span class="math inline">\(f_n(x)\downarrow\mathbf{1}_F(x)\)</span> for every <span class="math inline">\(x\in E\)</span>. By monotone convergence, <span class="math inline">\(F \in \mathcal{D}\)</span>. It is not difficult to check that <span class="math inline">\(\mathcal{D}\)</span> is a <span class="math inline">\(\lambda\)</span>-system. By the monotone class theorem, <span class="math inline">\(\mathcal{D} = \mathcal{B}_E\)</span>. □</p>
+<h1 id="prohorovs-theorem-in-the-lusin-case">Prohorov’s theorem in the Lusin case</h1>
+<p>Here we give a proof of Prohorov’s theorem for a Lusin space <span class="math inline">\(E\)</span>, <em>i.e.</em> <span class="math inline">\(E\)</span> is homeomorphic to a Borel subset of a compact metric space. We follow [2]. We will only admit Stone-Weierstrass’s theorem and Riesz’s representation theorem, and the theorems used in the proof of the following theorem, which shows that the Lusin assumption is enough for us.</p>
+<p><strong>Theorem 3.</strong> <em>A Polish space is Lusin. More precisely, a Polish space is homeomorphic to a <span class="math inline">\(G_\delta\)</span> subset of the Hilbert cube <span class="math inline">\({[0,1]}^\mathbb{N}\)</span>.</em></p>
+<p><em>Proof.</em> See theorems 3.11 and 4.14 in [1]. □</p>
+<p><strong>Proposition 4.</strong> <em>Let <span class="math inline">\((K,d)\)</span> be a compact metric space. Then <span class="math inline">\(C(K)\)</span> is separable and <span class="math inline">\(\Pr(K)\)</span> is compact metrizable</em>.</p>
+<p><em>Proof.</em> As a compact metric space, <span class="math inline">\(K\)</span> is separable. Let <span class="math inline">\((x_n)\)</span> be a dense sequence of <span class="math inline">\(K\)</span> and define <span class="math inline">\(h_n \in C(K)\)</span> by <span class="math inline">\(h_n(x)=d(x,x_n)\)</span>. The family of functions <span class="math inline">\(\{h_n\}\)</span> separates points of <span class="math inline">\(K\)</span>, that is to say, for every <span class="math inline">\(x,y \in K\)</span>, there exists <span class="math inline">\(i\)</span> such that <span class="math inline">\(h_i(x) \neq h_i(y)\)</span>. Indeed, let <span class="math inline">\(x,y\in K\)</span> be distinct. Take <span class="math inline">\((n_j)\)</span> such that <span class="math inline">\(d(x,x_{n_j}) \to 0\)</span>. If we had <span class="math inline">\(h_i(x) = h_i(y)\)</span> for every <span class="math inline">\(i\)</span>, we would have <span class="math inline">\(d(y,x_{n_j}) \to 0\)</span>, therefore we would have <span class="math inline">\(x=y\)</span>.</p>
+<p>Consider the subalgebra <span class="math inline">\(A\)</span> of <span class="math inline">\(C(K)\)</span> consisting of all polynomials in the <span class="math inline">\(h_k\)</span>, that is, the class of functions that are finite sums of the form <span class="math display">\[
+q\mathbf{1} + 
+\sum q_{k_1,\ldots,k_r;n_1,\ldots,n_r}h_{k_1}^{n_1}\cdots h_{k_r}^{n_r},
+\]</span> where <span class="math inline">\(q\)</span> and the <span class="math inline">\(q_{k_1,\ldots,k_r;n_1,\ldots,n_r}\)</span> are rational constants. The closure of this subalgebra is a subalgebra of <span class="math inline">\(C(J)\)</span>, it contains all constant functions and it separates points of <span class="math inline">\(K\)</span>. Therefore, by Stone-Weierstrass’s theorem (see [3]), <span class="math inline">\(A\)</span> is dense in <span class="math inline">\(C(K)\)</span>. Hence <span class="math inline">\(C(K)\)</span> is separable because <span class="math inline">\(A\)</span> is countable. Let <span class="math inline">\((f_n)\)</span> be a dense sequence in <span class="math inline">\(C(K)\)</span>. Consider the map <span class="math display">\[
+\begin{array}{rccl}
+\Phi\colon &amp; \Pr(K) &amp; \to &amp; V := 
+\displaystyle\prod_{n=1}^\infty
+\bigl[-{\Vert f_n\Vert}_\infty, {\Vert f_n\Vert}_\infty\bigr] \\
+&amp; \mu &amp; \mapsto &amp; \bigl(\mu(f_1), \mu(f_2), \ldots \bigr)
+\end{array}.
+\]</span></p>
+<ul>
+<li><p>The map <span class="math inline">\(\Phi\)</span> is injective: if <span class="math inline">\(\mu,\nu\in\Pr(K)\)</span> satisfy <span class="math inline">\(\mu(f_n) = \nu(f_n)\)</span> for every <span class="math inline">\(n\)</span>, then <span class="math inline">\(\mu(f)=\nu(f)\)</span> for every <span class="math inline">\(f\in C(K)\)</span> by dominated convergence; this implies <span class="math inline">\(\mu=\nu\)</span> (theorem 1.2 in [4]).</p></li>
+<li><p>The map <span class="math inline">\(\Phi\)</span> is continuous because each coordinate map <span class="math inline">\(\mu\mapsto\mu(f_n)\)</span> is continuous.</p></li>
+<li><p>The map <span class="math inline">\(\Phi^{-1}\)</span> is continuous. Indeed, take a net <span class="math inline">\({(v_\lambda)}_{\lambda\in\Lambda}\)</span> in <span class="math inline">\(\Phi(V)\)</span> converging to <span class="math inline">\(v_\infty \in \Phi(V)\)</span>. Let <span class="math inline">\(\mu_\lambda\)</span> such that <span class="math inline">\(v_\lambda = \Phi(\mu_\lambda)\)</span> for every <span class="math inline">\(\lambda \in \Lambda\cup\{\infty\}\)</span>. Thus <span class="math inline">\(\mu_\lambda(f_j) \to \mu_\infty(f_j)\)</span> for every <span class="math inline">\(j \geqslant 1\)</span>. For any <span class="math inline">\(f\in C(K)\)</span>, we have <span class="math display">\[
+\bigl|\mu_\lambda(f) - \mu_\infty(f)\bigr| \leqslant 
+2{\Vert f-f_j\Vert}_\infty + 
+\bigl|\mu_\lambda(f_j) - \mu_\infty(f_j)\bigr|
+\]</span> for every <span class="math inline">\(\lambda\)</span> and every <span class="math inline">\(j\)</span>. Hence <span class="math display">\[
+\limsup_{\lambda} \bigl|\mu_\lambda(f) - \mu_\infty(f)\bigr| 
+\leqslant 2{\Vert f-f_j\Vert}_\infty.
+\]</span> There exists a subsequence of <span class="math inline">\({\Vert f-f_j\Vert}_\infty\)</span> converging to <span class="math inline">\(0\)</span>. It follows that <span class="math display">\[
+\limsup_{\lambda} \bigl|\mu_\lambda(f) - \mu_\infty(f)\bigr| = 0 
+= \lim_{\lambda} \bigl|\mu_\lambda(f) - \mu_\infty(f)\bigr|
+\]</span> for all <span class="math inline">\(f\in C(K)\)</span>, hence <span class="math inline">\(\mu_\lambda \to \mu_\infty\)</span>.</p></li>
+</ul>
+<p>Thus <span class="math inline">\(\Phi\)</span> is a homeomorphism. It remains to show that <span class="math inline">\(\Phi\bigl(\Pr(K)\bigr)\)</span> is closed in the compact space <span class="math inline">\(V\)</span>. Since <span class="math inline">\(V\)</span> is metrizable (as a countable product of metrizable spaces), it suffices to show that a sequence of <span class="math inline">\(\Phi\bigl(\Pr(K)\bigr)\)</span> converges in <span class="math inline">\(\Phi\bigl(\Pr(K)\bigr)\)</span> whenever it converges in <span class="math inline">\(V\)</span>. Let <span class="math inline">\((\mu_k)\)</span> be a sequence in <span class="math inline">\(\Pr(K)\)</span> such that the sequence <span class="math inline">\(\bigl(\Phi(\mu_k)\bigr)\)</span> converges to <span class="math inline">\((\alpha_n) \in V\)</span>. Let <span class="math inline">\(f \in C_b(K)\)</span>. There exists a sequence <span class="math inline">\((j_r)\)</span> of integers such that <span class="math inline">\({\Vert f_{j_r} - f \Vert}_\infty \to 0\)</span>. We have <span class="math display">\[
+\bigl|\mu_n(f) - \mu_m(f)\bigr| \leqslant 2{\Vert f-f_{j_r}\Vert}_\infty + 
+\bigl|\mu_n(f_{j_r}) - \mu_m(f_{j_r})\bigr|.
+\]</span> The second term of the sum goes to <span class="math inline">\(0\)</span> as <span class="math inline">\(m,n\to\infty\)</span> because <span class="math inline">\(\mu_k(f_{j_r})\)</span> is the <span class="math inline">\(j_r\)</span>-th component of <span class="math inline">\(\Phi(\mu_k)\)</span>, which goes to <span class="math inline">\(\alpha_{j_r}\)</span>. Hence <span class="math display">\[
+\limsup_{m,n\to\infty} 
+\bigl|\mu_n(f) - \mu_m(f)\bigr| \leqslant 2{\Vert f-f_{j_r}\Vert}_\infty,
+\]</span> therefore <span class="math display">\[
+\limsup_{m,n\to\infty} \bigl|\mu_n(f) - \mu_m(f)\bigr| = 0.
+\]</span> Thus the limit <span class="math inline">\(\lim \mu_n(f) =: \Lambda(f)\)</span> exists. The map <span class="math inline">\(f \mapsto \Lambda(f)\)</span> is an increasing linear functional on <span class="math inline">\(C(K)\)</span> which maps <span class="math inline">\(\mathbf{1}\)</span> to <span class="math inline">\(1\)</span>. By Riesz’s representation theorem (see [3]), there exists <span class="math inline">\(\mu\in\Pr(K)\)</span> such that <span class="math inline">\(\Lambda(f) = \mu(f)\)</span>. In particular <span class="math inline">\(\mu(f_j) = \alpha_j\)</span>, thus <span class="math inline">\(\Phi(\mu) = (\alpha_1,\alpha_2,\ldots)\)</span>. In other words, <span class="math inline">\(\Phi\bigl(\Pr(K)\bigr)\)</span> is closed in <span class="math inline">\(V\)</span>. □</p>
+<p>Hereafter, <span class="math inline">\(E\)</span> denotes a <em>Lusin space</em>, which means that <span class="math inline">\(E\)</span> is homeomorphic to a Borel subset <span class="math inline">\(E'\)</span> of a compact metric space <span class="math inline">\((K,d)\)</span>. Let <span class="math inline">\(A\subset K\)</span> be a Borel set.<br />
+Any <span class="math inline">\(\mu\in\Pr(E)\)</span> can be extended to a probability <span class="math inline">\(\hat\mu\in\Pr(K)\)</span> by setting <span class="math display">\[
+\hat\mu(A') = \mu\bigl(\iota^{-1}(A'\cap E')\bigr) 
+= \mu\bigl(\iota^{-1}(A')\cap E\bigr)
+\]</span> where <span class="math inline">\(\iota\colon E \to E'\)</span> is a homeomorphism. Observe that <span class="math inline">\(\hat\mu(K\setminus E') = 0\)</span>. The map <span class="math inline">\(\mu \mapsto \hat\mu\)</span> is injective because <span class="math inline">\(\iota\)</span> is a bimeasurable bijection. Its image is the set <span class="math display">\[
+Q = \bigl\{\nu \in \Pr(K) \mid \nu(E')=1\bigr\}.
+\]</span> Indeed, if <span class="math inline">\(\nu \in Q\)</span>, then <span class="math inline">\(\nu = \hat\mu\)</span> for the probability <span class="math inline">\(\mu \in \Pr(E)\)</span> defined by <span class="math inline">\(\mu(A) = \nu(\iota(A))\)</span>.</p>
+<p><strong>Lemma 5.</strong> <em>The map <span class="math inline">\(Q \ni \nu \mapsto \nu_{|\mathcal{B}_{E'}} \in \Pr(E')\)</span> is continuous.</em></p>
+<p><em>Proof.</em> Denote this map by <span class="math inline">\(\kappa\)</span>. Since <span class="math inline">\(\Pr(K)\)</span> is metrizable by Proposition 3, <span class="math inline">\(Q\)</span> is metrizable as well, and it suffices to show that <span class="math inline">\(\kappa\)</span> is sequentially continuous. Take a sequence <span class="math inline">\((\mu_n)\)</span> in <span class="math inline">\(Q\)</span> and <span class="math inline">\(\mu_\infty \in Q\)</span> such that <span class="math inline">\(\mu_n \to \mu_\infty\)</span> in <span class="math inline">\(Q\)</span>. One also has <span class="math inline">\(\mu_n \to \mu_\infty\)</span> in <span class="math inline">\(\Pr(K)\)</span>, and then, by Proposition 1, <span class="math display">\[
+\forall F\subset K \text{ closed}, \limsup \mu_n(F) 
+\leqslant \mu_\infty(F). 
+\]</span> Let <span class="math inline">\(F' \subset E'\)</span> closed, hence <span class="math inline">\(F' = F \cap E'\)</span> for a closed <span class="math inline">\(F \subset K\)</span>. Then <span class="math display">\[
+\limsup \kappa(\mu_n)(F') = \limsup \mu_n(F') 
+\leqslant \limsup \mu_n(F) \leqslant \mu_\infty(F).
+\]</span> But <span class="math inline">\(\mu_\infty \in Q\)</span>, therefore <span class="math inline">\(\mu_\infty(F) = \mu_\infty(F') = \kappa(\mu_\infty)(F')\)</span>. By Proposition 1, <span class="math inline">\(\kappa(\mu_n) \to \kappa(\mu_\infty)\)</span> in <span class="math inline">\(\Pr(E')\)</span>. □</p>
+<p><strong>Lemma 6.</strong> <em>The subset <span class="math inline">\(Q\)</span> of <span class="math inline">\(\Pr(K)\)</span> is homeomorphic to <span class="math inline">\(\Pr(E')\)</span>. The map <span class="math inline">\(\Phi\colon\Pr(E')\to Q\)</span> defined by <span class="math inline">\(\Phi(\nu)(A) = \nu(A\cap E')\)</span> is a homeomorphism.</em></p>
+<p><em>Proof.</em> One has <span class="math inline">\(\mathcal{B}_{E'} = \{A\cap E' \mid A \in \mathcal{B}_K\}\)</span>. Hence it is clear that <span class="math inline">\(\Phi\)</span> is injective. Let <span class="math inline">\(\mu\in Q\)</span> and <span class="math inline">\(A'\in\mathcal{B}_{E'}\)</span>. One has <span class="math inline">\(A' = A\cap E'\)</span> for a certain <span class="math inline">\(A \in \mathcal{B}_K\)</span>. Define <span class="math inline">\(\mu'(A') = \mu(A)\)</span>. Since <span class="math inline">\(\mu(A) = \mu(A\cap E')=\mu(A')\)</span>, this definition of <span class="math inline">\(\mu'(A')\)</span> does not depend on the choice of <span class="math inline">\(A\)</span>. In fact <span class="math inline">\(\mu' = \mu_{|\mathcal{B}_{E'}}\)</span>. So <span class="math inline">\(\mu' \in \Pr(E')\)</span> and <span class="math inline">\(\Phi(\mu') = \mu\)</span>. Thus <span class="math inline">\(\Phi\)</span> is surjective.</p>
+<p>Lemma 5 says that the inverse map <span class="math inline">\(\Phi^{-1}\)</span> is continuous.</p>
+<p>Now we will show that <span class="math inline">\(\Phi\)</span> is continuous. The space <span class="math inline">\(\Pr(E')\)</span> is pseudometrizable: we know from the previous proposition that <span class="math inline">\(\Pr(K)\)</span> is metrizable, and with the help of a metric <span class="math inline">\(\rho\)</span> on <span class="math inline">\(\Pr(K)\)</span> one can define a pseudometric <span class="math inline">\(\rho'\)</span> on <span class="math inline">\(\Pr(E')\)</span> by <span class="math inline">\(\rho'(\mu',\nu') = \rho\bigl(\Phi(\mu'),\Phi(\nu')\bigr)\)</span>. Therefore it is sufficient to prove that <span class="math inline">\(\Phi\)</span> is sequentially continuous.</p>
+<p>The map <span class="math inline">\(\Phi\)</span> is sequentially continuous. Indeed, consider a sequence <span class="math inline">\((\nu_n)\)</span> in <span class="math inline">\(\Pr(E')\)</span> and <span class="math inline">\(\nu_\infty \in \Pr(E')\)</span> such that <span class="math inline">\(\nu_n \mapsto \nu_\infty\)</span> in <span class="math inline">\(\Pr(E')\)</span>. By Proposition 1, one has <span class="math inline">\(\limsup\nu_n(F')\leqslant\nu_\infty(F')\)</span> for all closed <span class="math inline">\(F' \subset E'\)</span>. Let <span class="math inline">\(F \subset K\)</span> be closed. One has <span class="math inline">\(\Phi(\nu_n)(F) = \nu_n(F \cap E')\)</span>. But <span class="math inline">\(F \cap E'\)</span> is closed in <span class="math inline">\(E'\)</span>. Therefore <span class="math display">\[
+\limsup \Phi(\nu_n)(F) = \limsup \nu_n(F \cap E') 
+\leqslant \nu_\infty(F \cap E') = \Phi(\nu_\infty)(F).
+\]</span> By Proposition 1, <span class="math inline">\(\Phi(\nu_n) \to \Phi(\nu_\infty)\)</span> in <span class="math inline">\(\Pr(K)\)</span>. Hence <span class="math inline">\(\Phi(\nu_n) \to \Phi(\nu_\infty)\)</span> in <span class="math inline">\(Q\)</span>. Indeed, for every <span class="math inline">\(\Pr(K)\)</span>-neighborhood <span class="math inline">\(V\)</span> of <span class="math inline">\(\Phi(\nu_\infty)\)</span>, there exists an integer <span class="math inline">\(N\)</span> such that <span class="math inline">\(\Phi(\nu_n) \in V\)</span> for every <span class="math inline">\(n \geqslant N\)</span>. Let <span class="math inline">\(W\)</span> be a <span class="math inline">\(Q\)</span>-neighborhood of <span class="math inline">\(\Phi(\nu_\infty)\)</span>, thus <span class="math inline">\(W = V \cap Q\)</span> where <span class="math inline">\(V\)</span> is a <span class="math inline">\(\Pr(K)\)</span>-neighborhood of <span class="math inline">\(\Phi(\nu_\infty)\)</span>. There exists <span class="math inline">\(N\)</span> such that <span class="math inline">\(\Phi(\nu_n) \in V\)</span> for every <span class="math inline">\(n \geqslant N\)</span>. But <span class="math inline">\(\Phi(\nu_n) \in Q\)</span>, hence <span class="math inline">\(\Phi(\nu_n) \in W\)</span>. Thus <span class="math inline">\(\Phi(\nu_n) \to \Phi(\nu_\infty)\)</span> in <span class="math inline">\(Q\)</span>. □</p>
+<p><strong>Theorem 7.</strong> <em>The map <span class="math inline">\(\mu\mapsto\hat\mu\)</span> defined above is a homeomorphism from <span class="math inline">\(\Pr(E)\)</span> to the subset <span class="math inline">\(Q\)</span> of <span class="math inline">\(\Pr(K)\)</span>. Hence <span class="math inline">\(\Pr(E)\)</span> is metrizable.</em></p>
+<p><em>Proof.</em> This map is bijective. Let <span class="math inline">\((\mu_\lambda)\)</span> be a net in <span class="math inline">\(\Pr(E)\)</span> and <span class="math inline">\(\mu_\infty\in\Pr(E)\)</span>. We must show that the <span class="math inline">\(\Pr(E)\)</span>-convergence <span class="math inline">\(\mu_\lambda\to\mu_\infty\)</span> and the <span class="math inline">\(Q\)</span>-convergence <span class="math inline">\(\widehat{\mu_\lambda}\to\widehat{\mu_\infty}\)</span> are equivalent. By the previous lemma, this <span class="math inline">\(Q\)</span>-convergence is equivalent to the <span class="math inline">\(\Pr(E')\)</span>-convergence <span class="math inline">\(\Phi(\widehat{\mu_\lambda})\to\Phi(\widehat{\mu_\infty})\)</span>.</p>
+<p>Observe that <span class="math inline">\(\nu(f) = \Phi(\hat\nu)(f\circ\iota^{-1})\)</span> for every <span class="math inline">\(\nu \in \Pr(E)\)</span> and all <span class="math inline">\(f\in C_b(E)\)</span>. Indeed, this is true when <span class="math inline">\(f\)</span> is the indicator function of a Borel set of <span class="math inline">\(E\)</span> and hence this is also true when <span class="math inline">\(f\)</span> is a finite linear combination of such indicator functions. But every <span class="math inline">\(f \in C_b(E)\)</span> is the dominated limit of a sequence <span class="math inline">\((f_n)\)</span> of such linear combinations: take <span class="math display">\[
+f_n(x) = 
+\sum_{j=1}^\infty \frac{j-1}{n} 
+\mathbf{1}_{f^{-1}\left(\left]\frac{j-1}{n},\frac{j}{n}\right]\right)}(x).
+\]</span> Therefore the equality holds for every <span class="math inline">\(f\in C_b(E)\)</span> by dominated convergence.</p>
+<p>Assume that <span class="math inline">\(\mu_\lambda\to\mu_\infty\)</span> and take <span class="math inline">\(f' \in C_b(E')\)</span>. Then <span class="math inline">\(f' = f \circ \iota^{-1}\)</span> for <span class="math inline">\(f = f'\circ\iota \in C_b(E)\)</span>, and <span class="math inline">\(\nu(f) = \Phi(\hat\nu)(f')\)</span> for all <span class="math inline">\(\nu\in\Pr(E)\)</span>. Therefore <span class="math display">\[
+\Phi(\widehat{\mu_\lambda})(f') = \mu_\lambda(f) \to \mu_\infty(f) 
+= \Phi(\widehat{\mu_\infty})(f').
+\]</span> That shows that <span class="math inline">\(\Phi(\widehat{\mu_\lambda}) \to \Phi(\widehat{\mu_\infty})\)</span>.</p>
+<p>Now assume that <span class="math inline">\(\Phi(\widehat{\mu_\lambda})\to\Phi(\widehat{\mu_\infty})\)</span> in <span class="math inline">\(\Pr(E')\)</span>. Let <span class="math inline">\(f \in C_b(E)\)</span> and define <span class="math inline">\(f' = f \circ \iota^{-1} \in C_b(E')\)</span>. Then <span class="math display">\[
+\mu_\lambda(f) = \Phi(\widehat{\mu_\lambda})(f') 
+\to \Phi(\widehat{\mu_\infty})(f') = \mu_\infty(f).
+\]</span> Therefore <span class="math inline">\(\mu_\lambda \to \mu_\infty\)</span>. □</p>
+<p><strong>Theorem 8.</strong> <em>The space <span class="math inline">\(\Pr(E)\)</span> is a Lusin space.</em></p>
+<p><em>Proof.</em> The subset <span class="math inline">\(Q\)</span> of <span class="math inline">\(\Pr(K)\)</span> is Borel by Lemma 2. By Proposition 4, <span class="math inline">\(\Pr(K)\)</span> is compact and metrizable. Thus the result follows from Lemma 7. □</p>
+<p><strong>Theorem (Prohorov).</strong> <em>If <span class="math inline">\(\Lambda \subset \Pr(E)\)</span> is tight, then every sequence in <span class="math inline">\(\Lambda\)</span> has a convergent subsequence.</em></p>
+<p><em>Proof.</em> For every <span class="math inline">\(\epsilon&gt;0\)</span>, let <span class="math inline">\(K_\epsilon \subset E\)</span> be a compact subset of <span class="math inline">\(E\)</span> such that <span class="math inline">\(\mu(K_\epsilon) &gt; 1-\epsilon\)</span> for all <span class="math inline">\(\mu\in\Lambda\)</span>. Let <span class="math inline">\((\mu_n)\)</span> be a sequence in <span class="math inline">\(\Lambda\)</span>. We know by the first proposition of this section that <span class="math inline">\(\Pr(K)\)</span> is compact metrizable, therefore the sequence <span class="math inline">\((\widehat{\mu_n})\)</span> has a convergent subsequence <span class="math inline">\((\widehat{\mu_{n_k}})\)</span>. Denote by <span class="math inline">\(\nu \in \Pr(K)\)</span> its limit. Let <span class="math inline">\(A_\epsilon = \iota(K_\epsilon) \subset E'\)</span>. One has <span class="math inline">\(\widehat{\mu_{n_k}}(A_\epsilon) = \mu_{n_k}(K_\epsilon) &gt; 1-\epsilon\)</span>. By Proposition 1, one has <span class="math inline">\(\limsup_k \widehat{\mu_{n_k}}(A_\epsilon) \leqslant \nu(A_\epsilon)\)</span>. Therefore <span class="math inline">\(\nu(E') \geqslant \nu(A_\epsilon) \geqslant 1-\epsilon\)</span>. Since this is true for every <span class="math inline">\(\epsilon&gt;0\)</span>, <span class="math inline">\(\nu(E') = 1\)</span>. Thus the sequence <span class="math inline">\((\widehat{\mu_{n_k}})\)</span> is a sequence in <span class="math inline">\(Q\)</span> and its limit is in <span class="math inline">\(Q\)</span>. Therefore it converges in <span class="math inline">\(Q\)</span>. By Theorem 7, the sequence <span class="math inline">\((\mu_{n_k})\)</span> converges in <span class="math inline">\(\Pr(E)\)</span>. □</p>
+<h1 id="kernels-as-random-probabilities">Kernels as random probabilities</h1>
+<p>Here we prove that a probability kernel on a Lusin space defines a measurable random probability.</p>
+<p><strong>Lemma 9.</strong> <em>Let <span class="math inline">\(E\)</span> be a Lusin space and <span class="math inline">\(\Omega\)</span> be a probability space. Then a map <span class="math inline">\(\Gamma\colon\Omega\to\Pr(E)\)</span> is measurable if and only if <span class="math inline">\(\omega\mapsto\Gamma_\omega(f)\)</span> is measurable for every <span class="math inline">\(f\in C_b(E)\)</span>, where we denote by <span class="math inline">\(\Gamma_\omega\)</span> the probability <span class="math inline">\(\mathcal{B}_E \ni A \mapsto \Gamma(\omega)(A)\)</span>.</em></p>
+<p><em>Proof.</em> In <a href="./conditionalLaw.html">The conditional law as a random probability</a>, we proved this result for a Polish space <span class="math inline">\(E\)</span>. But we only used the fact that <span class="math inline">\(\Pr(E)\)</span> is strongly Lindelöf in this case. The space <span class="math inline">\(\Pr(E)\)</span> is Lusin by Theorem 8, <a href="./Lusin.html">hence it is strongly Lindelöf</a>. □</p>
+<p><strong>Theorem 10.</strong> <em>Let <span class="math inline">\(E\)</span> be a metric space. Let <span class="math inline">\(\Omega\)</span> be a probability space, and <span class="math inline">\(\Gamma\colon\Omega\to\Pr(E)\)</span> be a map. We denote by <span class="math inline">\(\Gamma_\omega\)</span> the image of <span class="math inline">\(\omega\)</span> by <span class="math inline">\(\Gamma\)</span>. Define the map <span class="math inline">\(K\colon\Omega\times\mathcal{B}_E \to [0,1]\)</span> by <span class="math inline">\(K(\omega,A) = \Gamma_\omega(A)\)</span>. If <span class="math inline">\(\Gamma\)</span> is measurable, then <span class="math inline">\(K\)</span> is a probability kernel from <span class="math inline">\(\Omega\)</span> to <span class="math inline">\(E\)</span>. If <span class="math inline">\(E\)</span> is Lusin, the converse is true.</em></p>
+<p><em>Proof.</em> We proved the direct implication in <a href="./conditionalLaw.html">The conditional law as a random probability</a>. We also proved the converse for a Polish space <span class="math inline">\(E\)</span>, but to do so we used the same lemma as Lemma 9 for a Polish space <span class="math inline">\(E\)</span>. Thus the proof is similar for a Lusin space, using Lemma 9. □</p>
+<h1 id="references">References</h1>
+<ul>
+<li><p>[1] Alexander S. Kechris. <em>Classical descriptive set theory.</em> 1995.</p></li>
+<li><p>[2] L. C. G. Rogers, David Williams. <em>Diffusions, Markov Processes, and Martingales. Volume 1: Foundations.</em> Second edition, 1994.</p></li>
+<li><p>[3] N. Dunford, J. T. Schwartz. <em>Linear Operators: Part I, General Theory</em>. 1958.</p></li>
+<li><p>[4] Patrick Billingsley. <em>Convergence of probability measures.</em> Second edition, 1999.</p></li>
+</ul>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>

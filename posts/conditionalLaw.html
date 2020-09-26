@@ -1,0 +1,381 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - The conditional law as a random probability</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+    <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-3">
+        <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+          <a href="https://www.r-bloggers.com/">
+            <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+          </a>
+          <br />
+          <a href="http://t-redactyl.io/">
+            <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
+          </a>
+          <a href="http://timelyportfolio.blogspot.be/">
+            <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
+          </a>
+          <br />
+          <a href="https://antoineguillot.wordpress.com/blog/">
+            <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+          </a>
+          <br />
+          <a href="https://fronkonstin.com/">
+            <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="main col-sm-9">
+        <div id="header">
+          <div id="logo" style="position:absolute;">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>The conditional law as a random probability</h1> 
+          <div class="info">
+    Posted on May 10, 2020
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="../tags/maths.html">maths</a>
+    
+</div>
+
+<p>Let <span class="math inline">\((\Omega, \mathfrak{A}, \mathbb{P})\)</span> be a probability space, <span class="math inline">\(E\)</span> a Polish space, and <span class="math inline">\(X\)</span> an <span class="math inline">\(E\)</span>-valued random variable. Denote by <span class="math inline">\(\mathcal{B}_E\)</span> the Borel <span class="math inline">\(\sigma\)</span>-field on <span class="math inline">\(E\)</span>. It is well-known that the law of <span class="math inline">\(X\)</span> can be disintegrated over any <span class="math inline">\(\sigma\)</span>-field <span class="math inline">\(\mathfrak{B}\subset\mathfrak{A}\)</span>. That means that there exists a <em>probability kernel</em> <span class="math inline">\(K\colon\Omega\times\mathcal{B}_E \to [0,1]\)</span> from <span class="math inline">\(\Omega\)</span> to <span class="math inline">\(E\)</span> such that for every suitable function <span class="math inline">\(f\colon E \to\mathbb{R}\)</span>, <span class="math display">\[
+\mathbb{E}\bigl[f(X)\bigr] = 
+\int_\Omega K_\omega(f) \mathrm{d}\mathbb{P}(\omega)
+\]</span> where we denote by <span class="math inline">\(K_\omega\)</span> the probability <span class="math inline">\(A\mapsto K(\omega,A)\)</span> and we set <span class="math inline">\(\mu(f) = \int f \mathrm{d}\mu\)</span> for a probability <span class="math inline">\(\mu\)</span>. The map <span class="math inline">\(\omega\mapsto K_\omega\)</span> is called the <em>conditional law of <span class="math inline">\(X\)</span> given <span class="math inline">\(\mathfrak{B}\)</span></em>, and is denoted by <span class="math inline">\(\mathcal{L}(X\mid\mathfrak{B})\)</span>.</p>
+<p>Recall that a <em>probability kernel</em> from a probability space <span class="math inline">\(\Omega\)</span> to a measurable space <span class="math inline">\((E,\mathcal{B})\)</span> is an application <span class="math inline">\(K\colon\Omega\times\mathcal{B} \to [0,1]\)</span> such that</p>
+<p><em>(i)</em> for fixed <span class="math inline">\(\omega\in\Omega\)</span>, the map <span class="math inline">\(A \mapsto K(\omega,A)\)</span> is a probability on <span class="math inline">\((E,\mathcal{B})\)</span>;</p>
+<p><em>(ii)</em> for fixed <span class="math inline">\(A\in\mathcal{B}\)</span>, the map <span class="math inline">\(\omega \mapsto K(\omega,A)\)</span> is measurable.</p>
+<p>It is less known that there exists a Polish topology on the set <span class="math inline">\(\Pr(E)\)</span> of probabilities on <span class="math inline">\(E\)</span> such that the conditional law <span class="math inline">\(\mathcal{L}(X\mid\mathfrak{B})\)</span> is a <span class="math inline">\(\Pr(E)\)</span>-valued random variable.</p>
+<p>I am unable to find a self-contained reference for this result. I aim to prove it in these notes in a self-contained way, except that I don’t give a proof of Prohorov’s theorem here. However, I give a proof of Prohorov’s theorem for Lusin spaces in another post (<a href="ProhorovLusin.html">Probabilities on a Lusin space</a>), and Polish spaces are Lusin.</p>
+<h1 id="polish-spaces">Polish spaces</h1>
+<p>A topological space <span class="math inline">\(E\)</span> is said to be <em>Lindelöf</em> if there is a countable subcover of every open cover of <span class="math inline">\(E\)</span>. It is said to be <em>second-countable</em> when it has a countable basis.</p>
+<p><strong>Theorem.</strong> <em>Every second-countable topological space is Lindelöf.</em></p>
+<p><em>Proof.</em> Let <span class="math inline">\(E\)</span> be a second-countable topological space. Take a countable basis <span class="math inline">\({\{O_n\}}_{n \in \mathbb{N}}\)</span> of the topology on <span class="math inline">\(E\)</span>. Let <span class="math inline">\(\mathcal{C}={\{C_i\}}_{i \in I}\)</span> be an open cover of <span class="math inline">\(E\)</span>. For every <span class="math inline">\(x \in E\)</span>, take <span class="math inline">\(i(x) \in I\)</span> such that <span class="math inline">\(x \in C_{i(x)}\)</span>, and let <span class="math inline">\(n(x) \in \mathbb{N}\)</span> such that <span class="math inline">\(x \in O_{n(x)} \subset C_{i(x)}\)</span>. Then <span class="math inline">\({\{O_{n(x)}\}}_{x \in X}\)</span> is a countable open cover of <span class="math inline">\(E\)</span>. For every <span class="math inline">\(\ell \in n(E) \subset \mathbb{N}\)</span>, the set <span class="math inline">\(\{j \in I \mid O_\ell \subset C_j\}\)</span> is non-empty, therefore one can select <span class="math inline">\(j(\ell) \in I\)</span> such that <span class="math inline">\(O_\ell \subset C_{j(\ell)}\)</span> by using the axiom of countable choice. The set <span class="math inline">\({\{C_{j(\ell)}\}}_{\ell \in n(E)}\)</span> is a countable subcover of <span class="math inline">\(\mathcal{C}\)</span>. □</p>
+<p><strong>Theorem.</strong> <em>For a metrizable space, the notions of separability, second-countable and Lindelöf are equivalent.</em></p>
+<p><em>Proof.</em> Let <span class="math inline">\(E\)</span> be a metric space. Denote by <span class="math inline">\(B_r(x)\)</span> the open ball of radius <span class="math inline">\(r\)</span> centered at <span class="math inline">\(x\)</span>.</p>
+<p>Assume <span class="math inline">\(E\)</span> is separable. Let <span class="math inline">\({(x_n)}_{n\geqslant 1}\)</span> be a dense sequence of <span class="math inline">\(E\)</span>. Then <span class="math inline">\(\bigl\{B_r(x_n) \mid r \in \mathbb{Q}, n\geqslant 1\bigr\}\)</span> is a countable basis of <span class="math inline">\(E\)</span>, hence <span class="math inline">\(E\)</span> is second-countable.</p>
+<p>By the previous theorem, the second-countable property implies the Lindelöf property. Now assume <span class="math inline">\(E\)</span> is Lindelöf. Consider the open cover <span class="math inline">\(\bigl\{B_\epsilon(x)\bigr\}_{x \in E}\)</span> for a given <span class="math inline">\(\epsilon&gt;0\)</span>. By the Lindelöf property, there exists a countable subcover <span class="math inline">\(\bigl\{B_\epsilon(x_{\epsilon,k})\bigr\}_{k \in \mathbb{N}}\)</span>. Then <span class="math inline">\(\bigcup_{n\geqslant 1} {\bigl\{x_{1/n,k}\bigr\}}_{k \in \mathbb{N}}\)</span> is dense in <span class="math inline">\(E\)</span>, thereby showing that <span class="math inline">\(E\)</span> is separable. □</p>
+<p><strong>Corollary.</strong> <em>A subspace of a metrizable separable space is itself separable</em>.</p>
+<p><em>Proof.</em> It is clear that a subspace of a second-countable space is itself second-countable. Therefore the result follows from the previous theorem. □</p>
+<p>Given a metric space <span class="math inline">\((E,d)\)</span>, a non-empty set <span class="math inline">\(A \subset E\)</span> and <span class="math inline">\(\epsilon&gt;0\)</span>, we define the set <span class="math display">\[
+A^\epsilon = \bigl\{x \in E \mid d(x,A) &lt; \epsilon\bigr\}.
+\]</span> It is well-known that <span class="math inline">\(x \mapsto d(x,A)\)</span> is continuous. This straigthforwardly results from the inequality <span class="math inline">\(\bigl|d(x,A) - d(y,A)\bigr| \leqslant d(x,y)\)</span> (see [2]). Hence <span class="math inline">\(A^\epsilon\)</span> is open. It is also well-known that <span class="math inline">\(d(x,A) = 0\)</span> if and only if <span class="math inline">\(x \in \overline{A}\)</span>.</p>
+<p><strong>Proposition.</strong> <em>An open subset of a Polish space is Polish.</em></p>
+<p><em>Proof.</em> Let <span class="math inline">\(E\)</span> be a Polish metric space, and <span class="math inline">\(A \subset E\)</span> be open. Then <span class="math inline">\(A\)</span> is separable by the previous corollary. Assume <span class="math inline">\(A \neq E\)</span> and let <span class="math inline">\(d\)</span> be a compatible metric on <span class="math inline">\(E\)</span> under which <span class="math inline">\(E\)</span> is complete. For <span class="math inline">\(x,y\in A\)</span>, define <span class="math display">\[
+d'(x,y) = d(x,y) + \left|\frac{1}{d(x,A^c)}-\frac{1}{d(y,A^c)}\right|.
+\]</span> It is easy to check that <span class="math inline">\(d'\)</span> is a metric on <span class="math inline">\(A\)</span>. Using the continuity of <span class="math inline">\(x \mapsto d(x,A^c)\)</span>, it is easy to see that convergence for <span class="math inline">\(d\)</span> is equivalent to convergence for <span class="math inline">\(d'\)</span>.</p>
+<p>It is also clear that a <span class="math inline">\(d'\)</span>-Cauchy sequence <span class="math inline">\((u_n)\)</span> in <span class="math inline">\(A\)</span> is a <span class="math inline">\(d\)</span>-Cauchy sequence. Let <span class="math inline">\(u_\infty\)</span> be the limit of <span class="math inline">\((u_n)\)</span>. Then <span class="math inline">\(u_\infty \in A\)</span>, otherwise <span class="math inline">\(d(u_n, A^c) \to 0\)</span> and <span class="math inline">\(d'(u_n,u_m) \to \infty\)</span> as <span class="math inline">\(m,n \to \infty\)</span> □</p>
+<p>More generally, a subset of a Polish space is a Polish space if and only if it is a <span class="math inline">\(G_\delta\)</span> set - see [6].</p>
+<p>A topological space is said to be <em>strongly Lindelöf</em> if every open set is Lindelöf.</p>
+<p><strong>Corollary.</strong> <em>A Polish space is strongly Lindelöf.</em></p>
+<p><em>Proof.</em> A Polish space is metrizable and separable, therefore it is Lindelöf by the second theorem. Since an open subset of a Polish space is Polish, we see that a Polish space is strongly Lindelöf. □</p>
+<h1 id="space-of-probability-measures">Space of probability measures</h1>
+<p>For a topological space <span class="math inline">\(E\)</span>, we denote by <span class="math inline">\(\mathcal{B}_E\)</span> the Borel <span class="math inline">\(\sigma\)</span>-field on <span class="math inline">\(E\)</span>, by <span class="math inline">\(C_b(E)\)</span> the space of real-valued bounded continuous functions on <span class="math inline">\(E\)</span> and by <span class="math inline">\(\Pr(E)\)</span> the topological space of probabilities on <span class="math inline">\(E\)</span> equipped with the narrow topology.</p>
+<p>The <em>canonical basis of neighborhoods</em> at <span class="math inline">\(\mu \in \Pr(E)\)</span> is the family of open sets <span class="math display">\[
+\Bigl\{\nu\in\Pr(E) \mid
+\bigl|\nu(f_i)-\mu(f_i)\bigl| &lt; \epsilon, i\in [\![1,k]\!]\Bigr\}
+\]</span> for <span class="math inline">\(\epsilon&gt;0\)</span>, <span class="math inline">\(k \geqslant 1\)</span> and <span class="math inline">\(f_i \in C_b(E)\)</span>.</p>
+<p>In the last section of these notes, we will use the fact that a net <span class="math inline">\((\mu_\lambda)\)</span> in <span class="math inline">\(\Pr(E)\)</span> converges to <span class="math inline">\(\mu_\infty \in \Pr(E)\)</span> if and only if <span class="math inline">\(\mu_\lambda(f) \to \mu_\infty(f)\)</span> for every <span class="math inline">\(f \in C_b(E)\)</span>.</p>
+<p><strong>Lemma</strong>. <em>Let <span class="math inline">\(\mu\in\Pr(E)\)</span>, <span class="math inline">\(f \in C_b(E)\)</span> and <span class="math inline">\(\epsilon &gt; 0\)</span>. There exist an integer <span class="math inline">\(k \geqslant 1\)</span>, a number <span class="math inline">\(\eta &gt; 0\)</span> and some closed sets <span class="math inline">\(F_1 \subset E, \ldots, F_k \subset E\)</span> such that the set</em> <span class="math display">\[
+\Bigl\{\nu \mid  \bigl|\nu(f)-\mu(f)\bigl| &lt; \epsilon\Bigr\}
+\]</span> <em>contains the set</em> <span class="math display">\[
+\bigl\{\nu \in \Pr(E) \mid 
+\nu(F_i)&lt;\mu(F_i)+\eta, i\in [\![1,k]\!]\bigr\}.
+\]</span></p>
+<p><em>Proof.</em> Using a linear transformation, one can write <span class="math display">\[
+\Bigl\{\nu \mid  \bigl|\nu(f)-\mu(f)\bigl| &lt; \epsilon\Bigr\}
+\]</span> as <span class="math display">\[
+\Bigl\{\nu \mid  \bigl|\nu(g)-\mu(g)\bigl| &lt; \epsilon'\Bigr\}
+\]</span> where <span class="math inline">\(g \in C_b(E)\)</span> is such that <span class="math inline">\(0 &lt; g(x) &lt; 1\)</span> for all <span class="math inline">\(x\in E\)</span> and <span class="math inline">\(\epsilon' &gt; 0\)</span>. Take an integer <span class="math inline">\(k &gt; \frac{2}{\epsilon'}\)</span> and take the closed sets <span class="math inline">\(F_i = \bigl\{x \in E \mid g(x) \geqslant \frac{i-1}{k}\bigr\}\)</span> for <span class="math inline">\(i\in [\![1,k]\!]\)</span> and <span class="math inline">\(F_{k+1} = \varnothing\)</span>.</p>
+<p>Define the intervals <span class="math inline">\(J_i = \bigl[\frac{i-1}{k}, \frac{i}{k} \bigr[\)</span>. For every <span class="math inline">\(P\in\Pr(E)\)</span>, one has <span class="math display">\[
+\sum_{i=1}^k \frac{i-1}{k}P\bigl(g^{-1}(J_i)\bigr) \leqslant P(g) \leqslant 
+\sum_{i=1}^k \frac{i}{k}P\bigl(g^{-1}(J_i)\bigr).
+\]</span> The sum on the right is <span class="math display">\[
+\sum_{i=1}^k \frac{i}{k}\bigl(P(F_i) - P(F_{i+1})\bigr) 
+= \frac{1}{k} + \frac{1}{k}\sum_{i=2}^kP(F_i)
+\]</span> and the sum on the left is <span class="math inline">\(\frac{1}{k}\sum_{i=2}^kP(F_i)\)</span>. Therefore <span class="math inline">\(\nu(g) &lt; \frac{\epsilon'}{2} + \frac{1}{k}\sum_{i=2}^k\nu(F_i)\)</span> and <span class="math inline">\(\frac{1}{k}\sum_{i=2}^k\mu(F_i) \leqslant \mu(g)\)</span>. Thus, if <span class="math inline">\(\nu(F_i)&lt;\mu(F_i)+\eta\)</span>, one has <span class="math display">\[
+\nu(g) &lt; \frac{\epsilon'}{2} + \mu(g) + \eta
+\]</span> and then <span class="math inline">\(\nu(g) &lt; \mu(g) + \epsilon'\)</span> if we take <span class="math inline">\(\eta = \frac{\epsilon'}{2}\)</span>. Applying the same mathematics with <span class="math inline">\(1-g\)</span> instead of <span class="math inline">\(g\)</span>, we finally get <span class="math inline">\(\bigl|\nu(g)-\mu(g)\bigl| &lt; \epsilon'\)</span>. □</p>
+<p>The following proposition follows from this lemma; it will be used in <a href="ProhorovLusin.html">Probabilities on a Lusin space</a>.</p>
+<p><strong>Proposition.</strong> <em>Let <span class="math inline">\(\mu\in\Pr(E)\)</span> and <span class="math inline">\((\mu_n)\)</span> be a sequence in <span class="math inline">\(\Pr(E)\)</span>. If <span class="math inline">\(\limsup \mu_n(F) \leqslant \mu(F)\)</span> for all closed sets <span class="math inline">\(F\subset E\)</span>, then <span class="math inline">\((\mu_n)\)</span> converges to <span class="math inline">\(\mu\)</span>.</em></p>
+<p><em>Proof.</em> Let <span class="math inline">\(V\)</span> be a neighborhood of <span class="math inline">\(\mu\)</span>. By the previous lemma, there exist an integer <span class="math inline">\(k \geqslant 1\)</span>, a number <span class="math inline">\(\epsilon &gt; 0\)</span> and some closed sets <span class="math inline">\(F_1 \subset E, \ldots, F_k \subset E\)</span> such that <span class="math display">\[
+U := \bigl\{\nu \in \Pr(E) \mid 
+\nu(F_i)&lt;\mu(F_i)+\epsilon, i\in [\![1,k]\!]\bigr\} \subset V.
+\]</span> One has <span class="math inline">\(\limsup \mu_n(F_i) \leqslant \mu(F_i)\)</span> for every <span class="math inline">\(i\in [\![1,k]\!]\)</span>. Therefore, there is an integer <span class="math inline">\(N_i\)</span> such that <span class="math inline">\(\mu_n(F_i) &lt; \mu(F_i) + \epsilon\)</span> when <span class="math inline">\(n \geqslant N_i\)</span>. Hence, <span class="math inline">\(\mu_n \in U\)</span> for <span class="math inline">\(n\geqslant\max\{N_i\}\)</span>. Since <span class="math inline">\(U\subset V\)</span>, one gets <span class="math inline">\(\mu_n \to \mu\)</span> in <span class="math inline">\(\Pr(E)\)</span>. □</p>
+<p><strong>Theorem.</strong> <em>The probabilities on <span class="math inline">\(E\)</span> with finite support form a dense subset of <span class="math inline">\(\Pr(E)\)</span>.</em></p>
+<p><em>Proof.</em> Let <span class="math inline">\(\mu \in \Pr(E)\)</span> and <span class="math display">\[
+V = 
+\Bigl\{\nu \in\Pr(E) \mid \bigl|\nu(f_i)-\mu(f_i)\bigl| &lt; \epsilon, 
+i\in [\![1,k]\!]\Bigr\}
+\]</span> be an open set in the canonical basis of neighborhoods of <span class="math inline">\(\mu\)</span>. By the previous lemma, <span class="math inline">\(V\)</span> contains a set <span class="math display">\[
+U = \bigl\{\nu \in \Pr(E) \mid 
+\nu(F_i)&lt;\mu(F_i)+\epsilon', i\in [\![1,k']\!]\bigr\}
+\]</span> with <span class="math inline">\(k'\geqslant 1\)</span>, <span class="math inline">\(\epsilon'&gt;0\)</span>, and <span class="math inline">\(F_i\subset E\)</span> closed. The <span class="math inline">\(F_i\)</span> generate a finite partition<br />
+<span class="math inline">\(\mathcal{P} = \{B_1, \ldots, B_J\}\)</span> with <span class="math inline">\(B_j \neq \varnothing\)</span> closed. For each <span class="math inline">\(B_j \in \mathcal{P}\)</span>, we pick a point<br />
+<span class="math inline">\(b_j \in B_j\)</span>. The probability <span class="math inline">\(\sum_{j=1}^J\mu(B_j)\delta_{b_j}\)</span> belongs to <span class="math inline">\(U\)</span>. That shows the result. □</p>
+<p><strong>Theorem.</strong> <em>If <span class="math inline">\(E\)</span> is separable, then so is <span class="math inline">\(\Pr(E)\)</span>.</em></p>
+<p><em>Proof.</em> Let <span class="math inline">\(D \subset E\)</span> be a countable dense subset of <span class="math inline">\(E\)</span>. We are going to show that the set of probability measures with finite support contained in <span class="math inline">\(D\)</span> and which have a rational mass at each point of their support, is dense in <span class="math inline">\(\Pr(E)\)</span>. Since this set is countable, this will prove the proposition.</p>
+<p>By the preceding theorem, we know that the probabilities with finite support form a dense subset of <span class="math inline">\(\Pr(E)\)</span>. Let <span class="math inline">\(\mu = \sum_{j=1}^J p_j \delta_{x_j}\)</span> be such a probability. Take an open neighborhood of <span class="math inline">\(\mu\)</span> <span class="math display">\[
+\mathcal{V} = 
+\Bigl\{\nu \in\Pr(E) \mid  \bigl|\nu(f_i)-\mu(f_i)\bigl| &lt; \epsilon, 
+i\in [\![1,k]\!]\Bigr\},
+\]</span> with <span class="math inline">\(k \geqslant 1\)</span>, <span class="math inline">\(\epsilon&gt;0\)</span> and <span class="math inline">\(f_i \in C_b(E)\)</span>. Note that <span class="math inline">\(\mu(f_i) = \sum_{j=1}^J p_j f_i(x_j)\)</span>.</p>
+<p>Let <span class="math inline">\(K = \max\bigl\{{\Vert f_i \Vert}_\infty\bigr\}\)</span>. Let <span class="math inline">\(q_j \in \mathbb{Q}\cap [0,1]\)</span>, <span class="math inline">\(j \in [\![1,J]\!]\)</span>, such that <span class="math inline">\(\sum_{j=1}^J q_j = 1\)</span> and <span class="math inline">\(|q_j - p_j| &lt; \frac{\epsilon}{2JK}\)</span>. Let <span class="math inline">\(y_{j} \in D\)</span> such that <span class="math inline">\(\bigl|f_i(y_{j}) - f_i(x_j)\bigr| &lt; \frac{\epsilon}{2}\)</span> for every <span class="math inline">\(j \in [\![1,J]\!]\)</span>.</p>
+<p>We set <span class="math inline">\(\nu = \sum_{j=1}^J q_j \delta_{y_{j}}\)</span>, so that one has <span class="math inline">\(\nu(f_i) = \sum_{j=1}^J q_j f_i(y_{j})\)</span>, and then <span class="math display">\[
+\bigl|\nu(f_i)-\mu(f_i)\bigr| \leqslant 
+\sum_{j=1}^J \bigl|q_j f_i(y_{j}) - p_j f_i(x_j)\bigr|.
+\]</span> Let us bound from above each term of the sum: <span class="math display">\[
+\begin{align}
+&amp; \bigl|q_j f_i(y_{j}) - p_j f_i(x_j)\bigr|  \\ &amp; \quad \leqslant 
+\bigl|q_j f_i(y_{j}) - p_j f_i(y_{j})\bigr| + 
+\bigl|p_j f_i(y_{j}) - p_j f_i(x_j)\bigr| \\ &amp; \quad \leqslant
+|q_j - p_j| {\Vert f_i \Vert}_\infty + p_j \bigl|f_i(y_{j}) - f_i(x_j)\bigr| \\ 
+&amp; \quad &lt; \frac{\epsilon}{2J} + p_j \frac{\epsilon}{2}.
+\end{align}
+\]</span> By summing, one gets <span class="math inline">\(\bigl|\nu(f_i)-\mu(f_i)\bigr| &lt; \epsilon\)</span>, hence <span class="math inline">\(\nu \in \mathcal{V}\)</span>. □</p>
+<p><strong>Theorem.</strong> <em>Assume <span class="math inline">\(E\)</span> is metric and denote by <span class="math inline">\(d\)</span> the metric on <span class="math inline">\(E\)</span>. Let <span class="math inline">\(F \subset E\)</span> be closed and <span class="math inline">\(\epsilon&gt;0\)</span>. Then there is a function <span class="math inline">\(f\in C_b(E)\)</span> such that <span class="math inline">\(f(x)=1\)</span> for <span class="math inline">\(x\in F\)</span>, <span class="math inline">\(f(x)=0\)</span> if <span class="math inline">\(d(x,F)\geqslant\epsilon\)</span> and <span class="math inline">\(0\leqslant f(x)\leqslant 1\)</span> for all <span class="math inline">\(x \in E\)</span>. This function <span class="math inline">\(f\)</span> may be taken to be uniformly continuous.</em></p>
+<p><em>Proof.</em> Define the continuous function <span class="math inline">\(\phi\colon\mathbb{R}\to [0,1]\)</span> by <span class="math display">\[
+\phi(t) = 
+\begin{cases}
+1 &amp; \text{if } t \leqslant 0 \\
+1-t &amp; \text{if } 0 \leqslant t \leqslant 1 \\
+0 &amp; \text{if } t \geqslant 1 
+\end{cases}.
+\]</span> Then define <span class="math display">\[
+f(x) = \phi\left(\frac{1}{\epsilon}d(x,F)\right).
+\]</span> This function <span class="math inline">\(f\)</span> has the required properties. Here is the graph of <span class="math inline">\(f\)</span> for <span class="math inline">\(F = [a,b] \subset \mathbb{R}\)</span>:</p>
+<p><img src="figures/conditionalLaw-graph-1.png" /></p>
+<p>□</p>
+<p><strong>Proposition (neighborhood bases of the narrow topology).</strong> <em>If <span class="math inline">\(E\)</span> is a metric space, then each of the three families of sets below form a neighborhood basis of the narrow topology at <span class="math inline">\(\mu \in \Pr(E)\)</span>.</em></p>
+<p><em>(i)</em> <span class="math inline">\(\bigl\{\nu \in \Pr(E) \mid \nu(F_i)&lt;\mu(F_i)+\epsilon, i\in [\![1,k]\!]\bigr\}\)</span>, <em>where <span class="math inline">\(k \geqslant 1\)</span> is an integer, the <span class="math inline">\(F_i\)</span> are closed in <span class="math inline">\(E\)</span>, and</em> <span class="math inline">\(\epsilon &gt; 0\)</span>.</p>
+<p><em>(ii)</em> <span class="math inline">\(\bigl\{\nu \in \Pr(E) \mid \nu(O_i)&gt;\mu(O_i)-\epsilon, i\in [\![1,k]\!]\bigr\}\)</span>, <em>where <span class="math inline">\(k \geqslant 1\)</span> is an integer, the <span class="math inline">\(O_i\)</span> are open in <span class="math inline">\(E\)</span>, and</em> <span class="math inline">\(\epsilon &gt; 0\)</span>.</p>
+<p><em>(iii)</em> <span class="math inline">\(\Bigl\{\nu \in \Pr(E) \mid \bigl|\nu(A_i)-\mu(A_i)\bigr|&lt;\epsilon, i\in [\![1,k]\!]\Bigr\}\)</span>, <em>where <span class="math inline">\(k \geqslant 1\)</span> is an integer, the <span class="math inline">\(A_i\)</span> are Borelian in <span class="math inline">\(E\)</span> and satisfy</em> <span class="math inline">\(\mu(\partial A_i)=0\)</span>, <em>and</em> <span class="math inline">\(\epsilon &gt; 0\)</span>.</p>
+<p><em>Proof.</em> One obviously gets equality between the families <em>(i)</em> and <em>(ii)</em> with the help of the complementary operation. By the previous lemma, each neighborhood at <span class="math inline">\(\mu\)</span> in the canonical basis contains a set in the family <em>(ii)</em>. Let us show the converse. Denote by <span class="math inline">\(d\)</span> the metric on <span class="math inline">\(E\)</span> and for <span class="math inline">\(A \subset E\)</span> and <span class="math inline">\(\eta &gt; 0\)</span>, define <span class="math inline">\(A^\eta = \bigl\{x\in E \mid d(x,A) &lt; \eta \bigr\}\)</span>. Choose <span class="math inline">\(\eta_i&gt;0\)</span> such that <span class="math inline">\(\mu(F_i^{\eta_i}) &lt; \mu(F_i) + \frac{\epsilon}{2}\)</span>. Apply the previous theorem to get <span class="math inline">\(f_i\in C_b(E)\)</span> with value <span class="math inline">\(1\)</span> on <span class="math inline">\(F_i\)</span>, value <span class="math inline">\(0\)</span> outside <span class="math inline">\(F_i^{\eta_i}\)</span>, and value everywhere contained in <span class="math inline">\([0,1]\)</span>. If <span class="math inline">\(\bigl|\nu(f_i)-\mu(f_i)\bigr| &lt; \frac{\epsilon}{2}\)</span>, then <span class="math display">\[
+\nu(F_i) \leqslant \nu(f_i) &lt; \mu(f_i) + \frac{\epsilon}{2} 
+\leqslant \mu(F_i^{\eta_i}) + \frac{\epsilon}{2} &lt; \mu(F_i) + \epsilon.
+\]</span> Thus, each set in the canonical neighborhood at <span class="math inline">\(\mu\)</span> is contained in a set of family <em>(i)</em>.</p>
+<p>It remains to treat the family <em>(iii)</em>. If <span class="math inline">\(A\subset E\)</span> is Borel and <span class="math inline">\(\mu(\partial A) = 0\)</span>, then for <span class="math inline">\(\nu\)</span> in a set of family <em>(i)</em> we have <span class="math display">\[
+\nu(A) \leqslant \nu(\overline{A}) &lt; \mu(\overline{A}) + \epsilon 
+= \mu(A) + \epsilon
+\]</span> and for <span class="math inline">\(\nu\)</span> in a set of family <em>(ii)</em> we have <span class="math display">\[
+\nu(A) \geqslant \nu(A^\circ) &gt; \mu(A^\circ) - \epsilon 
+= \mu(A) - \epsilon.
+\]</span> Since <em>(i)</em> is a neighborhood basis at <span class="math inline">\(\mu\)</span>, each set of family <em>(iii)</em> contains a set of family <em>(i)</em>. On the other hand, if <span class="math inline">\(F \subset E\)</span> is closed, then for any <span class="math inline">\(\epsilon&gt;0\)</span> there is <span class="math inline">\(\eta&gt;0\)</span> such that <span class="math inline">\(\mu(\partial F^\eta) = 0\)</span> and <span class="math inline">\(\mu(F^\eta) &lt; \mu(F) + \frac{\epsilon}{2}\)</span>. Indeed, firstly one can obviously take <span class="math inline">\(\lambda\)</span> such that <span class="math inline">\(\mu(F^\lambda) &lt; \mu(F) + \frac{\epsilon}{2}\)</span>. Since the <span class="math inline">\(\partial F^\eta\)</span> for <span class="math inline">\(\eta \in ]0, \lambda[\)</span> have empty intersection (since <span class="math inline">\(\partial F^\eta = \bigl\{x\in E \mid d(x,F) = \eta \bigr\}\)</span>), there is <span class="math inline">\(\eta \in ]0, \lambda[\)</span> such that <span class="math inline">\(\mu(\partial F^\eta) = 0\)</span>. Obviously <span class="math inline">\(\mu(F^\eta) \leqslant \mu(F^\lambda)\)</span>. The claim is proved. Now take <span class="math inline">\(\nu\)</span> such that <span class="math inline">\(\bigl|\nu(F^\eta)-\mu(F^\eta)\bigr| &lt; \frac{\epsilon}{2}\)</span>. Then <span class="math display">\[
+\nu(F) \leqslant \nu(F^\eta) &lt; \mu(F^\eta) + \frac{\epsilon}{2} 
+&lt; \mu(F) + \epsilon.
+\]</span> Thus each set of family <em>(i)</em> contains a set of family <em>(iii)</em>. □</p>
+<p>The following proposition will be used in <a href="ProhorovLusin.html">Probabilities on a Lusin space</a>.</p>
+<p><strong>Proposition.</strong> <em>Assume <span class="math inline">\(E\)</span> is metric. Let <span class="math inline">\(\mu\in\Pr(E)\)</span> and <span class="math inline">\((\mu_n)\)</span> be a sequence in <span class="math inline">\(\Pr(E)\)</span>, such that <span class="math inline">\((\mu_n)\)</span> converges to <span class="math inline">\(\mu\)</span>. Then <span class="math inline">\(\limsup \mu_n(F) \leqslant \mu(F)\)</span> for all closed sets <span class="math inline">\(F\subset E\)</span>.</em></p>
+<p><em>Proof.</em> Suppose there exists a closed <span class="math inline">\(F\subset E\)</span> such that <span class="math inline">\(\limsup \mu_n(F) &gt; \mu(F)\)</span>. Let <span class="math inline">\(\epsilon&gt;0\)</span> such that <span class="math inline">\(\limsup \mu_n(F) &gt; \mu(F)+\epsilon\)</span>. Then there are infinitely many <span class="math inline">\(n\)</span> such that <span class="math inline">\(\mu_n(F) \geqslant \mu(F)+\epsilon\)</span>. The set <span class="math display">\[
+V = \bigl\{\nu \in \Pr(E) \mid \nu(F)&lt;\mu(F)+\epsilon\bigr\}
+\]</span> is a neighborhood of <span class="math inline">\(\mu\)</span> by the previous proposition. But for every <span class="math inline">\(N \geq 0\)</span>, there exists <span class="math inline">\(n \geqslant N\)</span> for which <span class="math inline">\(\mu_n\not\in V\)</span>. That shows that <span class="math inline">\((\mu_n)\)</span> does not converge to <span class="math inline">\(\mu\)</span>. □</p>
+<p><strong>Lemma (regularity of probabilities on metric spaces)</strong> <em>Assume <span class="math inline">\(E\)</span> is metric. Then for every probability <span class="math inline">\(\mu\)</span> on <span class="math inline">\(E\)</span> and every Borel set <span class="math inline">\(A \subset E\)</span>,</em> <span class="math display">\[
+\begin{align}
+\mu(A) &amp; = \inf\bigl\{\mu(O) \mid O \text{ open}, O \supset A\bigr\} \\
+&amp; = \sup\bigl\{\mu(F) \mid F \text{ closed}, F \subset A\bigr\}.
+\end{align}
+\]</span></p>
+<p><em>Proof.</em> The first equality is obviously true for an open set <span class="math inline">\(A\)</span>. Let us show that the second equality is true for any open set <span class="math inline">\(A\)</span>. There exist some closed sets <span class="math inline">\(F_n \uparrow A\)</span>: take <span class="math inline">\(F_n = \bigl\{x \mid d(x,A^c) \geqslant \frac{1}{n} \bigr\}\)</span>. Since we have <span class="math inline">\(\mu(F_n) \uparrow \mu(A)\)</span>, it is easy to see that the second equality holds for <span class="math inline">\(A\)</span>. Let <span class="math inline">\(\mathcal{A}\)</span> be the set of all Borel sets <span class="math inline">\(A\)</span> fulfilling the stated property. To prove that the lemma is true, it remains to show that <span class="math inline">\(\mathcal{A}\)</span> is a <span class="math inline">\(\sigma\)</span>-algebra. Let us show this is the case. It is clear that <span class="math inline">\(\mathcal{A}\)</span> is stable under complementation. It is easy to see that <span class="math inline">\(A \in \mathcal{A}\)</span> if and only if for every <span class="math inline">\(\epsilon &gt; 0\)</span> there exist an open set <span class="math inline">\(O \supset A\)</span> and a closed set <span class="math inline">\(F \subset A\)</span> such that <span class="math inline">\(\mu(O\setminus F) &lt; \epsilon\)</span>.</p>
+<p>Let <span class="math inline">\((A_n)\)</span> be a sequence in <span class="math inline">\(\mathcal{A}\)</span>. For every <span class="math inline">\(n\)</span>, let <span class="math inline">\(F_n \subset A_n \subset O_n\)</span> with <span class="math inline">\(\mu(O_n \setminus F_n) \leqslant \epsilon/3^n\)</span>. Let <span class="math inline">\(n_0\)</span> such that <span class="math display">\[
+\mu\bigl(\bigcup F_n \setminus \bigcup_{k=1}^{n_0} F_k \bigr) &lt; 
+\frac{\epsilon}{2}.
+\]</span> Take <span class="math inline">\(O = \bigcup_n O_n\)</span> and <span class="math inline">\(F = \bigcup_{k=1}^{n_0} F_k\)</span>. Then <span class="math inline">\(F \subset \bigcup_n A_n \subset O\)</span> and since <span class="math inline">\(O \setminus \bigcup_n F_n \subset \bigcup (O_n\setminus F_n)\)</span>, <span class="math display">\[
+\mu(O\setminus F) \leqslant 
+\mu(O \setminus \bigcup F_n) + \mu(\bigcup F_n \setminus F) &lt; 
+\sum \mu(O_n\setminus F_n) + \frac{\epsilon}{2} &lt; \epsilon.
+\]</span> □</p>
+<p><strong>Lemma.</strong> <em>If the inequality <span class="math inline">\(\mu(A) \leqslant \nu(A^\epsilon) + \epsilon\)</span> holds for <span class="math inline">\(A = E\setminus B^\epsilon\)</span>, then <span class="math inline">\(\nu(B) \leqslant \mu(B^\epsilon) + \epsilon\)</span>.</em></p>
+<p><em>Proof.</em> Note that the two inclusions <span class="math inline">\(A \subset E\setminus B^\epsilon\)</span> and <span class="math inline">\(B \subset E\setminus A^\epsilon\)</span> are equivalent because each one is equivalent to <span class="math inline">\(d(x,y) \geqslant \epsilon\)</span> for all <span class="math inline">\(x\in A\)</span> and <span class="math inline">\(y\in B\)</span>. Hence <span class="math display">\[
+\mu(B^\epsilon) = 1 - \mu(A) \geqslant 1 - \nu(A^\epsilon)-\epsilon 
+= \nu(E\setminus A^\epsilon)-\epsilon \geqslant \nu(B) -\epsilon.
+\]</span> □</p>
+<p>We will not use equality <span class="math inline">\((2)\)</span> of the following proposition.</p>
+<p><strong>Proposition and definition (Prohorov distance).</strong> <em>Let <span class="math inline">\(E\)</span> be a metric space. The Prohorov distance between <span class="math inline">\(\mu \in \Pr(E)\)</span> and <span class="math inline">\(\nu \in \Pr(E)\)</span> is defined by</em> <span class="math display">\[
+d_P(\mu,\nu) = 
+\inf\bigl\{\epsilon&gt;0 \mid \forall A\in\mathcal{B}_E, 
+\mu(A) \leqslant \nu(A^\epsilon) + \epsilon \,\text{ and }\, 
+\nu(A) \leqslant \mu(A^\epsilon) + \epsilon\bigr\}.
+\]</span> <em>One has</em> <span class="math display">\[
+\begin{align}
+d_P(\mu,\nu) &amp; \overset{(1)}{=} 
+\inf\bigl\{\epsilon&gt;0 \mid \forall A\in\mathcal{B}_E, 
+\mu(A) \leqslant \nu(A^\epsilon) + \epsilon\bigr\} \\ &amp; \overset{(2)}{=}
+\inf\bigl\{\epsilon&gt;0 \mid \forall \text{ closed } F\subset E, 
+\mu(F) \leqslant \nu(F^\epsilon)+\epsilon\bigr\}.
+\end{align}
+\]</span></p>
+<p><em>Proof.</em> Let <span class="math inline">\(\epsilon&gt;0\)</span> such that <span class="math inline">\(\mu(A) \leqslant \nu(A^\epsilon) + \epsilon\)</span> for all <span class="math inline">\(A\in\mathcal{B}_E\)</span>. Let <span class="math inline">\(B\in\mathcal{B}_E\)</span>. Then <span class="math inline">\(E\setminus B^\epsilon\in\mathcal{B}_E\)</span> since <span class="math inline">\(B^\epsilon\)</span> is open. Applying the previous lemma, we get <span class="math inline">\(\nu(B) \leqslant \mu(B^\epsilon) + \epsilon\)</span>. Thus the two inequalities in the definition of <span class="math inline">\(d_P(\mu,\nu)\)</span> hold for all <span class="math inline">\(B\in\mathcal{B}_E\)</span>. Equality <span class="math inline">\((1)\)</span> is proved.</p>
+<p>Now we prove equality <span class="math inline">\((2)\)</span>. Let <span class="math inline">\(\epsilon&gt;0\)</span> such that <span class="math inline">\(\mu(F) \leqslant \nu(F^\epsilon)+\epsilon\)</span> for all closed sets <span class="math inline">\(F \subset E\)</span>. We will first prove that <span class="math inline">\(\nu(F) \leqslant \mu(F^\epsilon)+\epsilon\)</span> for all closed sets <span class="math inline">\(F \subset E\)</span>. Let <span class="math inline">\(H\subset E\)</span> be closed and <span class="math inline">\(G = E\setminus H^\epsilon\)</span>. Then <span class="math inline">\(G\)</span> is closed. Hence <span class="math inline">\(\nu(H) \leqslant \mu(H^\epsilon) + \epsilon\)</span> by the previous lemma. Thus it suffices to prove that <span class="math inline">\(\epsilon&gt;0\)</span> satisfies <span class="math display">\[
+\mu(A) \leqslant \nu(A^\epsilon) + \epsilon \,\text{ and }\, 
+\nu(A) \leqslant \mu(A^\epsilon) + \epsilon
+\]</span> for all Borel <span class="math inline">\(A\)</span> if and only if it satisfies these inequalities for all closed <span class="math inline">\(A\)</span>. Assume these inequalities hold for all closed <span class="math inline">\(A\)</span>. Let <span class="math inline">\(B\subset E\)</span> be Borel. Take <span class="math inline">\(\eta&gt;0\)</span>. By the lemma <em>“regularity of probabilities on metric spaces”</em>, there exists a closed <span class="math inline">\(C\subset B\)</span> such that <span class="math inline">\(\mu(C) \geqslant \mu(B)-\delta\)</span>. Hence <span class="math display">\[
+\mu(B)-\delta \leqslant \mu(C) \leqslant \nu(C^\epsilon)+\epsilon \leqslant 
+\nu(B^\epsilon)+\epsilon.
+\]</span> Therefore <span class="math inline">\(\mu(B) \leqslant \nu(B^\epsilon)+\epsilon\)</span> since <span class="math inline">\(\delta\)</span> was arbitrary. The other inequality is similarly proved. □</p>
+<p><strong>Lemma.</strong> <em>Let <span class="math inline">\(E\)</span> be a metric space, and <span class="math inline">\(\mu\in\Pr(E)\)</span>. For every <span class="math inline">\(\eta&gt;0\)</span>, one can cover <span class="math inline">\(E\)</span> by open balls <span class="math inline">\(\{S_i\}\)</span> satisfying <span class="math inline">\(\mu(\partial S_i)=0\)</span> and <span class="math inline">\(\textrm{diam}(S_i) &lt; \eta\)</span> for all <span class="math inline">\(i\)</span>. If <span class="math inline">\(E\)</span> is separable, one can cover <span class="math inline">\(E\)</span> by countably many such balls.</em></p>
+<p><em>Proof.</em> Denote by <span class="math inline">\(S_\eta(x)\)</span> the open sphere of radius <span class="math inline">\(\eta\)</span> centered at <span class="math inline">\(x\)</span>, and by <span class="math inline">\(B_\eta(x)=\partial S_\eta(x) = \bigl\{y \mid d(x,y)=\eta\bigr\}\)</span> the boundary of this sphere. One has <span class="math inline">\(S_\eta(x) = \bigcup_{0\leqslant\eta'&lt;\eta}B_\eta(x)\)</span>. This is an uncountable disjoint union of Borel sets, and hence all but a countable number of them must have <span class="math inline">\(\mu\)</span>-measure zero. Therefore every sphere <span class="math inline">\(S_\eta(x)\)</span> contains a sphere <span class="math inline">\(S_{\eta'}(x)\)</span>, <span class="math inline">\(\eta'\leqslant\eta\)</span> such that <span class="math inline">\(\mu\bigl(B_{\eta'}(x)\bigr)=0\)</span>. Picking such a sphere for every <span class="math inline">\(x\in E\)</span>, one gets the first claim of the lemma. If <span class="math inline">\(E\)</span> is separable, it is Lindelöf, and the last statement follows. □</p>
+<p><strong>Theorem.</strong> <em>The Prohorov distance defines a metric on <span class="math inline">\(\Pr(E)\)</span>. The topology it induces is finer than the narrow topology. These two topologies coincide when <span class="math inline">\(E\)</span> is separable.</em></p>
+<p><em>Proof.</em> It is clear that <span class="math inline">\(d_P(\mu,\nu) = d_P(\nu,\mu) \geqslant 0\)</span> and <span class="math inline">\(d_P(\mu,\mu)=0\)</span>. If <span class="math inline">\(A \subset E\)</span> is closed then <span class="math inline">\(A^\epsilon \downarrow A\)</span> as <span class="math inline">\(\epsilon \downarrow 0\)</span> (it is easy to see that <span class="math inline">\(d(x,A)=0\)</span> for every <span class="math inline">\(x \in \cap_{\epsilon&gt;0} A^\epsilon\)</span>, and this is equivalent to <span class="math inline">\(x\in\overline{A}\)</span>), hence <span class="math inline">\(\mu(A^\epsilon) \downarrow \mu(A)\)</span>. Therefore <span class="math inline">\(d_P(\mu,\nu) = 0\)</span> implies <span class="math inline">\(\mu(A)=\nu(A)\)</span> for all closed <span class="math inline">\(A\)</span>, and therefore <span class="math inline">\(\mu = \nu\)</span>. Now let us prove the triangle inequality. Let <span class="math inline">\(\mu_1,\mu_2,\mu_3\in\Pr(E)\)</span>. For any <span class="math inline">\(\epsilon&gt;d_P(\mu_1,\mu_2)\)</span> and <span class="math inline">\(\eta&gt;d_P(\mu_2,\mu_3)\)</span>, we have <span class="math display">\[
+\mu_1(A) &lt; \mu_2(A^\epsilon)+\epsilon, \quad 
+\mu_2(A^\epsilon) &lt; \mu_3(A^{\epsilon+\eta})+\eta
+\]</span> for every Borel set <span class="math inline">\(A\subset E\)</span>. This implies <span class="math inline">\(\mu_1(A) &lt; \mu_3(A^{\epsilon+\eta})+\epsilon+\eta\)</span>. Similarly, <span class="math inline">\(\mu_3(A) &lt; \mu_1(A^{\epsilon+\eta})+\epsilon+\eta\)</span>. Therefore <span class="math inline">\(d_P(\mu_1,\mu_3) \leqslant \epsilon+\delta\)</span>. Letting <span class="math inline">\(\epsilon\to d_P(\mu_1,\mu_2)\)</span> and <span class="math inline">\(\eta\to d_P(\mu_2,\mu_3)\)</span>, we get <span class="math inline">\(d_P(\mu_1,\mu_3) \leqslant d_P(\mu_1,\mu_2) + d_P(\mu_2,\mu_3)\)</span>.</p>
+<p>Now let us show that the topology induced by <span class="math inline">\(d_P\)</span> is finer than the narrow topology.</p>
+<p>Let <span class="math inline">\(\mu\in\Pr(E)\)</span>, <span class="math inline">\(F\subset E\)</span> closed and <span class="math inline">\(\epsilon&gt;0\)</span>. Let <span class="math inline">\(\eta \in ]0,\epsilon[\)</span> such that <span class="math inline">\(\mu(F^\eta)&lt;\mu(F)+\epsilon\)</span>. If <span class="math inline">\(d_P(\mu,\nu)&lt;\eta\)</span>, then <span class="math inline">\(\nu(F) &lt;\mu(F^\eta)+\eta &lt; \mu(F) + 2\epsilon\)</span>. Thus each set of the family <em>(i)</em> in proposition <em>“neighborhood bases of the narrow topology”</em> contains a <span class="math inline">\(d_P\)</span>-ball. The separability assumption has not been used here.</p>
+<p>Now we show the converse under the separability assumption on <span class="math inline">\(E\)</span> . We will show that every open <span class="math inline">\(d_P\)</span>-ball contains a set of the family <em>(iii)</em> in proposition <em>“neighborhood bases of the narrow topology”</em>. Take <span class="math inline">\(\eta \in ]0,\epsilon/2[\)</span>. Apply the previous lemma: cover <span class="math inline">\(E\)</span> by open balls <span class="math inline">\({\{S_i\}}_{i \geqslant 1}\)</span> satisfying <span class="math inline">\(\mu(\partial S_i)=0\)</span> and <span class="math inline">\(\textrm{diam}(S_i) &lt; \eta\)</span> for all <span class="math inline">\(i\)</span>. Let <span class="math inline">\(A_1 = S_1\)</span> and <span class="math inline">\(A_n = S_n\setminus\bigl(\bigcup_{m=1}^{n-1}S_m\bigr)\)</span> for <span class="math inline">\(n \geqslant 2\)</span>. Take <span class="math inline">\(k\geqslant 1\)</span> such that <span class="math inline">\(\mu\bigl(\bigcup_{i=1}^kA_i\bigr) &gt; 1-\eta\)</span>. One has <span class="math inline">\(\bigcup_{i=1}^kA_i = \bigcup_{i=1}^kS_i\)</span>, therefore <span class="math inline">\(\mu\Bigl(\partial\bigl(\bigcup_{i=1}^kA_i\bigr)\Bigr) = 0\)</span>. Denote by <span class="math inline">\(\mathcal{A}\)</span> the set of all Borel <span class="math inline">\(A\)</span> that can be written as a union of sets from <span class="math inline">\(\{A_1, \ldots, A_k\}\)</span>. Let <span class="math inline">\(N\)</span> be a neighborhood of <span class="math inline">\(\mu\)</span> of type <em>(iii)</em> in proposition <em>“neighborhood bases of the narrow topology”</em>, described by <span class="math display">\[
+N = \Bigl\{\nu \in \Pr(E) \mid \forall A\in\mathcal{A}, 
+\bigl|\mu(A)-\nu(A)\bigr|&lt;\eta \Bigr\}.
+\]</span> For any Borel set <span class="math inline">\(B\subset E\)</span>, let <span class="math inline">\(A'\)</span> be the union of sets in <span class="math inline">\(\{A_1, \ldots, A_k\}\)</span> which intersect <span class="math inline">\(B\)</span>. Then <span class="math inline">\(\bigl|\mu(A')-\nu(A')\bigr|&lt;\eta\)</span> if <span class="math inline">\(\nu \in N\)</span>.<br />
+Let us check that <span class="math inline">\(A'\subset B^\eta\)</span>. If <span class="math inline">\(x \in A'\)</span>, then there is <span class="math inline">\(j\)</span> such that <span class="math inline">\(x \in A_j\)</span> and <span class="math inline">\(A_j\cap B \neq \varnothing\)</span>. Pick <span class="math inline">\(y \in A_j \cap B\)</span>. Then <span class="math inline">\(d(x,B) \leqslant d(x,y)\)</span>. Since <span class="math inline">\(\textrm{diam}(A_j)&lt;\eta\)</span>, one has <span class="math inline">\(x \in B^\eta\)</span>.</p>
+<p>One has <span class="math inline">\(B \subset A' \cup {\bigl(\bigcup_{i=1}^kA_i\bigr)}^c\)</span>. Thus <span class="math display">\[
+\mu(B) \leqslant \mu(A') + \mu\Bigl(\bigl(\bigcup_{i=1}^kA_i\bigr)^c\Bigr) 
+\leqslant \nu(A') + 2\eta \leqslant \nu(B^\eta)+2\eta,
+\]</span> hence <span class="math inline">\(d_P(\mu,\nu) \leqslant 2\eta &lt; \epsilon\)</span>. That is, every open <span class="math inline">\(d_P\)</span>-ball contains a set of type <em>(iii)</em> in proposition <em>“neighborhood bases of the narrow topology”</em>. □</p>
+<p>We refer the reader to [3] for a proof of the following theorem. But we will give a proof of this theorem in the last section for a Lusin space <span class="math inline">\(E\)</span>, which is enough for our purpose (since a Polish space is Lusin).</p>
+<p><strong>Theorem (Prohorov).</strong> <em>Let <span class="math inline">\(E\)</span> be a metrizable space. If <span class="math inline">\(\Lambda \subset \Pr(E)\)</span> is tight, then every sequence in <span class="math inline">\(\Lambda\)</span> has a convergent subsequence.</em></p>
+<p><strong>Theorem.</strong> <em>If <span class="math inline">\(E\)</span> is Polish, the Prohorov metric is complete</em>.</p>
+<p><em>Proof.</em> Let <span class="math inline">\((\mu_n)\)</span> be a Cauchy sequence in <span class="math inline">\(\Pr(E)\)</span> with respect to <span class="math inline">\(d_P\)</span>. Let <span class="math inline">\(\epsilon&gt;0\)</span> and <span class="math inline">\(k \geqslant 1\)</span> be an integer. Pick <span class="math inline">\(n(k)\geqslant 1\)</span> such that <span class="math inline">\(d_P(\mu_n,\mu_{n(k)}) &lt; \epsilon 2^{-k}\)</span> for <span class="math inline">\(n \geqslant n(k)\)</span>. Consider a complete metric on <span class="math inline">\(E\)</span> compatible with the topology. Since <span class="math inline">\(E\)</span> is separable, it can be covered by countably many open balls of diameter <span class="math inline">\(\epsilon 2^{-k}\)</span>. Let <span class="math inline">\(B_1^k, \ldots, B_{m(k)}^k\)</span> be finitely many open balls of diameter <span class="math inline">\(\epsilon 2^{-k}\)</span> satisfying <span class="math display">\[
+\mu_{n(k)}\left(\bigcup_{i=1}^{m(k)}B_i^k\right) &gt; 1 - \frac{\epsilon}{2^k}.
+\]</span> For each <span class="math inline">\(i \in [\![1,m(k)]\!]\)</span>, let <span class="math inline">\(A_i^k\)</span> be the open ball concentric with <span class="math inline">\(B_i^k\)</span> and with twice the radius. Since <span class="math display">\[
+{\left(\bigcup_{i=1}^{m(k)}B_i^k\right)}^{\!\!\frac{\epsilon}{2^k}}
+\subset \bigcup_{i=1}^{m(k)}A_i^k
+\]</span> and <span class="math inline">\(d_P(\mu_n,\mu_{n(k)}) &lt; \frac{\epsilon}{2^k}\)</span> for <span class="math inline">\(n\geqslant n(k)\)</span>, <span class="math display">\[
+\mu_n\left(\bigcup_{i=1}^{m(k)}A_i^k\right) &gt; 
+1 - \frac{2\epsilon}{2^k}
+\]</span> for <span class="math inline">\(n\geqslant n(k)\)</span>.</p>
+<p>By adding if necessary finitely many open balls <span class="math inline">\(A^k_{m(k)+1}, \ldots, A^k_{j(k)}\)</span> of radius <span class="math inline">\(\frac{2\epsilon}{2^k}\)</span>, we have <span class="math display">\[
+\mu_n\left(\bigcup_{i=1}^{j(k)}A_i^k\right) &gt; 
+1 - \frac{2\epsilon}{2^k}
+\]</span> for <span class="math inline">\(n\geqslant 1\)</span>. It is easy to see that the set <span class="math display">\[
+K = \bigcap_{k\geqslant 1}\bigcup_{i=1}^{j(k)}A_i^k
+\]</span> is totally bounded. Therefore its closure <span class="math inline">\(\overline{K}\)</span> is totally bounded as well. Since it is complete, <span class="math inline">\(\overline{K}\)</span> is compact. Also, <span class="math inline">\(\mu_n(\overline{K}) \geqslant 1-2\epsilon\)</span> for all <span class="math inline">\(n\)</span>. Therefore the sequence <span class="math inline">\((\mu_n)\)</span> is tight. By Prohorov’s theorem, it has a convergent subsequence. Since it is Cauchy, it converges. □</p>
+<p><strong>Corollary.</strong> <em>If <span class="math inline">\(E\)</span> is Polish, <span class="math inline">\(\Pr(E)\)</span> is Polish.</em></p>
+<p><em>Proof.</em> This is a consequence of the two previous theorems. □</p>
+<h1 id="kernels-as-random-probabilities">Kernels as random probabilities</h1>
+<p>Now we show the result stated in the introduction, namely that a probability kernel from a probability space to a Polish space <span class="math inline">\(E\)</span> is a random variable in the Polish space <span class="math inline">\(\Pr(E)\)</span>.</p>
+<p><strong>Lemma.</strong> <em>Let <span class="math inline">\(E\)</span> be a Polish space and <span class="math inline">\(\Omega\)</span> be a probability space. Then a map <span class="math inline">\(\Gamma\colon\Omega\to\Pr(E)\)</span> is measurable if and only if <span class="math inline">\(\omega\mapsto\Gamma_\omega(f)\)</span> is measurable for every <span class="math inline">\(f\in C_b(E)\)</span>, where we denote by <span class="math inline">\(\Gamma_\omega\)</span> the probability <span class="math inline">\(\mathcal{B}_E \ni A \mapsto \Gamma(\omega)(A)\)</span>.</em></p>
+<p><em>Proof.</em> The “only if” part is obvious (and does not require the Polish assumption). Let us show the converse. Since <span class="math inline">\(E\)</span> is Polish, <span class="math inline">\(\Pr(E)\)</span> is Polish, hence it is strongly Lindelöf. Therefore every open set <span class="math inline">\(O \subset \Pr(E)\)</span> is a countable union of sets <span class="math display">\[
+\Bigl\{\nu \mid \bigl|\nu(f_i) - \mu(f_i)\bigr| &lt; \epsilon, 
+i\in [\![1,k]\!] \Bigr\}
+\]</span> where <span class="math inline">\(\mu\in\Pr(E)\)</span>, <span class="math inline">\(\epsilon&gt;0\)</span>, <span class="math inline">\(k\geqslant 1\)</span> and <span class="math inline">\(f_i \in C_b(E)\)</span>. The maps <span class="math inline">\(\omega\mapsto\Gamma_\omega(f_i)\)</span> are measurable, therefore the set <span class="math display">\[
+\Bigl\{\omega \mid 
+\bigl|\Gamma_\omega(f_i) - \mu(f_i)\bigr|&lt;\epsilon, i\in [\![1,k]\!] \Bigr\}
+\]</span> is measurable. Thus <span class="math inline">\(\Gamma^{-1}(O)\)</span> is a measurable set. □</p>
+<p><strong>Theorem.</strong> <em>Let <span class="math inline">\(E\)</span> be a metric space. Let <span class="math inline">\(\Omega\)</span> be a probability space, and <span class="math inline">\(\Gamma\colon\Omega\to\Pr(E)\)</span> be a map. We denote by <span class="math inline">\(\Gamma_\omega\)</span> the image of <span class="math inline">\(\omega\)</span> by <span class="math inline">\(\Gamma\)</span>. Define the map <span class="math inline">\(K\colon\Omega\times\mathcal{B}_E \to [0,1]\)</span> by <span class="math inline">\(K(\omega,A) = \Gamma_\omega(A)\)</span>. If <span class="math inline">\(\Gamma\)</span> is measurable, then <span class="math inline">\(K\)</span> is a probability kernel from <span class="math inline">\(\Omega\)</span> to <span class="math inline">\(E\)</span>. If <span class="math inline">\(E\)</span> is Polish, the converse is true.</em></p>
+<p><em>Proof.</em> Assume <span class="math inline">\(\Gamma\)</span> is measurable. Then <span class="math inline">\(\omega\mapsto\Gamma_\omega(f)\)</span> is measurable for every <span class="math inline">\(f \in C_b(E)\)</span>. Let <span class="math inline">\(F\subset E\)</span> be a closed set and for every integer <span class="math inline">\(n\geqslant 1\)</span> define <span class="math inline">\(f_n\in C_b(E)\)</span> by <span class="math inline">\(f_n(x)=\max\bigl\{0,1-n d(x,F)\bigr\}\)</span> where <span class="math inline">\(d\)</span> is the metric on <span class="math inline">\(E\)</span>. Then <span class="math inline">\(f_n(x)\downarrow\mathbf{1}_F(x)\)</span> for every <span class="math inline">\(x\in E\)</span>. By monotone convergence, <span class="math inline">\(\Gamma_\omega(f_n) \to \Gamma_\omega(F)\)</span> and then <span class="math inline">\(\omega\mapsto\Gamma_\omega(F)\)</span> is measurable. It is easy to see that the set <span class="math display">\[
+\bigl\{A \in \mathcal{B}_E \mid 
+\omega\mapsto\Gamma_\omega(A) \text{ is measurable}\bigr\}
+\]</span> is a <span class="math inline">\(\lambda\)</span>-system. Since it contains the <span class="math inline">\(\pi\)</span>-system of closed sets, it is equal to <span class="math inline">\(\mathcal{B}_E\)</span> by the monotone class theorem.</p>
+<p>Now assume that <span class="math inline">\(E\)</span> is Polish and <span class="math inline">\(K\)</span> is a probability kernel. The set <span class="math display">\[
+V = \bigl\{f\colon E \to \mathbb{R} \mid 
+\omega\mapsto\Gamma_\omega(f) \text{ is measurable}\bigr\}
+\]</span> is a vector space containing the indicator function <span class="math inline">\(\mathbf{1}_A\)</span> for every <span class="math inline">\(A\in\mathcal{B}_E\)</span>, hence it contains all finite linear combinations of such indicators functions. Let <span class="math inline">\(f\in C_b(E)\)</span>. For every integer <span class="math inline">\(n\geqslant 1\)</span>, define <span class="math display">\[
+f_n(x) = \sum_{j=1}^\infty \frac{j-1}{n} 
+\mathbf{1}_{\left]\frac{j-1}{n},\frac{j}{n}\right]}\bigl(f(x)\bigr) = 
+\sum_{j=1}^\infty \frac{j-1}{n} 
+\mathbf{1}_{f^{-1}\left(\left]\frac{j-1}{n},\frac{j}{n}\right]\right)}(x).
+\]</span> Then <span class="math inline">\(f_n\)</span> is a finite linear combination since <span class="math inline">\(f\)</span> is bounded, and <span class="math inline">\(\bigl|f_n(x)-f(x)\bigr| \leqslant \frac{1}{n}\)</span> for every <span class="math inline">\(x\in E\)</span>. Therefore <span class="math inline">\(f_n(x) \leqslant 1+{\Vert f \Vert}_\infty\)</span> and <span class="math inline">\(f_n(x) \to f(x)\)</span> for every <span class="math inline">\(x\in E\)</span>. By dominated convergence, <span class="math inline">\(\Gamma_\omega(f_n) \to \Gamma_\omega(f)\)</span>, hence <span class="math inline">\(f \in V\)</span>. By the previous lemma, <span class="math inline">\(\Gamma\)</span> is measurable. □</p>
+<h1 id="references">References</h1>
+<ul>
+<li><p>[1] Nikolaos S. Papageorgiou, Patrick Winkert. <em>Applied Nonlinear Functional Analysis: An Introduction</em>. 2018.</p></li>
+<li><p>[2] Mícheál Ó Searcóid. <em>Metric spaces.</em> 2007.</p></li>
+<li><p>[3] Patrick Billingsley. <em>Convergence of probability measures.</em> Second edition, 1999.</p></li>
+<li><p>[4] K. R. Parthasarathy. <em>Probability Measures on Metric Spaces.</em> 1967.</p></li>
+<li><p>[5] Vivek S. Borkar. <em>Probability Theory: An Advanced Course.</em> 1995.</p></li>
+<li><p>[6] Alexander S. Kechris. <em>Classical descriptive set theory.</em> 1995.</p></li>
+</ul>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>

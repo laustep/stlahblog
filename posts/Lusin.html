@@ -1,0 +1,178 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Lusin spaces are strongly Lindelöf</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+    <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-3">
+        <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
+          <a href="https://www.r-bloggers.com/">
+            <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+          </a>
+          <br />
+          <a href="http://t-redactyl.io/">
+            <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
+          </a>
+          <a href="http://timelyportfolio.blogspot.be/">
+            <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
+          </a>
+          <br />
+          <a href="https://antoineguillot.wordpress.com/blog/">
+            <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+          </a>
+          <br />
+          <a href="https://fronkonstin.com/">
+            <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="main col-sm-9">
+        <div id="header">
+          <div id="logo" style="position:absolute;">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Lusin spaces are strongly Lindelöf</h1> 
+          <div class="info">
+    Posted on May 12, 2020
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="../tags/maths.html">maths</a>
+    
+</div>
+
+<p>Our goal is to prove that a Lusin space is strongly Lindelöf. We will need the elementary corollary below to prove the key proposition.</p>
+<p><strong>Lemma.</strong> <em>Let <span class="math inline">\(E\)</span> be a set and <span class="math inline">\(\mathcal{E}\subset\mathrm{Pow}(E)\)</span>. Then the <span class="math inline">\(\sigma\)</span>-field <span class="math inline">\(\sigma(\mathcal{E})\)</span> is the smallest collection of subsets <span class="math inline">\(E\)</span> containing <span class="math inline">\(\varnothing\)</span>, <span class="math inline">\(\mathcal{E}\)</span>, <span class="math inline">\(\{E\setminus A \mid A \in \mathcal{E}\}\)</span> and closed under countable intersections and countable disjoint unions.</em></p>
+<p><em>Proof.</em> Let <span class="math inline">\(\mathcal{R}\)</span> be the smallest collection of subsets <span class="math inline">\(E\)</span> containing <span class="math inline">\(\varnothing\)</span>, <span class="math inline">\(\mathcal{E}\)</span>, <span class="math inline">\(\{E\setminus A \mid A \in \mathcal{E}\}\)</span> and closed under countable intersections and countable disjoint unions. Let <span class="math inline">\(\mathcal{R}' = \{A \in \mathcal{R} \mid E \setminus A \in \mathcal{R}\}\)</span>. Then <span class="math inline">\(\mathcal{E} \subset \mathcal{R}'\)</span>, and <span class="math inline">\(\mathcal{R}'\)</span> is closed under complements. So it is enough to show that <span class="math inline">\(\mathcal{R}'\)</span> is closed under countable unions. But <span class="math inline">\(\bigcup_n A_n = \bigcup_n (A_n \setminus \bigcup_{i&lt;n}A_i)\)</span>, so it is sufficient to show that <span class="math inline">\(\mathcal{R}'\)</span> is closed under finite unions. Let <span class="math inline">\(A,B \in \mathcal{R}'\)</span>. One has <span class="math inline">\(A \cup B = (A \setminus B) \cup (B \setminus A) \cup (A \cap B)\)</span> and this is a disjoint union, so <span class="math inline">\(A \cup B \in \mathcal{R}\)</span>. Moreover <span class="math inline">\(E \setminus (A \cup B) = (E \setminus A) \cap (E \setminus B) \in \mathcal{R}\)</span>, hence <span class="math inline">\(A \cup B \in \mathcal{R}'\)</span>. □</p>
+<p><strong>Proposition.</strong> <em>Let <span class="math inline">\(E\)</span> be a topological space. A class of Borel sets of <span class="math inline">\(E\)</span> is equal to yhe Borel <span class="math inline">\(\sigma\)</span>-field <span class="math inline">\(\mathcal{B}_E\)</span> whenever it contains all open sets and closed sets and it is closed under countable intersections and countable disjoint unions.</em></p>
+<p><em>Proof.</em> Let <span class="math inline">\(\mathcal{C} \subset \mathcal{B}_E\)</span> be such a class. Let <span class="math inline">\(\mathcal{E}\)</span> be the collection of open sets of <span class="math inline">\(E\)</span>, so that <span class="math inline">\(\mathcal{B}_E = \sigma(\mathcal{E})\)</span>. Obviously one has <span class="math inline">\(\varnothing \in \mathcal{C}\)</span>. Moreover, <span class="math inline">\(\mathcal{C}\)</span> contains <span class="math inline">\(\mathcal{E}\)</span> and <span class="math inline">\(\{E\setminus A \mid A \in \mathcal{E}\}\)</span>. Therefore, by the lemma above, <span class="math inline">\(\mathcal{C}\)</span> contains <span class="math inline">\(\sigma(\mathcal{E})\)</span>. □</p>
+<p><strong>Corollary.</strong> <em>Let <span class="math inline">\(E\)</span> be a metric space. A class of Borel sets of <span class="math inline">\(E\)</span> is equal to <span class="math inline">\(\mathcal{B}_E\)</span> whenever it contains all open sets and it is closed under countable intersections and disjoint countable unions.</em></p>
+<p><em>Proof.</em> A closed set in a metric space is the countable intersection of some open sets. Therefore, if <span class="math inline">\(\mathcal{C}\subset\mathcal{B}_E\)</span> contains all open sets and is closed under countable intersections, it contains all closed sets. Thus the result is a consequence of the previous proposition. □</p>
+<p><strong>Disjoint union topology.</strong> We will resort to the disjoint union in the proof of the key proposition below. Let <span class="math inline">\({\{X_i\}}_{i \in I}\)</span> be a collection of sets. The <em>disjoint union</em> of the <span class="math inline">\(X_i\)</span> is the set <span class="math display">\[
+\bigsqcup_{i \in I} X_i = \bigl\{(x,i) \mid i \in I, x \in X_i\bigr\}. 
+\]</span> Define the canonical injections <span class="math inline">\(\varphi_i \colon X_i \to \bigsqcup_{i \in I} X_i\)</span> by <span class="math inline">\(\varphi_i(x) = (x,i)\)</span>. When the <span class="math inline">\(X_i\)</span> are topological spaces, the <em>disjoint union topology</em> on <span class="math inline">\(\bigsqcup_{i \in I} X_i\)</span> is the finest topology on <span class="math inline">\(\bigsqcup_{i \in I} X_i\)</span> for which the canonical injections are continuous. In other words, this is the final topology with respect to <span class="math inline">\({\{\varphi_i\}}_{i \in I}\)</span>. This topology is, denoting by <span class="math inline">\(\tau_i\)</span> the topology on <span class="math inline">\(X_i\)</span>, <span class="math display">\[
+\tau = \bigl\{ U \in \mathrm{Pow}(X) \mid \forall i \in I, 
+\varphi_i^{-1}(U) \in \tau_i\bigr\}.
+\]</span> If <span class="math inline">\(I\)</span> is countable and the <span class="math inline">\(X_i\)</span> are second-countable, then <span class="math inline">\(\bigsqcup_{i \in I} X_i\)</span> is second-countable. Now assume the <span class="math inline">\(X_i\)</span> are metrizable, and for each <span class="math inline">\(i \in I\)</span> take a metric <span class="math inline">\(d_i \leqslant 1\)</span> on <span class="math inline">\(X_i\)</span> compatible with the topology of <span class="math inline">\(X_i\)</span>. For <span class="math inline">\(i,j \in I\)</span>, <span class="math inline">\(x \in X_i\)</span> and <span class="math inline">\(y \in Y_j\)</span>, define <span class="math display">\[
+d\bigl((x,i), (y,j)\bigr) = 
+\begin{cases}
+d_i(x,y) &amp; \text{ if } i = j \\
+2 &amp; \text{ if } i \neq j
+\end{cases}.
+\]</span> It is easy to check that <span class="math inline">\(d\)</span> is a metric on <span class="math inline">\(\bigsqcup_{i \in I} X_i\)</span>. Clearly, each <span class="math inline">\(\varphi_i\)</span> is <span class="math inline">\((d_i,d)\)</span>-continuous. If <span class="math inline">\(Y\)</span> is a topological space, and <span class="math inline">\(g \colon \bigsqcup_{i \in I} X_i \to Y\)</span> is a map such that every <span class="math inline">\(g \circ \varphi_i\)</span> is continuous, it is easy to see that <span class="math inline">\(g\)</span> is continuous for <span class="math inline">\(d\)</span>. Thus <span class="math inline">\(d\)</span> induces the disjoint union topology, by the characteristic property of the final topology. It is easy to see that <span class="math inline">\(d\)</span> is complete if the <span class="math inline">\(d_i\)</span> are complete. Since <a href="./conditionalLaw.html">second-countability is equivalent to separability in a metric space</a>, we deduce from the above that the disjoint union of a countable family of Polish spaces is a Polish space.</p>
+<p><strong>Key proposition.</strong> <em>Let <span class="math inline">\(E\)</span> be a Polish space and <span class="math inline">\(B \in \mathcal{B}_E\)</span>. There exist a Polish space <span class="math inline">\(Z\)</span> and a continuous bijection from <span class="math inline">\(Z\)</span> onto <span class="math inline">\(B\)</span>.</em></p>
+<p><em>Proof.</em> Let <span class="math inline">\(\mathcal{C}\)</span> be the collection of sets <span class="math inline">\(B \subset E\)</span> for which there exist a Polish space and a continuous bijection from <span class="math inline">\(Z\)</span> onto <span class="math inline">\(B\)</span>. <a href="./conditionalLaw.html">An open subset of a Polish space is Polish</a>, therefore open sets of <span class="math inline">\(E\)</span> belong to <span class="math inline">\(\mathcal{C}\)</span>. By the previous corollary, it is sufficient to show that <span class="math inline">\(\mathcal{C}\)</span> is closed under countable intersections and countable disjoint unions. Let <span class="math inline">\(B_0\)</span>, <span class="math inline">\(B_1\)</span>, <span class="math inline">\(\ldots\)</span> belong to <span class="math inline">\(\mathcal{C}\)</span>. Take Polish spaces <span class="math inline">\(Z_i\)</span> and continuous bijections <span class="math inline">\(g_i\colon Z_i \to B_i\)</span>. Define <span class="math display">\[
+Z = \left\{ z \in \prod_{i\geqslant 0} Z_i 
+\mid g_0(z_0) = g_1(z_1) = \cdots \right\}.
+\]</span> Then <span class="math inline">\(Z\)</span> is closed in the Polish space <span class="math inline">\(\prod_{i\geqslant 0} Z_i\)</span>, therefore is Polish. Define <span class="math inline">\(g \colon Z \to E\)</span> by <span class="math inline">\(g(z) = g_0(z_0)\)</span>. Then <span class="math inline">\(g\)</span> is a continuous bijection from <span class="math inline">\(Z\)</span> onto <span class="math inline">\(\bigcap_{i \geqslant 0} B_i\)</span>. Thus <span class="math inline">\(\mathcal{C}\)</span> is closed under countable intersections.</p>
+<p>Now let <span class="math inline">\(B_0\)</span>, <span class="math inline">\(B_1\)</span>, <span class="math inline">\(\ldots\)</span> be pairwise disjoints sets belonging to <span class="math inline">\(\mathcal{C}\)</span>. Take Polish spaces <span class="math inline">\(Z_i\)</span> and continuous bijections <span class="math inline">\(g_i\colon Z_i \to B_i\)</span>. The disjoint union <span class="math inline">\(Z = \bigsqcup_{i \geqslant 0}Z_i\)</span> of the <span class="math inline">\(Z_i\)</span> is a Polish space. Define <span class="math inline">\(g\colon Z \to E\)</span> by <span class="math inline">\(g\bigl((z,i)\bigr) = g_i(z)\)</span>. Then <span class="math inline">\(g\)</span> is a continuous bijection from <span class="math inline">\(Z\)</span> onto <span class="math inline">\(\bigcup_{i \geqslant 0} B_i\)</span>. Thus <span class="math inline">\(\mathcal{C}\)</span> is closed under countable disjoint unions. □</p>
+<p>Say that a topological space is a <em>Lusin space</em> if it is homeomorphic to a Borel set of a compact metric space.</p>
+<p><strong>Corollary.</strong> <em>If <span class="math inline">\(E\)</span> is a Lusin space, then there exist a Polish space <span class="math inline">\(Z\)</span> and a continuous bijection from <span class="math inline">\(Z\)</span> onto <span class="math inline">\(E\)</span>.</em></p>
+<p><em>Proof.</em> A compact metric space is Polish. Apply the previous proposition. □</p>
+<p>To prove the proposition below, we use the results of the first section of <a href="./conditionalLaw.html">the previous post</a>.</p>
+<p>A topological space is said to be <em>strongly Lindelöf</em> if every open set of this space is Lindelöf.</p>
+<p><strong>Proposition.</strong> <em>A Polish space is strongly Lindelöf.</em></p>
+<p><em>Proof.</em> A Polish space is metrizable and separable, therefore it is Lindelöf. Since an open subset of a Polish space is Polish, we see that a Polish space is strongly Lindelöf. □</p>
+<p><strong>Lemma.</strong> <em>The continuous image of a strongly Lindelöf space is a strongly Lindelöf space.</em></p>
+<p><em>Proof.</em> Let <span class="math inline">\(E_1\)</span> and <span class="math inline">\(E_2\)</span> be two topological spaces with <span class="math inline">\(E_1\)</span> strongly Lindelöf, and let <span class="math inline">\(f\colon E_1 \to E_2\)</span> be a continuous function. Let <span class="math inline">\(O_2 \subset E_2\)</span> be an open subset of <span class="math inline">\(f(E_1)\)</span> and let <span class="math inline">\(\mathcal{C}_2\)</span> be an open cover of <span class="math inline">\(O_2\)</span>. Then <span class="math inline">\(\bigl\{f^{-1}(C) \mid C \in \mathcal{C}_2\bigr\}\)</span> is an open cover of the open set <span class="math inline">\(O_1 := f^{-1}(O_2)\)</span>. Then it has a countable subcover <span class="math inline">\(\bigl\{f^{-1}(C) \mid C \in \mathcal{D}_2\bigr\} =: \mathcal{D}_1\)</span> where <span class="math inline">\(\mathcal{D}_2\)</span> is a countable subset of <span class="math inline">\(\mathcal{C}_2\)</span>. One has <span class="math inline">\(f\bigl(f^{-1}(C)\bigr) = C\)</span> for every <span class="math inline">\(C \subset f(E_1)\)</span>, therefore <span class="math inline">\(f(\mathcal{D}_1) = \mathcal{D}_2\)</span> is an open subcover of <span class="math inline">\(f(O_1) = O_2\)</span>. Thus <span class="math inline">\(f(E_1)\)</span> is strongly Lindelöf. □</p>
+<p><strong>Theorem.</strong> <em>A Lusin space is strongly Lindelöf.</em></p>
+<p><em>Proof.</em> Let <span class="math inline">\(X\)</span> be a Lusin space, and <span class="math inline">\(f \colon Y \to X\)</span> be a surjective continuous function from a Polish space <span class="math inline">\(Y\)</span> onto <span class="math inline">\(X\)</span>. By the previous proposition, <span class="math inline">\(Y\)</span> is strongly Lindelöf, therefore <span class="math inline">\(X\)</span> is strongly Lindelöf by the previous lemma. □</p>
+<h1 id="references">References</h1>
+<ul>
+<li><p>[1] Alexander S. Kechris. <em>Classical descriptive set theory.</em> 1995.</p></li>
+<li><p>[2] S. M. Srivastava. <em>A Course on Borel Sets.</em> 1998.</p></li>
+<li><p>[3] Nikolaos S. Papageorgiou, Patrick Winkert. <em>Applied Nonlinear Functional Analysis: An Introduction</em>. 2018.</p></li>
+</ul>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
