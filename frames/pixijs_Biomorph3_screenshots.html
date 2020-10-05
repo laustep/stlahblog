@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <script src="../libraries/hamster.min.js"></script>
-  <title>Hyperbolic tiling</title>
+  <title>Biomorph</title>
   <style>
     html, body { 
       margin: 0; 
@@ -34,102 +34,68 @@
     uniform float xmax;
     uniform float ymin;
     uniform float ymax;
-    uniform float power;
+    uniform vec2 mouse;
+    uniform float iGlobalTime;
+    uniform bool anim;
+    uniform float time;
 
-    const float pi = 3.1415926535897932384626433832795;
-
-    // complex numbers
-    vec2 product(vec2 a, vec2 b){
-      return vec2(a.x*b.x-a.y*b.y, a.x*b.y+a.y*b.x);
-    }
-    vec2 conjugate(vec2 a){
-      return vec2(a.x, -a.y);
-    }
-    vec2 divide(vec2 a, vec2 b){
-      return vec2(a.x*b.x+a.y*b.y, a.y*b.x-a.x*b.y) / (b.x*b.x+b.y*b.y);
+    vec3 hsv2rgb(vec3 c){
+      vec4 K = vec4(1.0, 2.0/3.0, 1.0/3.0, 3.0);
+      vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+      return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
     }
 
-    vec2 mobius(vec2 z, vec2 gamma, float t){
-      float g2 = gamma.x*gamma.x + gamma.y*gamma.y;
-      float h = sqrt(1.0 - g2);
-      vec2 d2 = pow(h, t) * vec2(cos(t*pi/2.0), sin(t*pi/2.0));
-      vec2 d1 = conjugate(d2);
-      vec2 a = vec2(d1.x, -d1.y/h);
-      vec2 b = d2.y * gamma / h;
-      vec2 c = conjugate(b);
-      vec2 d = conjugate(a);
-      return divide(product(a, z) + b, product(c, z) + d);
+    float pi = 3.1415926535897932384626433832795;
+
+    vec3 pair2hsv(vec2 z){
+      float h = (atan(z.y, z.x) + pi) / 2.0 / pi;
+      float l = sqrt(z.x*z.x + z.y*z.y);
+      float s = (1.0 + sin(2.0*pi*log(1.0+l))) / 2.0;
+      float v = (1.0 + cos(2.0*pi*log(1.0+l))) / 2.0;
+      return vec3(h, s, v);
     }
 
-    const float sqrt2 = sqrt(2.0);
-    const vec2 c1 = vec2(sqrt2, 0.0);
-    const vec2 c2 = vec2(0.0, sqrt2);
-    const vec2 c3 = vec2(-sqrt2, 0.0);
-    const vec2 c4 = vec2(0.0, -sqrt2);
-    const vec2 c5 = vec2(0.0, 0.0);
-    const float R2 = 1.0;
-    const float r2 = (sqrt2-1.0)*(sqrt2-1.0);
-
-    float squaredLength(vec2 v){
-      return v.x*v.x + v.y*v.y;
+    vec2 f(vec2 z){
+      float re = z.x*z.x*z.x*z.x + z.y*z.y*z.y*z.y - 6.0*z.x*z.x*z.y*z.y;
+      float im = 4.0*(z.y*z.y*z.y*z.x - z.x*z.x*z.x*z.y);
+      vec2 cz4 = vec2(re, im);
+      return 2.0/3.0 * (cz4-2.0);
     }
 
-    vec2 iota(vec2 pole, float k, vec2 M){
-      vec2 pole_M = M - pole;
-      return pole + k/squaredLength(pole_M) * pole_M;
-    }
+    float R = 100.0;
 
-    bool contains(vec2 c, float r2, vec2 M){
-      return squaredLength(M-c) < r2;
-    }
-
-    vec3 color(vec2 M, int itr){
-      float s = 0.08 * (4.0-length(M)) + float(itr); 
-      float arg = pi * s / 20.0 - 3.74;
-      return sin(vec3(arg - pi, arg - 3.5*pi, arg - 3.6*pi)) * 0.49 + 0.5;
-    }
-
-    vec3 g(vec2 M){
-      int itr = 0;
-      for(int i=0; i < 50; i++){
-        if(contains(c1, R2, M)){
-          M = iota(c1, R2, M);
-          itr += 1;
-        }else if(contains(c2, R2, M)){
-          M = iota(c2, R2, M);
-          itr += 1;
-        }else if(contains(c3, R2, M)){
-          M = iota(c3, R2, M);
-          itr += 1;
-        }else if(contains(c4, R2, M)){
-          M = iota(c4, R2, M);
-          itr += 1;
-        }else if(contains(c5, r2, M)){
-          M = iota(c5, r2, M);
-          itr += 1;
-        }else{
-          break;
+    vec3 g(vec2 z, float c, float d, float alpha, float beta){
+      vec3 rgb = vec3(0.0,0.0,0.0);
+      for(int k=1; k <= 15; k++){
+        vec2 w = beta*(f(z) + c) + (1.0 - beta)*z;
+        z = alpha*(f(w) + d) + (1.0 - alpha)*w;
+        if(z.x*z.x + z.y*z.y > R){
+            rgb = hsv2rgb(pair2hsv(z));
+            break;
         }
       }
-      return color(M, itr);
+      return rgb;
     }
 
     void main(void){
-      vec2 z0 = vec2(
+      float c = mouse.x / iResolution.x;
+      float d = mouse.y / iResolution.y;
+      float alpha0 = anim ? cos(iGlobalTime) : cos(time);
+      float beta0 = anim ? sin(iGlobalTime) : sin(time);
+      vec2 z = vec2(
         (xmax - xmin) * gl_FragCoord.x/iResolution.x + xmin, 
         (ymax - ymin) * gl_FragCoord.y/iResolution.y + ymin
       );
-      vec2 z = mobius(z0, vec2(0.8,0.2), power);
-      gl_FragColor = vec4(g(z), 1.0);
+      gl_FragColor = vec4(g(z, c, d, (1.0+alpha0)/2.0, (1.0+beta0)/2.0), 1.0);
     }
   </script>
 
   <script>
 
-    let xmin = -1.25, xmax = 1.25, ymin = -1.25, ymax = 1.25;
+    let xmin = -2, xmax = 2, ymin = -2, ymax = 2;
 
-    var app = new PIXI.Application({ width: window.innerWidth, height: window.innerHeight, antialiasing: false });
-    //app.resizeTo = window;
+    var app = new PIXI.Application({ width: window.innerWidth, height: window.innerHeight });
+    app.resizeTo = window;
 
     let fragmentShader = document.getElementById('fragmentShader').textContent;
     let filter = new PIXI.Filter(null, fragmentShader);
@@ -138,7 +104,19 @@
     filter.uniforms.xmax = xmax;
     filter.uniforms.ymin = ymin;
     filter.uniforms.ymax = ymax;
-    filter.uniforms.power = 0;
+    filter.uniforms.mouse = {x: 0, y: 0}; 
+    filter.uniforms.iGlobalTime = 0;
+    filter.uniforms.anim = true;
+    filter.uniforms.time = 0;
+
+    document.onmousemove = function(evt){
+//      filter.uniforms.mouse = {x: evt.clientX, y: evt.clientY};
+    };
+
+    document.onclick = function(evt){
+//      filter.uniforms.anim = !filter.uniforms.anim;
+//      filter.uniforms.time = filter.uniforms.iGlobalTime;
+    };
 
     let zoom0 = 1.001;
     let hamster = Hamster(document.body);
@@ -177,6 +155,7 @@
     }
     window.addEventListener('resize', onresize, false);
 
+    // screenshots
     let wait = false;
     let waiting = false;
     let i = 0;
@@ -184,7 +163,7 @@
       wait = true;
       if (i < 200) {
         let ii = i < 10 ? '00' + i : (i < 100 ? '0' + i : i);
-        let filename = 'apollony' + ii;
+        let filename = 'biomorph' + ii;
         i += 1;
         const renderTexture = new PIXI.RenderTexture.create({ width: app.screen.width, height: app.screen.height }); // enter your size , maybe from app.screen
         app.renderer.render(container, renderTexture);
@@ -209,7 +188,7 @@
         }, 500);
       }
       if (!waiting) {
-        filter.uniforms.power += 2 / 200;
+        filter.uniforms.iGlobalTime += 2*Math.PI / 200;
         takeScreenshot();
       }
     }); 
