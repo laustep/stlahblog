@@ -5,7 +5,7 @@
         <title>Saturn Elephant</title>
         <link>https://laustep.github.io/stlahblog</link>
         <description><![CDATA[A blog about R and more.]]></description>
-        <atom:link href="https://laustep.github.io/stlahblog/rss.xml" rel="self"
+        <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self"
                    type="application/rss+xml" />
         <lastBuildDate>Fri, 08 May 2020 00:00:00 UT</lastBuildDate>
         <item>
@@ -615,8 +615,10 @@
     <pubDate>Fri, 08 May 2020 00:00:00 UT</pubDate>
     <guid>https://laustep.github.io/stlahblog/posts/DT_childTables.html</guid>
     <dc:creator>Stéphane Laurent</dc:creator>
-</item>
-<item>
+    
+        <category>R</category>
+    
+</item><item>
     <title>Focal quadrics and their lines of curvature</title>
     <link>https://laustep.github.io/stlahblog/posts/focalQuadrics.html</link>
     <description><![CDATA[<!DOCTYPE HTML>
@@ -1298,8 +1300,10 @@
     <pubDate>Sun, 03 May 2020 00:00:00 UT</pubDate>
     <guid>https://laustep.github.io/stlahblog/posts/focalQuadrics.html</guid>
     <dc:creator>Stéphane Laurent</dc:creator>
-</item>
-<item>
+    
+        <category>R</category>
+    
+</item><item>
     <title>Drawing slices of a hypersurface with R</title>
     <link>https://laustep.github.io/stlahblog/posts/slicedHypersurface.html</link>
     <description><![CDATA[<!DOCTYPE HTML>
@@ -1625,8 +1629,10 @@ d \sin v \sinh w
     <pubDate>Fri, 01 May 2020 00:00:00 UT</pubDate>
     <guid>https://laustep.github.io/stlahblog/posts/slicedHypersurface.html</guid>
     <dc:creator>Stéphane Laurent</dc:creator>
-</item>
-<item>
+    
+        <category>R</category>
+    
+</item><item>
     <title>Back to the parametric Hopf torus</title>
     <link>https://laustep.github.io/stlahblog/posts/HopfTorus2.html</link>
     <description><![CDATA[<!DOCTYPE HTML>
@@ -1966,8 +1972,8 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
     <pubDate>Sun, 12 Apr 2020 00:00:00 UT</pubDate>
     <guid>https://laustep.github.io/stlahblog/posts/HopfTorus2.html</guid>
     <dc:creator>Stéphane Laurent</dc:creator>
-</item>
-<item>
+    
+</item><item>
     <title>An orbit of the modular tessellation</title>
     <link>https://laustep.github.io/stlahblog/posts/ModularTessellationOrbit.html</link>
     <description><![CDATA[<!DOCTYPE HTML>
@@ -2232,8 +2238,10 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
     <pubDate>Wed, 19 Feb 2020 00:00:00 UT</pubDate>
     <guid>https://laustep.github.io/stlahblog/posts/ModularTessellationOrbit.html</guid>
     <dc:creator>Stéphane Laurent</dc:creator>
-</item>
-<item>
+    
+        <category>R</category>
+    
+</item><item>
     <title>Tooltips for the headers of a datatable in Shiny</title>
     <link>https://laustep.github.io/stlahblog/posts/DTqTips.html</link>
     <description><![CDATA[<!DOCTYPE HTML>
@@ -2597,8 +2605,10 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
     <pubDate>Sun, 16 Feb 2020 00:00:00 UT</pubDate>
     <guid>https://laustep.github.io/stlahblog/posts/DTqTips.html</guid>
     <dc:creator>Stéphane Laurent</dc:creator>
-</item>
-<item>
+    
+        <category>R</category>
+    
+</item><item>
     <title>Drawing a stereographic duoprism</title>
     <link>https://laustep.github.io/stlahblog/posts/DuoprismStereo.html</link>
     <description><![CDATA[<!DOCTYPE HTML>
@@ -3653,8 +3663,8 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
     <pubDate>Tue, 11 Feb 2020 00:00:00 UT</pubDate>
     <guid>https://laustep.github.io/stlahblog/posts/DuoprismStereo.html</guid>
     <dc:creator>Stéphane Laurent</dc:creator>
-</item>
-<item>
+    
+</item><item>
     <title>Inversion swapping two circles</title>
     <link>https://laustep.github.io/stlahblog/posts/InversionSwappingTwoCircles.html</link>
     <description><![CDATA[<!DOCTYPE HTML>
@@ -3996,8 +4006,8 @@ The first inversion has pole <span class="math inline">\(I = O_1 - \frac{\rho}{1
     <pubDate>Sun, 09 Feb 2020 00:00:00 UT</pubDate>
     <guid>https://laustep.github.io/stlahblog/posts/InversionSwappingTwoCircles.html</guid>
     <dc:creator>Stéphane Laurent</dc:creator>
-</item>
-<item>
+    
+</item><item>
     <title>Complex incomplete elliptic integral of the second kind</title>
     <link>https://laustep.github.io/stlahblog/posts/EllipticIntegralSecondKindComplex.html</link>
     <description><![CDATA[<!DOCTYPE HTML>
@@ -4361,8 +4371,8 @@ F_1\Bigl(\frac12, \frac12, -\frac{3}{2}, z_1, z_2\Bigr) =
     <pubDate>Thu, 30 Jan 2020 00:00:00 UT</pubDate>
     <guid>https://laustep.github.io/stlahblog/posts/EllipticIntegralSecondKindComplex.html</guid>
     <dc:creator>Stéphane Laurent</dc:creator>
-</item>
-<item>
+    
+</item><item>
     <title>My JavaScript artworks</title>
     <link>https://laustep.github.io/stlahblog/posts/myJSartworks.html</link>
     <description><![CDATA[<!DOCTYPE HTML>
@@ -4497,7 +4507,7 @@ F_1\Bigl(\frac12, \frac12, -\frac{3}{2}, z_1, z_2\Bigr) =
     <pubDate>Fri, 17 Jan 2020 00:00:00 UT</pubDate>
     <guid>https://laustep.github.io/stlahblog/posts/myJSartworks.html</guid>
     <dc:creator>Stéphane Laurent</dc:creator>
+    
 </item>
-
     </channel>
 </rss>
