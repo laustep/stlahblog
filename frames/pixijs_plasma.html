@@ -78,29 +78,27 @@
       return divide(product(a, z) + b, product(c, z) + d);
     }
 
-    vec2 gamma = vec2(0.1, 0.2); 
+    float plasma(float x, float y, float w, float h) {
+      return  
+        (128.0 + (128.0 * sin(x/16.0))
+       + 128.0 + (128.0 * sin(y/32.0))
+       + 128.0 + (128.0 * sin(sqrt((x - w/2.0)*(x - w/2.0) + (y - h/2.0)*(y - h/2.0)) / 8.0))
+       + 128.0 + (128.0 * sin(sqrt(x*x + y*y) / 8.0))) / 1024.0;
+    }    
+
+    vec2 gamma = vec2(0.01, 0.02); 
 
     void main(void){
       vec2 z = vec2(
-        map(gl_FragCoord.x, 0.0, iResolution.x, -pi, pi),
-        map(gl_FragCoord.y, 0.0, iResolution.y, -pi, pi)
+        map(gl_FragCoord.x, 0.0, iResolution.x, -128.0, 128.0),
+        map(gl_FragCoord.y, 0.0, iResolution.y, -128.0, 128.0)
       );
-      float cx = map(mouse.x, 0.0, iResolution.x, -2.0, 2.0);
-      float cy = map(mouse.y, 0.0, iResolution.y, -2.0, 2.0);
+      float w = map(mouse.x, 0.0, iResolution.x, -200.0, 200.0);
+      float h = map(mouse.y, 0.0, iResolution.y, -200.0, 200.0);
       vec2 zprime = s * mobius(z/s, gamma, 1.0 + cos(iGlobalTime));
       float x = zprime.x; float y = zprime.y;
-      float ii;    
-      for(int i = 0; i < 32; i++){
-        float nx = x/cos(y) + cx;
-        float ny = y/sin(x) + cy;
-        x = nx;
-        y = ny;
-        ii = float(i);
-        if(x*x + y*y > 1000000.0){
-          break;
-        }
-      }
-      gl_FragColor = color ? vec4(viridis(ii/32.0), 1.0) : vec4(vec3(ii/32.0), 1.0);
+      float u = plasma(x, y, w, h);
+      gl_FragColor = color ? vec4(viridis(u*u*u), 1.0) : vec4(vec3(u), 1.0);
     }
   </script>
 
@@ -114,15 +112,15 @@
     filter.uniforms.iResolution = [app.screen.width, app.screen.height];
     filter.uniforms.iGlobalTime = 0;
     filter.uniforms.mouse = { x: 0, y: 0 }; 
-    filter.uniforms.color = true;
-    filter.uniforms.s = 0.158;
+    filter.uniforms.color = false;
+    filter.uniforms.s = 1;
 
     document.onmousemove = function(evt){
-      //filter.uniforms.mouse = { x: evt.clientX, y: evt.clientY };
+      filter.uniforms.mouse = { x: evt.clientX, y: evt.clientY };
     };
 
     document.onclick = function(evt){
-      //filter.uniforms.color = !filter.uniforms.color;
+      filter.uniforms.color = !filter.uniforms.color;
     };
 
     let factor0 = 1.001;
@@ -130,7 +128,6 @@
     hamster.wheel(function (event, delta, deltaX, deltaY) {
       let factor = Math.max(0.1, Math.pow(factor0, deltaY));
       filter.uniforms.s /= factor;
-      console.log(filter.uniforms.s);
     });
 
     let container = new PIXI.Container();
@@ -148,43 +145,11 @@
     }
     window.addEventListener('resize', onresize, false);
 
-    // screenshots
-    let wait = false;
-    let waiting = false;
-    let i = 0;
-    function takeScreenshot() {
-      wait = true;
-      if (i < 200) {
-        let ii = i < 10 ? '00' + i : (i < 100 ? '0' + i : i);
-        let filename = 'thornScreenshot' + ii;
-        i += 1;
-        const renderTexture = new PIXI.RenderTexture.create({ width: app.screen.width, height: app.screen.height }); // enter your size , maybe from app.screen
-        app.renderer.render(container, renderTexture);
-        app.renderer.extract.canvas(renderTexture).toBlob((b) => {
-          const a = document.createElement('a');
-          document.body.append(a);
-          a.download = filename;
-          a.href = URL.createObjectURL(b);
-          a.click();
-          a.remove();
-          renderTexture.destroy();
-        }, 'image/png');
-      }
-    }
-
+    let startTime = Date.now();
     app.ticker.add(function (delta) {
-      if (wait) {
-        waiting = true;
-        wait = false;
-        setTimeout(() => {
-          waiting = false;
-        }, 500);
-      }
-      if (!waiting) {
-        filter.uniforms.iGlobalTime += 2*Math.PI / 200;
-        takeScreenshot();
-      }
-    }); 
+      var currentTime = Date.now();
+      filter.uniforms.iGlobalTime = (currentTime - startTime) * 0.00025;
+    });
 
   </script>
 </body>
