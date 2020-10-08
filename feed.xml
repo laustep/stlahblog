@@ -77,7 +77,19 @@
 
         <div class="content">
           <h1>My POV-Ray artworks</h1> 
-          <p>These are some of my artworks realized with POV-Ray.</p>
+          <div class="info">
+    Posted on October  8, 2020
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="/tags/geometry.html">geometry</a>, <a href="/tags/graphics.html">graphics</a>, <a href="/tags/povray.html">povray</a>
+    
+</div>
+
+<p>These are some of my artworks realized with POV-Ray.</p>
 <p><img src="https://camo.githubusercontent.com/aa14a5a0e940d5e00ed4df07a1fc7a2e1a18a75c/68747470733a2f2f7468756d62732e6766796361742e636f6d2f4162736f6c757465536861647941726d6564637261622d73697a655f726573747269637465642e676966" /></p>
 <p><img src="https://camo.githubusercontent.com/89e7653c1b3439a869e92a867b7834530f8512bb/68747470733a2f2f7468756d62732e6766796361742e636f6d2f486566747944617a7a6c696e6742756c6c66726f672d73697a655f726573747269637465642e676966" /></p>
 <p><img src="https://camo.githubusercontent.com/bad8ce98c4a9cc894d299d793a60757ae944b9f9/68747470733a2f2f7468756d62732e6766796361742e636f6d2f4964656e746963616c496e646f6c656e744861636b65652d73697a655f726573747269637465642e676966" /></p>
@@ -99,6 +111,7 @@
 <p><img src="https://camo.githubusercontent.com/ae994edc48077797e06b3c51a8c3ab0ba9534d3a/68747470733a2f2f7468756d62732e6766796361742e636f6d2f5368616d6566756c536f7265457175696e652d73697a655f726573747269637465642e676966" /></p>
 <p><img src="https://camo.githubusercontent.com/12ebdb3c36d49715a3700a0017d8dd5cd9130761/68747470733a2f2f7468756d62732e6766796361742e636f6d2f476c616d6f726f7573536166654962657269616e6d696477696665746f61642d73697a655f726573747269637465642e676966" /></p>
 <p><img src="https://camo.githubusercontent.com/3162e00a146770b6ef5691c6e7d01b3f36a48874/68747470733a2f2f7468756d62732e6766796361742e636f6d2f466169746866756c45737465656d6564426f612d73697a655f726573747269637465642e676966" /></p>
+
         </div>
 
 
@@ -229,7 +242,19 @@
 
         <div class="content">
           <h1>Child tables with DT, editing, exporting</h1> 
-          <p>I’m going to show how to use the <code>DT</code> package to do a table with child tables, and how to edit and export such a table.</p>
+          <div class="info">
+    Posted on May  8, 2020
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="/tags/R.html">R</a>, <a href="/tags/datatables.html">datatables</a>, <a href="/tags/shiny.html">shiny</a>, <a href="/tags/javascript.html">javascript</a>
+    
+</div>
+
+<p>I’m going to show how to use the <code>DT</code> package to do a table with child tables, and how to edit and export such a table.</p>
 <p>In order to do a table with child tables, one adds a list column to the dataframe of the main table; each cell of this column contains the child table of the corresponding row, given as a list. This is done by the <code>NestedData</code> function below.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">NestedData &lt;-<span class="st"> </span><span class="cf">function</span>(dat, children){</a>
 <a class="sourceLine" id="cb1-2" title="2">  <span class="kw">stopifnot</span>(<span class="kw">length</span>(children) <span class="op">==</span><span class="st"> </span><span class="kw">nrow</span>(dat))</a>
@@ -693,6 +718,7 @@
 <a class="sourceLine" id="cb13-37" title="37">)</a></code></pre></div>
 <p>Here is the Excel file one gets:</p>
 <p><img src="figures/DTchildRows3.png" /></p>
+
         </div>
 
 
@@ -839,7 +865,19 @@
 
         <div class="content">
           <h1>Focal quadrics and their lines of curvature</h1> 
-          <p>This blog post provides some R code for drawing focal quadrics and their curvatures lines with the <code>rgl</code> package.</p>
+          <div class="info">
+    Posted on May  3, 2020
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="/tags/R.html">R</a>, <a href="/tags/graphics.html">graphics</a>, <a href="/tags/rgl.html">rgl</a>, <a href="/tags/geometry.html">geometry</a>, <a href="/tags/maths.html">maths</a>
+    
+</div>
+
+<p>This blog post provides some R code for drawing focal quadrics and their curvatures lines with the <code>rgl</code> package.</p>
 <h1 id="ellipsoid">Ellipsoid</h1>
 <p>The <code>ellipsoidMesh</code> function below generates a mesh of the ellipsoid of equation <span class="math display">\[
 \frac{x^2}{a^2} + \frac{y^2}{b^2} + \frac{z^2}{c^2} = 1.
@@ -1378,6 +1416,7 @@
 <a class="sourceLine" id="cb13-3" title="3">})</a>
 <a class="sourceLine" id="cb13-4" title="4"><span class="co">## [1] 5.684342e-14 7.105427e-14 4.973799e-14 4.973799e-14 4.263256e-14</span></a></code></pre></div>
 <p>Up to small numerical errors, we indeed get <span class="math inline">\(0\)</span> for each of the five vertices.</p>
+
         </div>
 
 
@@ -1524,7 +1563,19 @@
 
         <div class="content">
           <h1>Drawing slices of a hypersurface with R</h1> 
-          <p>Let <span class="math inline">\(s \colon I \times J \times K \to \mathbb{R}^4\)</span> be a parameterization of a hypersurface <span class="math inline">\(\mathcal{S}\)</span>, where <span class="math inline">\(I,J,K \subset \mathbb{R}\)</span> are some intervals. I’m going to show how to draw the cross-section of <span class="math inline">\(\mathcal{S}\)</span> by a hyperplane with R.</p>
+          <div class="info">
+    Posted on May  1, 2020
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="/tags/R.html">R</a>, <a href="/tags/graphics.html">graphics</a>, <a href="/tags/rgl.html">rgl</a>, <a href="/tags/geometry.html">geometry</a>, <a href="/tags/maths.html">maths</a>
+    
+</div>
+
+<p>Let <span class="math inline">\(s \colon I \times J \times K \to \mathbb{R}^4\)</span> be a parameterization of a hypersurface <span class="math inline">\(\mathcal{S}\)</span>, where <span class="math inline">\(I,J,K \subset \mathbb{R}\)</span> are some intervals. I’m going to show how to draw the cross-section of <span class="math inline">\(\mathcal{S}\)</span> by a hyperplane with R.</p>
 <p>For the illustration, we consider the <a href="http://hi.gher.space/wiki/Tiger"><em>tiger</em></a>:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">R1 =<span class="st"> </span><span class="dv">2</span>; R2 =<span class="st"> </span><span class="dv">2</span>; r =<span class="st"> </span><span class="fl">0.5</span></a>
 <a class="sourceLine" id="cb1-2" title="2">s &lt;-<span class="st"> </span><span class="cf">function</span>(u, v, w){</a>
@@ -1707,6 +1758,7 @@ d \sin v \sinh w
 \end{array}.
 \]</span></p>
 <p><img src="figures/toroidalHyperboloid.gif" /></p>
+
         </div>
 
 
@@ -1853,7 +1905,19 @@ d \sin v \sinh w
 
         <div class="content">
           <h1>Back to the parametric Hopf torus</h1> 
-          <p>In a <a href="./HopfTorusParametric.html">previous post</a>, I explained how to get a parameterization of a Hopf cylinder or torus. There is a clearer way, which I present here.</p>
+          <div class="info">
+    Posted on April 12, 2020
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="/tags/R.html">R</a>, <a href="/tags/graphics.html">graphics</a>, <a href="/tags/rgl.html">rgl</a>, <a href="/tags/geometry.html">geometry</a>, <a href="/tags/maths.html">maths</a>
+    
+</div>
+
+<p>In a <a href="./HopfTorusParametric.html">previous post</a>, I explained how to get a parameterization of a Hopf cylinder or torus. There is a clearer way, which I present here.</p>
 <p>For the Hopf map, the preimage of a point <span class="math inline">\(p=(p_x,p_y,p_z)\)</span> on the unit sphere <span class="math inline">\(S^2\)</span> is the circle on <span class="math inline">\(S^3\)</span> with parametrization: <span class="math display">\[
 \begin{array}{ccc}
 \mathcal{C}_p \colon &amp; (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
@@ -2050,6 +2114,7 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
 <a class="sourceLine" id="cb8-11" title="11"><span class="kw">parametric3d</span>(fx, fy, fz, <span class="dt">umin =</span> <span class="dv">0</span>, <span class="dt">umax =</span> <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">vmin =</span> <span class="dv">0</span>, <span class="dt">vmax =</span> <span class="dv">2</span><span class="op">*</span>pi, </a>
 <a class="sourceLine" id="cb8-12" title="12">             <span class="dt">n =</span> <span class="dv">250</span>, <span class="dt">smooth =</span> <span class="ot">TRUE</span>, <span class="dt">color =</span> <span class="st">&quot;#363940&quot;</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <p><img src="./figures/linkedCyclides_grey.png" /></p>
+
         </div>
 
 
@@ -2194,7 +2259,19 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
 
         <div class="content">
           <h1>An orbit of the modular tessellation</h1> 
-          <p>I came across this <a href="https://www3.risc.jku.at/publications/download/risc_5011/DiplomaThesisPonweiser.pdf">interesting paper</a> entitled <em>Complex Variables Visualized</em> and written by Thomas Ponweiser.</p>
+          <div class="info">
+    Posted on February 19, 2020
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="/tags/R.html">R</a>, <a href="/tags/maths.html">maths</a>, <a href="/tags/geometry.html">geometry</a>
+    
+</div>
+
+<p>I came across this <a href="https://www3.risc.jku.at/publications/download/risc_5011/DiplomaThesisPonweiser.pdf">interesting paper</a> entitled <em>Complex Variables Visualized</em> and written by Thomas Ponweiser.</p>
 <p>In particular, I was intrigued by the <em>generalized powers</em> of a Möbius transformation (of a matrix, actually), and their actions on the modular tessellation.</p>
 <p>So I firstly implemented the generalized powers in my package <code>PlaneGeometry</code>. Then I wrote the script below to visualize the orbit of the modular tessellation under the action of <span class="math inline">\(R^t\)</span>, <span class="math inline">\(0 \leqslant t &lt; 3\)</span>, with the notations of the paper. The command <code>fplot(u)</code> generates the modular tessellation under the action of <span class="math inline">\(R^t\)</span> when <code>u</code> is the value of <span class="math inline">\(t\)</span>. Then I use the <code>gifski</code> package to create the animation.</p>
 <p>To get the modular transformations <span class="math inline">\(z \mapsto \frac{az+b}{cz+d}\)</span>, I use the <code>unimodular</code> function of the <code>elliptic</code> package. It generates the quadruples <span class="math inline">\((a,b,c,d)\)</span> of <em>positive</em> integers such that <span class="math inline">\(ad-bc=1\)</span>. Then we can get all such quadruples <span class="math inline">\((a,b,c,d) \in \mathbb{Z}^4\)</span> by inverting these modular transformations, swapping <span class="math inline">\(a\)</span> and <span class="math inline">\(d\)</span> and changing their signs.</p>
@@ -2316,6 +2393,7 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
 <a class="sourceLine" id="cb1-116" title="116">  }</a>
 <a class="sourceLine" id="cb1-117" title="117">}, <span class="st">&quot;ModularTessellation.gif&quot;</span>, <span class="dv">512</span>, <span class="dv">512</span>, <span class="dt">delay =</span> <span class="dv">1</span><span class="op">/</span><span class="dv">12</span>, <span class="dt">res =</span> <span class="dv">144</span>)</a></code></pre></div>
 <p><img src="./figures/ModularTessellationOrbit.gif" /></p>
+
         </div>
 
 
@@ -2462,7 +2540,19 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
 
         <div class="content">
           <h1>Tooltips for the headers of a datatable in Shiny</h1> 
-          <p>In this post, I show how to use the <a href="http://qtip2.com/">qTip2</a> JavaScript library to create some tooltips on the headers of a <code>DT</code> datatable in Shiny, displaying some information about the columns, such as summary statistics.</p>
+          <div class="info">
+    Posted on February 16, 2020
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="/tags/R.html">R</a>, <a href="/tags/datatables.html">datatables</a>, <a href="/tags/javascript.html">javascript</a>, <a href="/tags/shiny.html">shiny</a>
+    
+</div>
+
+<p>In this post, I show how to use the <a href="http://qtip2.com/">qTip2</a> JavaScript library to create some tooltips on the headers of a <code>DT</code> datatable in Shiny, displaying some information about the columns, such as summary statistics.</p>
 <p>Firstly, we write a function returning some JavaScript code that creates some hidden <code>div</code> elements which will contain the contents of the tooltips. This function takes two arguments: <code>n</code>, the number of <code>div</code> elements to create (this will be the number of columns of the table), and <code>prefixID</code>; the i-th <code>div</code> will have the identifier <code>{prefixID}-{i}</code>. We also set a class to each <code>div</code>, namely <code>qtip-big</code>.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">createDiv &lt;-<span class="st"> </span><span class="cf">function</span>(n, prefixID){</a>
 <a class="sourceLine" id="cb1-2" title="2">  <span class="kw">sprintf</span>(<span class="kw">paste</span>(</a>
@@ -2683,6 +2773,7 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
 <a class="sourceLine" id="cb7-58" title="58"></a>
 <a class="sourceLine" id="cb7-59" title="59"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
 <p><img src="./figures/DTqTip.gif" /></p>
+
         </div>
 
 
@@ -2829,7 +2920,19 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
 
         <div class="content">
           <h1>Drawing a stereographic duoprism</h1> 
-          <p>In this post, I’ll show how to draw a stereographic <a href="./Duoprism.html">duoprism</a> using R, Asymptote and POV-Ray.</p>
+          <div class="info">
+    Posted on February 11, 2020
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="/tags/R.html">R</a>, <a href="/tags/maths.html">maths</a>, <a href="/tags/geometry.html">geometry</a>, <a href="/tags/graphics.html">graphics</a>, <a href="/tags/rgl.html">rgl</a>, <a href="/tags/asymptote.html">asymptote</a>, <a href="/tags/povray.html">povray</a>
+    
+</div>
+
+<p>In this post, I’ll show how to draw a stereographic <a href="./Duoprism.html">duoprism</a> using R, Asymptote and POV-Ray.</p>
 <h1 id="with-r">With R</h1>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">library</span>(rgl)</a>
 <a class="sourceLine" id="cb1-2" title="2"></a>
@@ -3741,6 +3844,7 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
 <a class="sourceLine" id="cb4-374" title="374">  <span class="kw">translate</span> &lt;<span class="fl">0</span>, <span class="fl">0.5</span>, <span class="fl">-2</span>&gt;</a>
 <a class="sourceLine" id="cb4-375" title="375">}</a></code></pre></div>
 <p><img src="./figures/DuoprismStereo_POVRAY2.gif" /></p>
+
         </div>
 
 
@@ -3885,7 +3989,19 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
 
         <div class="content">
           <h1>Inversion swapping two circles</h1> 
-          <p>Consider two circles <span class="math inline">\(\mathcal{C}_1(O_1,r_1)\)</span> and <span class="math inline">\(\mathcal{C}_2(O_2,r_2)\)</span>. There is always an inversion which swaps <span class="math inline">\(\mathcal{C}_1\)</span> and <span class="math inline">\(\mathcal{C}_2\)</span> (which maps <span class="math inline">\(\mathcal{C}_1\)</span> to <span class="math inline">\(\mathcal{C}_2\)</span> and <span class="math inline">\(\mathcal{C}_2\)</span> to <span class="math inline">\(\mathcal{C}_1\)</span>). When this is an inversion on a circle, this circle of inversion is called a <em>mid-circle</em> of <span class="math inline">\(\mathcal{C}_1\)</span> and <span class="math inline">\(\mathcal{C}_2\)</span>.</p>
+          <div class="info">
+    Posted on February  9, 2020
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="/tags/R.html">R</a>, <a href="/tags/maths.html">maths</a>, <a href="/tags/geometry.html">geometry</a>
+    
+</div>
+
+<p>Consider two circles <span class="math inline">\(\mathcal{C}_1(O_1,r_1)\)</span> and <span class="math inline">\(\mathcal{C}_2(O_2,r_2)\)</span>. There is always an inversion which swaps <span class="math inline">\(\mathcal{C}_1\)</span> and <span class="math inline">\(\mathcal{C}_2\)</span> (which maps <span class="math inline">\(\mathcal{C}_1\)</span> to <span class="math inline">\(\mathcal{C}_2\)</span> and <span class="math inline">\(\mathcal{C}_2\)</span> to <span class="math inline">\(\mathcal{C}_1\)</span>). When this is an inversion on a circle, this circle of inversion is called a <em>mid-circle</em> of <span class="math inline">\(\mathcal{C}_1\)</span> and <span class="math inline">\(\mathcal{C}_2\)</span>.</p>
 <h1 id="congruent-case">Congruent case</h1>
 <p>When <span class="math inline">\(r_1 = r_2\)</span>, the two circles <span class="math inline">\(\mathcal{C}_1\)</span> and <span class="math inline">\(\mathcal{C}_2\)</span> can be swapped by an inversion on a line (that is, a reflection with respect to this line); obviously, this line is the perpendicular bisector of the segment joining the two centers <span class="math inline">\(O_1\)</span> and <span class="math inline">\(O_2\)</span>. We could say that this line is a mid-circle, if we allow the mid-circle to be a generalized circle.</p>
 <p>If the two circles are tangent, this is the unique mid-circle.</p>
@@ -4084,6 +4200,7 @@ The first inversion has pole <span class="math inline">\(I = O_1 - \frac{\rho}{1
 <a class="sourceLine" id="cb11-12" title="12"><span class="co">## $radius</span></a>
 <a class="sourceLine" id="cb11-13" title="13"><span class="co">## [1] 2</span></a></code></pre></div>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1"><span class="kw">par</span>(opar)</a></code></pre></div>
+
         </div>
 
 
@@ -4228,7 +4345,19 @@ The first inversion has pole <span class="math inline">\(I = O_1 - \frac{\rho}{1
 
         <div class="content">
           <h1>Complex incomplete elliptic integral of the second kind</h1> 
-          <p>The <em>incomplete elliptic integral of the second kind</em> is usually defined by <span class="math display">\[
+          <div class="info">
+    Posted on January 30, 2020
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a href="/tags/R.html">R</a>, <a href="/tags/maths.html">maths</a>, <a href="/tags/special-functions.html">special-functions</a>
+    
+</div>
+
+<p>The <em>incomplete elliptic integral of the second kind</em> is usually defined by <span class="math display">\[
 E(\phi \mid k) = 
 \int_0^\phi \sqrt{1 - k^2\sin^2t}\,\mathrm{d}t
 \]</span> for <span class="math inline">\(-\frac{\pi}{2} \leqslant \phi \leqslant \frac{\pi}{2}\)</span> and <span class="math inline">\(k^2 \leqslant \frac{1}{\sin^2\phi}\)</span>.</p>
@@ -4449,6 +4578,7 @@ F_1\Bigl(\frac12, \frac12, -\frac{3}{2}, z_1, z_2\Bigr) =
 <a class="sourceLine" id="cb12-37" title="37"><span class="kw">E</span>(<span class="dv">7</span><span class="op">+</span>2i, <span class="op">-</span>5i) <span class="co"># almost the same as before</span></a>
 <a class="sourceLine" id="cb12-38" title="38"><span class="co">## [1] 14.95287+4.83346i</span></a></code></pre></div>
 <p>The slight differences are due to the numerical integrations. The previous way is preferable.</p>
+
         </div>
 
 
