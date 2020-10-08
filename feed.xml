@@ -20,6 +20,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - The Good Citizen's Alphabet - L'ABC du Bon Citoyen</title>
   <link href="/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/default2.css" />
   <link rel="stylesheet" href="/css/post.css" />
   <link rel="stylesheet" href="/css/misc.css" /> 
   
@@ -38,25 +39,51 @@
     <div class="row">
       <!-- Sidebar. -->
       <div class="sidebar col-sm-3">
-        <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
-          <a href="https://www.r-bloggers.com/">
-            <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
-          </a>
-          <br/>
-          <a href="http://t-redactyl.io/">
-            <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
-          </a>
-          <a href="http://timelyportfolio.blogspot.be/">
-            <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
-          </a>
-          <br/>
-          <a href="https://antoineguillot.wordpress.com/blog/">
-            <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
-          </a>
-          <br/>
-          <a href="https://fronkonstin.com/">
-            <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
-          </a>
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+            </a>
+            <br/>
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
+            </a>
+            <br/>
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br/>
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/Rlogo.svg" style="width: 110%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/shiny-hex.png" style="width: 90%;" class="center"/>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="/images/Povray_logo_sphere.png" style="width: 105%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/javascript.svg" style="width: 90%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/haskell.svg" style="width: 110%;" class="center"/>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -677,7 +704,7 @@ centerMode: false});
   <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
 </noscript>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
-<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<script type="text/x-mathjax-config" src="/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
 <!-- <script>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
@@ -700,6 +727,7 @@ centerMode: false});
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - My RGL artworks</title>
   <link href="/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/default2.css" />
   <link rel="stylesheet" href="/css/post.css" />
   <link rel="stylesheet" href="/css/misc.css" /> 
   
@@ -718,25 +746,51 @@ centerMode: false});
     <div class="row">
       <!-- Sidebar. -->
       <div class="sidebar col-sm-3">
-        <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
-          <a href="https://www.r-bloggers.com/">
-            <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
-          </a>
-          <br/>
-          <a href="http://t-redactyl.io/">
-            <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
-          </a>
-          <a href="http://timelyportfolio.blogspot.be/">
-            <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
-          </a>
-          <br/>
-          <a href="https://antoineguillot.wordpress.com/blog/">
-            <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
-          </a>
-          <br/>
-          <a href="https://fronkonstin.com/">
-            <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
-          </a>
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+            </a>
+            <br/>
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
+            </a>
+            <br/>
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br/>
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/Rlogo.svg" style="width: 110%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/shiny-hex.png" style="width: 90%;" class="center"/>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="/images/Povray_logo_sphere.png" style="width: 105%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/javascript.svg" style="width: 90%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/haskell.svg" style="width: 110%;" class="center"/>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -837,7 +891,7 @@ centerMode: false});
   <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
 </noscript>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
-<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<script type="text/x-mathjax-config" src="/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
 <!-- <script>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
@@ -862,6 +916,7 @@ centerMode: false});
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - My POV-Ray artworks</title>
   <link href="/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/default2.css" />
   <link rel="stylesheet" href="/css/post.css" />
   <link rel="stylesheet" href="/css/misc.css" /> 
   
@@ -880,25 +935,51 @@ centerMode: false});
     <div class="row">
       <!-- Sidebar. -->
       <div class="sidebar col-sm-3">
-        <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
-          <a href="https://www.r-bloggers.com/">
-            <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
-          </a>
-          <br/>
-          <a href="http://t-redactyl.io/">
-            <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
-          </a>
-          <a href="http://timelyportfolio.blogspot.be/">
-            <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
-          </a>
-          <br/>
-          <a href="https://antoineguillot.wordpress.com/blog/">
-            <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
-          </a>
-          <br/>
-          <a href="https://fronkonstin.com/">
-            <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
-          </a>
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+            </a>
+            <br/>
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
+            </a>
+            <br/>
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br/>
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/Rlogo.svg" style="width: 110%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/shiny-hex.png" style="width: 90%;" class="center"/>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="/images/Povray_logo_sphere.png" style="width: 105%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/javascript.svg" style="width: 90%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/haskell.svg" style="width: 110%;" class="center"/>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1002,7 +1083,7 @@ centerMode: false});
   <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
 </noscript>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
-<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<script type="text/x-mathjax-config" src="/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
 <!-- <script>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
@@ -1025,6 +1106,7 @@ centerMode: false});
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - My Asymptote artworks</title>
   <link href="/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/default2.css" />
   <link rel="stylesheet" href="/css/post.css" />
   <link rel="stylesheet" href="/css/misc.css" /> 
   
@@ -1043,25 +1125,51 @@ centerMode: false});
     <div class="row">
       <!-- Sidebar. -->
       <div class="sidebar col-sm-3">
-        <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
-          <a href="https://www.r-bloggers.com/">
-            <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
-          </a>
-          <br/>
-          <a href="http://t-redactyl.io/">
-            <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
-          </a>
-          <a href="http://timelyportfolio.blogspot.be/">
-            <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
-          </a>
-          <br/>
-          <a href="https://antoineguillot.wordpress.com/blog/">
-            <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
-          </a>
-          <br/>
-          <a href="https://fronkonstin.com/">
-            <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
-          </a>
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+            </a>
+            <br/>
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
+            </a>
+            <br/>
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br/>
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/Rlogo.svg" style="width: 110%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/shiny-hex.png" style="width: 90%;" class="center"/>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="/images/Povray_logo_sphere.png" style="width: 105%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/javascript.svg" style="width: 90%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/haskell.svg" style="width: 110%;" class="center"/>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1159,7 +1267,7 @@ centerMode: false});
   <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
 </noscript>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
-<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<script type="text/x-mathjax-config" src="/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
 <!-- <script>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
@@ -1182,6 +1290,7 @@ centerMode: false});
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - Child tables with DT, editing, exporting</title>
   <link href="/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/default2.css" />
   <link rel="stylesheet" href="/css/post.css" />
   <link rel="stylesheet" href="/css/misc.css" /> 
   
@@ -1202,25 +1311,51 @@ centerMode: false});
     <div class="row">
       <!-- Sidebar. -->
       <div class="sidebar col-sm-3">
-        <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
-          <a href="https://www.r-bloggers.com/">
-            <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
-          </a>
-          <br/>
-          <a href="http://t-redactyl.io/">
-            <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
-          </a>
-          <a href="http://timelyportfolio.blogspot.be/">
-            <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
-          </a>
-          <br/>
-          <a href="https://antoineguillot.wordpress.com/blog/">
-            <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
-          </a>
-          <br/>
-          <a href="https://fronkonstin.com/">
-            <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
-          </a>
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+            </a>
+            <br/>
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
+            </a>
+            <br/>
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br/>
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/Rlogo.svg" style="width: 110%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/shiny-hex.png" style="width: 90%;" class="center"/>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="/images/Povray_logo_sphere.png" style="width: 105%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/javascript.svg" style="width: 90%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/haskell.svg" style="width: 110%;" class="center"/>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1766,7 +1901,7 @@ centerMode: false});
   <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
 </noscript>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
-<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<script type="text/x-mathjax-config" src="/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
 <!-- <script>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
@@ -1805,6 +1940,7 @@ centerMode: false});
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - Focal quadrics and their lines of curvature</title>
   <link href="/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/default2.css" />
   <link rel="stylesheet" href="/css/post.css" />
   <link rel="stylesheet" href="/css/misc.css" /> 
   
@@ -1825,25 +1961,51 @@ centerMode: false});
     <div class="row">
       <!-- Sidebar. -->
       <div class="sidebar col-sm-3">
-        <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
-          <a href="https://www.r-bloggers.com/">
-            <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
-          </a>
-          <br/>
-          <a href="http://t-redactyl.io/">
-            <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
-          </a>
-          <a href="http://timelyportfolio.blogspot.be/">
-            <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
-          </a>
-          <br/>
-          <a href="https://antoineguillot.wordpress.com/blog/">
-            <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
-          </a>
-          <br/>
-          <a href="https://fronkonstin.com/">
-            <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
-          </a>
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+            </a>
+            <br/>
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
+            </a>
+            <br/>
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br/>
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/Rlogo.svg" style="width: 110%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/shiny-hex.png" style="width: 90%;" class="center"/>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="/images/Povray_logo_sphere.png" style="width: 105%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/javascript.svg" style="width: 90%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/haskell.svg" style="width: 110%;" class="center"/>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2464,7 +2626,7 @@ centerMode: false});
   <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
 </noscript>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
-<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<script type="text/x-mathjax-config" src="/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
 <!-- <script>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
@@ -2503,6 +2665,7 @@ centerMode: false});
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - Drawing slices of a hypersurface with R</title>
   <link href="/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/default2.css" />
   <link rel="stylesheet" href="/css/post.css" />
   <link rel="stylesheet" href="/css/misc.css" /> 
   
@@ -2523,25 +2686,51 @@ centerMode: false});
     <div class="row">
       <!-- Sidebar. -->
       <div class="sidebar col-sm-3">
-        <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
-          <a href="https://www.r-bloggers.com/">
-            <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
-          </a>
-          <br/>
-          <a href="http://t-redactyl.io/">
-            <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
-          </a>
-          <a href="http://timelyportfolio.blogspot.be/">
-            <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
-          </a>
-          <br/>
-          <a href="https://antoineguillot.wordpress.com/blog/">
-            <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
-          </a>
-          <br/>
-          <a href="https://fronkonstin.com/">
-            <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
-          </a>
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+            </a>
+            <br/>
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
+            </a>
+            <br/>
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br/>
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/Rlogo.svg" style="width: 110%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/shiny-hex.png" style="width: 90%;" class="center"/>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="/images/Povray_logo_sphere.png" style="width: 105%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/javascript.svg" style="width: 90%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/haskell.svg" style="width: 110%;" class="center"/>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2806,7 +2995,7 @@ d \sin v \sinh w
   <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
 </noscript>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
-<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<script type="text/x-mathjax-config" src="/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
 <!-- <script>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
@@ -2845,6 +3034,7 @@ d \sin v \sinh w
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - Back to the parametric Hopf torus</title>
   <link href="/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/default2.css" />
   <link rel="stylesheet" href="/css/post.css" />
   <link rel="stylesheet" href="/css/misc.css" /> 
   
@@ -2865,25 +3055,51 @@ d \sin v \sinh w
     <div class="row">
       <!-- Sidebar. -->
       <div class="sidebar col-sm-3">
-        <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
-          <a href="https://www.r-bloggers.com/">
-            <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
-          </a>
-          <br/>
-          <a href="http://t-redactyl.io/">
-            <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
-          </a>
-          <a href="http://timelyportfolio.blogspot.be/">
-            <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
-          </a>
-          <br/>
-          <a href="https://antoineguillot.wordpress.com/blog/">
-            <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
-          </a>
-          <br/>
-          <a href="https://fronkonstin.com/">
-            <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
-          </a>
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+            </a>
+            <br/>
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
+            </a>
+            <br/>
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br/>
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/Rlogo.svg" style="width: 110%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/shiny-hex.png" style="width: 90%;" class="center"/>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="/images/Povray_logo_sphere.png" style="width: 105%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/javascript.svg" style="width: 90%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/haskell.svg" style="width: 110%;" class="center"/>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -3162,7 +3378,7 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
   <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
 </noscript>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
-<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<script type="text/x-mathjax-config" src="/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
 <!-- <script>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
@@ -3199,6 +3415,7 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - An orbit of the modular tessellation</title>
   <link href="/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/default2.css" />
   <link rel="stylesheet" href="/css/post.css" />
   <link rel="stylesheet" href="/css/misc.css" /> 
   
@@ -3219,25 +3436,51 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
     <div class="row">
       <!-- Sidebar. -->
       <div class="sidebar col-sm-3">
-        <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
-          <a href="https://www.r-bloggers.com/">
-            <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
-          </a>
-          <br/>
-          <a href="http://t-redactyl.io/">
-            <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
-          </a>
-          <a href="http://timelyportfolio.blogspot.be/">
-            <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
-          </a>
-          <br/>
-          <a href="https://antoineguillot.wordpress.com/blog/">
-            <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
-          </a>
-          <br/>
-          <a href="https://fronkonstin.com/">
-            <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
-          </a>
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+            </a>
+            <br/>
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
+            </a>
+            <br/>
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br/>
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/Rlogo.svg" style="width: 110%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/shiny-hex.png" style="width: 90%;" class="center"/>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="/images/Povray_logo_sphere.png" style="width: 105%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/javascript.svg" style="width: 90%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/haskell.svg" style="width: 110%;" class="center"/>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -3441,7 +3684,7 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
   <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
 </noscript>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
-<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<script type="text/x-mathjax-config" src="/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
 <!-- <script>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
@@ -3480,6 +3723,7 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - Tooltips for the headers of a datatable in Shiny</title>
   <link href="/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/default2.css" />
   <link rel="stylesheet" href="/css/post.css" />
   <link rel="stylesheet" href="/css/misc.css" /> 
   
@@ -3500,25 +3744,51 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
     <div class="row">
       <!-- Sidebar. -->
       <div class="sidebar col-sm-3">
-        <div style="float:right;clear:both;margin-right:50px;margin-top:150px;">
-          <a href="https://www.r-bloggers.com/">
-            <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
-          </a>
-          <br/>
-          <a href="http://t-redactyl.io/">
-            <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
-          </a>
-          <a href="http://timelyportfolio.blogspot.be/">
-            <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
-          </a>
-          <br/>
-          <a href="https://antoineguillot.wordpress.com/blog/">
-            <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
-          </a>
-          <br/>
-          <a href="https://fronkonstin.com/">
-            <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
-          </a>
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="https://www.r-bloggers.com/wp-content/uploads/2016/04/R_02_2016-05-01.png" alt="stla" width="100%" />
+            </a>
+            <br/>
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:29px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:27px;">Timely portfolio</span>
+            </a>
+            <br/>
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:25px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br/>
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:32px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/Rlogo.svg" style="width: 110%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/shiny-hex.png" style="width: 90%;" class="center"/>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="/images/Povray_logo_sphere.png" style="width: 105%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/javascript.svg" style="width: 90%;" class="center"/>
+            </div>
+            <div class="col-sm-4">
+              <img src="/images/haskell.svg" style="width: 110%;" class="center"/>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -3821,7 +4091,7 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
   <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
 </noscript>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
-<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<script type="text/x-mathjax-config" src="/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
 <!-- <script>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
