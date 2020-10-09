@@ -673,19 +673,6 @@
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="https://laustep.github.io/stlahblog/libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
 
-  <!-- Google Prettify -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-  <script src="https://laustep.github.io/stlahblog/libraries/highlighters/prettify/js/lang-r.js"></script>
-  <script>
-    var pres = document.getElementsByTagName("pre");
-    for (var i = 0; i < pres.length; ++i) {
-
-        pres[i].className = pres[i].className + " prettyprint linenums";
-
-    }
-    prettyPrint();
-  </script>
 
 
 ]]></description>
@@ -1322,19 +1309,6 @@
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="https://laustep.github.io/stlahblog/libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
 
-  <!-- Google Prettify -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-  <script src="https://laustep.github.io/stlahblog/libraries/highlighters/prettify/js/lang-r.js"></script>
-  <script>
-    var pres = document.getElementsByTagName("pre");
-    for (var i = 0; i < pres.length; ++i) {
-
-        pres[i].className = pres[i].className + " prettyprint linenums";
-
-    }
-    prettyPrint();
-  </script>
 
 
 ]]></description>
@@ -1614,19 +1588,6 @@ d \sin v \sinh w
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="https://laustep.github.io/stlahblog/libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
 
-  <!-- Google Prettify -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-  <script src="https://laustep.github.io/stlahblog/libraries/highlighters/prettify/js/lang-r.js"></script>
-  <script>
-    var pres = document.getElementsByTagName("pre");
-    for (var i = 0; i < pres.length; ++i) {
-
-        pres[i].className = pres[i].className + " prettyprint linenums";
-
-    }
-    prettyPrint();
-  </script>
 
 
 ]]></description>
@@ -1846,19 +1807,6 @@ d \sin v \sinh w
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="https://laustep.github.io/stlahblog/libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
 
-  <!-- Google Prettify -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-  <script src="https://laustep.github.io/stlahblog/libraries/highlighters/prettify/js/lang-r.js"></script>
-  <script>
-    var pres = document.getElementsByTagName("pre");
-    for (var i = 0; i < pres.length; ++i) {
-
-        pres[i].className = pres[i].className + " prettyprint linenums";
-
-    }
-    prettyPrint();
-  </script>
 
 
 ]]></description>
@@ -2177,19 +2125,6 @@ d \sin v \sinh w
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="https://laustep.github.io/stlahblog/libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
 
-  <!-- Google Prettify -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-  <script src="https://laustep.github.io/stlahblog/libraries/highlighters/prettify/js/lang-r.js"></script>
-  <script>
-    var pres = document.getElementsByTagName("pre");
-    for (var i = 0; i < pres.length; ++i) {
-
-        pres[i].className = pres[i].className + " prettyprint linenums";
-
-    }
-    prettyPrint();
-  </script>
 
 
 ]]></description>
