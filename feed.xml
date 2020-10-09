@@ -11,14 +11,7 @@
         <item>
     <title>My RGL artworks</title>
     <link>https://laustep.github.io/stlahblog/posts/MyRGLartworks.html</link>
-    <description><![CDATA[<!DOCTYPE HTML>
-<html lang="en">
-
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Saturn Elephant - My RGL artworks</title>
+    <description>
   <link href="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/default2.css" />
   <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/post.css" />
@@ -32,9 +25,7 @@
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
   <script src="https://laustep.github.io/stlahblog/libraries/jquery.min.js"></script>
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
-</head>
 
-<body>
   <div class="container-fluid">
     <div class="row">
       <div class="main col-sm-12">
@@ -113,7 +104,6 @@
 
   </div>
 
-</body>
 
 <script src="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap.min.js"></script>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
@@ -123,7 +113,7 @@
 </script> -->
 
 
-</html>]]></description>
+</description>
     <pubDate>Thu, 08 Oct 2020 00:00:00 UT</pubDate>
     <guid>https://laustep.github.io/stlahblog/posts/MyRGLartworks.html</guid>
     <dc:creator>Stéphane Laurent</dc:creator>
@@ -134,14 +124,8 @@
 <item>
     <title>Child tables with DT, editing, exporting</title>
     <link>https://laustep.github.io/stlahblog/posts/DT_childTables.html</link>
-    <description><![CDATA[<!DOCTYPE HTML>
-<html lang="en">
+    <description>
 
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Saturn Elephant - Child tables with DT, editing, exporting</title>
   <link href="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/default2.css" />
   <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/post.css" />
@@ -157,9 +141,7 @@
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
   <script src="https://laustep.github.io/stlahblog/libraries/jquery.min.js"></script>
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
-</head>
 
-<body>
   <div class="container-fluid">
     <div class="row">
       <div class="main col-sm-12">
@@ -683,7 +665,6 @@
 
   </div>
 
-</body>
 
 <script src="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap.min.js"></script>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
@@ -707,7 +688,7 @@
   </script>
 
 
-</html>]]></description>
+</description>
     <pubDate>Fri, 08 May 2020 00:00:00 UT</pubDate>
     <guid>https://laustep.github.io/stlahblog/posts/DT_childTables.html</guid>
     <dc:creator>Stéphane Laurent</dc:creator>
@@ -718,15 +699,8 @@
 <item>
     <title>Focal quadrics and their lines of curvature</title>
     <link>https://laustep.github.io/stlahblog/posts/focalQuadrics.html</link>
-    <description><![CDATA[<!DOCTYPE HTML>
-<html lang="en">
-
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Saturn Elephant - Focal quadrics and their lines of curvature</title>
-  <link href="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+    <description>
+        <link href="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/default2.css" />
   <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/post.css" />
   <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/misc.css" />
@@ -741,9 +715,7 @@
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
   <script src="https://laustep.github.io/stlahblog/libraries/jquery.min.js"></script>
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
-</head>
 
-<body>
   <div class="container-fluid">
     <div class="row">
       <div class="main col-sm-12">
@@ -1342,7 +1314,6 @@
 
   </div>
 
-</body>
 
 <script src="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap.min.js"></script>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
@@ -1366,7 +1337,7 @@
   </script>
 
 
-</html>]]></description>
+</description>
     <pubDate>Sun, 03 May 2020 00:00:00 UT</pubDate>
     <guid>https://laustep.github.io/stlahblog/posts/focalQuadrics.html</guid>
     <dc:creator>Stéphane Laurent</dc:creator>
@@ -1377,15 +1348,8 @@
 <item>
     <title>Drawing slices of a hypersurface with R</title>
     <link>https://laustep.github.io/stlahblog/posts/slicedHypersurface.html</link>
-    <description><![CDATA[<!DOCTYPE HTML>
-<html lang="en">
-
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Saturn Elephant - Drawing slices of a hypersurface with R</title>
-  <link href="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+    <description>
+    <link href="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/default2.css" />
   <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/post.css" />
   <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/misc.css" />
@@ -1400,9 +1364,7 @@
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
   <script src="https://laustep.github.io/stlahblog/libraries/jquery.min.js"></script>
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
-</head>
 
-<body>
   <div class="container-fluid">
     <div class="row">
       <div class="main col-sm-12">
@@ -1645,8 +1607,6 @@ d \sin v \sinh w
 
   </div>
 
-</body>
-
 <script src="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap.min.js"></script>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
 <script type="text/x-mathjax-config" src="https://laustep.github.io/stlahblog/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
@@ -1669,7 +1629,7 @@ d \sin v \sinh w
   </script>
 
 
-</html>]]></description>
+</description>
     <pubDate>Fri, 01 May 2020 00:00:00 UT</pubDate>
     <guid>https://laustep.github.io/stlahblog/posts/slicedHypersurface.html</guid>
     <dc:creator>Stéphane Laurent</dc:creator>
@@ -1680,15 +1640,8 @@ d \sin v \sinh w
 <item>
     <title>An orbit of the modular tessellation</title>
     <link>https://laustep.github.io/stlahblog/posts/ModularTessellationOrbit.html</link>
-    <description><![CDATA[<!DOCTYPE HTML>
-<html lang="en">
-
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Saturn Elephant - An orbit of the modular tessellation</title>
-  <link href="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+    <description>
+    <link href="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/default2.css" />
   <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/post.css" />
   <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/misc.css" />
@@ -1703,9 +1656,7 @@ d \sin v \sinh w
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
   <script src="https://laustep.github.io/stlahblog/libraries/jquery.min.js"></script>
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
-</head>
 
-<body>
   <div class="container-fluid">
     <div class="row">
       <div class="main col-sm-12">
@@ -1887,7 +1838,6 @@ d \sin v \sinh w
 
   </div>
 
-</body>
 
 <script src="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap.min.js"></script>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
@@ -1911,7 +1861,7 @@ d \sin v \sinh w
   </script>
 
 
-</html>]]></description>
+</description>
     <pubDate>Wed, 19 Feb 2020 00:00:00 UT</pubDate>
     <guid>https://laustep.github.io/stlahblog/posts/ModularTessellationOrbit.html</guid>
     <dc:creator>Stéphane Laurent</dc:creator>
@@ -1922,15 +1872,8 @@ d \sin v \sinh w
 <item>
     <title>Tooltips for the headers of a datatable in Shiny</title>
     <link>https://laustep.github.io/stlahblog/posts/DTqTips.html</link>
-    <description><![CDATA[<!DOCTYPE HTML>
-<html lang="en">
-
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Saturn Elephant - Tooltips for the headers of a datatable in Shiny</title>
-  <link href="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+    <description>
+    <link href="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/default2.css" />
   <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/post.css" />
   <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/misc.css" />
@@ -1945,9 +1888,7 @@ d \sin v \sinh w
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
   <script src="https://laustep.github.io/stlahblog/libraries/jquery.min.js"></script>
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
-</head>
 
-<body>
   <div class="container-fluid">
     <div class="row">
       <div class="main col-sm-12">
@@ -2228,7 +2169,6 @@ d \sin v \sinh w
 
   </div>
 
-</body>
 
 <script src="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap.min.js"></script>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
@@ -2252,7 +2192,7 @@ d \sin v \sinh w
   </script>
 
 
-</html>]]></description>
+</description>
     <pubDate>Sun, 16 Feb 2020 00:00:00 UT</pubDate>
     <guid>https://laustep.github.io/stlahblog/posts/DTqTips.html</guid>
     <dc:creator>Stéphane Laurent</dc:creator>
