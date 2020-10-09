@@ -19,18 +19,18 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - The Good Citizen's Alphabet - L'ABC du Bon Citoyen</title>
-  <link href="/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="/css/default2.css" />
-  <link rel="stylesheet" href="/css/post.css" />
-  <link rel="stylesheet" href="/css/misc.css" /> 
+  <link href="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/default2.css" />
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/post.css" />
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/misc.css" /> 
   
-    <link rel="stylesheet" href="/css/pandoc-solarized.css" /> 
+    <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/pandoc-solarized.css" /> 
    
   
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
-  <script src="/libraries/jquery.min.js"></script>
+  <script src="https://laustep.github.io/stlahblog/libraries/jquery.min.js"></script>
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 
@@ -42,7 +42,7 @@
         <div class="row">
           <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
             <a href="https://www.r-bloggers.com/">
-              <img src="/images/Rbloggers.png" alt="Rbloggers" width="100%" />
+              <img src="https://laustep.github.io/stlahblog/images/Rbloggers.png" alt="Rbloggers" width="100%" />
             </a>
             <br/>
             <a href="http://t-redactyl.io/">
@@ -64,24 +64,24 @@
         <div id="logos">
           <div class="row">
             <div class="col-sm-4">
-              <img src="/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)"/>
+              <img src="https://laustep.github.io/stlahblog/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/Rlogo.svg" style="width: 110%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/Rlogo.svg" style="width: 110%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/shiny-hex.png" style="width: 90%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/shiny-hex.png" style="width: 90%;"/>
             </div>
           </div>
           <div class="row">
             <div class="col-sm-4">
-              <img src="/images/Povray_logo_sphere.png" style="width: 105%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/Povray_logo_sphere.png" style="width: 105%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/javascript.svg" style="width: 90%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/javascript.svg" style="width: 90%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/haskell.svg" style="width: 110%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/haskell.svg" style="width: 110%;"/>
             </div>
           </div>
         </div>
@@ -90,15 +90,15 @@
       <div class="main col-sm-10">
         <div id="header">
           <div id="logo" style="position:absolute;">
-            <a href="/">
-              <img src="/images/stla.jpg" alt="stla" width="100px" />
+            <a href="https://laustep.github.io/stlahblog/">
+              <img src="https://laustep.github.io/stlahblog/images/stla.jpg" alt="stla" width="100px" />
             </a>
           </div>
           <div id="navigation" style="margin-top:50px;">
-            <a href="/">Home</a>
-            <a href="/about.html">About</a>
-            <a href="/contact.html">Contact</a>
-            <a href="/archive.html">Archive</a>
+            <a href="https://laustep.github.io/stlahblog/">Home</a>
+            <a href="https://laustep.github.io/stlahblog/about.html">About</a>
+            <a href="https://laustep.github.io/stlahblog/contact.html">Contact</a>
+            <a href="https://laustep.github.io/stlahblog/archive.html">Archive</a>
           </div>
         </div>
 
@@ -112,7 +112,7 @@
 </div>
 <div class="info">
     
-    Tags: <a href="/tags/misc.html">misc</a>
+    Tags: <a href="https://laustep.github.io/stlahblog/tags/misc.html">misc</a>
     
 </div>
 
@@ -685,7 +685,7 @@ centerMode: false});
 
 </body>
 
-<script src="/libraries/bootstrap/bootstrap.min.js"></script>
+<script src="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap.min.js"></script>
 <script>
   var disqus_developer = 1;
   var disqus_shortname = 'stlapblog';
@@ -704,7 +704,7 @@ centerMode: false});
   <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
 </noscript>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
-<script type="text/x-mathjax-config" src="/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<script type="text/x-mathjax-config" src="https://laustep.github.io/stlahblog/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
 <!-- <script>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
@@ -726,18 +726,18 @@ centerMode: false});
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - My RGL artworks</title>
-  <link href="/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="/css/default2.css" />
-  <link rel="stylesheet" href="/css/post.css" />
-  <link rel="stylesheet" href="/css/misc.css" /> 
+  <link href="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/default2.css" />
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/post.css" />
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/misc.css" /> 
   
-    <link rel="stylesheet" href="/css/pandoc-solarized.css" /> 
+    <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/pandoc-solarized.css" /> 
    
   
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
-  <script src="/libraries/jquery.min.js"></script>
+  <script src="https://laustep.github.io/stlahblog/libraries/jquery.min.js"></script>
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 
@@ -749,7 +749,7 @@ centerMode: false});
         <div class="row">
           <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
             <a href="https://www.r-bloggers.com/">
-              <img src="/images/Rbloggers.png" alt="Rbloggers" width="100%" />
+              <img src="https://laustep.github.io/stlahblog/images/Rbloggers.png" alt="Rbloggers" width="100%" />
             </a>
             <br/>
             <a href="http://t-redactyl.io/">
@@ -771,24 +771,24 @@ centerMode: false});
         <div id="logos">
           <div class="row">
             <div class="col-sm-4">
-              <img src="/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)"/>
+              <img src="https://laustep.github.io/stlahblog/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/Rlogo.svg" style="width: 110%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/Rlogo.svg" style="width: 110%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/shiny-hex.png" style="width: 90%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/shiny-hex.png" style="width: 90%;"/>
             </div>
           </div>
           <div class="row">
             <div class="col-sm-4">
-              <img src="/images/Povray_logo_sphere.png" style="width: 105%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/Povray_logo_sphere.png" style="width: 105%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/javascript.svg" style="width: 90%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/javascript.svg" style="width: 90%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/haskell.svg" style="width: 110%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/haskell.svg" style="width: 110%;"/>
             </div>
           </div>
         </div>
@@ -797,15 +797,15 @@ centerMode: false});
       <div class="main col-sm-10">
         <div id="header">
           <div id="logo" style="position:absolute;">
-            <a href="/">
-              <img src="/images/stla.jpg" alt="stla" width="100px" />
+            <a href="https://laustep.github.io/stlahblog/">
+              <img src="https://laustep.github.io/stlahblog/images/stla.jpg" alt="stla" width="100px" />
             </a>
           </div>
           <div id="navigation" style="margin-top:50px;">
-            <a href="/">Home</a>
-            <a href="/about.html">About</a>
-            <a href="/contact.html">Contact</a>
-            <a href="/archive.html">Archive</a>
+            <a href="https://laustep.github.io/stlahblog/">Home</a>
+            <a href="https://laustep.github.io/stlahblog/about.html">About</a>
+            <a href="https://laustep.github.io/stlahblog/contact.html">Contact</a>
+            <a href="https://laustep.github.io/stlahblog/archive.html">Archive</a>
           </div>
         </div>
 
@@ -819,7 +819,7 @@ centerMode: false});
 </div>
 <div class="info">
     
-    Tags: <a href="/tags/geometry.html">geometry</a>, <a href="/tags/graphics.html">graphics</a>, <a href="/tags/R.html">R</a>, <a href="/tags/rgl.html">rgl</a>
+    Tags: <a href="https://laustep.github.io/stlahblog/tags/geometry.html">geometry</a>, <a href="https://laustep.github.io/stlahblog/tags/graphics.html">graphics</a>, <a href="https://laustep.github.io/stlahblog/tags/R.html">R</a>, <a href="https://laustep.github.io/stlahblog/tags/rgl.html">rgl</a>
     
 </div>
 
@@ -872,7 +872,7 @@ centerMode: false});
 
 </body>
 
-<script src="/libraries/bootstrap/bootstrap.min.js"></script>
+<script src="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap.min.js"></script>
 <script>
   var disqus_developer = 1;
   var disqus_shortname = 'stlapblog';
@@ -891,7 +891,7 @@ centerMode: false});
   <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
 </noscript>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
-<script type="text/x-mathjax-config" src="/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<script type="text/x-mathjax-config" src="https://laustep.github.io/stlahblog/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
 <!-- <script>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
@@ -915,18 +915,18 @@ centerMode: false});
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - My POV-Ray artworks</title>
-  <link href="/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="/css/default2.css" />
-  <link rel="stylesheet" href="/css/post.css" />
-  <link rel="stylesheet" href="/css/misc.css" /> 
+  <link href="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/default2.css" />
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/post.css" />
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/misc.css" /> 
   
-    <link rel="stylesheet" href="/css/pandoc-solarized.css" /> 
+    <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/pandoc-solarized.css" /> 
    
   
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
-  <script src="/libraries/jquery.min.js"></script>
+  <script src="https://laustep.github.io/stlahblog/libraries/jquery.min.js"></script>
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 
@@ -938,7 +938,7 @@ centerMode: false});
         <div class="row">
           <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
             <a href="https://www.r-bloggers.com/">
-              <img src="/images/Rbloggers.png" alt="Rbloggers" width="100%" />
+              <img src="https://laustep.github.io/stlahblog/images/Rbloggers.png" alt="Rbloggers" width="100%" />
             </a>
             <br/>
             <a href="http://t-redactyl.io/">
@@ -960,24 +960,24 @@ centerMode: false});
         <div id="logos">
           <div class="row">
             <div class="col-sm-4">
-              <img src="/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)"/>
+              <img src="https://laustep.github.io/stlahblog/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/Rlogo.svg" style="width: 110%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/Rlogo.svg" style="width: 110%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/shiny-hex.png" style="width: 90%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/shiny-hex.png" style="width: 90%;"/>
             </div>
           </div>
           <div class="row">
             <div class="col-sm-4">
-              <img src="/images/Povray_logo_sphere.png" style="width: 105%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/Povray_logo_sphere.png" style="width: 105%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/javascript.svg" style="width: 90%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/javascript.svg" style="width: 90%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/haskell.svg" style="width: 110%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/haskell.svg" style="width: 110%;"/>
             </div>
           </div>
         </div>
@@ -986,15 +986,15 @@ centerMode: false});
       <div class="main col-sm-10">
         <div id="header">
           <div id="logo" style="position:absolute;">
-            <a href="/">
-              <img src="/images/stla.jpg" alt="stla" width="100px" />
+            <a href="https://laustep.github.io/stlahblog/">
+              <img src="https://laustep.github.io/stlahblog/images/stla.jpg" alt="stla" width="100px" />
             </a>
           </div>
           <div id="navigation" style="margin-top:50px;">
-            <a href="/">Home</a>
-            <a href="/about.html">About</a>
-            <a href="/contact.html">Contact</a>
-            <a href="/archive.html">Archive</a>
+            <a href="https://laustep.github.io/stlahblog/">Home</a>
+            <a href="https://laustep.github.io/stlahblog/about.html">About</a>
+            <a href="https://laustep.github.io/stlahblog/contact.html">Contact</a>
+            <a href="https://laustep.github.io/stlahblog/archive.html">Archive</a>
           </div>
         </div>
 
@@ -1008,7 +1008,7 @@ centerMode: false});
 </div>
 <div class="info">
     
-    Tags: <a href="/tags/geometry.html">geometry</a>, <a href="/tags/graphics.html">graphics</a>, <a href="/tags/povray.html">povray</a>
+    Tags: <a href="https://laustep.github.io/stlahblog/tags/geometry.html">geometry</a>, <a href="https://laustep.github.io/stlahblog/tags/graphics.html">graphics</a>, <a href="https://laustep.github.io/stlahblog/tags/povray.html">povray</a>
     
 </div>
 
@@ -1064,7 +1064,7 @@ centerMode: false});
 
 </body>
 
-<script src="/libraries/bootstrap/bootstrap.min.js"></script>
+<script src="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap.min.js"></script>
 <script>
   var disqus_developer = 1;
   var disqus_shortname = 'stlapblog';
@@ -1083,7 +1083,7 @@ centerMode: false});
   <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
 </noscript>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
-<script type="text/x-mathjax-config" src="/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<script type="text/x-mathjax-config" src="https://laustep.github.io/stlahblog/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
 <!-- <script>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
@@ -1105,18 +1105,18 @@ centerMode: false});
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - My Asymptote artworks</title>
-  <link href="/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="/css/default2.css" />
-  <link rel="stylesheet" href="/css/post.css" />
-  <link rel="stylesheet" href="/css/misc.css" /> 
+  <link href="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/default2.css" />
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/post.css" />
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/misc.css" /> 
   
-    <link rel="stylesheet" href="/css/pandoc-solarized.css" /> 
+    <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/pandoc-solarized.css" /> 
    
   
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
-  <script src="/libraries/jquery.min.js"></script>
+  <script src="https://laustep.github.io/stlahblog/libraries/jquery.min.js"></script>
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 
@@ -1128,7 +1128,7 @@ centerMode: false});
         <div class="row">
           <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
             <a href="https://www.r-bloggers.com/">
-              <img src="/images/Rbloggers.png" alt="Rbloggers" width="100%" />
+              <img src="https://laustep.github.io/stlahblog/images/Rbloggers.png" alt="Rbloggers" width="100%" />
             </a>
             <br/>
             <a href="http://t-redactyl.io/">
@@ -1150,24 +1150,24 @@ centerMode: false});
         <div id="logos">
           <div class="row">
             <div class="col-sm-4">
-              <img src="/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)"/>
+              <img src="https://laustep.github.io/stlahblog/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/Rlogo.svg" style="width: 110%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/Rlogo.svg" style="width: 110%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/shiny-hex.png" style="width: 90%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/shiny-hex.png" style="width: 90%;"/>
             </div>
           </div>
           <div class="row">
             <div class="col-sm-4">
-              <img src="/images/Povray_logo_sphere.png" style="width: 105%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/Povray_logo_sphere.png" style="width: 105%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/javascript.svg" style="width: 90%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/javascript.svg" style="width: 90%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/haskell.svg" style="width: 110%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/haskell.svg" style="width: 110%;"/>
             </div>
           </div>
         </div>
@@ -1176,15 +1176,15 @@ centerMode: false});
       <div class="main col-sm-10">
         <div id="header">
           <div id="logo" style="position:absolute;">
-            <a href="/">
-              <img src="/images/stla.jpg" alt="stla" width="100px" />
+            <a href="https://laustep.github.io/stlahblog/">
+              <img src="https://laustep.github.io/stlahblog/images/stla.jpg" alt="stla" width="100px" />
             </a>
           </div>
           <div id="navigation" style="margin-top:50px;">
-            <a href="/">Home</a>
-            <a href="/about.html">About</a>
-            <a href="/contact.html">Contact</a>
-            <a href="/archive.html">Archive</a>
+            <a href="https://laustep.github.io/stlahblog/">Home</a>
+            <a href="https://laustep.github.io/stlahblog/about.html">About</a>
+            <a href="https://laustep.github.io/stlahblog/contact.html">Contact</a>
+            <a href="https://laustep.github.io/stlahblog/archive.html">Archive</a>
           </div>
         </div>
 
@@ -1198,7 +1198,7 @@ centerMode: false});
 </div>
 <div class="info">
     
-    Tags: <a href="/tags/geometry.html">geometry</a>, <a href="/tags/graphics.html">graphics</a>, <a href="/tags/asymptote.html">asymptote</a>
+    Tags: <a href="https://laustep.github.io/stlahblog/tags/geometry.html">geometry</a>, <a href="https://laustep.github.io/stlahblog/tags/graphics.html">graphics</a>, <a href="https://laustep.github.io/stlahblog/tags/asymptote.html">asymptote</a>
     
 </div>
 
@@ -1248,7 +1248,7 @@ centerMode: false});
 
 </body>
 
-<script src="/libraries/bootstrap/bootstrap.min.js"></script>
+<script src="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap.min.js"></script>
 <script>
   var disqus_developer = 1;
   var disqus_shortname = 'stlapblog';
@@ -1267,7 +1267,7 @@ centerMode: false});
   <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
 </noscript>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
-<script type="text/x-mathjax-config" src="/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<script type="text/x-mathjax-config" src="https://laustep.github.io/stlahblog/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
 <!-- <script>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
@@ -1289,20 +1289,20 @@ centerMode: false});
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - Child tables with DT, editing, exporting</title>
-  <link href="/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="/css/default2.css" />
-  <link rel="stylesheet" href="/css/post.css" />
-  <link rel="stylesheet" href="/css/misc.css" /> 
+  <link href="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/default2.css" />
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/post.css" />
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/misc.css" /> 
   
-    <link rel="stylesheet" href="/css/pandoc-solarized.css" /> 
+    <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/pandoc-solarized.css" /> 
    
   
-    <link href="/libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+    <link href="https://laustep.github.io/stlahblog/libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
-  <script src="/libraries/jquery.min.js"></script>
+  <script src="https://laustep.github.io/stlahblog/libraries/jquery.min.js"></script>
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 
@@ -1314,7 +1314,7 @@ centerMode: false});
         <div class="row">
           <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
             <a href="https://www.r-bloggers.com/">
-              <img src="/images/Rbloggers.png" alt="Rbloggers" width="100%" />
+              <img src="https://laustep.github.io/stlahblog/images/Rbloggers.png" alt="Rbloggers" width="100%" />
             </a>
             <br/>
             <a href="http://t-redactyl.io/">
@@ -1336,24 +1336,24 @@ centerMode: false});
         <div id="logos">
           <div class="row">
             <div class="col-sm-4">
-              <img src="/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)"/>
+              <img src="https://laustep.github.io/stlahblog/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/Rlogo.svg" style="width: 110%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/Rlogo.svg" style="width: 110%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/shiny-hex.png" style="width: 90%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/shiny-hex.png" style="width: 90%;"/>
             </div>
           </div>
           <div class="row">
             <div class="col-sm-4">
-              <img src="/images/Povray_logo_sphere.png" style="width: 105%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/Povray_logo_sphere.png" style="width: 105%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/javascript.svg" style="width: 90%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/javascript.svg" style="width: 90%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/haskell.svg" style="width: 110%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/haskell.svg" style="width: 110%;"/>
             </div>
           </div>
         </div>
@@ -1362,15 +1362,15 @@ centerMode: false});
       <div class="main col-sm-10">
         <div id="header">
           <div id="logo" style="position:absolute;">
-            <a href="/">
-              <img src="/images/stla.jpg" alt="stla" width="100px" />
+            <a href="https://laustep.github.io/stlahblog/">
+              <img src="https://laustep.github.io/stlahblog/images/stla.jpg" alt="stla" width="100px" />
             </a>
           </div>
           <div id="navigation" style="margin-top:50px;">
-            <a href="/">Home</a>
-            <a href="/about.html">About</a>
-            <a href="/contact.html">Contact</a>
-            <a href="/archive.html">Archive</a>
+            <a href="https://laustep.github.io/stlahblog/">Home</a>
+            <a href="https://laustep.github.io/stlahblog/about.html">About</a>
+            <a href="https://laustep.github.io/stlahblog/contact.html">Contact</a>
+            <a href="https://laustep.github.io/stlahblog/archive.html">Archive</a>
           </div>
         </div>
 
@@ -1384,7 +1384,7 @@ centerMode: false});
 </div>
 <div class="info">
     
-    Tags: <a href="/tags/R.html">R</a>, <a href="/tags/datatables.html">datatables</a>, <a href="/tags/shiny.html">shiny</a>, <a href="/tags/javascript.html">javascript</a>
+    Tags: <a href="https://laustep.github.io/stlahblog/tags/R.html">R</a>, <a href="https://laustep.github.io/stlahblog/tags/datatables.html">datatables</a>, <a href="https://laustep.github.io/stlahblog/tags/shiny.html">shiny</a>, <a href="https://laustep.github.io/stlahblog/tags/javascript.html">javascript</a>
     
 </div>
 
@@ -1882,7 +1882,7 @@ centerMode: false});
 
 </body>
 
-<script src="/libraries/bootstrap/bootstrap.min.js"></script>
+<script src="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap.min.js"></script>
 <script>
   var disqus_developer = 1;
   var disqus_shortname = 'stlapblog';
@@ -1901,7 +1901,7 @@ centerMode: false});
   <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
 </noscript>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
-<script type="text/x-mathjax-config" src="/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<script type="text/x-mathjax-config" src="https://laustep.github.io/stlahblog/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
 <!-- <script>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
@@ -1909,7 +1909,7 @@ centerMode: false});
   <!-- Google Prettify -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-  <script src="/libraries/highlighters/prettify/js/lang-r.js"></script>
+  <script src="https://laustep.github.io/stlahblog/libraries/highlighters/prettify/js/lang-r.js"></script>
   <script>
     var pres = document.getElementsByTagName("pre");
     for (var i = 0; i < pres.length; ++i) {
@@ -1939,20 +1939,20 @@ centerMode: false});
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - Focal quadrics and their lines of curvature</title>
-  <link href="/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="/css/default2.css" />
-  <link rel="stylesheet" href="/css/post.css" />
-  <link rel="stylesheet" href="/css/misc.css" /> 
+  <link href="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/default2.css" />
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/post.css" />
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/misc.css" /> 
   
-    <link rel="stylesheet" href="/css/pandoc-solarized.css" /> 
+    <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/pandoc-solarized.css" /> 
    
   
-    <link href="/libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+    <link href="https://laustep.github.io/stlahblog/libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
-  <script src="/libraries/jquery.min.js"></script>
+  <script src="https://laustep.github.io/stlahblog/libraries/jquery.min.js"></script>
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 
@@ -1964,7 +1964,7 @@ centerMode: false});
         <div class="row">
           <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
             <a href="https://www.r-bloggers.com/">
-              <img src="/images/Rbloggers.png" alt="Rbloggers" width="100%" />
+              <img src="https://laustep.github.io/stlahblog/images/Rbloggers.png" alt="Rbloggers" width="100%" />
             </a>
             <br/>
             <a href="http://t-redactyl.io/">
@@ -1986,24 +1986,24 @@ centerMode: false});
         <div id="logos">
           <div class="row">
             <div class="col-sm-4">
-              <img src="/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)"/>
+              <img src="https://laustep.github.io/stlahblog/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/Rlogo.svg" style="width: 110%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/Rlogo.svg" style="width: 110%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/shiny-hex.png" style="width: 90%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/shiny-hex.png" style="width: 90%;"/>
             </div>
           </div>
           <div class="row">
             <div class="col-sm-4">
-              <img src="/images/Povray_logo_sphere.png" style="width: 105%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/Povray_logo_sphere.png" style="width: 105%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/javascript.svg" style="width: 90%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/javascript.svg" style="width: 90%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/haskell.svg" style="width: 110%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/haskell.svg" style="width: 110%;"/>
             </div>
           </div>
         </div>
@@ -2012,15 +2012,15 @@ centerMode: false});
       <div class="main col-sm-10">
         <div id="header">
           <div id="logo" style="position:absolute;">
-            <a href="/">
-              <img src="/images/stla.jpg" alt="stla" width="100px" />
+            <a href="https://laustep.github.io/stlahblog/">
+              <img src="https://laustep.github.io/stlahblog/images/stla.jpg" alt="stla" width="100px" />
             </a>
           </div>
           <div id="navigation" style="margin-top:50px;">
-            <a href="/">Home</a>
-            <a href="/about.html">About</a>
-            <a href="/contact.html">Contact</a>
-            <a href="/archive.html">Archive</a>
+            <a href="https://laustep.github.io/stlahblog/">Home</a>
+            <a href="https://laustep.github.io/stlahblog/about.html">About</a>
+            <a href="https://laustep.github.io/stlahblog/contact.html">Contact</a>
+            <a href="https://laustep.github.io/stlahblog/archive.html">Archive</a>
           </div>
         </div>
 
@@ -2034,7 +2034,7 @@ centerMode: false});
 </div>
 <div class="info">
     
-    Tags: <a href="/tags/R.html">R</a>, <a href="/tags/graphics.html">graphics</a>, <a href="/tags/rgl.html">rgl</a>, <a href="/tags/geometry.html">geometry</a>, <a href="/tags/maths.html">maths</a>
+    Tags: <a href="https://laustep.github.io/stlahblog/tags/R.html">R</a>, <a href="https://laustep.github.io/stlahblog/tags/graphics.html">graphics</a>, <a href="https://laustep.github.io/stlahblog/tags/rgl.html">rgl</a>, <a href="https://laustep.github.io/stlahblog/tags/geometry.html">geometry</a>, <a href="https://laustep.github.io/stlahblog/tags/maths.html">maths</a>
     
 </div>
 
@@ -2607,7 +2607,7 @@ centerMode: false});
 
 </body>
 
-<script src="/libraries/bootstrap/bootstrap.min.js"></script>
+<script src="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap.min.js"></script>
 <script>
   var disqus_developer = 1;
   var disqus_shortname = 'stlapblog';
@@ -2626,7 +2626,7 @@ centerMode: false});
   <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
 </noscript>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
-<script type="text/x-mathjax-config" src="/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<script type="text/x-mathjax-config" src="https://laustep.github.io/stlahblog/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
 <!-- <script>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
@@ -2634,7 +2634,7 @@ centerMode: false});
   <!-- Google Prettify -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-  <script src="/libraries/highlighters/prettify/js/lang-r.js"></script>
+  <script src="https://laustep.github.io/stlahblog/libraries/highlighters/prettify/js/lang-r.js"></script>
   <script>
     var pres = document.getElementsByTagName("pre");
     for (var i = 0; i < pres.length; ++i) {
@@ -2664,20 +2664,20 @@ centerMode: false});
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - Drawing slices of a hypersurface with R</title>
-  <link href="/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="/css/default2.css" />
-  <link rel="stylesheet" href="/css/post.css" />
-  <link rel="stylesheet" href="/css/misc.css" /> 
+  <link href="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/default2.css" />
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/post.css" />
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/misc.css" /> 
   
-    <link rel="stylesheet" href="/css/pandoc-solarized.css" /> 
+    <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/pandoc-solarized.css" /> 
    
   
-    <link href="/libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+    <link href="https://laustep.github.io/stlahblog/libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
-  <script src="/libraries/jquery.min.js"></script>
+  <script src="https://laustep.github.io/stlahblog/libraries/jquery.min.js"></script>
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 
@@ -2689,7 +2689,7 @@ centerMode: false});
         <div class="row">
           <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
             <a href="https://www.r-bloggers.com/">
-              <img src="/images/Rbloggers.png" alt="Rbloggers" width="100%" />
+              <img src="https://laustep.github.io/stlahblog/images/Rbloggers.png" alt="Rbloggers" width="100%" />
             </a>
             <br/>
             <a href="http://t-redactyl.io/">
@@ -2711,24 +2711,24 @@ centerMode: false});
         <div id="logos">
           <div class="row">
             <div class="col-sm-4">
-              <img src="/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)"/>
+              <img src="https://laustep.github.io/stlahblog/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/Rlogo.svg" style="width: 110%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/Rlogo.svg" style="width: 110%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/shiny-hex.png" style="width: 90%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/shiny-hex.png" style="width: 90%;"/>
             </div>
           </div>
           <div class="row">
             <div class="col-sm-4">
-              <img src="/images/Povray_logo_sphere.png" style="width: 105%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/Povray_logo_sphere.png" style="width: 105%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/javascript.svg" style="width: 90%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/javascript.svg" style="width: 90%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/haskell.svg" style="width: 110%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/haskell.svg" style="width: 110%;"/>
             </div>
           </div>
         </div>
@@ -2737,15 +2737,15 @@ centerMode: false});
       <div class="main col-sm-10">
         <div id="header">
           <div id="logo" style="position:absolute;">
-            <a href="/">
-              <img src="/images/stla.jpg" alt="stla" width="100px" />
+            <a href="https://laustep.github.io/stlahblog/">
+              <img src="https://laustep.github.io/stlahblog/images/stla.jpg" alt="stla" width="100px" />
             </a>
           </div>
           <div id="navigation" style="margin-top:50px;">
-            <a href="/">Home</a>
-            <a href="/about.html">About</a>
-            <a href="/contact.html">Contact</a>
-            <a href="/archive.html">Archive</a>
+            <a href="https://laustep.github.io/stlahblog/">Home</a>
+            <a href="https://laustep.github.io/stlahblog/about.html">About</a>
+            <a href="https://laustep.github.io/stlahblog/contact.html">Contact</a>
+            <a href="https://laustep.github.io/stlahblog/archive.html">Archive</a>
           </div>
         </div>
 
@@ -2759,7 +2759,7 @@ centerMode: false});
 </div>
 <div class="info">
     
-    Tags: <a href="/tags/R.html">R</a>, <a href="/tags/graphics.html">graphics</a>, <a href="/tags/rgl.html">rgl</a>, <a href="/tags/geometry.html">geometry</a>, <a href="/tags/maths.html">maths</a>
+    Tags: <a href="https://laustep.github.io/stlahblog/tags/R.html">R</a>, <a href="https://laustep.github.io/stlahblog/tags/graphics.html">graphics</a>, <a href="https://laustep.github.io/stlahblog/tags/rgl.html">rgl</a>, <a href="https://laustep.github.io/stlahblog/tags/geometry.html">geometry</a>, <a href="https://laustep.github.io/stlahblog/tags/maths.html">maths</a>
     
 </div>
 
@@ -2976,7 +2976,7 @@ d \sin v \sinh w
 
 </body>
 
-<script src="/libraries/bootstrap/bootstrap.min.js"></script>
+<script src="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap.min.js"></script>
 <script>
   var disqus_developer = 1;
   var disqus_shortname = 'stlapblog';
@@ -2995,7 +2995,7 @@ d \sin v \sinh w
   <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
 </noscript>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
-<script type="text/x-mathjax-config" src="/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<script type="text/x-mathjax-config" src="https://laustep.github.io/stlahblog/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
 <!-- <script>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
@@ -3003,7 +3003,7 @@ d \sin v \sinh w
   <!-- Google Prettify -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-  <script src="/libraries/highlighters/prettify/js/lang-r.js"></script>
+  <script src="https://laustep.github.io/stlahblog/libraries/highlighters/prettify/js/lang-r.js"></script>
   <script>
     var pres = document.getElementsByTagName("pre");
     for (var i = 0; i < pres.length; ++i) {
@@ -3033,20 +3033,20 @@ d \sin v \sinh w
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - Back to the parametric Hopf torus</title>
-  <link href="/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="/css/default2.css" />
-  <link rel="stylesheet" href="/css/post.css" />
-  <link rel="stylesheet" href="/css/misc.css" /> 
+  <link href="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/default2.css" />
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/post.css" />
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/misc.css" /> 
   
-    <link rel="stylesheet" href="/css/pandoc-solarized.css" /> 
+    <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/pandoc-solarized.css" /> 
    
   
-    <link href="/libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+    <link href="https://laustep.github.io/stlahblog/libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
-  <script src="/libraries/jquery.min.js"></script>
+  <script src="https://laustep.github.io/stlahblog/libraries/jquery.min.js"></script>
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 
@@ -3058,7 +3058,7 @@ d \sin v \sinh w
         <div class="row">
           <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
             <a href="https://www.r-bloggers.com/">
-              <img src="/images/Rbloggers.png" alt="Rbloggers" width="100%" />
+              <img src="https://laustep.github.io/stlahblog/images/Rbloggers.png" alt="Rbloggers" width="100%" />
             </a>
             <br/>
             <a href="http://t-redactyl.io/">
@@ -3080,24 +3080,24 @@ d \sin v \sinh w
         <div id="logos">
           <div class="row">
             <div class="col-sm-4">
-              <img src="/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)"/>
+              <img src="https://laustep.github.io/stlahblog/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/Rlogo.svg" style="width: 110%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/Rlogo.svg" style="width: 110%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/shiny-hex.png" style="width: 90%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/shiny-hex.png" style="width: 90%;"/>
             </div>
           </div>
           <div class="row">
             <div class="col-sm-4">
-              <img src="/images/Povray_logo_sphere.png" style="width: 105%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/Povray_logo_sphere.png" style="width: 105%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/javascript.svg" style="width: 90%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/javascript.svg" style="width: 90%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/haskell.svg" style="width: 110%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/haskell.svg" style="width: 110%;"/>
             </div>
           </div>
         </div>
@@ -3106,15 +3106,15 @@ d \sin v \sinh w
       <div class="main col-sm-10">
         <div id="header">
           <div id="logo" style="position:absolute;">
-            <a href="/">
-              <img src="/images/stla.jpg" alt="stla" width="100px" />
+            <a href="https://laustep.github.io/stlahblog/">
+              <img src="https://laustep.github.io/stlahblog/images/stla.jpg" alt="stla" width="100px" />
             </a>
           </div>
           <div id="navigation" style="margin-top:50px;">
-            <a href="/">Home</a>
-            <a href="/about.html">About</a>
-            <a href="/contact.html">Contact</a>
-            <a href="/archive.html">Archive</a>
+            <a href="https://laustep.github.io/stlahblog/">Home</a>
+            <a href="https://laustep.github.io/stlahblog/about.html">About</a>
+            <a href="https://laustep.github.io/stlahblog/contact.html">Contact</a>
+            <a href="https://laustep.github.io/stlahblog/archive.html">Archive</a>
           </div>
         </div>
 
@@ -3128,7 +3128,7 @@ d \sin v \sinh w
 </div>
 <div class="info">
     
-    Tags: <a href="/tags/R.html">R</a>, <a href="/tags/graphics.html">graphics</a>, <a href="/tags/rgl.html">rgl</a>, <a href="/tags/geometry.html">geometry</a>, <a href="/tags/maths.html">maths</a>
+    Tags: <a href="https://laustep.github.io/stlahblog/tags/R.html">R</a>, <a href="https://laustep.github.io/stlahblog/tags/graphics.html">graphics</a>, <a href="https://laustep.github.io/stlahblog/tags/rgl.html">rgl</a>, <a href="https://laustep.github.io/stlahblog/tags/geometry.html">geometry</a>, <a href="https://laustep.github.io/stlahblog/tags/maths.html">maths</a>
     
 </div>
 
@@ -3359,7 +3359,7 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
 
 </body>
 
-<script src="/libraries/bootstrap/bootstrap.min.js"></script>
+<script src="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap.min.js"></script>
 <script>
   var disqus_developer = 1;
   var disqus_shortname = 'stlapblog';
@@ -3378,7 +3378,7 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
   <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
 </noscript>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
-<script type="text/x-mathjax-config" src="/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<script type="text/x-mathjax-config" src="https://laustep.github.io/stlahblog/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
 <!-- <script>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
@@ -3386,7 +3386,7 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
   <!-- Google Prettify -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-  <script src="/libraries/highlighters/prettify/js/lang-r.js"></script>
+  <script src="https://laustep.github.io/stlahblog/libraries/highlighters/prettify/js/lang-r.js"></script>
   <script>
     var pres = document.getElementsByTagName("pre");
     for (var i = 0; i < pres.length; ++i) {
@@ -3414,20 +3414,20 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - An orbit of the modular tessellation</title>
-  <link href="/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="/css/default2.css" />
-  <link rel="stylesheet" href="/css/post.css" />
-  <link rel="stylesheet" href="/css/misc.css" /> 
+  <link href="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/default2.css" />
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/post.css" />
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/misc.css" /> 
   
-    <link rel="stylesheet" href="/css/pandoc-solarized.css" /> 
+    <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/pandoc-solarized.css" /> 
    
   
-    <link href="/libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+    <link href="https://laustep.github.io/stlahblog/libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
-  <script src="/libraries/jquery.min.js"></script>
+  <script src="https://laustep.github.io/stlahblog/libraries/jquery.min.js"></script>
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 
@@ -3439,7 +3439,7 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
         <div class="row">
           <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
             <a href="https://www.r-bloggers.com/">
-              <img src="/images/Rbloggers.png" alt="Rbloggers" width="100%" />
+              <img src="https://laustep.github.io/stlahblog/images/Rbloggers.png" alt="Rbloggers" width="100%" />
             </a>
             <br/>
             <a href="http://t-redactyl.io/">
@@ -3461,24 +3461,24 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
         <div id="logos">
           <div class="row">
             <div class="col-sm-4">
-              <img src="/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)"/>
+              <img src="https://laustep.github.io/stlahblog/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/Rlogo.svg" style="width: 110%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/Rlogo.svg" style="width: 110%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/shiny-hex.png" style="width: 90%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/shiny-hex.png" style="width: 90%;"/>
             </div>
           </div>
           <div class="row">
             <div class="col-sm-4">
-              <img src="/images/Povray_logo_sphere.png" style="width: 105%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/Povray_logo_sphere.png" style="width: 105%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/javascript.svg" style="width: 90%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/javascript.svg" style="width: 90%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/haskell.svg" style="width: 110%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/haskell.svg" style="width: 110%;"/>
             </div>
           </div>
         </div>
@@ -3487,15 +3487,15 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
       <div class="main col-sm-10">
         <div id="header">
           <div id="logo" style="position:absolute;">
-            <a href="/">
-              <img src="/images/stla.jpg" alt="stla" width="100px" />
+            <a href="https://laustep.github.io/stlahblog/">
+              <img src="https://laustep.github.io/stlahblog/images/stla.jpg" alt="stla" width="100px" />
             </a>
           </div>
           <div id="navigation" style="margin-top:50px;">
-            <a href="/">Home</a>
-            <a href="/about.html">About</a>
-            <a href="/contact.html">Contact</a>
-            <a href="/archive.html">Archive</a>
+            <a href="https://laustep.github.io/stlahblog/">Home</a>
+            <a href="https://laustep.github.io/stlahblog/about.html">About</a>
+            <a href="https://laustep.github.io/stlahblog/contact.html">Contact</a>
+            <a href="https://laustep.github.io/stlahblog/archive.html">Archive</a>
           </div>
         </div>
 
@@ -3509,7 +3509,7 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
 </div>
 <div class="info">
     
-    Tags: <a href="/tags/R.html">R</a>, <a href="/tags/maths.html">maths</a>, <a href="/tags/geometry.html">geometry</a>
+    Tags: <a href="https://laustep.github.io/stlahblog/tags/R.html">R</a>, <a href="https://laustep.github.io/stlahblog/tags/maths.html">maths</a>, <a href="https://laustep.github.io/stlahblog/tags/geometry.html">geometry</a>
     
 </div>
 
@@ -3665,7 +3665,7 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
 
 </body>
 
-<script src="/libraries/bootstrap/bootstrap.min.js"></script>
+<script src="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap.min.js"></script>
 <script>
   var disqus_developer = 1;
   var disqus_shortname = 'stlapblog';
@@ -3684,7 +3684,7 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
   <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
 </noscript>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
-<script type="text/x-mathjax-config" src="/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<script type="text/x-mathjax-config" src="https://laustep.github.io/stlahblog/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
 <!-- <script>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
@@ -3692,7 +3692,7 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
   <!-- Google Prettify -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-  <script src="/libraries/highlighters/prettify/js/lang-r.js"></script>
+  <script src="https://laustep.github.io/stlahblog/libraries/highlighters/prettify/js/lang-r.js"></script>
   <script>
     var pres = document.getElementsByTagName("pre");
     for (var i = 0; i < pres.length; ++i) {
@@ -3722,20 +3722,20 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saturn Elephant - Tooltips for the headers of a datatable in Shiny</title>
-  <link href="/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="/css/default2.css" />
-  <link rel="stylesheet" href="/css/post.css" />
-  <link rel="stylesheet" href="/css/misc.css" /> 
+  <link href="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/default2.css" />
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/post.css" />
+  <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/misc.css" /> 
   
-    <link rel="stylesheet" href="/css/pandoc-solarized.css" /> 
+    <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/pandoc-solarized.css" /> 
    
   
-    <link href="/libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
+    <link href="https://laustep.github.io/stlahblog/libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
-  <script src="/libraries/jquery.min.js"></script>
+  <script src="https://laustep.github.io/stlahblog/libraries/jquery.min.js"></script>
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 
@@ -3747,7 +3747,7 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
         <div class="row">
           <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
             <a href="https://www.r-bloggers.com/">
-              <img src="/images/Rbloggers.png" alt="Rbloggers" width="100%" />
+              <img src="https://laustep.github.io/stlahblog/images/Rbloggers.png" alt="Rbloggers" width="100%" />
             </a>
             <br/>
             <a href="http://t-redactyl.io/">
@@ -3769,24 +3769,24 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
         <div id="logos">
           <div class="row">
             <div class="col-sm-4">
-              <img src="/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)"/>
+              <img src="https://laustep.github.io/stlahblog/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/Rlogo.svg" style="width: 110%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/Rlogo.svg" style="width: 110%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/shiny-hex.png" style="width: 90%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/shiny-hex.png" style="width: 90%;"/>
             </div>
           </div>
           <div class="row">
             <div class="col-sm-4">
-              <img src="/images/Povray_logo_sphere.png" style="width: 105%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/Povray_logo_sphere.png" style="width: 105%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/javascript.svg" style="width: 90%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/javascript.svg" style="width: 90%;"/>
             </div>
             <div class="col-sm-4">
-              <img src="/images/haskell.svg" style="width: 110%;"/>
+              <img src="https://laustep.github.io/stlahblog/images/haskell.svg" style="width: 110%;"/>
             </div>
           </div>
         </div>
@@ -3795,15 +3795,15 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
       <div class="main col-sm-10">
         <div id="header">
           <div id="logo" style="position:absolute;">
-            <a href="/">
-              <img src="/images/stla.jpg" alt="stla" width="100px" />
+            <a href="https://laustep.github.io/stlahblog/">
+              <img src="https://laustep.github.io/stlahblog/images/stla.jpg" alt="stla" width="100px" />
             </a>
           </div>
           <div id="navigation" style="margin-top:50px;">
-            <a href="/">Home</a>
-            <a href="/about.html">About</a>
-            <a href="/contact.html">Contact</a>
-            <a href="/archive.html">Archive</a>
+            <a href="https://laustep.github.io/stlahblog/">Home</a>
+            <a href="https://laustep.github.io/stlahblog/about.html">About</a>
+            <a href="https://laustep.github.io/stlahblog/contact.html">Contact</a>
+            <a href="https://laustep.github.io/stlahblog/archive.html">Archive</a>
           </div>
         </div>
 
@@ -3817,7 +3817,7 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
 </div>
 <div class="info">
     
-    Tags: <a href="/tags/R.html">R</a>, <a href="/tags/datatables.html">datatables</a>, <a href="/tags/javascript.html">javascript</a>, <a href="/tags/shiny.html">shiny</a>
+    Tags: <a href="https://laustep.github.io/stlahblog/tags/R.html">R</a>, <a href="https://laustep.github.io/stlahblog/tags/datatables.html">datatables</a>, <a href="https://laustep.github.io/stlahblog/tags/javascript.html">javascript</a>, <a href="https://laustep.github.io/stlahblog/tags/shiny.html">shiny</a>
     
 </div>
 
@@ -4072,7 +4072,7 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
 
 </body>
 
-<script src="/libraries/bootstrap/bootstrap.min.js"></script>
+<script src="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap.min.js"></script>
 <script>
   var disqus_developer = 1;
   var disqus_shortname = 'stlapblog';
@@ -4091,7 +4091,7 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
   <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
 </noscript>
 <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
-<script type="text/x-mathjax-config" src="/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<script type="text/x-mathjax-config" src="https://laustep.github.io/stlahblog/libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
 <!-- <script>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
@@ -4099,7 +4099,7 @@ H_\Gamma \colon &amp; I \times (0,2\pi[ &amp; \longrightarrow &amp; S^3 \\
   <!-- Google Prettify -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-  <script src="/libraries/highlighters/prettify/js/lang-r.js"></script>
+  <script src="https://laustep.github.io/stlahblog/libraries/highlighters/prettify/js/lang-r.js"></script>
   <script>
     var pres = document.getElementsByTagName("pre");
     for (var i = 0; i < pres.length; ++i) {
