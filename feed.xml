@@ -11,7 +11,7 @@
         <item>
     <title>My RGL artworks</title>
     <link>https://laustep.github.io/stlahblog/posts/MyRGLartworks.html</link>
-    <description>
+    <description><![CDATA[
   <link href="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/default2.css" />
   <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/post.css" />
@@ -113,7 +113,7 @@
 </script> -->
 
 
-</description>
+]]></description>
     <pubDate>Thu, 08 Oct 2020 00:00:00 UT</pubDate>
     <guid>https://laustep.github.io/stlahblog/posts/MyRGLartworks.html</guid>
     <dc:creator>Stéphane Laurent</dc:creator>
@@ -124,7 +124,7 @@
 <item>
     <title>Child tables with DT, editing, exporting</title>
     <link>https://laustep.github.io/stlahblog/posts/DT_childTables.html</link>
-    <description>
+    <description><![CDATA[
 
   <link href="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/default2.css" />
@@ -688,7 +688,7 @@
   </script>
 
 
-</description>
+]]></description>
     <pubDate>Fri, 08 May 2020 00:00:00 UT</pubDate>
     <guid>https://laustep.github.io/stlahblog/posts/DT_childTables.html</guid>
     <dc:creator>Stéphane Laurent</dc:creator>
@@ -699,7 +699,7 @@
 <item>
     <title>Focal quadrics and their lines of curvature</title>
     <link>https://laustep.github.io/stlahblog/posts/focalQuadrics.html</link>
-    <description>
+    <description><![CDATA[
         <link href="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/default2.css" />
   <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/post.css" />
@@ -1337,7 +1337,7 @@
   </script>
 
 
-</description>
+]]></description>
     <pubDate>Sun, 03 May 2020 00:00:00 UT</pubDate>
     <guid>https://laustep.github.io/stlahblog/posts/focalQuadrics.html</guid>
     <dc:creator>Stéphane Laurent</dc:creator>
@@ -1348,7 +1348,7 @@
 <item>
     <title>Drawing slices of a hypersurface with R</title>
     <link>https://laustep.github.io/stlahblog/posts/slicedHypersurface.html</link>
-    <description>
+    <description><![CDATA[
     <link href="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/default2.css" />
   <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/post.css" />
@@ -1629,7 +1629,7 @@ d \sin v \sinh w
   </script>
 
 
-</description>
+]]></description>
     <pubDate>Fri, 01 May 2020 00:00:00 UT</pubDate>
     <guid>https://laustep.github.io/stlahblog/posts/slicedHypersurface.html</guid>
     <dc:creator>Stéphane Laurent</dc:creator>
@@ -1640,7 +1640,7 @@ d \sin v \sinh w
 <item>
     <title>An orbit of the modular tessellation</title>
     <link>https://laustep.github.io/stlahblog/posts/ModularTessellationOrbit.html</link>
-    <description>
+    <description><![CDATA[
     <link href="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/default2.css" />
   <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/post.css" />
@@ -1861,7 +1861,7 @@ d \sin v \sinh w
   </script>
 
 
-</description>
+]]></description>
     <pubDate>Wed, 19 Feb 2020 00:00:00 UT</pubDate>
     <guid>https://laustep.github.io/stlahblog/posts/ModularTessellationOrbit.html</guid>
     <dc:creator>Stéphane Laurent</dc:creator>
@@ -1872,7 +1872,7 @@ d \sin v \sinh w
 <item>
     <title>Tooltips for the headers of a datatable in Shiny</title>
     <link>https://laustep.github.io/stlahblog/posts/DTqTips.html</link>
-    <description>
+    <description><![CDATA[
     <link href="https://laustep.github.io/stlahblog/libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/default2.css" />
   <link rel="stylesheet" href="https://laustep.github.io/stlahblog/css/post.css" />
@@ -2192,7 +2192,7 @@ d \sin v \sinh w
   </script>
 
 
-</description>
+]]></description>
     <pubDate>Sun, 16 Feb 2020 00:00:00 UT</pubDate>
     <guid>https://laustep.github.io/stlahblog/posts/DTqTips.html</guid>
     <dc:creator>Stéphane Laurent</dc:creator>
