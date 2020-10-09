@@ -37,35 +37,7 @@
 <body>
   <div class="container-fluid">
     <div class="row">
-      <!-- Sidebar. -->
-      <div class="sidebar col-sm-2">
-        <div id="logos">
-          <div class="row">
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)"/>
-            </div>
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/Rlogo.svg" style="width: 110%;"/>
-            </div>
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/shiny-hex.png" style="width: 90%;"/>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/Povray_logo_sphere.png" style="width: 105%;"/>
-            </div>
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/javascript.svg" style="width: 90%;"/>
-            </div>
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/haskell.svg" style="width: 110%;"/>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="main col-sm-10">
+      <div class="main col-sm-12">
         <div id="header">
           <div id="logo" style="position:absolute;">
             <a href="https://laustep.github.io/stlahblog/">
@@ -190,35 +162,7 @@
 <body>
   <div class="container-fluid">
     <div class="row">
-      <!-- Sidebar. -->
-      <div class="sidebar col-sm-2">
-        <div id="logos">
-          <div class="row">
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)"/>
-            </div>
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/Rlogo.svg" style="width: 110%;"/>
-            </div>
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/shiny-hex.png" style="width: 90%;"/>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/Povray_logo_sphere.png" style="width: 105%;"/>
-            </div>
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/javascript.svg" style="width: 90%;"/>
-            </div>
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/haskell.svg" style="width: 110%;"/>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="main col-sm-10">
+      <div class="main col-sm-12">
         <div id="header">
           <div id="logo" style="position:absolute;">
             <a href="https://laustep.github.io/stlahblog/">
@@ -802,35 +746,7 @@
 <body>
   <div class="container-fluid">
     <div class="row">
-      <!-- Sidebar. -->
-      <div class="sidebar col-sm-2">
-        <div id="logos">
-          <div class="row">
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)"/>
-            </div>
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/Rlogo.svg" style="width: 110%;"/>
-            </div>
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/shiny-hex.png" style="width: 90%;"/>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/Povray_logo_sphere.png" style="width: 105%;"/>
-            </div>
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/javascript.svg" style="width: 90%;"/>
-            </div>
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/haskell.svg" style="width: 110%;"/>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="main col-sm-10">
+      <div class="main col-sm-12">
         <div id="header">
           <div id="logo" style="position:absolute;">
             <a href="https://laustep.github.io/stlahblog/">
@@ -1489,35 +1405,7 @@
 <body>
   <div class="container-fluid">
     <div class="row">
-      <!-- Sidebar. -->
-      <div class="sidebar col-sm-2">
-        <div id="logos">
-          <div class="row">
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)"/>
-            </div>
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/Rlogo.svg" style="width: 110%;"/>
-            </div>
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/shiny-hex.png" style="width: 90%;"/>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/Povray_logo_sphere.png" style="width: 105%;"/>
-            </div>
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/javascript.svg" style="width: 90%;"/>
-            </div>
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/haskell.svg" style="width: 110%;"/>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="main col-sm-10">
+      <div class="main col-sm-12">
         <div id="header">
           <div id="logo" style="position:absolute;">
             <a href="https://laustep.github.io/stlahblog/">
@@ -1820,35 +1708,7 @@ d \sin v \sinh w
 <body>
   <div class="container-fluid">
     <div class="row">
-      <!-- Sidebar. -->
-      <div class="sidebar col-sm-2">
-        <div id="logos">
-          <div class="row">
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)"/>
-            </div>
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/Rlogo.svg" style="width: 110%;"/>
-            </div>
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/shiny-hex.png" style="width: 90%;"/>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/Povray_logo_sphere.png" style="width: 105%;"/>
-            </div>
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/javascript.svg" style="width: 90%;"/>
-            </div>
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/haskell.svg" style="width: 110%;"/>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="main col-sm-10">
+      <div class="main col-sm-12">
         <div id="header">
           <div id="logo" style="position:absolute;">
             <a href="https://laustep.github.io/stlahblog/">
@@ -2090,35 +1950,7 @@ d \sin v \sinh w
 <body>
   <div class="container-fluid">
     <div class="row">
-      <!-- Sidebar. -->
-      <div class="sidebar col-sm-2">
-        <div id="logos">
-          <div class="row">
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)"/>
-            </div>
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/Rlogo.svg" style="width: 110%;"/>
-            </div>
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/shiny-hex.png" style="width: 90%;"/>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/Povray_logo_sphere.png" style="width: 105%;"/>
-            </div>
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/javascript.svg" style="width: 90%;"/>
-            </div>
-            <div class="col-sm-4">
-              <img src="https://laustep.github.io/stlahblog/images/haskell.svg" style="width: 110%;"/>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="main col-sm-10">
+      <div class="main col-sm-12">
         <div id="header">
           <div id="logo" style="position:absolute;">
             <a href="https://laustep.github.io/stlahblog/">
