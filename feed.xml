@@ -18,26 +18,20 @@
               <img src="https://laustep.github.io/stlahblog/images/stla.jpg" alt="stla" width="100px" />
             </a>
           </div>
-          <div id="navigation" style="margin-top:50px;">
-            <a href="https://laustep.github.io/stlahblog/">Home</a>
-            <a href="https://laustep.github.io/stlahblog/about.html">About</a>
-            <a href="https://laustep.github.io/stlahblog/contact.html">Contact</a>
-            <a href="https://laustep.github.io/stlahblog/archive.html">Archive</a>
-          </div>
         </div>
 
         <div class="content">
-          <h1>My RGL artworks</h1> 
+          <h1>My RGL artworks</h1>
           <div class="info">
     Posted on October  8, 2020
-    
+
         by Stéphane Laurent
-    
+
 </div>
 <div class="info">
-    
+
     Tags: <a title="All pages tagged &#39;geometry&#39;." href="https://laustep.github.io/stlahblog/tags/geometry.html">geometry</a>, <a title="All pages tagged &#39;graphics&#39;." href="https://laustep.github.io/stlahblog/tags/graphics.html">graphics</a>, <a title="All pages tagged &#39;R&#39;." href="https://laustep.github.io/stlahblog/tags/R.html">R</a>, <a title="All pages tagged &#39;rgl&#39;." href="https://laustep.github.io/stlahblog/tags/rgl.html">rgl</a>
-    
+
 </div>
 
 <p>These are some of my artworks realized with the R package <code>rgl</code>. Source code is available in <a href="https://gist.github.com/stla">my gists</a>.</p>
@@ -91,26 +85,20 @@
               <img src="https://laustep.github.io/stlahblog/images/stla.jpg" alt="stla" width="100px" />
             </a>
           </div>
-          <div id="navigation" style="margin-top:50px;">
-            <a href="https://laustep.github.io/stlahblog/">Home</a>
-            <a href="https://laustep.github.io/stlahblog/about.html">About</a>
-            <a href="https://laustep.github.io/stlahblog/contact.html">Contact</a>
-            <a href="https://laustep.github.io/stlahblog/archive.html">Archive</a>
-          </div>
         </div>
 
         <div class="content">
-          <h1>Child tables with DT, editing, exporting</h1> 
+          <h1>Child tables with DT, editing, exporting</h1>
           <div class="info">
     Posted on May  8, 2020
-    
+
         by Stéphane Laurent
-    
+
 </div>
 <div class="info">
-    
+
     Tags: <a title="All pages tagged &#39;R&#39;." href="https://laustep.github.io/stlahblog/tags/R.html">R</a>, <a title="All pages tagged &#39;datatables&#39;." href="https://laustep.github.io/stlahblog/tags/datatables.html">datatables</a>, <a title="All pages tagged &#39;shiny&#39;." href="https://laustep.github.io/stlahblog/tags/shiny.html">shiny</a>, <a title="All pages tagged &#39;javascript&#39;." href="https://laustep.github.io/stlahblog/tags/javascript.html">javascript</a>
-    
+
 </div>
 
 <p>I’m going to show how to use the <code>DT</code> package to do a table with child tables, and how to edit and export such a table.</p>
@@ -610,26 +598,20 @@
               <img src="https://laustep.github.io/stlahblog/images/stla.jpg" alt="stla" width="100px" />
             </a>
           </div>
-          <div id="navigation" style="margin-top:50px;">
-            <a href="https://laustep.github.io/stlahblog/">Home</a>
-            <a href="https://laustep.github.io/stlahblog/about.html">About</a>
-            <a href="https://laustep.github.io/stlahblog/contact.html">Contact</a>
-            <a href="https://laustep.github.io/stlahblog/archive.html">Archive</a>
-          </div>
         </div>
 
         <div class="content">
-          <h1>Focal quadrics and their lines of curvature</h1> 
+          <h1>Focal quadrics and their lines of curvature</h1>
           <div class="info">
     Posted on May  3, 2020
-    
+
         by Stéphane Laurent
-    
+
 </div>
 <div class="info">
-    
+
     Tags: <a title="All pages tagged &#39;R&#39;." href="https://laustep.github.io/stlahblog/tags/R.html">R</a>, <a title="All pages tagged &#39;graphics&#39;." href="https://laustep.github.io/stlahblog/tags/graphics.html">graphics</a>, <a title="All pages tagged &#39;rgl&#39;." href="https://laustep.github.io/stlahblog/tags/rgl.html">rgl</a>, <a title="All pages tagged &#39;geometry&#39;." href="https://laustep.github.io/stlahblog/tags/geometry.html">geometry</a>, <a title="All pages tagged &#39;maths&#39;." href="https://laustep.github.io/stlahblog/tags/maths.html">maths</a>
-    
+
 </div>
 
 <p>This blog post provides some R code for drawing focal quadrics and their curvatures lines with the <code>rgl</code> package.</p>
@@ -1128,8 +1110,8 @@
 <p><img src="https://laustep.github.io/stlahblog/posts/figures/quadrics_H2.png" /></p>
 <h1 id="general-quadric">General quadric</h1>
 <p>A general quadric in <span class="math inline">\(\mathbb{R}^3\)</span> has equation <span class="math display">\[
-(x \quad y \quad z)\, A 
-\begin{pmatrix} x \\ y \\ z \end{pmatrix} 
+(x \quad y \quad z)\, A
+\begin{pmatrix} x \\ y \\ z \end{pmatrix}
 + J&#39; \begin{pmatrix} x \\ y \\ z \end{pmatrix}
 + K = 0,
 \]</span> where <span class="math inline">\(A\)</span> is a symmetric <span class="math inline">\((3\times 3)\)</span>-matrix, <span class="math inline">\(J \in \mathbb{R}^3\)</span>, and <span class="math inline">\(K \in \mathbb{R}\)</span>. Let’s treat an example. We follow the strategy given at page 45 of Brannan &amp; al’s book <em>Geometry</em> (<a href="http://math.haifa.ac.il/ROVENSKI/B2.pdf">pdf</a>).</p>
@@ -1147,7 +1129,7 @@
 <span id="cb10-12"><span class="co">## [1]  5.614627  2.632676 -3.247303</span></span></code></pre></div>
 <p>There is no eigenvalue equal to <span class="math inline">\(0\)</span>; this is the first necessary condition in order for the solution of the equation to be a focal quadric.</p>
 <p>Now we write the equation in the form <span class="math display">\[
-\lambda_1 {(x&#39;&#39;)}^2 + \lambda_2 {(y&#39;&#39;)}^2 + \lambda_3 {(z&#39;&#39;)}^2 = 
+\lambda_1 {(x&#39;&#39;)}^2 + \lambda_2 {(y&#39;&#39;)}^2 + \lambda_3 {(z&#39;&#39;)}^2 =
 \mathrm{rhs}
 \]</span> where <span class="math inline">\(\lambda_1\)</span>, <span class="math inline">\(\lambda_2\)</span>, <span class="math inline">\(\lambda_3\)</span> are the eigenvalues of <span class="math inline">\(A\)</span>, and <span class="math inline">\((x&#39;&#39;,y&#39;&#39;,z&#39;&#39;)\)</span> is a new coordinate system.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb11-1">center &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">t</span>(J) <span class="op">%*%</span><span class="st"> </span>P) <span class="op">/</span><span class="st"> </span>evalues <span class="op">/</span><span class="st"> </span><span class="dv">2</span></span>
@@ -1204,26 +1186,20 @@
               <img src="https://laustep.github.io/stlahblog/images/stla.jpg" alt="stla" width="100px" />
             </a>
           </div>
-          <div id="navigation" style="margin-top:50px;">
-            <a href="https://laustep.github.io/stlahblog/">Home</a>
-            <a href="https://laustep.github.io/stlahblog/about.html">About</a>
-            <a href="https://laustep.github.io/stlahblog/contact.html">Contact</a>
-            <a href="https://laustep.github.io/stlahblog/archive.html">Archive</a>
-          </div>
         </div>
 
         <div class="content">
-          <h1>Drawing slices of a hypersurface with R</h1> 
+          <h1>Drawing slices of a hypersurface with R</h1>
           <div class="info">
     Posted on May  1, 2020
-    
+
         by Stéphane Laurent
-    
+
 </div>
 <div class="info">
-    
+
     Tags: <a title="All pages tagged &#39;R&#39;." href="https://laustep.github.io/stlahblog/tags/R.html">R</a>, <a title="All pages tagged &#39;graphics&#39;." href="https://laustep.github.io/stlahblog/tags/graphics.html">graphics</a>, <a title="All pages tagged &#39;rgl&#39;." href="https://laustep.github.io/stlahblog/tags/rgl.html">rgl</a>, <a title="All pages tagged &#39;geometry&#39;." href="https://laustep.github.io/stlahblog/tags/geometry.html">geometry</a>, <a title="All pages tagged &#39;maths&#39;." href="https://laustep.github.io/stlahblog/tags/maths.html">maths</a>
-    
+
 </div>
 
 <p>Let <span class="math inline">\(s \colon I \times J \times K \to \mathbb{R}^4\)</span> be a parameterization of a hypersurface <span class="math inline">\(\mathcal{S}\)</span>, where <span class="math inline">\(I,J,K \subset \mathbb{R}\)</span> are some intervals. I’m going to show how to draw the cross-section of <span class="math inline">\(\mathcal{S}\)</span> by a hyperplane with R.</p>
@@ -1309,8 +1285,8 @@
 <li><p>if necessary, negate the normals.</p></li>
 </ul>
 <p>The projection of <span class="math inline">\(\mathbf{x} \in \mathbb{R}^4\)</span> to the hyperplane <span class="math inline">\(\mathcal{P}\)</span> is given by <span class="math display">\[
-\mathbf{x} - 
-\frac{\langle \mathbf{a}, \mathbf{x} \rangle - b}{\Vert \mathbf{a} \Vert^2} 
+\mathbf{x} -
+\frac{\langle \mathbf{a}, \mathbf{x} \rangle - b}{\Vert \mathbf{a} \Vert^2}
 \mathbf{a}.
 \]</span></p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb9-1"><span class="co"># projection onto hyperplane &lt;a,x&gt; = b</span></span>
@@ -1329,14 +1305,14 @@
 <p>Here is another way to get the normals. The normal at the point <span class="math inline">\(s(u,v,w)\)</span> is <span class="math display">\[
 \frac{\partial s}{\partial u}(u,v,w) \times
 \frac{\partial s}{\partial v}(u,v,w) \times
-\frac{\partial s}{\partial w}(u,v,w) 
+\frac{\partial s}{\partial w}(u,v,w)
 \]</span> where <span class="math inline">\(\cdot \times \cdot \times \cdot\)</span> is the <em>ternary cross-product</em> in <span class="math inline">\(\mathbb{R}^4\)</span>, defined by <span class="math display">\[
-\vec v_1 \times \vec v_2 \times \vec v_3 = 
+\vec v_1 \times \vec v_2 \times \vec v_3 =
 \left\vert\begin{matrix}
-\vec i &amp; \vec j &amp; \vec k &amp; \vec l \\ 
-v_{1x} &amp; v_{1y} &amp; v_{1z} &amp; v_{1t} \\ 
-v_{2x} &amp; v_{2y} &amp; v_{2z} &amp; v_{2t} \\ 
-v_{3x} &amp; v_{3y} &amp; v_{3z} &amp; v_{3t} 
+\vec i &amp; \vec j &amp; \vec k &amp; \vec l \\
+v_{1x} &amp; v_{1y} &amp; v_{1z} &amp; v_{1t} \\
+v_{2x} &amp; v_{2y} &amp; v_{2z} &amp; v_{2t} \\
+v_{3x} &amp; v_{3y} &amp; v_{3z} &amp; v_{3t}
 \end{matrix}\right\vert.
 \]</span></p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb11-1">crossProd4D &lt;-<span class="st"> </span><span class="cf">function</span>(v1, v2, v3){</span>
@@ -1397,14 +1373,14 @@ v_{3x} &amp; v_{3y} &amp; v_{3z} &amp; v_{3t}
 \frac{x^2}{a^2} + \frac{y^2}{b^2} - \frac{z^2}{c^2} - \frac{t^2}{d^2} = 1,
 \]</span> and a parameterization of this quadric is <span class="math display">\[
 \begin{array}{ccc}
-s \colon &amp; (0,2\pi) \times (0,2\pi) \times (0, +\infty[ &amp; 
+s \colon &amp; (0,2\pi) \times (0,2\pi) \times (0, +\infty[ &amp;
 \longrightarrow &amp; \mathbb{R}^4 \\
- &amp; (u,v,w) &amp; \longmapsto &amp; 
+ &amp; (u,v,w) &amp; \longmapsto &amp;
 \begin{pmatrix}
-a \cos u \cosh w \\ 
+a \cos u \cosh w \\
 b \sin u \cosh w \\
 c \cos v \sinh w \\
-d \sin v \sinh w 
+d \sin v \sinh w
 \end{pmatrix}
 \end{array}.
 \]</span></p>
@@ -1442,26 +1418,20 @@ d \sin v \sinh w
               <img src="https://laustep.github.io/stlahblog/images/stla.jpg" alt="stla" width="100px" />
             </a>
           </div>
-          <div id="navigation" style="margin-top:50px;">
-            <a href="https://laustep.github.io/stlahblog/">Home</a>
-            <a href="https://laustep.github.io/stlahblog/about.html">About</a>
-            <a href="https://laustep.github.io/stlahblog/contact.html">Contact</a>
-            <a href="https://laustep.github.io/stlahblog/archive.html">Archive</a>
-          </div>
         </div>
 
         <div class="content">
-          <h1>An orbit of the modular tessellation</h1> 
+          <h1>An orbit of the modular tessellation</h1>
           <div class="info">
     Posted on February 19, 2020
-    
+
         by Stéphane Laurent
-    
+
 </div>
 <div class="info">
-    
+
     Tags: <a title="All pages tagged &#39;R&#39;." href="https://laustep.github.io/stlahblog/tags/R.html">R</a>, <a title="All pages tagged &#39;maths&#39;." href="https://laustep.github.io/stlahblog/tags/maths.html">maths</a>, <a title="All pages tagged &#39;geometry&#39;." href="https://laustep.github.io/stlahblog/tags/geometry.html">geometry</a>
-    
+
 </div>
 
 <p>I came across this <a href="https://www3.risc.jku.at/publications/download/risc_5011/DiplomaThesisPonweiser.pdf">interesting paper</a> entitled <em>Complex Variables Visualized</em> and written by Thomas Ponweiser.</p>
@@ -1619,26 +1589,20 @@ d \sin v \sinh w
               <img src="https://laustep.github.io/stlahblog/images/stla.jpg" alt="stla" width="100px" />
             </a>
           </div>
-          <div id="navigation" style="margin-top:50px;">
-            <a href="https://laustep.github.io/stlahblog/">Home</a>
-            <a href="https://laustep.github.io/stlahblog/about.html">About</a>
-            <a href="https://laustep.github.io/stlahblog/contact.html">Contact</a>
-            <a href="https://laustep.github.io/stlahblog/archive.html">Archive</a>
-          </div>
         </div>
 
         <div class="content">
-          <h1>Tooltips for the headers of a datatable in Shiny</h1> 
+          <h1>Tooltips for the headers of a datatable in Shiny</h1>
           <div class="info">
     Posted on February 16, 2020
-    
+
         by Stéphane Laurent
-    
+
 </div>
 <div class="info">
-    
+
     Tags: <a title="All pages tagged &#39;R&#39;." href="https://laustep.github.io/stlahblog/tags/R.html">R</a>, <a title="All pages tagged &#39;datatables&#39;." href="https://laustep.github.io/stlahblog/tags/datatables.html">datatables</a>, <a title="All pages tagged &#39;javascript&#39;." href="https://laustep.github.io/stlahblog/tags/javascript.html">javascript</a>, <a title="All pages tagged &#39;shiny&#39;." href="https://laustep.github.io/stlahblog/tags/shiny.html">shiny</a>
-    
+
 </div>
 
 <p>In this post, I show how to use the <a href="http://qtip2.com/">qTip2</a> JavaScript library to create some tooltips on the headers of a <code>DT</code> datatable in Shiny, displaying some information about the columns, such as summary statistics.</p>
