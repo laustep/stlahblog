@@ -1,19 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"
-    xmlns:dc="http://purl.org/dc/elements/1.1/">
-    <channel>
-        <title>Saturn Elephant</title>
-        <link>https://laustep.github.io/stlahblog</link>
-        <description><![CDATA[A blog about R and more.]]></description>
-        <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self"
-                   type="application/rss+xml" />
-        <lastBuildDate>Fri, 09 Oct 2020 00:00:00 UT</lastBuildDate>
-        
-
-<item>
-    <title>My RGL artworks</title>
-    <link>https://laustep.github.io/stlahblog/posts/MyRGLartworks.html</link>
-    <description><![CDATA[
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">
+  <channel>
+    <title>Saturn Elephant</title>
+    <link>https://laustep.github.io/stlahblog</link>
+    <description><![CDATA[A blog about R and more.]]></description>
+    <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
+    <lastBuildDate>Fri, 09 Oct 2020 00:00:00 UT</lastBuildDate>
+    <item>
+      <link>https://laustep.github.io/stlahblog/posts/MyRGLartworks.html</link>
+      <description><![CDATA[
     <div class="container-fluid">
     <div class="row">
       <div class="main col-sm-12">
@@ -80,19 +75,13 @@
   </div>
 
 ]]></description>
-    <pubDate>Thu, 08 Oct 2020 00:00:00 UT</pubDate>
-    <guid>https://laustep.github.io/stlahblog/posts/MyRGLartworks.html</guid>
-    <dc:creator>Stéphane Laurent</dc:creator>
-    <category>R</category>
-</item>
-
-
-
-
-<item>
-    <title>Child tables with DT, editing, exporting</title>
-    <link>https://laustep.github.io/stlahblog/posts/DT_childTables.html</link>
-    <description><![CDATA[
+      <guid>https://laustep.github.io/stlahblog/posts/MyRGLartworks.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
+    <item>
+      <link>https://laustep.github.io/stlahblog/posts/DT_childTables.html</link>
+      <description><![CDATA[
     <div class="container-fluid">
     <div class="row">
       <div class="main col-sm-12">
@@ -605,17 +594,13 @@
   </div>
 
 ]]></description>
-    <pubDate>Fri, 08 May 2020 00:00:00 UT</pubDate>
-    <guid>https://laustep.github.io/stlahblog/posts/DT_childTables.html</guid>
-    <dc:creator>Stéphane Laurent</dc:creator>
-    <category>R</category>
-</item>
-
-
-<item>
-    <title>Focal quadrics and their lines of curvature</title>
-    <link>https://laustep.github.io/stlahblog/posts/focalQuadrics.html</link>
-    <description><![CDATA[
+      <guid>https://laustep.github.io/stlahblog/posts/DT_childTables.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
+    <item>
+      <link>https://laustep.github.io/stlahblog/posts/focalQuadrics.html</link>
+      <description><![CDATA[
   <div class="container-fluid">
     <div class="row">
       <div class="main col-sm-12">
@@ -1203,17 +1188,13 @@
   </div>
 
 ]]></description>
-    <pubDate>Sun, 03 May 2020 00:00:00 UT</pubDate>
-    <guid>https://laustep.github.io/stlahblog/posts/focalQuadrics.html</guid>
-    <dc:creator>Stéphane Laurent</dc:creator>
-    <category>R</category>
-</item>
-
-
-<item>
-    <title>Drawing slices of a hypersurface with R</title>
-    <link>https://laustep.github.io/stlahblog/posts/slicedHypersurface.html</link>
-    <description><![CDATA[
+      <guid>https://laustep.github.io/stlahblog/posts/focalQuadrics.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
+    <item>
+      <link>https://laustep.github.io/stlahblog/posts/slicedHypersurface.html</link>
+      <description><![CDATA[
     <div class="container-fluid">
     <div class="row">
       <div class="main col-sm-12">
@@ -1445,18 +1426,13 @@ d \sin v \sinh w
   </div>
 
 ]]></description>
-    <pubDate>Fri, 01 May 2020 00:00:00 UT</pubDate>
-    <guid>https://laustep.github.io/stlahblog/posts/slicedHypersurface.html</guid>
-    <dc:creator>Stéphane Laurent</dc:creator>
-    <category>R</category>
-</item>
-
-
-
-<item>
-    <title>An orbit of the modular tessellation</title>
-    <link>https://laustep.github.io/stlahblog/posts/ModularTessellationOrbit.html</link>
-    <description><![CDATA[
+      <guid>https://laustep.github.io/stlahblog/posts/slicedHypersurface.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
+    <item>
+      <link>https://laustep.github.io/stlahblog/posts/ModularTessellationOrbit.html</link>
+      <description><![CDATA[
   <div class="container-fluid">
     <div class="row">
       <div class="main col-sm-12">
@@ -1627,17 +1603,13 @@ d \sin v \sinh w
   </div>
 
 ]]></description>
-    <pubDate>Wed, 19 Feb 2020 00:00:00 UT</pubDate>
-    <guid>https://laustep.github.io/stlahblog/posts/ModularTessellationOrbit.html</guid>
-    <dc:creator>Stéphane Laurent</dc:creator>
-    <category>R</category>
-</item>
-
-
-<item>
-    <title>Tooltips for the headers of a datatable in Shiny</title>
-    <link>https://laustep.github.io/stlahblog/posts/DTqTips.html</link>
-    <description><![CDATA[
+      <guid>https://laustep.github.io/stlahblog/posts/ModularTessellationOrbit.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
+    <item>
+      <link>https://laustep.github.io/stlahblog/posts/DTqTips.html</link>
+      <description><![CDATA[
   <div class="container-fluid">
     <div class="row">
       <div class="main col-sm-12">
@@ -1907,12 +1879,9 @@ d \sin v \sinh w
   </div>
 
 ]]></description>
-    <pubDate>Sun, 16 Feb 2020 00:00:00 UT</pubDate>
-    <guid>https://laustep.github.io/stlahblog/posts/DTqTips.html</guid>
-    <dc:creator>Stéphane Laurent</dc:creator>
-    <category>R</category>
-</item>
-
-
-    </channel>
+      <guid>https://laustep.github.io/stlahblog/posts/DTqTips.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
+  </channel>
 </rss>
