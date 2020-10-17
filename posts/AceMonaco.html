@@ -1,0 +1,170 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - A second editor in RStudio</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:26px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:22px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>A second editor in RStudio</h1> 
+          <div class="info">
+    Posted on October 17, 2020
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'shiny'." href="../tags/shiny.html">shiny</a>, <a title="All pages tagged 'javascript'." href="../tags/javascript.html">javascript</a>
+    
+</div>
+
+<p>Last month, my package <a href="https://github.com/stla/shinyMonacoEditor">shinyMonacoEditor</a> has been published on CRAN. This package provides a code editor as a Shiny app. It is powered by <a href="https://microsoft.github.io/monaco-editor/">Monaco editor</a>, an amazing JavaScript library better known for powering the Microsoft ‘VS code’ editor.</p>
+<p><img src="https://raw.githubusercontent.com/stla/shinyMonacoEditor/master/inst/screenshots/shinyMonacoEditor.gif" /> While developing this app I really had fun and I improved my modest JavaScript skills. It works fine but it is rather a proof of concept. Indeed, if you want to enjoy the Monaco editor, it is better to use ‘VS code’. Even though <code>shinyMonacoEditor</code> makes available some features in addition to the built-ins features of the Monaco editor, it is not an essential tool for code development.</p>
+<p>Recently I developed two HTML widgets which also are code editors: <a href="https://github.com/stla/aceEditor">aceEditor</a> and <a href="https://github.com/stla/monaco">monaco</a>. They have less features than <code>shinyMonacoEditor</code>, because you cannot communicate with R from a HTML widget, and you cannot run a system command. For example, <code>shinyMonacoEditor</code> allows to reformat a <code>C++</code> file with the help of the command line utility <code>clang-format</code>. Again, this is just a proof of concept; if you want a tool to prettify some code, I would rather recommend my package <a href="https://github.com/stla/prettifyAddins">prettifyAddins</a> (available on CRAN).</p>
+<p>The HTML widgets are less funny but more practical. They really provide a second editor in RStudio: you can open them in the viewer pane and they don’t lock RStudio, contrary to a Shiny app.</p>
+<p><img src="https://raw.githubusercontent.com/stla/monaco/main/inst/screenshots/monacoJS.gif" /></p>
+<p>The <code>aceEditor</code> widget is powered by Ace editor, the JavaScript library also used by RStudio. It has support for 150 languages (syntax highlighting and snippets). It provides diagnostics for JavaScript and CSS but those tools are now quite old and provide false positive errors for more modern usages. I added the possibility to prettify or reformat the code for some languages, with the help of <a href="https://prettier.io/">Prettier</a>.</p>
+<p>The <code>monaco</code> widget is powered by Monaco editor. It has support for 50 languages, particularly good for JavaScript. I have not submitted it to CRAN yet. I submitted <code>aceEditor</code> last week but there is a more recent version in my Github repo. If you want to try it now, run:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;stla/aceEditor@browsable&quot;</span>)</span></code></pre></div>
+<p>The Ace <em>diff</em> editor is implemented in this version. It allows to highlight the differences between two files (if you want a tool to also <em>merge</em> two files, give a try to my other package <a href="https://github.com/stla/shinyMergely">shinyMergely</a>, available on CRAN).</p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
