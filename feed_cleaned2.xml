@@ -4,7 +4,7 @@
     <title>Saturn Elephant</title>
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
-    <atom:link href="https://laustep.github.io/stlahblog/feed_cleaned.xml" rel="self" type="application/rss+xml"/>
+    <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
     <lastBuildDate>Sat, 17 Oct 2020 00:00:00 UT</lastBuildDate>
     <item>
       <title>The 'kde1d' package</title>
@@ -52,7 +52,11 @@
 <span id="cb2-4"><span class="kw">curve</span>(<span class="kw">dkde1d</span>(x, fit), <span class="dt">n =</span> <span class="dv">300</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">col =</span> <span class="st">"green"</span>, <span class="dt">lwd =</span> <span class="dv">2</span>)</span>
 <span id="cb2-5"><span class="kw">curve</span>(<span class="kw">dnorm</span>(x), <span class="dt">n =</span> <span class="dv">300</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">col =</span> <span class="st">"blue"</span>, <span class="dt">lwd =</span> <span class="dv">2</span>)</span></code></pre>
       </div>
-      <p><img src="/posts/figures/kde1d-unnamed-chunk-2-1.png" /></p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/kde1d-unnamed-chunk-2-1.png"
+        />
+      </p>
       <p>The density can even be evaluated outside the range of the data:</p>
       <div class="sourceCode" id="cb3">
         <pre
@@ -72,7 +76,11 @@
 <span id="cb4-6"><span class="kw">curve</span>(<span class="kw">pkde1d</span>(x, fit), <span class="dt">n =</span> <span class="dv">300</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">col =</span> <span class="st">"green"</span>, <span class="dt">lwd =</span> <span class="dv">2</span>)</span>
 <span id="cb4-7"><span class="kw">curve</span>(<span class="kw">pnorm</span>(x), <span class="dt">n =</span> <span class="dv">300</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">col =</span> <span class="st">"blue"</span>, <span class="dt">lwd =</span> <span class="dv">2</span>)</span></code></pre>
       </div>
-      <p><img src="/posts/figures/kde1d-unnamed-chunk-4-1.png" /></p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/kde1d-unnamed-chunk-4-1.png"
+        />
+      </p>
       <p>
         The corresponding inverse cumulative distribution function is evaluated
         by <code>qkde1d</code>, and <code>rkde1d</code> simulates from the
@@ -104,7 +112,11 @@
 <span id="cb5-6"><span class="kw">lines</span>(<span class="kw">density</span>(y, <span class="dt">from =</span> <span class="dv">0</span>, <span class="dt">to =</span> <span class="dv">1</span>), <span class="dt">col =</span> <span class="st">"green"</span>, <span class="dt">lwd =</span> <span class="dv">2</span>)</span>
 <span id="cb5-7"><span class="kw">curve</span>(<span class="kw">dbeta</span>(x, <span class="dv">1</span>, <span class="dv">4</span>), <span class="dt">n =</span> <span class="dv">300</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">col =</span> <span class="st">"blue"</span>, <span class="dt">lwd =</span> <span class="dv">2</span>)</span></code></pre>
       </div>
-      <p><img src="/posts/figures/kde1d-unnamed-chunk-5-1.png" /></p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/kde1d-unnamed-chunk-5-1.png"
+        />
+      </p>
       <p>
         The monotonic aspect of the density does not occur in the estimated
         density. With <code>kde1d</code>, it does:
@@ -119,7 +131,11 @@
 <span id="cb6-5"><span class="kw">curve</span>(<span class="kw">dkde1d</span>(x, fit), <span class="dt">n =</span> <span class="dv">300</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">col =</span> <span class="st">"green"</span>, <span class="dt">lwd =</span> <span class="dv">2</span>)</span>
 <span id="cb6-6"><span class="kw">curve</span>(<span class="kw">dbeta</span>(x, <span class="dv">1</span>, <span class="dv">4</span>), <span class="dt">n =</span> <span class="dv">300</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">col =</span> <span class="st">"blue"</span>, <span class="dt">lwd =</span> <span class="dv">2</span>)</span></code></pre>
       </div>
-      <p><img src="/posts/figures/kde1d-unnamed-chunk-6-1.png" /></p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/kde1d-unnamed-chunk-6-1.png"
+        />
+      </p>
     </div>
   </div>
 </div>
@@ -492,7 +508,11 @@
 <span id="cb4-22">  )</span>
 <span id="cb4-23">)</span></code></pre>
       </div>
-      <p><img src="/posts/figures/DTchildRows1.gif" /></p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/DTchildRows1.gif"
+        />
+      </p>
       <h1 id="editing">Editing</h1>
       <p>
         We use the JavaScript library
@@ -622,7 +642,11 @@
 <span id="cb8-9"></span>
 <span id="cb8-10">dtable</span></code></pre>
       </div>
-      <p><img src="/posts/figures/DTchildRows2.gif" /></p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/DTchildRows2.gif"
+        />
+      </p>
       <h1 id="exporting">Exporting</h1>
       <p>
         Now we show how to export a table with its child tables to an Excel
@@ -810,7 +834,11 @@
 <span id="cb13-37">)</span></code></pre>
       </div>
       <p>Here is the Excel file one gets:</p>
-      <p><img src="/posts/figures/DTchildRows3.png" /></p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/DTchildRows3.png"
+        />
+      </p>
     </div>
   </div>
 </div>
@@ -960,7 +988,11 @@
 <span id="cb3-7">  <span class="kw">shade3d</span>(<span class="kw">cylinder3d</span>(l, <span class="dt">radius =</span> <span class="fl">0.08</span>, <span class="dt">sides =</span> <span class="dv">30</span>))</span>
 <span id="cb3-8">}))</span></code></pre>
       </div>
-      <p><img src="/posts/figures/quadrics_E.png" /></p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/quadrics_E.png"
+        />
+      </p>
       <h1 id="one-sheeted-hyperboloid">One-sheeted hyperboloid</h1>
       <p>
         There are three types of one-sheeted hyperboloids, corresponding to
@@ -1188,7 +1220,11 @@
 <span id="cb6-8">  <span class="kw">shade3d</span>(<span class="kw">cylinder3d</span>(l, <span class="dt">radius =</span> <span class="fl">0.1</span>, <span class="dt">sides =</span> <span class="dv">30</span>))</span>
 <span id="cb6-9">}))</span></code></pre>
       </div>
-      <p><img src="/posts/figures/quadrics_H1.png" /></p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/quadrics_H1.png"
+        />
+      </p>
       <h1 id="two-sheeted-hyperboloid">Two-sheeted hyperboloid</h1>
       <p>
         There are three types of two-sheeted hyperboloids, corresponding to
@@ -1419,7 +1455,11 @@
 <span id="cb9-9">  <span class="kw">shade3d</span>(<span class="kw">cylinder3d</span>(l, <span class="dt">radius =</span> <span class="fl">0.2</span>, <span class="dt">sides =</span> <span class="dv">30</span>))</span>
 <span id="cb9-10">}))</span></code></pre>
       </div>
-      <p><img src="/posts/figures/quadrics_H2.png" /></p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/quadrics_H2.png"
+        />
+      </p>
       <h1 id="general-quadric">General quadric</h1>
       <p>
         A general quadric in
@@ -1778,7 +1818,11 @@
           class="sourceCode r"
         ><code class="sourceCode r"><span id="cb10-1"><span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">"darkmagenta"</span>)</span></code></pre>
       </div>
-      <p><img src="/posts/figures/tiger1.png" /></p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/tiger1.png"
+        />
+      </p>
       <p>
         Here is another way to get the normals. The normal at the point
         <span class="math inline">\(s(u,v,w)\)</span> is
@@ -1865,7 +1909,11 @@
 <span id="cb13-31">pngfiles &lt;-<span class="st"> </span><span class="kw">list.files</span>(<span class="dt">pattern =</span> <span class="st">"^pic.*png$"</span>)</span>
 <span id="cb13-32"><span class="kw">file.remove</span>(pngfiles)</span></code></pre>
       </div>
-      <p><img src="/posts/figures/tiger2.gif" /></p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/tiger2.gif"
+        />
+      </p>
       <h2 id="toroidal-hyperboloid">Toroidal hyperboloid</h2>
       <p>
         Let’s give another example, a <em>toroidal hyperboloid</em>. This is a
@@ -1883,7 +1931,11 @@
           \end{array}. \]</span
         >
       </p>
-      <p><img src="/posts/figures/toroidalHyperboloid.gif" /></p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/toroidalHyperboloid.gif"
+        />
+      </p>
     </div>
   </div>
 </div>
