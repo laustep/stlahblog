@@ -1,0 +1,292 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Formatting code with PhantomJS and CodeMirror</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:26px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:22px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Formatting code with PhantomJS and CodeMirror</h1> 
+          <div class="info">
+    Posted on October 21, 2020
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'javascript'." href="../tags/javascript.html">javascript</a>
+    
+</div>
+
+<p>Here is some ugly Julia code:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">function</span> mandelbrot(a)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>z <span class="op">=</span> <span class="fl">0</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="kw">for</span> i<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">50</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>        z <span class="op">=</span> z<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> a</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>    <span class="kw">end</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="kw">return</span> z</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="kw">end</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="kw">for</span> y<span class="op">=</span><span class="fl">1.0</span><span class="op">:-</span><span class="fl">0.05</span><span class="op">:-</span><span class="fl">1.0</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a><span class="kw">for</span> x<span class="op">=-</span><span class="fl">2.0</span><span class="op">:</span><span class="fl">0.0315</span><span class="op">:</span><span class="fl">0.5</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>abs(mandelbrot(complex(x<span class="op">,</span> y))) <span class="op">&lt;</span> <span class="fl">2</span> ? print(<span class="st">&quot;*&quot;</span>) <span class="op">:</span> print(<span class="st">&quot; &quot;</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a><span class="kw">end</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>    println()</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a><span class="kw">end</span></span></code></pre></div>
+<p>We will see how to format it with the help of <a href="https://codemirror.net/">CodeMirror</a> and <a href="https://phantomjs.org/">PhantomJS</a>. The result we will get is:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">function</span> mandelbrot(a)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>  z <span class="op">=</span> <span class="fl">0</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>  <span class="kw">for</span> i<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">50</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>    z <span class="op">=</span> z<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> a</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>  <span class="kw">end</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>  <span class="kw">return</span> z</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a><span class="kw">end</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a><span class="kw">for</span> y<span class="op">=</span><span class="fl">1.0</span><span class="op">:-</span><span class="fl">0.05</span><span class="op">:-</span><span class="fl">1.0</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>  <span class="kw">for</span> x<span class="op">=-</span><span class="fl">2.0</span><span class="op">:</span><span class="fl">0.0315</span><span class="op">:</span><span class="fl">0.5</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>    abs(mandelbrot(complex(x<span class="op">,</span> y))) <span class="op">&lt;</span> <span class="fl">2</span> ? print(<span class="st">&quot;*&quot;</span>) <span class="op">:</span> print(<span class="st">&quot; &quot;</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>  <span class="kw">end</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>  println()</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a><span class="kw">end</span></span></code></pre></div>
+<p>If necessary, install <code>PhantomJS</code>. If you are a R user, you can install it with the help of the ‘webdriver’ package, by running <code>webdriver::install_phantomjs()</code>.</p>
+<p>Now, download these files (these are <code>CodeMirror</code> components):</p>
+<ul>
+<li><a href="http://codemirror.net/lib/codemirror.js">codemirror.js</a></li>
+<li><a href="http://codemirror.net/mode/julia/julia.js">julia.js</a></li>
+<li><a href="http://codemirror.net/2/lib/util/formatting.js">formatting.js</a></li>
+</ul>
+<p>Below is the <code>PhantomJS</code> script. Save it into a file named <strong>JuliaFormatter.js</strong>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource js numberLines"><code class="sourceCode javascript"><span id="cb3-1"><a href="#cb3-1"></a><span class="st">&quot;use strict&quot;</span><span class="op">;</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a></span>
+<span id="cb3-3"><a href="#cb3-3"></a>phantom<span class="op">.</span><span class="at">onError</span> <span class="op">=</span> <span class="kw">function</span> (msg<span class="op">,</span> trace) {</span>
+<span id="cb3-4"><a href="#cb3-4"></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(msg)<span class="op">;</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a>  phantom<span class="op">.</span><span class="fu">exit</span>(<span class="dv">1</span>)<span class="op">;</span></span>
+<span id="cb3-6"><a href="#cb3-6"></a>}<span class="op">;</span></span>
+<span id="cb3-7"><a href="#cb3-7"></a></span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="co">// read the arguments of the call</span></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="kw">var</span> system <span class="op">=</span> <span class="pp">require</span>(<span class="st">&quot;system&quot;</span>)<span class="op">;</span></span>
+<span id="cb3-10"><a href="#cb3-10"></a><span class="kw">var</span> args <span class="op">=</span> system<span class="op">.</span><span class="at">args</span><span class="op">;</span> <span class="co">// = [script, julia file, indentation size]</span></span>
+<span id="cb3-11"><a href="#cb3-11"></a></span>
+<span id="cb3-12"><a href="#cb3-12"></a><span class="co">// open the Julia file and put its contents in the 'code' variable</span></span>
+<span id="cb3-13"><a href="#cb3-13"></a><span class="kw">var</span> fs <span class="op">=</span> <span class="pp">require</span>(<span class="st">&quot;fs&quot;</span>)<span class="op">;</span></span>
+<span id="cb3-14"><a href="#cb3-14"></a><span class="kw">var</span> code <span class="op">=</span> fs<span class="op">.</span><span class="fu">read</span>(args[<span class="dv">1</span>])<span class="op">;</span></span>
+<span id="cb3-15"><a href="#cb3-15"></a></span>
+<span id="cb3-16"><a href="#cb3-16"></a><span class="co">// create a page</span></span>
+<span id="cb3-17"><a href="#cb3-17"></a><span class="kw">var</span> page <span class="op">=</span> <span class="pp">require</span>(<span class="st">&quot;webpage&quot;</span>)<span class="op">.</span><span class="fu">create</span>()<span class="op">;</span></span>
+<span id="cb3-18"><a href="#cb3-18"></a>page<span class="op">.</span><span class="at">onConsoleMessage</span> <span class="op">=</span> <span class="kw">function</span> (str) {</span>
+<span id="cb3-19"><a href="#cb3-19"></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(str)<span class="op">;</span></span>
+<span id="cb3-20"><a href="#cb3-20"></a>}<span class="op">;</span></span>
+<span id="cb3-21"><a href="#cb3-21"></a></span>
+<span id="cb3-22"><a href="#cb3-22"></a><span class="co">// main stuff</span></span>
+<span id="cb3-23"><a href="#cb3-23"></a>page<span class="op">.</span><span class="fu">open</span>(<span class="st">&quot;about:blank&quot;</span><span class="op">,</span> <span class="kw">function</span> (status) {</span>
+<span id="cb3-24"><a href="#cb3-24"></a>  <span class="cf">if</span> (status <span class="op">===</span> <span class="st">&quot;success&quot;</span>) {</span>
+<span id="cb3-25"><a href="#cb3-25"></a>    page<span class="op">.</span><span class="at">content</span> <span class="op">=</span></span>
+<span id="cb3-26"><a href="#cb3-26"></a>      <span class="st">'&lt;html&gt;&lt;body&gt;&lt;textarea id=&quot;editor&quot;&gt;'</span> <span class="op">+</span></span>
+<span id="cb3-27"><a href="#cb3-27"></a>      code <span class="op">+</span></span>
+<span id="cb3-28"><a href="#cb3-28"></a>      <span class="st">&quot;&lt;/textarea&gt;&lt;/body&gt;&lt;/html&gt;&quot;</span><span class="op">;</span></span>
+<span id="cb3-29"><a href="#cb3-29"></a>    <span class="cf">if</span> (page<span class="op">.</span><span class="fu">injectJs</span>(<span class="st">&quot;xcodemirror.js&quot;</span>)) {</span>
+<span id="cb3-30"><a href="#cb3-30"></a>      <span class="cf">if</span> (page<span class="op">.</span><span class="fu">injectJs</span>(<span class="st">&quot;julia.js&quot;</span>)) {</span>
+<span id="cb3-31"><a href="#cb3-31"></a>        <span class="cf">if</span> (page<span class="op">.</span><span class="fu">injectJs</span>(<span class="st">&quot;formatting.js&quot;</span>)) {</span>
+<span id="cb3-32"><a href="#cb3-32"></a>          page<span class="op">.</span><span class="fu">evaluate</span>(<span class="kw">function</span> (tabSize) {</span>
+<span id="cb3-33"><a href="#cb3-33"></a>            <span class="kw">var</span> editor <span class="op">=</span> CodeMirror<span class="op">.</span><span class="fu">fromTextArea</span>(</span>
+<span id="cb3-34"><a href="#cb3-34"></a>              <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(<span class="st">&quot;editor&quot;</span>)<span class="op">,</span></span>
+<span id="cb3-35"><a href="#cb3-35"></a>              {</span>
+<span id="cb3-36"><a href="#cb3-36"></a>                <span class="dt">mode</span><span class="op">:</span> <span class="st">&quot;julia&quot;</span><span class="op">,</span></span>
+<span id="cb3-37"><a href="#cb3-37"></a>                <span class="dt">tabSize</span><span class="op">:</span> tabSize<span class="op">,</span></span>
+<span id="cb3-38"><a href="#cb3-38"></a>                <span class="dt">indentUnit</span><span class="op">:</span> tabSize</span>
+<span id="cb3-39"><a href="#cb3-39"></a>              }</span>
+<span id="cb3-40"><a href="#cb3-40"></a>            )<span class="op">;</span></span>
+<span id="cb3-41"><a href="#cb3-41"></a>            CodeMirror<span class="op">.</span><span class="at">commands</span><span class="op">.</span><span class="fu">selectAll</span>(editor)<span class="op">;</span></span>
+<span id="cb3-42"><a href="#cb3-42"></a>            editor<span class="op">.</span><span class="fu">autoFormatRange</span>(</span>
+<span id="cb3-43"><a href="#cb3-43"></a>              editor<span class="op">.</span><span class="fu">getCursor</span>(<span class="kw">true</span>)<span class="op">,</span></span>
+<span id="cb3-44"><a href="#cb3-44"></a>              editor<span class="op">.</span><span class="fu">getCursor</span>(<span class="kw">false</span>)</span>
+<span id="cb3-45"><a href="#cb3-45"></a>            )<span class="op">;</span></span>
+<span id="cb3-46"><a href="#cb3-46"></a>            editor<span class="op">.</span><span class="fu">setCursor</span>(<span class="dv">0</span>)<span class="op">;</span></span>
+<span id="cb3-47"><a href="#cb3-47"></a>            <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(editor<span class="op">.</span><span class="fu">getValue</span>())<span class="op">;</span></span>
+<span id="cb3-48"><a href="#cb3-48"></a>          }<span class="op">,</span> <span class="pp">parseInt</span>(args[<span class="dv">2</span>]))<span class="op">;</span></span>
+<span id="cb3-49"><a href="#cb3-49"></a>        } <span class="cf">else</span> {</span>
+<span id="cb3-50"><a href="#cb3-50"></a>          <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(<span class="st">&quot;injectJs failed&quot;</span>)<span class="op">;</span></span>
+<span id="cb3-51"><a href="#cb3-51"></a>          phantom<span class="op">.</span><span class="fu">exit</span>(<span class="dv">1</span>)<span class="op">;</span></span>
+<span id="cb3-52"><a href="#cb3-52"></a>        }</span>
+<span id="cb3-53"><a href="#cb3-53"></a>      } <span class="cf">else</span> {</span>
+<span id="cb3-54"><a href="#cb3-54"></a>        <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(<span class="st">&quot;injectJs failed&quot;</span>)<span class="op">;</span></span>
+<span id="cb3-55"><a href="#cb3-55"></a>        phantom<span class="op">.</span><span class="fu">exit</span>(<span class="dv">1</span>)<span class="op">;</span></span>
+<span id="cb3-56"><a href="#cb3-56"></a>      }</span>
+<span id="cb3-57"><a href="#cb3-57"></a>    } <span class="cf">else</span> {</span>
+<span id="cb3-58"><a href="#cb3-58"></a>      <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(<span class="st">&quot;injectJs failed&quot;</span>)<span class="op">;</span></span>
+<span id="cb3-59"><a href="#cb3-59"></a>      phantom<span class="op">.</span><span class="fu">exit</span>(<span class="dv">1</span>)<span class="op">;</span></span>
+<span id="cb3-60"><a href="#cb3-60"></a>    }</span>
+<span id="cb3-61"><a href="#cb3-61"></a>  } <span class="cf">else</span> {</span>
+<span id="cb3-62"><a href="#cb3-62"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(<span class="st">&quot;page.open failed&quot;</span>)<span class="op">;</span></span>
+<span id="cb3-63"><a href="#cb3-63"></a>    phantom<span class="op">.</span><span class="fu">exit</span>(<span class="dv">1</span>)<span class="op">;</span></span>
+<span id="cb3-64"><a href="#cb3-64"></a>  }</span>
+<span id="cb3-65"><a href="#cb3-65"></a>  phantom<span class="op">.</span><span class="fu">exit</span>(<span class="dv">0</span>)<span class="op">;</span></span>
+<span id="cb3-66"><a href="#cb3-66"></a>})<span class="op">;</span></span></code></pre></div>
+<p>The script takes two arguments: the file containing the Julia code, say <strong>mandelbrot.jl</strong>, and an integer, the desired number of spaces of the indentation. Below is the command to execute it, and the output:</p>
+<pre><code>$ phantomjs JuliaFormatter.js mandelbrot.jl 2
+function mandelbrot(a)
+  z = 0
+  for i=1:50
+    z = z^2 + a
+  end
+  return z
+end
+for y=1.0:-0.05:-1.0
+  for x=-2.0:0.0315:0.5
+    abs(mandelbrot(complex(x, y))) &lt; 2 ? print(&quot;*&quot;) : print(&quot; &quot;)
+  end
+  println()
+end</code></pre>
+<p><code>PhantomJS</code> is a <a href="https://en.wikipedia.org/wiki/Headless_browser">headless browser</a>:</p>
+<blockquote>
+<p>A headless browser is a web browser without a graphical user interface. Headless browsers provide automated control of a web page in an environment similar to popular web browsers, but they are executed via a command-line interface or using network communication. They are particularly useful for testing web pages as they are able to render and <strong>understand HTML the same way a browser would</strong>, including styling elements such as page layout, colour, font selection and execution of JavaScript and Ajax which are usually not available when using other testing methods.</p>
+</blockquote>
+<p>So you can create a HTML element with <code>PhantomJS</code>, such as a <code>textarea</code>, and you can get it with <code>document.getElementById</code>, exactly as you would do with a normal browser.</p>
+<p>What does the script do:</p>
+<ul>
+<li>it creates a blank HTML page</li>
+<li>it fills it with a <code>textarea</code> displaying the code contained in the Julia file (but nothing is displayed to the user!)</li>
+<li>it runs JavaScript code using <code>CodeMirror</code> to format the code.</li>
+</ul>
+<p><code>CodeMirror</code> is a client-side library. It does not allow to format the code on the JavaScript side exclusively: this code must be rendered in the browser. This is why one needs a headless browser to use <code>CodeMirror</code> without using a normal browser.</p>
+<p>My R package <a href="https://github.com/stla/prettifyAddins">prettifyAddins</a> uses this method to format C, C++, Java, Fortran, Julia, Python, SAS, Scala, Shell, and SQL. There are many other languages supported by <code>CodeMirror</code>.</p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
