@@ -1,0 +1,235 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Haskell is fast</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:26px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:22px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Haskell is fast</h1> 
+          <div class="info">
+    Posted on October 22, 2020
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'haskell'." href="../tags/haskell.html">haskell</a>, <a title="All pages tagged 'julia'." href="../tags/julia.html">julia</a>, <a title="All pages tagged 'Rcpp'." href="../tags/Rcpp.html">Rcpp</a>, <a title="All pages tagged 'C'." href="../tags/C.html">C</a>, <a title="All pages tagged 'special-functions'." href="../tags/special-functions.html">special-functions</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>
+    
+</div>
+
+<p>My R package ‘HypergeoMat’ provides a Rcpp implementation of Koev &amp; Edelman’s algorithm for the evaluation of the hypergeometric function of a matrix argument.</p>
+<p>I also implemented this algorithm in <a href="https://gist.github.com/stla/e85e2de1ad9aeeebc01583f1d0b8e1d0#file-hypergeompq9-jl">Julia</a> and in <a href="https://github.com/stla/hypergeomPFQ">Haskell</a>.</p>
+<p>So let us benchmark now.</p>
+<p>Here is the hypergeometric function of a matrix argument:</p>
+<p><span class="math display">\[
+{}_pF_q^{(\alpha)}
+\left(\begin{matrix} a_1, \ldots, a_p \\ b_1, \ldots, b_q\end{matrix}; X\right) = 
+\sum_{k=0}^\infty\sum_{\kappa \vdash k} 
+\frac{{(a_1)}_\kappa^{(\alpha)} \cdots {(a_p)}_\kappa^{(\alpha)}}
+{{(b_1)}_\kappa^{(\alpha)} \cdots {(b_q)}_\kappa^{(\alpha)}} 
+\frac{C_\kappa^{(\alpha)}(X)}{k!}.
+\]</span></p>
+<p>Well, I will not explain this expression. But observe that this is a sum from <span class="math inline">\(k=0\)</span> to <span class="math inline">\(\infty\)</span>. The algorithm evaluates the partial sums of this series, that is, the sum from <span class="math inline">\(k=0\)</span> to an integer <span class="math inline">\(m\)</span>.</p>
+<p>My Haskell library generates a shared library (a DLL) which can be called from R. And one can call Julia from R with the help of the ‘XRJulia’ package. So we will benchmark the three implementations from R.</p>
+<p>Firstly, let’s check that they return the same value:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">library</span>(HypergeoMat)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="kw">library</span>(XRJulia)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="co"># source the Julia code</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="kw">juliaSource</span>(<span class="st">&quot;HypergeomPQ09.jl&quot;</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="co"># load the Haskell DLL</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>dll &lt;-<span class="st"> &quot;libHypergeom.so&quot;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="kw">dyn.load</span>(dll)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="kw">.C</span>(<span class="st">&quot;HsStart&quot;</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>a &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">8</span>, <span class="dv">7</span>, <span class="dv">3</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>b &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">9</span>, <span class="dv">16</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.3</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>alpha &lt;-<span class="st"> </span><span class="dv">2</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>m &lt;-<span class="st"> </span>5L <span class="co"># `m` is the truncation order</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a><span class="kw">hypergeomPFQ</span>(m, a, b, x, alpha)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a><span class="co"># 2.116251</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a><span class="kw">juliaEval</span>(<span class="st">&quot;hypergeom(5, [8.0, 7.0, 3.0], [9.0, 16.0], [0.1, 0.2, 0.3], 2.0)&quot;</span>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a><span class="co"># 2.116251</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a><span class="kw">.Call</span>(<span class="st">&quot;hypergeomR&quot;</span>, m, a, b, x, alpha)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a><span class="co"># 2.116251</span></span></code></pre></div>
+<p>Well, the same results. Now, let’s run a first series of benchmarks, for <span class="math inline">\(m=5\)</span>.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">library</span>(microbenchmark)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="kw">microbenchmark</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>  <span class="dt">Rcpp =</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>    <span class="kw">hypergeomPFQ</span>(m, a, b, x, alpha),</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>  <span class="dt">Julia =</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>    <span class="kw">juliaEval</span>(<span class="st">&quot;hypergeom(5, [8.0, 7.0, 3.0], [9.0, 16.0], [0.1, 0.2, 0.3], 2.0)&quot;</span>),</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>  <span class="dt">Haskell =</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>    <span class="kw">.Call</span>(<span class="st">&quot;hypergeomR&quot;</span>, m, a, b, x, alpha),</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>  <span class="dt">times =</span> <span class="dv">10</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>)</span></code></pre></div>
+<pre><code>Unit: microseconds
+    expr      min        lq       mean    median        uq       max neval cld
+    Rcpp  356.682   623.807   837.7237   827.402  1084.191  1382.500    10  a 
+   Julia 4052.000 47767.565 44725.3895 48845.156 50597.779 51308.089    10   b
+ Haskell  610.852  1136.963  1343.7442  1289.435  1504.323  2650.976    10  a </code></pre>
+<p>Should we conclude that Rcpp is the winner, and that Julia is slow? That’s not sure. Observe that the unit of these durations is the microsecond. Perhaps the call to Julia via <code>juliaEval</code> is time-consuming, as well as the call to the Haskell DLL via <code>.Call</code>.</p>
+<p>So let us try with <span class="math inline">\(m=40\)</span> now.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>m &lt;-<span class="st"> </span>40L</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="kw">microbenchmark</span>(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>  <span class="dt">Rcpp =</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>    <span class="kw">hypergeomPFQ</span>(m, a, b, x, alpha),</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>  <span class="dt">Julia =</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>    <span class="kw">juliaEval</span>(<span class="st">&quot;hypergeom(40, [8.0, 7.0, 3.0], [9.0, 16.0], [0.1, 0.2, 0.3], 2.0)&quot;</span>),</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>  <span class="dt">Haskell =</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>    <span class="kw">.Call</span>(<span class="st">&quot;hypergeomR&quot;</span>, m, a, b, x, alpha),</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>  <span class="dt">times =</span> <span class="dv">10</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a>)</span></code></pre></div>
+<pre><code>Unit: seconds
+    expr       min        lq      mean    median        uq      max neval cld
+    Rcpp 25.547556 25.924749 26.130888 26.185776 26.354177 26.47846    10   c
+   Julia 18.959032 19.088749 19.191394 19.173662 19.291175 19.62415    10  b 
+ Haskell  6.642601  6.653627  6.736082  6.735448  6.760926  6.94283    10 a </code></pre>
+<p>This time, the unit is the second. Haskell is clearly the winner, followed by Julia.</p>
+<p>I’m using Julia 1.2.0, and I have been told that there is a great improvement of performance in Julia 1.5.0, the latest version. I’ll try with Julia 1.5.0 and then I will update this post to show whether there is a gain of speed.</p>
+<p>One should not conclude from this experiment that Haskell <em>always</em> beats C++. That depends on the algorithm we benchmark. This one intensively uses recursion, and perhaps Haskell is strong when dealing with recursion.</p>
+<p>Don’t forget:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">dyn.unload</span>(dll)</span></code></pre></div>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
