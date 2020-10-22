@@ -148,6 +148,20 @@
           class="sourceCode r"
         ><code class="sourceCode r"><span id="cb6-1"><span class="kw">dyn.unload</span>(dll)</span></code></pre>
       </div>
+      <h1 id="update-julia-1.5-is-amazing">Update: Julia 1.5 is amazing</h1>
+      <p>
+        Now I upgraded Julia to the latest version, 1.5.2. The results are
+        amazing:
+      </p>
+      <pre><code>Unit: seconds
+    expr       min        lq      mean    median        uq       max neval cld
+    Rcpp 23.464676 24.392115 24.860484 24.823062 25.013047 27.437176    10   c
+   Julia  2.806364  2.852674  3.101521  2.973963  3.363618  3.897855    10 a
+ Haskell  6.912441  7.459939  7.648012  7.674404  7.798719  8.322777    10  b</code></pre>
+      <p>
+        19 seconds for Julia 1.2.0 and 3 seconds for Julia 1.5.2! It beats
+        Haskell.
+      </p>
     </div>
   </div>
 </div>
