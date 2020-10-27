@@ -11,10 +11,8 @@
   <link rel="stylesheet" href="../css/post.css" />
   <link rel="stylesheet" href="../css/misc.css" /> 
   
-    <link rel="stylesheet" href="../css/kate.css" /> 
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
    
-  
-    <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
@@ -78,7 +76,7 @@
 
       <div class="main col-sm-10">
         <div id="header">
-          <div id="logo" style="position:absolute;">
+          <div id="logo">
             <a href="../">
               <img src="../images/stla.jpg" alt="stla" width="100px" />
             </a>
@@ -101,7 +99,7 @@
 </div>
 <div class="info">
     
-    Tags: <a href="../tags/R.html">R</a>, <a href="../tags/Rcpp.html">Rcpp</a>, <a href="../tags/statistics.html">statistics</a>
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'Rcpp'." href="../tags/Rcpp.html">Rcpp</a>, <a title="All pages tagged 'statistics'." href="../tags/statistics.html">statistics</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>
     
 </div>
 
@@ -112,79 +110,79 @@
 = 1-\alpha
 \]</span> where <span class="math inline">\(\ell\)</span> is the corank of the <span class="math inline">\(X\)</span> matrix, and <span class="math inline">\(d\)</span> is a number calculated from the desired values of the predictors (as we will see on the example).</p>
 <p>Below we provide a <code>Rcpp</code> implementation of the integral. We use the <code>boost</code> library (offered by the <code>BH</code> package) to evaluate the integrand, and the package <a href="https://github.com/yixuan/RcppNumerical"><code>RcppNumerical</code></a> to evaluate the integral, after transforming this integral to an integral on <span class="math inline">\((0,1)\)</span>.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb1-1" title="1"><span class="co">// [[Rcpp::depends(BH)]]</span></a>
-<a class="sourceLine" id="cb1-2" title="2"><span class="co">// [[Rcpp::depends(RcppEigen)]]</span></a>
-<a class="sourceLine" id="cb1-3" title="3"><span class="co">// [[Rcpp::depends(RcppNumerical)]]</span></a>
-<a class="sourceLine" id="cb1-4" title="4"><span class="pp">#include </span><span class="im">&lt;RcppNumerical.h&gt;</span></a>
-<a class="sourceLine" id="cb1-5" title="5"><span class="kw">using</span> <span class="kw">namespace</span> Numer;</a>
-<a class="sourceLine" id="cb1-6" title="6"><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></a>
-<a class="sourceLine" id="cb1-7" title="7"><span class="kw">using</span> <span class="kw">namespace</span> Rcpp;</a>
-<a class="sourceLine" id="cb1-8" title="8"><span class="pp">#include </span><span class="im">&lt;boost/math/distributions/non_central_chi_squared.hpp&gt;</span></a>
-<a class="sourceLine" id="cb1-9" title="9"><span class="pp">#include </span><span class="im">&lt;boost/math/distributions/complement.hpp&gt;</span></a>
-<a class="sourceLine" id="cb1-10" title="10"><span class="pp">#include </span><span class="im">&lt;boost/math/distributions/normal.hpp&gt;</span></a>
-<a class="sourceLine" id="cb1-11" title="11"><span class="pp">#include </span><span class="im">&lt;boost/math/distributions/chi_squared.hpp&gt;</span></a>
-<a class="sourceLine" id="cb1-12" title="12"></a>
-<a class="sourceLine" id="cb1-13" title="13"><span class="co">// [[Rcpp::export]]</span></a>
-<a class="sourceLine" id="cb1-14" title="14"><span class="dt">double</span> integrand(<span class="dt">double</span> u, <span class="dt">double</span> l, <span class="dt">double</span> p, <span class="dt">double</span> k, <span class="dt">double</span> d){</a>
-<a class="sourceLine" id="cb1-15" title="15">  <span class="dt">double</span> x = u/(<span class="dv">1</span>-u);</a>
-<a class="sourceLine" id="cb1-16" title="16">  <span class="dt">double</span> q = <span class="ex">boost::</span>math<span class="ex">::</span>quantile(<span class="ex">boost::</span>math<span class="ex">::</span>non_central_chi_squared(<span class="dv">1</span>, x*x), p);</a>
-<a class="sourceLine" id="cb1-17" title="17">  <span class="dt">double</span> pchisq = <span class="ex">boost::</span>math<span class="ex">::</span>cdf(<span class="ex">boost::</span>math<span class="ex">::</span>complement(<span class="ex">boost::</span>math<span class="ex">::</span>chi_squared(l), l*q/k/k));</a>
-<a class="sourceLine" id="cb1-18" title="18">  <span class="dt">double</span> w = <span class="dv">2</span>*<span class="ex">boost::</span>math<span class="ex">::</span>pdf(<span class="ex">boost::</span>math<span class="ex">::</span>normal(<span class="dv">0</span>, d), x);</a>
-<a class="sourceLine" id="cb1-19" title="19">  <span class="cf">return</span> w * pchisq / ((<span class="dv">1</span>-u)*(<span class="dv">1</span>-u));</a>
-<a class="sourceLine" id="cb1-20" title="20">}</a>
-<a class="sourceLine" id="cb1-21" title="21"></a>
-<a class="sourceLine" id="cb1-22" title="22"><span class="kw">class</span> Integrand: <span class="kw">public</span> Func</a>
-<a class="sourceLine" id="cb1-23" title="23">{</a>
-<a class="sourceLine" id="cb1-24" title="24"><span class="kw">private</span>:</a>
-<a class="sourceLine" id="cb1-25" title="25">  <span class="dt">double</span> l;</a>
-<a class="sourceLine" id="cb1-26" title="26">  <span class="dt">double</span> p;</a>
-<a class="sourceLine" id="cb1-27" title="27">  <span class="dt">double</span> k;</a>
-<a class="sourceLine" id="cb1-28" title="28">  <span class="dt">double</span> d;</a>
-<a class="sourceLine" id="cb1-29" title="29"><span class="kw">public</span>:</a>
-<a class="sourceLine" id="cb1-30" title="30">  Integrand(<span class="dt">double</span> <span class="va">l_</span>, <span class="dt">double</span> <span class="va">p_</span>, <span class="dt">double</span> <span class="va">k_</span>, <span class="dt">double</span> <span class="va">d_</span>) : l(<span class="va">l_</span>), p(<span class="va">p_</span>), k(<span class="va">k_</span>), d(<span class="va">d_</span>) {}</a>
-<a class="sourceLine" id="cb1-31" title="31">  </a>
-<a class="sourceLine" id="cb1-32" title="32">  <span class="dt">double</span> <span class="kw">operator</span>()(<span class="at">const</span> <span class="dt">double</span>&amp; u) <span class="at">const</span></a>
-<a class="sourceLine" id="cb1-33" title="33">  {</a>
-<a class="sourceLine" id="cb1-34" title="34">    <span class="cf">return</span> integrand(u, l, p, k, d);</a>
-<a class="sourceLine" id="cb1-35" title="35">  }</a>
-<a class="sourceLine" id="cb1-36" title="36">};</a>
-<a class="sourceLine" id="cb1-37" title="37"></a>
-<a class="sourceLine" id="cb1-38" title="38"><span class="co">// [[Rcpp::export]]</span></a>
-<a class="sourceLine" id="cb1-39" title="39">Rcpp::NumericVector integral(<span class="dt">double</span> l, <span class="dt">double</span> p, <span class="dt">double</span> k, <span class="dt">double</span> d){</a>
-<a class="sourceLine" id="cb1-40" title="40">  Integrand f(l, p, k, d);</a>
-<a class="sourceLine" id="cb1-41" title="41">  <span class="dt">double</span> err_est;</a>
-<a class="sourceLine" id="cb1-42" title="42">  <span class="dt">int</span> err_code;</a>
-<a class="sourceLine" id="cb1-43" title="43">  <span class="at">const</span> <span class="dt">double</span> res = integrate(f, <span class="dv">0</span>, <span class="dv">1</span>, err_est, err_code);</a>
-<a class="sourceLine" id="cb1-44" title="44">  Rcpp::NumericVector out = Rcpp::NumericVector::create(res);</a>
-<a class="sourceLine" id="cb1-45" title="45">  out.attr(<span class="st">&quot;err_est&quot;</span>) = err_est;</a>
-<a class="sourceLine" id="cb1-46" title="46">  out.attr(<span class="st">&quot;err_code&quot;</span>) = err_code;</a>
-<a class="sourceLine" id="cb1-47" title="47">  <span class="cf">return</span> out;</a>
-<a class="sourceLine" id="cb1-48" title="48">}</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="co">// [[Rcpp::depends(BH)]]</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="co">// [[Rcpp::depends(RcppEigen)]]</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="co">// [[Rcpp::depends(RcppNumerical)]]</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;RcppNumerical.h&gt;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="kw">using</span> <span class="kw">namespace</span> Numer;</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp;</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;boost/math/distributions/non_central_chi_squared.hpp&gt;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;boost/math/distributions/complement.hpp&gt;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;boost/math/distributions/normal.hpp&gt;</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;boost/math/distributions/chi_squared.hpp&gt;</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a><span class="dt">double</span> integrand(<span class="dt">double</span> u, <span class="dt">double</span> l, <span class="dt">double</span> p, <span class="dt">double</span> k, <span class="dt">double</span> d){</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a>  <span class="dt">double</span> x = u/(<span class="dv">1</span>-u);</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>  <span class="dt">double</span> q = <span class="ex">boost::</span>math<span class="ex">::</span>quantile(<span class="ex">boost::</span>math<span class="ex">::</span>non_central_chi_squared(<span class="dv">1</span>, x*x), p);</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a>  <span class="dt">double</span> pchisq = <span class="ex">boost::</span>math<span class="ex">::</span>cdf(<span class="ex">boost::</span>math<span class="ex">::</span>complement(<span class="ex">boost::</span>math<span class="ex">::</span>chi_squared(l), l*q/k/k));</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a>  <span class="dt">double</span> w = <span class="dv">2</span>*<span class="ex">boost::</span>math<span class="ex">::</span>pdf(<span class="ex">boost::</span>math<span class="ex">::</span>normal(<span class="dv">0</span>, d), x);</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a>  <span class="cf">return</span> w * pchisq / ((<span class="dv">1</span>-u)*(<span class="dv">1</span>-u));</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a>}</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a><span class="kw">class</span> Integrand: <span class="kw">public</span> Func</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a>{</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a><span class="kw">private</span>:</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true"></a>  <span class="dt">double</span> l;</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true"></a>  <span class="dt">double</span> p;</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true"></a>  <span class="dt">double</span> k;</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true"></a>  <span class="dt">double</span> d;</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true"></a><span class="kw">public</span>:</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true"></a>  Integrand(<span class="dt">double</span> <span class="va">l_</span>, <span class="dt">double</span> <span class="va">p_</span>, <span class="dt">double</span> <span class="va">k_</span>, <span class="dt">double</span> <span class="va">d_</span>) : l(<span class="va">l_</span>), p(<span class="va">p_</span>), k(<span class="va">k_</span>), d(<span class="va">d_</span>) {}</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true"></a>  </span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true"></a>  <span class="dt">double</span> <span class="kw">operator</span>()(<span class="at">const</span> <span class="dt">double</span>&amp; u) <span class="at">const</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true"></a>  {</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true"></a>    <span class="cf">return</span> integrand(u, l, p, k, d);</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true"></a>  }</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true"></a>};</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true"></a>Rcpp::NumericVector integral(<span class="dt">double</span> l, <span class="dt">double</span> p, <span class="dt">double</span> k, <span class="dt">double</span> d){</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true"></a>  Integrand f(l, p, k, d);</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true"></a>  <span class="dt">double</span> err_est;</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true"></a>  <span class="dt">int</span> err_code;</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true"></a>  <span class="at">const</span> <span class="dt">double</span> res = integrate(f, <span class="dv">0</span>, <span class="dv">1</span>, err_est, err_code);</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true"></a>  Rcpp::NumericVector out = Rcpp::NumericVector::create(res);</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true"></a>  out.attr(<span class="st">&quot;err_est&quot;</span>) = err_est;</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true"></a>  out.attr(<span class="st">&quot;err_code&quot;</span>) = err_code;</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true"></a>  <span class="cf">return</span> out;</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true"></a>}</span></code></pre></div>
 <h2 id="example">Example</h2>
 <p>We test our function on Example 3.1 of Krishnamoorthy &amp; Mathew’s book. We firstly calculate the value of <span class="math inline">\(d\)</span>.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">dat &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</a>
-<a class="sourceLine" id="cb2-2" title="2">  <span class="dt">x1 =</span> <span class="kw">c</span>(<span class="dv">80</span>, <span class="dv">93</span>, <span class="dv">100</span>, <span class="dv">82</span>, <span class="dv">90</span>, <span class="dv">99</span>, <span class="dv">81</span>, <span class="dv">96</span>, <span class="dv">94</span>, <span class="dv">93</span>, <span class="dv">97</span>, <span class="dv">95</span>, <span class="dv">100</span>, <span class="dv">85</span>, <span class="dv">86</span>, <span class="dv">87</span>), </a>
-<a class="sourceLine" id="cb2-3" title="3">  <span class="dt">x2 =</span> <span class="kw">c</span>(<span class="dv">8</span>, <span class="dv">9</span>, <span class="dv">10</span>, <span class="dv">12</span>, <span class="dv">11</span>, <span class="dv">8</span>, <span class="dv">8</span>, <span class="dv">10</span>, <span class="dv">12</span>, <span class="dv">11</span>, <span class="dv">13</span>, <span class="dv">11</span>, <span class="dv">8</span>, <span class="dv">12</span>, <span class="dv">9</span>, <span class="dv">12</span>), </a>
-<a class="sourceLine" id="cb2-4" title="4">  <span class="dt">y =</span> <span class="kw">c</span>(<span class="dv">2256</span>, <span class="dv">2340</span>, <span class="dv">2426</span>, <span class="dv">2293</span>, <span class="dv">2330</span>, <span class="dv">2368</span>, <span class="dv">2250</span>, <span class="dv">2409</span>, <span class="dv">2364</span>, <span class="dv">2379</span>, <span class="dv">2440</span>, <span class="dv">2364</span>, <span class="dv">2404</span>, <span class="dv">2317</span>, <span class="dv">2309</span>, <span class="dv">2328</span>)</a>
-<a class="sourceLine" id="cb2-5" title="5">)</a>
-<a class="sourceLine" id="cb2-6" title="6">fit &lt;-<span class="st"> </span><span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span>x1<span class="op">+</span>x2, <span class="dt">data=</span>dat)</a>
-<a class="sourceLine" id="cb2-7" title="7">X &lt;-<span class="st"> </span><span class="kw">model.matrix</span>(fit)</a>
-<a class="sourceLine" id="cb2-8" title="8">H &lt;-<span class="st"> </span><span class="kw">chol2inv</span>(<span class="kw">chol</span>(<span class="kw">t</span>(X)<span class="op">%*%</span>X)) <span class="co"># inverse of X'X</span></a>
-<a class="sourceLine" id="cb2-9" title="9"><span class="co">## we want the tolerance interval at x1=88 and x2=9</span></a>
-<a class="sourceLine" id="cb2-10" title="10">xnew &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">88</span>, <span class="dv">9</span>)</a>
-<a class="sourceLine" id="cb2-11" title="11">d &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">t</span>(xnew) <span class="op">%*%</span><span class="st"> </span>H <span class="op">%*%</span><span class="st"> </span><span class="kw">matrix</span>(xnew)))</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>dat &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>  <span class="dt">x1 =</span> <span class="kw">c</span>(<span class="dv">80</span>, <span class="dv">93</span>, <span class="dv">100</span>, <span class="dv">82</span>, <span class="dv">90</span>, <span class="dv">99</span>, <span class="dv">81</span>, <span class="dv">96</span>, <span class="dv">94</span>, <span class="dv">93</span>, <span class="dv">97</span>, <span class="dv">95</span>, <span class="dv">100</span>, <span class="dv">85</span>, <span class="dv">86</span>, <span class="dv">87</span>), </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>  <span class="dt">x2 =</span> <span class="kw">c</span>(<span class="dv">8</span>, <span class="dv">9</span>, <span class="dv">10</span>, <span class="dv">12</span>, <span class="dv">11</span>, <span class="dv">8</span>, <span class="dv">8</span>, <span class="dv">10</span>, <span class="dv">12</span>, <span class="dv">11</span>, <span class="dv">13</span>, <span class="dv">11</span>, <span class="dv">8</span>, <span class="dv">12</span>, <span class="dv">9</span>, <span class="dv">12</span>), </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>  <span class="dt">y =</span> <span class="kw">c</span>(<span class="dv">2256</span>, <span class="dv">2340</span>, <span class="dv">2426</span>, <span class="dv">2293</span>, <span class="dv">2330</span>, <span class="dv">2368</span>, <span class="dv">2250</span>, <span class="dv">2409</span>, <span class="dv">2364</span>, <span class="dv">2379</span>, <span class="dv">2440</span>, <span class="dv">2364</span>, <span class="dv">2404</span>, <span class="dv">2317</span>, <span class="dv">2309</span>, <span class="dv">2328</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>fit &lt;-<span class="st"> </span><span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span>x1<span class="op">+</span>x2, <span class="dt">data=</span>dat)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>X &lt;-<span class="st"> </span><span class="kw">model.matrix</span>(fit)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>H &lt;-<span class="st"> </span><span class="kw">chol2inv</span>(<span class="kw">chol</span>(<span class="kw">t</span>(X)<span class="op">%*%</span>X)) <span class="co"># inverse of X'X</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a><span class="co">## we want the tolerance interval at x1=88 and x2=9</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>xnew &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">88</span>, <span class="dv">9</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>d &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">t</span>(xnew) <span class="op">%*%</span><span class="st"> </span>H <span class="op">%*%</span><span class="st"> </span><span class="kw">matrix</span>(xnew)))</span></code></pre></div>
 <p>No we solve the equation. The <code>Rcpp</code> function <code>integral</code> is available in a package I called <code>regtolerance</code>.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">f &lt;-<span class="st"> </span><span class="cf">function</span>(k, l, p, d, alpha){</a>
-<a class="sourceLine" id="cb3-2" title="2">  regtolerance<span class="op">:::</span><span class="kw">integral</span>(l, p, k, d) <span class="op">-</span><span class="st"> </span>(<span class="dv">1</span><span class="op">-</span>alpha)</a>
-<a class="sourceLine" id="cb3-3" title="3">}</a>
-<a class="sourceLine" id="cb3-4" title="4"><span class="co">## Calculation of the (0.9, 0.95)-tolerance factor</span></a>
-<a class="sourceLine" id="cb3-5" title="5">( k &lt;-<span class="st"> </span><span class="kw">uniroot</span>(f, <span class="dt">l=</span><span class="kw">nrow</span>(dat)<span class="op">-</span><span class="dv">3</span>, <span class="dt">p=</span><span class="fl">0.9</span>, <span class="dt">d=</span>d, <span class="dt">alpha=</span><span class="fl">0.05</span>, <span class="dt">lower=</span><span class="dv">2</span>, <span class="dt">upper=</span><span class="dv">3</span>)<span class="op">$</span>root )</a>
-<a class="sourceLine" id="cb3-6" title="6"><span class="co">## [1] 2.602851</span></a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>f &lt;-<span class="st"> </span><span class="cf">function</span>(k, l, p, d, alpha){</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>  regtolerance<span class="op">:::</span><span class="kw">integral</span>(l, p, k, d) <span class="op">-</span><span class="st"> </span>(<span class="dv">1</span><span class="op">-</span>alpha)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>}</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="co">## Calculation of the (0.9, 0.95)-tolerance factor</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>( k &lt;-<span class="st"> </span><span class="kw">uniroot</span>(f, <span class="dt">l=</span><span class="kw">nrow</span>(dat)<span class="op">-</span><span class="dv">3</span>, <span class="dt">p=</span><span class="fl">0.9</span>, <span class="dt">d=</span>d, <span class="dt">alpha=</span><span class="fl">0.05</span>, <span class="dt">lower=</span><span class="dv">2</span>, <span class="dt">upper=</span><span class="dv">3</span>)<span class="op">$</span>root )</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a><span class="co">## [1] 2.602851</span></span></code></pre></div>
 <p>Now we get the tolerance interval as follows:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">estimates &lt;-<span class="st"> </span>fit<span class="op">$</span>coefficients</a>
-<a class="sourceLine" id="cb4-2" title="2">yhat &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">t</span>(xnew) <span class="op">%*%</span><span class="st"> </span><span class="kw">matrix</span>(estimates))</a>
-<a class="sourceLine" id="cb4-3" title="3">yhat <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>)<span class="op">*</span>k<span class="op">*</span><span class="kw">sigma</span>(fit)</a>
-<a class="sourceLine" id="cb4-4" title="4"><span class="co">## [1] 2271.436 2356.594</span></a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>estimates &lt;-<span class="st"> </span>fit<span class="op">$</span>coefficients</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>yhat &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">t</span>(xnew) <span class="op">%*%</span><span class="st"> </span><span class="kw">matrix</span>(estimates))</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>yhat <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>)<span class="op">*</span>k<span class="op">*</span><span class="kw">sigma</span>(fit)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a><span class="co">## [1] 2271.436 2356.594</span></span></code></pre></div>
 <h2 id="bounding-the-tolerance-factor">Bounding the tolerance factor</h2>
 <h3 id="lower-bound">Lower bound</h3>
 <p>For a fixed number of degrees of freedom, the Chi-squared distribution is stochastically increasing in its non-centrality parameter. Therefore <span class="math display">\[
@@ -194,40 +192,40 @@
 <p>Thus, the value of <span class="math inline">\(k\)</span> satisfying <span class="math display">\[
 \Pr\left(\chi^2_\ell &gt; \frac{\ell\chi^2_{1}(p)}{k^2} \right) = 1-\alpha
 \]</span> is lower than the tolerance factor.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">l &lt;-<span class="st"> </span><span class="kw">nrow</span>(dat)<span class="op">-</span><span class="dv">3</span></a>
-<a class="sourceLine" id="cb5-2" title="2">p &lt;-<span class="st"> </span><span class="fl">0.9</span></a>
-<a class="sourceLine" id="cb5-3" title="3">alpha &lt;-<span class="st"> </span><span class="fl">0.05</span></a>
-<a class="sourceLine" id="cb5-4" title="4"><span class="co"># lower bound</span></a>
-<a class="sourceLine" id="cb5-5" title="5"><span class="kw">sqrt</span>(l<span class="op">*</span><span class="kw">qchisq</span>(p,<span class="dv">1</span>)<span class="op">/</span><span class="kw">qchisq</span>(<span class="dv">1</span><span class="op">-</span>alpha, l, <span class="dt">lower.tail=</span><span class="ot">FALSE</span>))</a>
-<a class="sourceLine" id="cb5-6" title="6"><span class="co">## [1] 2.443276</span></a></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="kw">curve</span>(<span class="kw">Vectorize</span>(regtolerance<span class="op">:::</span>integral)(l, p, x, d), </a>
-<a class="sourceLine" id="cb6-2" title="2">      <span class="dt">from=</span><span class="fl">0.1</span>, <span class="dt">to=</span><span class="dv">4</span>, <span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb6-3" title="3"><span class="kw">curve</span>(<span class="kw">pchisq</span>(l<span class="op">*</span><span class="kw">qchisq</span>(p,<span class="dv">1</span>)<span class="op">/</span>x<span class="op">^</span><span class="dv">2</span>, l, <span class="dt">lower.tail=</span><span class="ot">FALSE</span>), <span class="dt">add=</span><span class="ot">TRUE</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>l &lt;-<span class="st"> </span><span class="kw">nrow</span>(dat)<span class="op">-</span><span class="dv">3</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>p &lt;-<span class="st"> </span><span class="fl">0.9</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>alpha &lt;-<span class="st"> </span><span class="fl">0.05</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="co"># lower bound</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="kw">sqrt</span>(l<span class="op">*</span><span class="kw">qchisq</span>(p,<span class="dv">1</span>)<span class="op">/</span><span class="kw">qchisq</span>(<span class="dv">1</span><span class="op">-</span>alpha, l, <span class="dt">lower.tail=</span><span class="ot">FALSE</span>))</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a><span class="co">## [1] 2.443276</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">curve</span>(<span class="kw">Vectorize</span>(regtolerance<span class="op">:::</span>integral)(l, p, x, d), </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>      <span class="dt">from=</span><span class="fl">0.1</span>, <span class="dt">to=</span><span class="dv">4</span>, <span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>))</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="kw">curve</span>(<span class="kw">pchisq</span>(l<span class="op">*</span><span class="kw">qchisq</span>(p,<span class="dv">1</span>)<span class="op">/</span>x<span class="op">^</span><span class="dv">2</span>, l, <span class="dt">lower.tail=</span><span class="ot">FALSE</span>), <span class="dt">add=</span><span class="ot">TRUE</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>)</span></code></pre></div>
 <p><img src="figures/regtol-lowerBound-1.png" /></p>
 <h3 id="upper-bound">Upper bound</h3>
 <p>The Lee &amp; Mathew approximation of <span class="math inline">\(k\)</span> is known to be generally higher than <span class="math inline">\(k\)</span>. It is returned by the function <code>kLM</code> below.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">kLM &lt;-<span class="st"> </span><span class="cf">function</span>(p, alpha, l, d){</a>
-<a class="sourceLine" id="cb7-2" title="2">  e &lt;-<span class="st"> </span>(<span class="dv">1</span><span class="op">+</span>d<span class="op">^</span><span class="dv">2</span>)<span class="op">^</span><span class="dv">2</span><span class="op">/</span>d<span class="op">^</span><span class="dv">4</span></a>
-<a class="sourceLine" id="cb7-3" title="3">  f &lt;-<span class="st"> </span>d<span class="op">^</span><span class="dv">4</span><span class="op">/</span>(<span class="dv">1</span><span class="op">+</span>d<span class="op">^</span><span class="dv">2</span>) </a>
-<a class="sourceLine" id="cb7-4" title="4">  delta &lt;-<span class="st"> </span>d<span class="op">^</span><span class="dv">2</span><span class="op">*</span>((<span class="dv">3</span><span class="op">*</span>d<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="kw">sqrt</span>(<span class="dv">9</span><span class="op">*</span>d<span class="op">^</span><span class="dv">4</span><span class="op">+</span><span class="dv">6</span><span class="op">*</span>d<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">3</span>))<span class="op">/</span>(<span class="dv">2</span><span class="op">*</span>d<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb7-5" title="5">  <span class="kw">sqrt</span>(e<span class="op">*</span>f<span class="op">/</span>(<span class="dv">1</span><span class="op">+</span>delta)<span class="op">*</span><span class="kw">qchisq</span>(p, <span class="dv">1</span>, delta)<span class="op">*</span><span class="kw">qf</span>(<span class="dv">1</span><span class="op">-</span>alpha, e, l))</a>
-<a class="sourceLine" id="cb7-6" title="6">}</a>
-<a class="sourceLine" id="cb7-7" title="7"><span class="kw">kLM</span>(p, alpha, l, d)</a>
-<a class="sourceLine" id="cb7-8" title="8"><span class="co">## [1] 2.606926</span></a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>kLM &lt;-<span class="st"> </span><span class="cf">function</span>(p, alpha, l, d){</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>  e &lt;-<span class="st"> </span>(<span class="dv">1</span><span class="op">+</span>d<span class="op">^</span><span class="dv">2</span>)<span class="op">^</span><span class="dv">2</span><span class="op">/</span>d<span class="op">^</span><span class="dv">4</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>  f &lt;-<span class="st"> </span>d<span class="op">^</span><span class="dv">4</span><span class="op">/</span>(<span class="dv">1</span><span class="op">+</span>d<span class="op">^</span><span class="dv">2</span>) </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>  delta &lt;-<span class="st"> </span>d<span class="op">^</span><span class="dv">2</span><span class="op">*</span>((<span class="dv">3</span><span class="op">*</span>d<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="kw">sqrt</span>(<span class="dv">9</span><span class="op">*</span>d<span class="op">^</span><span class="dv">4</span><span class="op">+</span><span class="dv">6</span><span class="op">*</span>d<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">3</span>))<span class="op">/</span>(<span class="dv">2</span><span class="op">*</span>d<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">1</span>))</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a>  <span class="kw">sqrt</span>(e<span class="op">*</span>f<span class="op">/</span>(<span class="dv">1</span><span class="op">+</span>delta)<span class="op">*</span><span class="kw">qchisq</span>(p, <span class="dv">1</span>, delta)<span class="op">*</span><span class="kw">qf</span>(<span class="dv">1</span><span class="op">-</span>alpha, e, l))</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a>}</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a><span class="kw">kLM</span>(p, alpha, l, d)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a><span class="co">## [1] 2.606926</span></span></code></pre></div>
 <h3 id="put-things-together">Put things together</h3>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">p =<span class="st"> </span><span class="fl">0.9</span> </a>
-<a class="sourceLine" id="cb8-2" title="2">alpha =<span class="st"> </span><span class="fl">0.05</span></a>
-<a class="sourceLine" id="cb8-3" title="3">xnew =<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">88</span>, <span class="dv">9</span>)</a>
-<a class="sourceLine" id="cb8-4" title="4">X &lt;-<span class="st"> </span><span class="kw">model.matrix</span>(fit)</a>
-<a class="sourceLine" id="cb8-5" title="5">H &lt;-<span class="st"> </span><span class="kw">chol2inv</span>(<span class="kw">chol</span>(<span class="kw">t</span>(X)<span class="op">%*%</span>X)) </a>
-<a class="sourceLine" id="cb8-6" title="6">d &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">t</span>(xnew) <span class="op">%*%</span><span class="st"> </span>H <span class="op">%*%</span><span class="st"> </span><span class="kw">matrix</span>(xnew)))</a>
-<a class="sourceLine" id="cb8-7" title="7">l &lt;-<span class="st"> </span><span class="kw">nrow</span>(X)<span class="op">-</span><span class="kw">ncol</span>(X)</a>
-<a class="sourceLine" id="cb8-8" title="8">k_low &lt;-<span class="st"> </span><span class="kw">sqrt</span>(l<span class="op">*</span><span class="kw">qchisq</span>(p,<span class="dv">1</span>)<span class="op">/</span><span class="kw">qchisq</span>(alpha, l))</a>
-<a class="sourceLine" id="cb8-9" title="9">k_upp &lt;-<span class="st"> </span><span class="kw">kLM</span>(p, alpha, l, d)</a>
-<a class="sourceLine" id="cb8-10" title="10">( k &lt;-<span class="st"> </span><span class="kw">uniroot</span>(f, <span class="dt">l =</span> l, <span class="dt">p =</span> p, <span class="dt">d =</span> d, <span class="dt">alpha =</span> alpha, </a>
-<a class="sourceLine" id="cb8-11" title="11">               <span class="dt">lower =</span> k_low, <span class="dt">upper =</span> k_upp, </a>
-<a class="sourceLine" id="cb8-12" title="12">               <span class="dt">extendInt =</span> <span class="st">&quot;upX&quot;</span>)<span class="op">$</span>root )</a>
-<a class="sourceLine" id="cb8-13" title="13"><span class="co">## [1] 2.602831</span></a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>p =<span class="st"> </span><span class="fl">0.9</span> </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a>alpha =<span class="st"> </span><span class="fl">0.05</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a>xnew =<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">88</span>, <span class="dv">9</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a>X &lt;-<span class="st"> </span><span class="kw">model.matrix</span>(fit)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a>H &lt;-<span class="st"> </span><span class="kw">chol2inv</span>(<span class="kw">chol</span>(<span class="kw">t</span>(X)<span class="op">%*%</span>X)) </span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true"></a>d &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">t</span>(xnew) <span class="op">%*%</span><span class="st"> </span>H <span class="op">%*%</span><span class="st"> </span><span class="kw">matrix</span>(xnew)))</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true"></a>l &lt;-<span class="st"> </span><span class="kw">nrow</span>(X)<span class="op">-</span><span class="kw">ncol</span>(X)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true"></a>k_low &lt;-<span class="st"> </span><span class="kw">sqrt</span>(l<span class="op">*</span><span class="kw">qchisq</span>(p,<span class="dv">1</span>)<span class="op">/</span><span class="kw">qchisq</span>(alpha, l))</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true"></a>k_upp &lt;-<span class="st"> </span><span class="kw">kLM</span>(p, alpha, l, d)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true"></a>( k &lt;-<span class="st"> </span><span class="kw">uniroot</span>(f, <span class="dt">l =</span> l, <span class="dt">p =</span> p, <span class="dt">d =</span> d, <span class="dt">alpha =</span> alpha, </span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true"></a>               <span class="dt">lower =</span> k_low, <span class="dt">upper =</span> k_upp, </span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true"></a>               <span class="dt">extendInt =</span> <span class="st">&quot;upX&quot;</span>)<span class="op">$</span>root )</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true"></a><span class="co">## [1] 2.602831</span></span></code></pre></div>
 <h1 id="references">References</h1>
 <p>Krishnamoorthy &amp; Mathew (2009). <em>Statistical Tolerance Regions</em>. Wiley.</p>
 
@@ -283,20 +281,6 @@
 <!-- <script>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
-
-  <!-- Google Prettify -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-  <script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
-  <script>
-    var pres = document.getElementsByTagName("pre");
-    for (var i = 0; i < pres.length; ++i) {
-      
-        pres[i].className = pres[i].className + " prettyprint";
-      
-    }
-    prettyPrint();
-  </script> 
 
 
 </html>
