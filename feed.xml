@@ -7,6 +7,447 @@
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
     <lastBuildDate>Thu, 22 Oct 2020 00:00:00 UT</lastBuildDate>
     <item>
+      <title>Owen Q-function by numerical integration</title>
+      <link>https://laustep.github.io/stlahblog/posts/OwenQintegration.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <ul>
+        <li>
+          <a href="#the-first-owen-q-function"
+            >The first Owen <span class="math inline">\(Q\)</span>-function</a
+          >
+        </li>
+        <li>
+          <a href="#integration-with-r---failure"
+            >Integration with R - failure</a
+          >
+        </li>
+        <li>
+          <a href="#integration-with-rcppnumerical"
+            >Integration with <code>RcppNumerical</code></a
+          >
+        </li>
+        <li><a href="#increasing-the-accuracy">Increasing the accuracy</a></li>
+        <li>
+          <a href="#when-the-numerical-integration-beats-owens-algorithm"
+            >When the numerical integration beats Owen’s algorithm</a
+          >
+        </li>
+        <li><a href="#benchmarks">Benchmarks</a></li>
+        <li><a href="#reference">Reference</a></li>
+      </ul>
+      <h2 id="the-first-owen-q-function">
+        The first Owen <span class="math inline">\(Q\)</span>-function
+      </h2>
+      <p>
+        My package <a href="https://github.com/stla/OwenQ">OwenQ</a> provides an
+        implementation of the function I call the first Owen
+        <span class="math inline">\(Q\)</span>-function, defined by
+        <span class="math display"
+          >\[ Q_1(\nu, t, \delta, R) =
+          \frac{1}{\Gamma\left(\frac{\nu}{2}\right)2^{\frac12(\nu-2)}} \int_0^R
+          \Phi\left(\frac{tx}{\sqrt{\nu}}-\delta\right) x^{\nu-1}
+          e^{-\frac{x^2}{2}} \mathrm{d}x. \]</span
+        >
+      </p>
+      <p>
+        The implementation is done in <code>Rcpp</code>, following the algorithm
+        given by Owen (1965) for integer values of the number of degrees of
+        freedom <span class="math inline">\(\nu\)</span>. For odd values of
+        <span class="math inline">\(\nu\)</span>, this algorithm resorts to the
+        evaluation of the Owen <span class="math inline">\(T\)</span>-function.
+        The <code>OwenQ</code> package uses the implementation of the Owen
+        <span class="math inline">\(T\)</span>-function provided by the
+        <code>boost</code> C++ library.
+      </p>
+      <p>
+        Some comparisons with Mathematica show that <code>OwenQ</code> provides
+        an excellent evaluation of <span class="math inline">\(Q_1\)</span>,
+        except for very large values of
+        <span class="math inline">\(\nu\)</span> in combination with large
+        values of the non-centrality parameter
+        <span class="math inline">\(\delta\)</span>.
+      </p>
+      <h2 id="integration-with-r---failure">Integration with R - failure</h2>
+      <p>
+        Let us try to evaluate <span class="math inline">\(Q_1\)</span> with the
+        R function <code>integrate</code>.
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>integrand &lt;-<span class="st"> </span><span class="cf">function</span>(x, nu, t, delta){</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>  <span class="kw">pnorm</span>(t<span class="op">*</span>x <span class="op">/</span><span class="kw">sqrt</span>(nu) <span class="op">-</span><span class="st"> </span>delta) <span class="op">*</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="st">    </span><span class="kw">exp</span>((nu<span class="dv">-1</span>)<span class="op">*</span><span class="kw">log</span>(x) <span class="op">-</span><span class="st"> </span>x<span class="op">*</span>x<span class="op">/</span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span>((nu<span class="op">/</span><span class="dv">2</span>) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>) <span class="op">*</span><span class="st"> </span><span class="kw">log</span>(<span class="dv">2</span>) <span class="op">-</span><span class="st"> </span><span class="kw">lgamma</span>(nu<span class="op">/</span><span class="dv">2</span>))</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>}</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>Q1 &lt;-<span class="st"> </span><span class="cf">function</span>(nu, t, delta, R, ...){</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>  <span class="kw">integrate</span>(integrand, <span class="dt">lower=</span><span class="dv">0</span>, <span class="dt">upper=</span>R, <span class="dt">nu=</span>nu, <span class="dt">t=</span>t, <span class="dt">delta=</span>delta, ...)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>}</span></code></pre>
+      </div>
+      <p>
+        The evaluation for <span class="math inline">\(\nu=1\)</span>,
+        <span class="math inline">\(t=2\)</span>,
+        <span class="math inline">\(\delta=3\)</span> and
+        <span class="math inline">\(R=4\)</span> is good:
+      </p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">library</span>(OwenQ)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="kw">OwenQ1</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="co">## [1] 0.1794992</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="kw">Q1</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="co">## 0.1794992 with absolute error &lt; 1.4e-05</span></span></code></pre>
+      </div>
+      <p>Now let us try with some other values.</p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>nu =<span class="st"> </span><span class="dv">300</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>t =<span class="st"> </span><span class="dv">150</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>delta =<span class="st"> </span><span class="dv">160</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="kw">OwenQ1</span>(nu, t, delta, <span class="dv">20</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a><span class="co">## [1] 0.05232857</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a><span class="kw">Q1</span>(nu, t, delta, <span class="dv">20</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a><span class="co">## 0.05232857 with absolute error &lt; 5.1e-05</span></span></code></pre>
+      </div>
+      <p>
+        For <span class="math inline">\(R=20\)</span>, the evaluation is good.
+        Now, increase <span class="math inline">\(R\)</span>:
+      </p>
+      <div class="sourceCode" id="cb4">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">OwenQ1</span>(nu, t, delta, <span class="dv">100</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="co">## [1] 0.05242536</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="kw">Q1</span>(nu, t, delta, <span class="dv">100</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a><span class="co">## 7.411467e-07 with absolute error &lt; 1.4e-06</span></span></code></pre>
+      </div>
+      <p>
+        The evaluation has failed. And it stills fails if we increase the number
+        of subdivisions:
+      </p>
+      <div class="sourceCode" id="cb5">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="kw">Q1</span>(nu, t, delta, <span class="dv">100</span>, <span class="dt">subdivisions=</span><span class="dv">10000</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="co">## 7.411467e-07 with absolute error &lt; 1.4e-06</span></span></code></pre>
+      </div>
+      <p>Let us have a look at the integrand:</p>
+      <div class="sourceCode" id="cb6">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">curve</span>(<span class="kw">integrand</span>(x, nu, t, delta), <span class="dt">from=</span><span class="dv">16</span>, <span class="dt">to=</span><span class="dv">22</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/OwenQ1-unnamed-chunk-6-1.png"
+        />
+      </p>
+      <p>
+        The integrand is almost zero outside the interval
+        <span class="math inline">\([18,21]\)</span>.
+      </p>
+      <p>
+        Therefore the integral from <span class="math inline">\(0\)</span> to
+        <span class="math inline">\(R\)</span> stabilizes at
+        <span class="math inline">\(R=21\)</span>:
+      </p>
+      <div class="sourceCode" id="cb7">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>R &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">30</span>, <span class="dt">length.out=</span><span class="dv">1000</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>integral &lt;-<span class="st"> </span><span class="kw">sapply</span>(R, <span class="cf">function</span>(R) <span class="kw">OwenQ1</span>(nu, t, delta, R))</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a><span class="kw">plot</span>(R, integral, <span class="dt">type=</span><span class="st">"l"</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/OwenQ1-unnamed-chunk-7-1.png"
+        />
+      </p>
+      <p>
+        The graphic below shows the problem encountered when we use the R
+        integration:
+      </p>
+      <div class="sourceCode" id="cb8">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>R &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">21</span>, <span class="dv">100</span>, <span class="dt">length.out=</span><span class="dv">1000</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a>integral &lt;-<span class="st"> </span><span class="kw">sapply</span>(R, <span class="cf">function</span>(R) <span class="kw">Q1</span>(nu, t, delta, R)<span class="op">$</span>value)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a><span class="kw">plot</span>(R, integral, <span class="dt">type=</span><span class="st">"l"</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/OwenQ1-unnamed-chunk-8-1.png"
+        />
+      </p>
+      <p>
+        After <span class="math inline">\(R = 70\)</span>, the evaluation of the
+        integral from <span class="math inline">\(0\)</span> to
+        <span class="math inline">\(R\)</span> is not stable.
+      </p>
+      <h2 id="integration-with-rcppnumerical">
+        Integration with <code>RcppNumerical</code>
+      </h2>
+      <p>
+        The
+        <a href="https://github.com/yixuan/RcppNumerical"
+          ><code>RcppNumerical</code> package</a
+        >
+        allows numerical integration based on the C++
+        <code>NumericalIntegration</code> library.
+      </p>
+      <p>Let us give it a first try.</p>
+      <div class="sourceCode" id="cb9">
+        <pre
+          class="sourceCode cpp"
+        ><code class="sourceCode cpp"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="co">// [[Rcpp::depends(RcppEigen)]]</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="co">// [[Rcpp::depends(RcppNumerical)]]</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;RcppNumerical.h&gt;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a><span class="kw">using</span> <span class="kw">namespace</span> Numer;</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;cmath&gt;</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true"></a><span class="dt">double</span> integrand (<span class="dt">double</span> x, <span class="dt">double</span> nu, <span class="dt">double</span> t, <span class="dt">double</span> delta) {</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true"></a>  <span class="dt">double</span> f = R::pnorm(t*x /sqrt(nu) - delta, <span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="dv">1</span>, <span class="dv">0</span>) *</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true"></a>    exp((nu-<span class="dv">1</span>)*log(x) - x*x/<span class="dv">2</span> - ((nu/<span class="dv">2</span>) - <span class="dv">1</span>) * log(<span class="dv">2</span>) - lgamma(nu/<span class="dv">2</span>));</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true"></a>  <span class="cf">return</span> f;</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true"></a>}</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true"></a><span class="kw">class</span> Integrand: <span class="kw">public</span> Func</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true"></a>{</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true"></a><span class="kw">private</span>:</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true"></a>  <span class="dt">double</span> nu;</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true"></a>  <span class="dt">double</span> t;</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true"></a>  <span class="dt">double</span> delta;</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true"></a><span class="kw">public</span>:</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true"></a>  Integrand(<span class="dt">double</span> <span class="va">nu_</span>, <span class="dt">double</span> <span class="va">t_</span>, <span class="dt">double</span> <span class="va">delta_</span>) : </span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true"></a>    nu(<span class="va">nu_</span>), t(<span class="va">t_</span>), delta(<span class="va">delta_</span>) {}</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true"></a></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true"></a>  <span class="dt">double</span> <span class="kw">operator</span>()(<span class="at">const</span> <span class="dt">double</span>&amp; x) <span class="at">const</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true"></a>  {</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true"></a>    <span class="cf">return</span> integrand_numer(x, nu, t, delta);</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true"></a>  }</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true"></a>};</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true"></a></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true"></a>Rcpp::NumericVector </span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true"></a>OwenQ1numer(<span class="dt">double</span> nu, <span class="dt">double</span> t, <span class="dt">double</span> delta, <span class="dt">double</span> R,</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true"></a>            <span class="dt">int</span> subdiv=<span class="dv">100</span>, </span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true"></a>            <span class="dt">double</span> eps_abs=<span class="fl">1e-14</span>, <span class="dt">double</span> eps_rel=<span class="fl">1e-14</span>){</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true"></a>  Integrand f(nu, t, delta);</span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true"></a>  <span class="dt">double</span> err_est;</span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true"></a>  <span class="dt">int</span> err_code;</span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true"></a>  <span class="at">const</span> <span class="dt">double</span> res = integrate(f, <span class="dv">0</span>, R, err_est, err_code, </span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true"></a>                               subdiv, eps_abs, eps_rel);</span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true"></a>  Rcpp::NumericVector out = Rcpp::NumericVector::create(res);</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true"></a>  out.attr(<span class="st">"err_est"</span>) = err_est;</span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true"></a>  out.attr(<span class="st">"err_code"</span>) = err_code;</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true"></a>  <span class="cf">return</span> out;</span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true"></a>}</span></code></pre>
+      </div>
+      <p>
+        For <span class="math inline">\(R=100\)</span>, the evaluation is
+        successful:
+      </p>
+      <div class="sourceCode" id="cb10">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="kw">OwenQ1numer</span>(nu, t, delta, <span class="dv">100</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a><span class="co">## [1] 0.05242536</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a><span class="co">## attr(,"err_est")</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a><span class="co">## [1] 5.773263e-16</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a><span class="co">## attr(,"err_code")</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a><span class="co">## [1] 0</span></span></code></pre>
+      </div>
+      <p>It fails for <span class="math inline">\(R=3000\)</span>:</p>
+      <div class="sourceCode" id="cb11">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="kw">OwenQ1</span>(nu, t, delta, <span class="dv">3000</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a><span class="co">## [1] 0.05242536</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true"></a><span class="kw">OwenQ1numer</span>(nu, t, delta, <span class="dv">3000</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true"></a><span class="co">## [1] 1.913546e-35</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true"></a><span class="co">## attr(,"err_est")</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true"></a><span class="co">## [1] 3.788077e-35</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true"></a><span class="co">## attr(,"err_code")</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true"></a><span class="co">## [1] 0</span></span></code></pre>
+      </div>
+      <p>Let us have a look at the instability:</p>
+      <div class="sourceCode" id="cb12">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a>R &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">2500</span>, <span class="dv">5000</span>, <span class="dt">length.out=</span><span class="dv">1000</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a>integral &lt;-<span class="st"> </span><span class="kw">sapply</span>(R, <span class="cf">function</span>(R) <span class="kw">OwenQ1numer</span>(nu, t, delta, R))</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true"></a><span class="kw">plot</span>(R, integral, <span class="dt">type=</span><span class="st">"l"</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/OwenQ1-unnamed-chunk-11-1.png"
+        />
+      </p>
+      <h2 id="increasing-the-accuracy">Increasing the accuracy</h2>
+      <p>
+        Different integration rules are available in <code>RcppNumerical</code>.
+        They all are Gauss-Kronrod quadratures, but with different accuracies.
+        Let us try the Gauss-Kronrod integration rule with the highest available
+        accuracy:
+      </p>
+      <div class="sourceCode" id="cb13">
+        <pre
+          class="sourceCode cpp"
+        ><code class="sourceCode cpp"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true"></a>Rcpp::NumericVector </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true"></a>OwenQ1numer201(<span class="dt">double</span> nu, <span class="dt">double</span> t, <span class="dt">double</span> delta, <span class="dt">double</span> R,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true"></a>              <span class="dt">int</span> subdiv=<span class="dv">100</span>, </span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true"></a>              <span class="dt">double</span> eps_abs=<span class="fl">1e-14</span>, <span class="dt">double</span> eps_rel=<span class="fl">1e-14</span>){</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true"></a>  Integrand f(nu, t, delta);</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true"></a>  <span class="dt">double</span> err_est;</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true"></a>  <span class="dt">int</span> err_code;</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true"></a>  <span class="at">const</span> <span class="dt">double</span> res = integrate(f, <span class="dv">0</span>, R, err_est, err_code, subdiv, </span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true"></a>                               eps_abs, eps_rel, </span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true"></a>                               Integrator&lt;<span class="dt">double</span>&gt;::GaussKronrod201);</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true"></a>  Rcpp::NumericVector out = Rcpp::NumericVector::create(res);</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true"></a>  out.attr(<span class="st">"err_est"</span>) = err_est;</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true"></a>  out.attr(<span class="st">"err_code"</span>) = err_code;</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true"></a>  <span class="cf">return</span> out;</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true"></a>}</span></code></pre>
+      </div>
+      <p>
+        For <span class="math inline">\(R=3000\)</span>, the numerical
+        integration does not fail anymore:
+      </p>
+      <div class="sourceCode" id="cb14">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a><span class="kw">OwenQ1numer201</span>(nu, t, delta, <span class="dv">3000</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true"></a><span class="co">## [1] 0.05242536</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true"></a><span class="co">## attr(,"err_est")</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true"></a><span class="co">## [1] 5.84141e-16</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true"></a><span class="co">## attr(,"err_code")</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true"></a><span class="co">## [1] 0</span></span></code></pre>
+      </div>
+      <p>
+        Let us have a look at the integral from
+        <span class="math inline">\(0\)</span> to
+        <span class="math inline">\(R\)</span> for
+        <span class="math inline">\(R\)</span> going, as before, from
+        <span class="math inline">\(2500\)</span> to
+        <span class="math inline">\(5000\)</span>:
+      </p>
+      <div class="sourceCode" id="cb15">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a>R &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">2500</span>, <span class="dv">5000</span>, <span class="dt">length.out=</span><span class="dv">1000</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true"></a>integral &lt;-<span class="st"> </span><span class="kw">sapply</span>(R, <span class="cf">function</span>(R) <span class="kw">OwenQ1numer201</span>(nu, t, delta, R))</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true"></a><span class="kw">plot</span>(R, integral, <span class="dt">type=</span><span class="st">"l"</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/OwenQ1-unnamed-chunk-13-1.png"
+        />
+      </p>
+      <p>
+        The instability has gone. Now it appears for
+        <span class="math inline">\(R\)</span> higher than
+        <span class="math inline">\(15000\)</span>:
+      </p>
+      <div class="sourceCode" id="cb16">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true"></a>R &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">15000</span>, <span class="dv">30000</span>, <span class="dt">length.out=</span><span class="dv">1000</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true"></a>integral &lt;-<span class="st"> </span><span class="kw">sapply</span>(R, <span class="cf">function</span>(R) <span class="kw">OwenQ1numer201</span>(nu, t, delta, R))</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true"></a><span class="kw">plot</span>(R, integral, <span class="dt">type=</span><span class="st">"l"</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/OwenQ1-unnamed-chunk-14-1.png"
+        />
+      </p>
+      <p>
+        There is no such problem with the <code>OwenQ1</code> function of the
+        <code>OwenQ</code> package:
+      </p>
+      <div class="sourceCode" id="cb17">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true"></a>R &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">1500</span>, <span class="dv">30000</span>, <span class="dt">length.out=</span><span class="dv">1000</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true"></a>owenQ1 &lt;-<span class="st"> </span><span class="kw">sapply</span>(R, <span class="cf">function</span>(R) <span class="kw">OwenQ1</span>(nu, t, delta, R))</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true"></a><span class="kw">plot</span>(R, owenQ1, <span class="dt">type=</span><span class="st">"l"</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/OwenQ1-unnamed-chunk-15-1.png"
+        />
+      </p>
+      <h2 id="when-the-numerical-integration-beats-owens-algorithm">
+        When the numerical integration beats Owen’s algorithm
+      </h2>
+      <p>
+        On the other hand, for some situations it can happen that
+        <code>OwenQ1</code> fails while the
+        <code>RcppNumerical</code> integration is successful. As we announced
+        before, <code>OwenQ1</code> can fail to evaluate the
+        <span class="math inline">\(Q_1\)</span> function when
+        <span class="math inline">\(\nu\)</span> is very large. Here is such an
+        example:
+      </p>
+      <div class="sourceCode" id="cb18">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true"></a><span class="kw">OwenQ1</span>(<span class="dv">5000</span>, <span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">100</span>) <span class="co"># this result is not correct</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true"></a><span class="co">## [1] 0</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true"></a><span class="kw">OwenQ1numer201</span>(<span class="dv">5000</span>, <span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">100</span>) <span class="co"># this result is correct</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true"></a><span class="co">## [1] 0.4990485</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true"></a><span class="co">## attr(,"err_est")</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true"></a><span class="co">## [1] 5.561545e-15</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true"></a><span class="co">## attr(,"err_code")</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true"></a><span class="co">## [1] 0</span></span></code></pre>
+      </div>
+      <p>The numerical integration brilliantly gives the correct result.</p>
+      <h2 id="benchmarks">Benchmarks</h2>
+      <p>Now let us compare the speed of the two implementations.</p>
+      <div class="sourceCode" id="cb19">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true"></a><span class="kw">library</span>(microbenchmark)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true"></a><span class="kw">microbenchmark</span>(</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true"></a>  <span class="dt">OwenQ1 =</span> <span class="kw">OwenQ1</span>(nu, t, delta, <span class="dv">5000</span>),</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true"></a>  <span class="dt">OwenQ1numer201 =</span> <span class="kw">OwenQ1numer201</span>(nu, t, delta, <span class="dv">5000</span>), </span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true"></a>  <span class="dt">times =</span> <span class="dv">100</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true"></a>)</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true"></a><span class="co">## Unit: microseconds</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true"></a><span class="co">##            expr     min      lq      mean  median      uq     max neval</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true"></a><span class="co">##          OwenQ1  50.425  51.764  55.13293  52.210  53.103 115.576   100</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true"></a><span class="co">##  OwenQ1numer201 485.953 486.400 494.11950 486.846 487.738 614.024   100</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true"></a><span class="co">##  cld</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true"></a><span class="co">##   a </span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true"></a><span class="co">##    b</span></span></code></pre>
+      </div>
+      <p>
+        Well, <code>OwenQ1</code> is faster. But, as we have seen, not always
+        better. And <code>OwenQ1</code> is restricted to integer values of
+        <span class="math inline">\(\nu\)</span>.
+      </p>
+      <h2 id="reference">Reference</h2>
+      <ul>
+        <li>
+          Owen, D. B. (1965).
+          <em>A special case of a bivariate noncentral t-distribution.</em>
+          Biometrika 52, 437-446.
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Mon, 31 Jul 2017 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/OwenQintegration.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
+    <item>
       <title>Back to the parametric Hopf torus</title>
       <link>https://laustep.github.io/stlahblog/posts/HopfTorus2.html</link>
       <description><![CDATA[<div class="container-fluid">
