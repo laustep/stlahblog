@@ -11,10 +11,8 @@
   <link rel="stylesheet" href="../css/post.css" />
   <link rel="stylesheet" href="../css/misc.css" /> 
   
-    <link rel="stylesheet" href="../css/kate.css" /> 
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
    
-  
-    <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
@@ -78,7 +76,7 @@
 
       <div class="main col-sm-10">
         <div id="header">
-          <div id="logo" style="position:absolute;">
+          <div id="logo">
             <a href="../">
               <img src="../images/stla.jpg" alt="stla" width="100px" />
             </a>
@@ -101,23 +99,23 @@
 </div>
 <div class="info">
     
-    Tags: <a href="../tags/maths.html">maths</a>, <a href="../tags/R.html">R</a>
+    Tags: <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>, <a title="All pages tagged 'R'." href="../tags/R.html">R</a>
     
 </div>
 
 <ul>
 <li><a href="#rappels-sur-les-fractions-continues">Rappels sur les fractions continues</a>
 <ul>
-<li><a href="#developpement-fini---nombre-rationnel">Développement fini - nombre rationnel</a></li>
-<li><a href="#developpement-infini---nombre-irrationnel">Développement infini - nombre irrationnel</a></li>
+<li><a href="#développement-fini---nombre-rationnel">Développement fini - nombre rationnel</a></li>
+<li><a href="#développement-infini---nombre-irrationnel">Développement infini - nombre irrationnel</a></li>
 </ul></li>
-<li><a href="#ecriture-n-mq_k-q_k-1-r">Écriture <span class="math inline">\(n = mq_k + q_{k-1} + r\)</span></a></li>
-<li><a href="#theoreme-des-trois-distances">Théorème des trois distances</a></li>
+<li><a href="#écriture-n-mq_k-q_k-1-r">Écriture <span class="math inline">\(n = mq_k + q_{k-1} + r\)</span></a></li>
+<li><a href="#théorème-des-trois-distances">Théorème des trois distances</a></li>
 <li><a href="#application-epsilon-filet">Application : <span class="math inline">\(\epsilon\)</span>-filet</a></li>
 </ul>
 <p>Le théorème des trois distances, ou des trois longueurs, est à propos de la longueur des arcs qu’on obtient lorsqu’on place sur le cercle unité les points <span class="math inline">\(0\)</span>, <span class="math inline">\(\alpha\)</span>, <span class="math inline">\(2\alpha\)</span>, <span class="math inline">\(\ldots\)</span>, <span class="math inline">\(n\alpha\)</span>, où <span class="math inline">\(\alpha\)</span> est un nombre irrationnel.</p>
 <h2 id="rappels-sur-les-fractions-continues">Rappels sur les fractions continues</h2>
-<h3 id="developpement-fini---nombre-rationnel">Développement fini - nombre rationnel</h3>
+<h3 id="développement-fini---nombre-rationnel">Développement fini - nombre rationnel</h3>
 <p>Soient <span class="math inline">\(a_0\geq 0\)</span>, <span class="math inline">\(a_1 \geq 1\)</span>, <span class="math inline">\(\ldots\)</span>, <span class="math inline">\(a_N \geq 1\)</span> des nombres entiers. On définit le nombre rationnel <span class="math display">\[
 r_N = a_0 + \dfrac{1}{a_1 + \dfrac{1}{\cdots + \dfrac{1}{a_{N-1} + \dfrac{1}{a_N}}}}.
 \]</span> Le numérateur <span class="math inline">\(p_N\)</span> et le dénominateur <span class="math inline">\(q_N\)</span> de l’écriture fractionnaire irréductible <span class="math inline">\(r_n = \frac{p_N}{q_N}\)</span> s’obtiennent par récurrence avec les formules suivantes : <span class="math display">\[
@@ -128,37 +126,37 @@ p_n = a_n p_{n-1} + p_{n-2}, \, q_n = a_n q_{n-1} + q_{n-2}
 \end{cases}.
 \]</span> Notons qu’on a alors <span class="math inline">\(q_1 = a_1\)</span>.</p>
 <p>Voyons un exemple avec R. On prend <span class="math inline">\(a_0=0\)</span>, <span class="math inline">\(a_1=1\)</span>, <span class="math inline">\(a_2=2\)</span> et <span class="math inline">\(a_3=3\)</span>.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">a &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb1-2" title="2">( rN &lt;-<span class="st"> </span>a[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span>(a[<span class="dv">2</span>] <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span>(a[<span class="dv">3</span>] <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span>a[<span class="dv">4</span>])) )</a>
-<a class="sourceLine" id="cb1-3" title="3"><span class="co">## 0.7</span></a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>a &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>( rN &lt;-<span class="st"> </span>a[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span>(a[<span class="dv">2</span>] <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span>(a[<span class="dv">3</span>] <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span>a[<span class="dv">4</span>])) )</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="co">## 0.7</span></span></code></pre></div>
 <p>On peut obtenir <span class="math inline">\(r_N\)</span> avec la librairie <code>contfrac</code> :</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">library</span>(contfrac)</a>
-<a class="sourceLine" id="cb2-2" title="2">( rN &lt;-<span class="st"> </span><span class="kw">CF</span>(a, <span class="dt">finite=</span><span class="ot">TRUE</span>) )</a>
-<a class="sourceLine" id="cb2-3" title="3"><span class="co">## 0.7</span></a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">library</span>(contfrac)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>( rN &lt;-<span class="st"> </span><span class="kw">CF</span>(a, <span class="dt">finite=</span><span class="ot">TRUE</span>) )</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="co">## 0.7</span></span></code></pre></div>
 <p>Les entiers <span class="math inline">\(p_n\)</span> et <span class="math inline">\(q_n\)</span> s’obtiennent avec la fonction <code>convergents</code> :</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw">convergents</span>(a)</a>
-<a class="sourceLine" id="cb3-2" title="2"><span class="co">## $A</span></a>
-<a class="sourceLine" id="cb3-3" title="3"><span class="co">## [1] 0 1 2 7</span></a>
-<a class="sourceLine" id="cb3-4" title="4"><span class="co">## </span></a>
-<a class="sourceLine" id="cb3-5" title="5"><span class="co">## $B</span></a>
-<a class="sourceLine" id="cb3-6" title="6"><span class="co">## [1]  1  1  3 10</span></a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">convergents</span>(a)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="co">## $A</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="co">## [1] 0 1 2 7</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="co">## </span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a><span class="co">## $B</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a><span class="co">## [1]  1  1  3 10</span></span></code></pre></div>
 <p>Inversément, si on donne le nombre rationnel <span class="math inline">\(0.7\)</span> on peut obtenir son développement en fraction continue - les <span class="math inline">\(a_n\)</span> :</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="kw">as_cf</span>(<span class="fl">0.7</span>)</a>
-<a class="sourceLine" id="cb4-2" title="2"><span class="co">##  [1] 0.0000e+00 1.0000e+00 2.0000e+00 3.0000e+00 3.7530e+14 3.0000e+00</span></a>
-<a class="sourceLine" id="cb4-3" title="3"><span class="co">##  [7] 4.0000e+00 1.0000e+00 2.2518e+14 1.0000e+00</span></a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">as_cf</span>(<span class="fl">0.7</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="co">##  [1] 0.0000e+00 1.0000e+00 2.0000e+00 3.0000e+00 3.7530e+14 3.0000e+00</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="co">##  [7] 4.0000e+00 1.0000e+00 2.2518e+14 1.0000e+00</span></span></code></pre></div>
 <p>Comme on le voit, la fonction <code>as_cf</code> donne bien les entiers <span class="math inline">\(a_0=0\)</span>, <span class="math inline">\(a_1=1\)</span>, <span class="math inline">\(a_2=2\)</span> et <span class="math inline">\(a_3=3\)</span>, puis donne des <span class="math inline">\(a_n\)</span> curieux pour <span class="math inline">\(n \geq 4\)</span>. Cela vient du fait que <code>0.7</code> n’est pas parfaitement encodé en nombre “double” dans R :</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">print</span>(<span class="fl">0.7</span>, <span class="dt">digits=</span><span class="dv">20</span>)</a>
-<a class="sourceLine" id="cb5-2" title="2"><span class="co">## [1] 0.69999999999999996</span></a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="kw">print</span>(<span class="fl">0.7</span>, <span class="dt">digits=</span><span class="dv">20</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="co">## [1] 0.69999999999999995559</span></span></code></pre></div>
 <p>L’algorithme qui calcule les <span class="math inline">\(a_n\)</span> quand on donne un nombre rationnel <span class="math inline">\(x\)</span> est le suivant. Il calcule<br />
 <span class="math display">\[
 x_0=x, \, x_n = \frac{1}{\{x_{n-1}\}}
 \]</span> en s’arrêtant à l’indice <span class="math inline">\(N\)</span> lorsque <span class="math inline">\(x_N\)</span> est entier, puis calcule <span class="math inline">\(a_n = [x_n]\)</span>.</p>
-<h3 id="developpement-infini---nombre-irrationnel">Développement infini - nombre irrationnel</h3>
+<h3 id="développement-infini---nombre-irrationnel">Développement infini - nombre irrationnel</h3>
 <p>Lorsque <span class="math inline">\(x=\alpha&gt;0\)</span> est un nombre irrationnel, le même algorithme ne s’arrête jamais, et produit alors une suite <span class="math inline">\({(a_n)}_{n \geq 0}\)</span> - le développement en fraction continue de <span class="math inline">\(\alpha\)</span>.</p>
 <p>On a aussi les suites <span class="math inline">\({(p_n)}_{n \geq 0}\)</span> et <span class="math inline">\({(q_n)}_{n \geq 0}\)</span> définies de la même façon. On note de plus <span class="math display">\[
 \eta_n = |q_n\alpha-p_n|.  
 \]</span> La majoration <span class="math inline">\(\eta_n \leq \frac{1}{q_{n+1}}\)</span> est bien connue.</p>
-<h2 id="ecriture-n-mq_k-q_k-1-r">Écriture <span class="math inline">\(n = mq_k + q_{k-1} + r\)</span></h2>
+<h2 id="écriture-n-mq_k-q_k-1-r">Écriture <span class="math inline">\(n = mq_k + q_{k-1} + r\)</span></h2>
 <p>Soit <span class="math inline">\(\alpha \in ]0,1[\)</span> un nombre irrationnel. On note <span class="math inline">\({(a_n)}_{n \geq 0}\)</span> son développement en fraction continue.<br />
 Du fait que <span class="math inline">\(\alpha &lt; 1\)</span>, le premier “chiffre” <span class="math inline">\(a_0\)</span> est <span class="math inline">\(0\)</span>.</p>
 <p>Tout nombre entier <span class="math inline">\(n \geq a_1+1\)</span> s’écrit de façon unique <span class="math display">\[
@@ -172,27 +170,27 @@ mq_k + q_{k-1}  %= (m-1) q_k + q_{k-1} + q_k
 \]</span> et finalement <span class="math display">\[
 r = n - (m q_k + q_{k-1})
 \]</span> La fonction ci-dessous retourne <span class="math inline">\(k\)</span>, <span class="math inline">\(m\)</span> et <span class="math inline">\(r\)</span>, et prend en entrée <span class="math inline">\((a_1, a_2, \ldots)\)</span> et <span class="math inline">\(n\)</span> :</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">f &lt;-<span class="st"> </span><span class="cf">function</span>(a, n){</a>
-<a class="sourceLine" id="cb6-2" title="2">  <span class="cf">if</span>(n <span class="op">&lt;</span><span class="st"> </span>a[<span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>) <span class="kw">stop</span>(<span class="kw">sprintf</span>(<span class="st">&quot;m must be &gt;= %s&quot;</span>, a[<span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb6-3" title="3">  q &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, a[<span class="dv">1</span>])</a>
-<a class="sourceLine" id="cb6-4" title="4">  k &lt;-<span class="st"> </span><span class="dv">1</span>; <span class="cf">while</span>(q[k<span class="op">+</span><span class="dv">1</span>]<span class="op">+</span>q[k] <span class="op">&lt;=</span><span class="st"> </span>n){</a>
-<a class="sourceLine" id="cb6-5" title="5">    q &lt;-<span class="st"> </span><span class="kw">c</span>(q, a[k<span class="op">+</span><span class="dv">1</span>]<span class="op">*</span>q[k<span class="op">+</span><span class="dv">1</span>]<span class="op">+</span>q[k])</a>
-<a class="sourceLine" id="cb6-6" title="6">    k &lt;-<span class="st"> </span>k<span class="op">+</span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb6-7" title="7">  }</a>
-<a class="sourceLine" id="cb6-8" title="8">  m &lt;-<span class="st"> </span><span class="dv">1</span>; <span class="cf">while</span>(m<span class="op">*</span>q[k] <span class="op">+</span><span class="st"> </span>q[k<span class="dv">-1</span>] <span class="op">+</span><span class="st"> </span>q[k] <span class="op">&lt;=</span><span class="st"> </span>n){</a>
-<a class="sourceLine" id="cb6-9" title="9">    m &lt;-<span class="st"> </span>m<span class="op">+</span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb6-10" title="10">  }</a>
-<a class="sourceLine" id="cb6-11" title="11">  r &lt;-<span class="st"> </span>n<span class="op">-</span>(m<span class="op">*</span>q[k]<span class="op">+</span>q[k<span class="dv">-1</span>])</a>
-<a class="sourceLine" id="cb6-12" title="12">  <span class="kw">cat</span>(<span class="kw">sprintf</span>(<span class="st">&quot;k=%s, m=%s, r=%s</span><span class="ch">\n</span><span class="st">&quot;</span>, k<span class="dv">-1</span>, m, r))</a>
-<a class="sourceLine" id="cb6-13" title="13">  <span class="kw">return</span>(<span class="kw">invisible</span>(<span class="kw">list</span>(<span class="dt">k=</span>k<span class="dv">-1</span>, <span class="dt">m=</span>m, <span class="dt">r=</span>r)))</a>
-<a class="sourceLine" id="cb6-14" title="14">}</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>f &lt;-<span class="st"> </span><span class="cf">function</span>(a, n){</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>  <span class="cf">if</span>(n <span class="op">&lt;</span><span class="st"> </span>a[<span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>) <span class="kw">stop</span>(<span class="kw">sprintf</span>(<span class="st">&quot;m must be &gt;= %s&quot;</span>, a[<span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>))</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>  q &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, a[<span class="dv">1</span>])</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>  k &lt;-<span class="st"> </span><span class="dv">1</span>; <span class="cf">while</span>(q[k<span class="op">+</span><span class="dv">1</span>]<span class="op">+</span>q[k] <span class="op">&lt;=</span><span class="st"> </span>n){</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>    q &lt;-<span class="st"> </span><span class="kw">c</span>(q, a[k<span class="op">+</span><span class="dv">1</span>]<span class="op">*</span>q[k<span class="op">+</span><span class="dv">1</span>]<span class="op">+</span>q[k])</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>    k &lt;-<span class="st"> </span>k<span class="op">+</span><span class="dv">1</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a>  }</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a>  m &lt;-<span class="st"> </span><span class="dv">1</span>; <span class="cf">while</span>(m<span class="op">*</span>q[k] <span class="op">+</span><span class="st"> </span>q[k<span class="dv">-1</span>] <span class="op">+</span><span class="st"> </span>q[k] <span class="op">&lt;=</span><span class="st"> </span>n){</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a>    m &lt;-<span class="st"> </span>m<span class="op">+</span><span class="dv">1</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a>  }</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a>  r &lt;-<span class="st"> </span>n<span class="op">-</span>(m<span class="op">*</span>q[k]<span class="op">+</span>q[k<span class="dv">-1</span>])</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a>  <span class="kw">cat</span>(<span class="kw">sprintf</span>(<span class="st">&quot;k=%s, m=%s, r=%s</span><span class="ch">\n</span><span class="st">&quot;</span>, k<span class="dv">-1</span>, m, r))</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a>  <span class="kw">return</span>(<span class="kw">invisible</span>(<span class="kw">list</span>(<span class="dt">k=</span>k<span class="dv">-1</span>, <span class="dt">m=</span>m, <span class="dt">r=</span>r)))</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a>}</span></code></pre></div>
 <p>Prenons par exemple <span class="math inline">\(a_1=2\)</span>, <span class="math inline">\(a_2=3\)</span>, <span class="math inline">\(a_3=2\)</span>, <span class="math inline">\(a_4=4\)</span> (rappelons que <span class="math inline">\(a_0=0\)</span>). Cela donne <span class="math inline">\(q_1=2\)</span>, <span class="math inline">\(q_2 = 7\)</span>, <span class="math inline">\(q_3 = 16\)</span>. Et prenons<br />
 <span class="math display">\[
 n = 2 \times q_3 + q_2 + 1 = 40
 \]</span></p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="kw">f</span>(<span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">2</span>,<span class="dv">4</span>), <span class="dv">40</span>)</a>
-<a class="sourceLine" id="cb7-2" title="2"><span class="co">## k=3, m=2, r=1</span></a></code></pre></div>
-<h2 id="theoreme-des-trois-distances">Théorème des trois distances</h2>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="kw">f</span>(<span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">2</span>,<span class="dv">4</span>), <span class="dv">40</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="co">## k=3, m=2, r=1</span></span></code></pre></div>
+<h2 id="théorème-des-trois-distances">Théorème des trois distances</h2>
 <p>Soit <span class="math inline">\(\alpha \in ]0,1[\)</span> un nombre irrationnel et <span class="math inline">\(n\)</span> un nombre entier. Si on place successivement les points <span class="math inline">\(0\)</span>, <span class="math inline">\(\alpha\)</span>, <span class="math inline">\(2\alpha\)</span>, <span class="math inline">\(\ldots\)</span>, <span class="math inline">\(n\alpha\)</span> sur le cercle unité, on dépasse un tour de cercle du moment que <span class="math inline">\(n \geq a_1+1\)</span>.</p>
 <p>Ces points partitionnent le cercle en un certain nombre d’arcs :</p>
 <p><img src="./figures/Thm3D-circle-1.png" style="display: block; margin: auto;" /></p>
@@ -261,20 +259,6 @@ n = m q_k + q_{k-1} + r.
 <!-- <script>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
-
-  <!-- Google Prettify -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-  <script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
-  <script>
-    var pres = document.getElementsByTagName("pre");
-    for (var i = 0; i < pres.length; ++i) {
-      
-        pres[i].className = pres[i].className + " prettyprint";
-      
-    }
-    prettyPrint();
-  </script> 
 
 
 </html>

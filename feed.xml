@@ -7,6 +7,308 @@
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
     <lastBuildDate>Thu, 22 Oct 2020 00:00:00 UT</lastBuildDate>
     <item>
+      <title>Back to the parametric Hopf torus</title>
+      <link>https://laustep.github.io/stlahblog/posts/HopfTorus2.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        In a <a href="https://laustep.github.io/stlahblog/posts/HopfTorusParametric.html">previous post</a>, I explained
+        how to get a parameterization of a Hopf cylinder or torus. There is a
+        clearer way, which I present here.
+      </p>
+      <p>
+        For the Hopf map, the preimage of a point
+        <span class="math inline">\(p=(p_x,p_y,p_z)\)</span> on the unit sphere
+        <span class="math inline">\(S^2\)</span> is the circle on
+        <span class="math inline">\(S^3\)</span> with parametrization:
+        <span class="math display"
+          >\[ \begin{array}{ccc} \mathcal{C}_p \colon &amp; (0,2\pi[ &amp;
+          \longrightarrow &amp; S^3 \\ &amp; \phi &amp; \longmapsto &amp;
+          \mathcal{C}_p(\phi) \end{array} \]</span
+        >
+        where
+        <span class="math display"
+          >\[ \mathcal{C}_p(\phi) = \frac{1}{\sqrt{2(1+p_z)}} \begin{pmatrix}
+          (1+p_z) \cos(\phi) \\ p_x \sin(\phi) - p_y \cos(\phi) \\ p_x
+          \cos(\phi) + p_y \sin(\phi) \\ (1+p_z) \sin(\phi) \end{pmatrix}.
+          \]</span
+        >
+      </p>
+      <p>
+        Now consider a spherical curve. That is, let
+        <span class="math inline">\(\Gamma\)</span> be a function mapping an
+        interval <span class="math inline">\(I \subset \mathbb{R}\)</span> to
+        the unit sphere <span class="math inline">\(S^2\)</span>. Then the Hopf
+        cylinder corresponding to
+        <span class="math inline">\(\Gamma\)</span> has parameterization
+        <span class="math display"
+          >\[ \begin{array}{ccc} H_\Gamma \colon &amp; I \times (0,2\pi[ &amp;
+          \longrightarrow &amp; S^3 \\ &amp; (t, \phi) &amp; \longmapsto &amp;
+          \mathcal{C}_{\Gamma(t)}(\phi) \end{array}. \]</span
+        >
+        Recall the
+        <a href="https://laustep.github.io/stlahblog/posts/HopfTorusTennisBall.html">tennis ball curve</a> example,
+        given for a real constant <span class="math inline">\(A\)</span> and an
+        integer constant <span class="math inline">\(n\)</span> by:
+        <span class="math display"
+          >\[ \Gamma(t) = \begin{pmatrix} \sin\bigl(\pi/2 - (\pi/2 - A)
+          \cos(nt)\bigr) \cos\bigl(t + A \sin(2nt)\bigr) \\ \sin\bigl(\pi/2 -
+          (\pi/2 - A) \cos(nt)\bigr) \sin\bigl(t + A \sin(2nt)\bigr) \\
+          \cos\bigl(\pi/2 - (\pi/2 - A) \cos(nt)\bigr) \end{pmatrix}, \quad t
+          \in (0,2\pi[. \]</span
+        >
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb1-1">A &lt;-<span class="st"> </span><span class="fl">0.44</span></span>
+<span id="cb1-2">n &lt;-<span class="st"> </span><span class="dv">3</span></span>
+<span id="cb1-3">Gamma &lt;-<span class="st"> </span><span class="cf">function</span>(t){</span>
+<span id="cb1-4">  alpha &lt;-<span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span>(pi<span class="op">/</span><span class="dv">2</span><span class="op">-</span>A)<span class="op">*</span><span class="kw">cos</span>(n<span class="op">*</span>t)</span>
+<span id="cb1-5">  beta &lt;-<span class="st"> </span>t <span class="op">+</span><span class="st"> </span>A<span class="op">*</span><span class="kw">sin</span>(<span class="dv">2</span><span class="op">*</span>n<span class="op">*</span>t)</span>
+<span id="cb1-6">  <span class="kw">c</span>(</span>
+<span id="cb1-7">    <span class="kw">sin</span>(alpha) <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(beta),</span>
+<span id="cb1-8">    <span class="kw">sin</span>(alpha) <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(beta),</span>
+<span id="cb1-9">    <span class="kw">cos</span>(alpha)</span>
+<span id="cb1-10">  )</span>
+<span id="cb1-11">}</span>
+<span id="cb1-12">HopfInverse &lt;-<span class="st"> </span><span class="cf">function</span>(p, phi){</span>
+<span id="cb1-13">  <span class="kw">c</span>(</span>
+<span id="cb1-14">    (<span class="dv">1</span><span class="op">+</span>p[<span class="dv">3</span>])<span class="op">*</span><span class="kw">cos</span>(phi),</span>
+<span id="cb1-15">    p[<span class="dv">1</span>]<span class="op">*</span><span class="kw">sin</span>(phi) <span class="op">-</span><span class="st"> </span>p[<span class="dv">2</span>]<span class="op">*</span><span class="kw">cos</span>(phi), </span>
+<span id="cb1-16">    p[<span class="dv">1</span>]<span class="op">*</span><span class="kw">cos</span>(phi) <span class="op">+</span><span class="st"> </span>p[<span class="dv">2</span>]<span class="op">*</span><span class="kw">sin</span>(phi),</span>
+<span id="cb1-17">    (<span class="dv">1</span><span class="op">+</span>p[<span class="dv">3</span>])<span class="op">*</span><span class="kw">sin</span>(phi)</span>
+<span id="cb1-18">  ) <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="dv">2</span><span class="op">*</span>(<span class="dv">1</span><span class="op">+</span>p[<span class="dv">3</span>])) </span>
+<span id="cb1-19">}</span>
+<span id="cb1-20">Stereo &lt;-<span class="st"> </span><span class="cf">function</span>(q){</span>
+<span id="cb1-21">  <span class="dv">2</span><span class="op">*</span>q[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>] <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span><span class="op">-</span>q[<span class="dv">4</span>])</span>
+<span id="cb1-22">}</span>
+<span id="cb1-23">F &lt;-<span class="st"> </span><span class="cf">function</span>(t, phi){</span>
+<span id="cb1-24">  <span class="kw">Stereo</span>(<span class="kw">HopfInverse</span>(<span class="kw">Gamma</span>(t), phi))</span>
+<span id="cb1-25">}</span></code></pre>
+      </div>
+      <p>
+        Now we’re ready to plot the stereographic projection of the Hopf torus
+        with <code>misc3d</code>:
+      </p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb2-1">fx &lt;-<span class="st"> </span><span class="kw">Vectorize</span>(<span class="cf">function</span>(u,v) <span class="kw">F</span>(u,v)[<span class="dv">1</span>])</span>
+<span id="cb2-2">fy &lt;-<span class="st"> </span><span class="kw">Vectorize</span>(<span class="cf">function</span>(u,v) <span class="kw">F</span>(u,v)[<span class="dv">2</span>])</span>
+<span id="cb2-3">fz &lt;-<span class="st"> </span><span class="kw">Vectorize</span>(<span class="cf">function</span>(u,v) <span class="kw">F</span>(u,v)[<span class="dv">3</span>])</span>
+<span id="cb2-4"><span class="kw">library</span>(misc3d)</span>
+<span id="cb2-5"><span class="kw">parametric3d</span>(fx, fy, fz, <span class="dt">umin =</span> <span class="dv">0</span>, <span class="dt">umax =</span> <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">vmin =</span> <span class="dv">0</span>, <span class="dt">vmax =</span> <span class="dv">2</span><span class="op">*</span>pi, </span>
+<span id="cb2-6">             <span class="dt">n =</span> <span class="dv">300</span>, <span class="dt">smooth =</span> <span class="ot">TRUE</span>, <span class="dt">color =</span> <span class="st">"#363940"</span>)</span>
+<span id="cb2-7">rgl<span class="op">::</span><span class="kw">view3d</span>(<span class="dv">90</span>, <span class="dv">0</span>, <span class="dt">zoom =</span> <span class="fl">0.65</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/HopfTorus_grey.png"
+        />
+      </p>
+      <p>
+        A ring cyclide is a Hopf torus. It corresponds to the case when
+        <span class="math inline">\(\Gamma\)</span> describes a circle on the
+        unit sphere <span class="math inline">\(S^2\)</span>. Below is a R
+        function to compute such a circle.
+      </p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb3-1"><span class="co"># helper function: plane passing by points p1, p2, p3 </span></span>
+<span id="cb3-2">plane3pts &lt;-<span class="st"> </span><span class="cf">function</span>(p1,p2,p3){ </span>
+<span id="cb3-3">    xcoef &lt;-<span class="st"> </span>(p1[<span class="dv">2</span>]<span class="op">-</span>p2[<span class="dv">2</span>])<span class="op">*</span>(p2[<span class="dv">3</span>]<span class="op">-</span>p3[<span class="dv">3</span>])<span class="op">-</span>(p1[<span class="dv">3</span>]<span class="op">-</span>p2[<span class="dv">3</span>])<span class="op">*</span>(p2[<span class="dv">2</span>]<span class="op">-</span>p3[<span class="dv">2</span>])</span>
+<span id="cb3-4">    ycoef &lt;-<span class="st"> </span>(p1[<span class="dv">3</span>]<span class="op">-</span>p2[<span class="dv">3</span>])<span class="op">*</span>(p2[<span class="dv">1</span>]<span class="op">-</span>p3[<span class="dv">1</span>])<span class="op">-</span>(p1[<span class="dv">1</span>]<span class="op">-</span>p2[<span class="dv">1</span>])<span class="op">*</span>(p2[<span class="dv">3</span>]<span class="op">-</span>p3[<span class="dv">3</span>])</span>
+<span id="cb3-5">    zcoef &lt;-<span class="st"> </span>(p1[<span class="dv">1</span>]<span class="op">-</span>p2[<span class="dv">1</span>])<span class="op">*</span>(p2[<span class="dv">2</span>]<span class="op">-</span>p3[<span class="dv">2</span>])<span class="op">-</span>(p1[<span class="dv">2</span>]<span class="op">-</span>p2[<span class="dv">2</span>])<span class="op">*</span>(p2[<span class="dv">1</span>]<span class="op">-</span>p3[<span class="dv">1</span>])</span>
+<span id="cb3-6">    offset &lt;-<span class="st"> </span>p1[<span class="dv">1</span>]<span class="op">*</span>xcoef <span class="op">+</span><span class="st"> </span>p1[<span class="dv">2</span>]<span class="op">*</span>ycoef <span class="op">+</span><span class="st"> </span>p1[<span class="dv">3</span>]<span class="op">*</span>zcoef</span>
+<span id="cb3-7">    <span class="kw">c</span>(xcoef, ycoef, zcoef, offset)</span>
+<span id="cb3-8">}</span>
+<span id="cb3-9"></span>
+<span id="cb3-10"><span class="co"># helper function: cross product </span></span>
+<span id="cb3-11">cross &lt;-<span class="st"> </span><span class="cf">function</span>(v, w){ </span>
+<span id="cb3-12">  <span class="kw">c</span>(</span>
+<span id="cb3-13">    v[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>w[<span class="dv">3</span>] <span class="op">-</span><span class="st"> </span>v[<span class="dv">3</span>] <span class="op">*</span><span class="st"> </span>w[<span class="dv">2</span>], </span>
+<span id="cb3-14">    v[<span class="dv">3</span>] <span class="op">*</span><span class="st"> </span>w[<span class="dv">1</span>] <span class="op">-</span><span class="st"> </span>v[<span class="dv">1</span>] <span class="op">*</span><span class="st"> </span>w[<span class="dv">3</span>], </span>
+<span id="cb3-15">    v[<span class="dv">1</span>] <span class="op">*</span><span class="st"> </span>w[<span class="dv">2</span>] <span class="op">-</span><span class="st"> </span>v[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>w[<span class="dv">1</span>]</span>
+<span id="cb3-16">  )</span>
+<span id="cb3-17">}</span>
+<span id="cb3-18"></span>
+<span id="cb3-19"><span class="co"># circle passing by points three points p1, p2, p3 </span></span>
+<span id="cb3-20"><span class="co"># given in Cartesian coordinates</span></span>
+<span id="cb3-21">circle3pts &lt;-<span class="st"> </span><span class="cf">function</span>(p1, p2, p3){</span>
+<span id="cb3-22">  p12 &lt;-<span class="st"> </span>(p1<span class="op">+</span>p2)<span class="op">/</span><span class="dv">2</span></span>
+<span id="cb3-23">  p23 &lt;-<span class="st"> </span>(p2<span class="op">+</span>p3)<span class="op">/</span><span class="dv">2</span></span>
+<span id="cb3-24">  v12 &lt;-<span class="st"> </span>p2<span class="op">-</span>p1</span>
+<span id="cb3-25">  v23 &lt;-<span class="st"> </span>p3<span class="op">-</span>p2</span>
+<span id="cb3-26">  plane &lt;-<span class="st"> </span><span class="kw">plane3pts</span>(p1, p2, p3)</span>
+<span id="cb3-27">  A &lt;-<span class="st"> </span><span class="kw">rbind</span>(plane[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>], v12, v23)</span>
+<span id="cb3-28">  b &lt;-<span class="st"> </span><span class="kw">c</span>(plane[<span class="dv">4</span>], <span class="kw">sum</span>(p12<span class="op">*</span>v12), <span class="kw">sum</span>(p23<span class="op">*</span>v23))</span>
+<span id="cb3-29">  center &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">solve</span>(A) <span class="op">%*%</span><span class="st"> </span>b)</span>
+<span id="cb3-30">  r &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(p1<span class="op">-</span>center)))</span>
+<span id="cb3-31">  i &lt;-<span class="st"> </span>(p1<span class="op">-</span>center) <span class="op">/</span><span class="st"> </span>r</span>
+<span id="cb3-32">  normal &lt;-<span class="st"> </span>plane[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>] <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(plane[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>])))</span>
+<span id="cb3-33">  <span class="kw">list</span>(<span class="dt">center =</span> center, <span class="dt">radius =</span> r, <span class="dt">i =</span> i, <span class="dt">j =</span> <span class="kw">cross</span>(i,normal))</span>
+<span id="cb3-34">} <span class="co"># circle parameterization: center + radius*(cos(t)*i + sin(t)*j)</span></span>
+<span id="cb3-35"></span>
+<span id="cb3-36"><span class="co"># circle on unit sphere passing by three points </span></span>
+<span id="cb3-37"><span class="co"># given in spherical coordinates </span></span>
+<span id="cb3-38">circleOnUnitSphere &lt;-<span class="st"> </span><span class="cf">function</span>(thph1, thph2, thph3){</span>
+<span id="cb3-39">  theta1 &lt;-<span class="st"> </span>thph1[<span class="dv">1</span>]; phi1 &lt;-<span class="st"> </span>thph1[<span class="dv">2</span>]</span>
+<span id="cb3-40">  theta2 &lt;-<span class="st"> </span>thph2[<span class="dv">1</span>]; phi2 &lt;-<span class="st"> </span>thph2[<span class="dv">2</span>]</span>
+<span id="cb3-41">  theta3 &lt;-<span class="st"> </span>thph3[<span class="dv">1</span>]; phi3 &lt;-<span class="st"> </span>thph3[<span class="dv">2</span>]</span>
+<span id="cb3-42">  p1 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">sin</span>(theta1)<span class="op">*</span><span class="kw">cos</span>(phi1), <span class="kw">sin</span>(theta1)<span class="op">*</span><span class="kw">sin</span>(phi1), <span class="kw">cos</span>(theta1))</span>
+<span id="cb3-43">  p2 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">sin</span>(theta2)<span class="op">*</span><span class="kw">cos</span>(phi2), <span class="kw">sin</span>(theta2)<span class="op">*</span><span class="kw">sin</span>(phi2), <span class="kw">cos</span>(theta2))</span>
+<span id="cb3-44">  p3 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">sin</span>(theta3)<span class="op">*</span><span class="kw">cos</span>(phi3), <span class="kw">sin</span>(theta3)<span class="op">*</span><span class="kw">sin</span>(phi3), <span class="kw">cos</span>(theta3))</span>
+<span id="cb3-45">  <span class="kw">circle3pts</span>(p1, p2, p3)</span>
+<span id="cb3-46">}</span></code></pre>
+      </div>
+      <p>
+        The function returns a list with four elements: a point
+        <code>center</code>, a number <code>radius</code>, and two vectors
+        <code>i</code> and <code>j</code>. The parameterization of the spherical
+        circle is then <code>center + radius*(cos(t)*i + sin(t)*j)</code> for
+        <code>t</code> <span class="math inline">\(\in (0, 2\pi[\)</span>.
+      </p>
+      <p>
+        Let’s try. We enter three pairs of spherical coordinates and we apply
+        the <code>circleOnUnitSphere</code> function:
+      </p>
+      <div class="sourceCode" id="cb4">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb4-1">thph1 =<span class="st"> </span><span class="kw">c</span>(<span class="fl">1.3</span>, <span class="fl">1.5</span>)</span>
+<span id="cb4-2">thph2 =<span class="st"> </span><span class="kw">c</span>(<span class="fl">1.9</span>, <span class="fl">2.8</span>)</span>
+<span id="cb4-3">thph3 =<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb4-4">circ &lt;-<span class="st"> </span><span class="kw">circleOnUnitSphere</span>(thph1, thph2, thph3)</span></code></pre>
+      </div>
+      <p>
+        Then we define the parametrization of the stereographically projected
+        Hopf torus:
+      </p>
+      <div class="sourceCode" id="cb5">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb5-1">F &lt;-<span class="st"> </span><span class="cf">function</span>(t, phi){</span>
+<span id="cb5-2">  p &lt;-<span class="st"> </span><span class="kw">with</span>(circ, center <span class="op">+</span><span class="st"> </span>radius<span class="op">*</span>(<span class="kw">cos</span>(t)<span class="op">*</span>i <span class="op">+</span><span class="st"> </span><span class="kw">sin</span>(t)<span class="op">*</span>j))</span>
+<span id="cb5-3">  <span class="kw">Stereo</span>(<span class="kw">HopfInverse</span>(p, phi))</span>
+<span id="cb5-4">}</span></code></pre>
+      </div>
+      <p>And we plot:</p>
+      <div class="sourceCode" id="cb6">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb6-1"><span class="kw">parametric3d</span>(fx, fy, fz, <span class="dt">umin =</span> <span class="dv">0</span>, <span class="dt">umax =</span> <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">vmin =</span> <span class="dv">0</span>, <span class="dt">vmax =</span> <span class="dv">2</span><span class="op">*</span>pi, </span>
+<span id="cb6-2">             <span class="dt">n =</span> <span class="dv">250</span>, <span class="dt">smooth =</span> <span class="ot">TRUE</span>, <span class="dt">color =</span> <span class="st">"#363940"</span>)</span>
+<span id="cb6-3">rgl<span class="op">::</span><span class="kw">view3d</span>(<span class="dv">90</span>, <span class="dv">0</span>, <span class="dt">zoom =</span> <span class="fl">0.65</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/cyclide_grey.png"
+        />
+      </p>
+      <p>
+        By rotating our spherical circle about the
+        <span class="math inline">\(z\)</span>-axis, we can obtain the
+        <a href="https://laustep.github.io/stlahblog/posts/linkedCyclidesParametric.html">linked cyclides</a>. Below is
+        a R function to perform a rotation in spherical coordinates. See
+        <a
+          href="http://stla.github.io/stlapblog/posts/RotationSphericalCoordinates.html"
+          >this post</a
+        >
+        on my former blog for some explanations.
+      </p>
+      <div class="sourceCode" id="cb7">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb7-1"><span class="co"># helper functions: basic rotations ####</span></span>
+<span id="cb7-2">Rx &lt;-<span class="st"> </span><span class="cf">function</span>(alpha){</span>
+<span id="cb7-3">  <span class="kw">rbind</span>(<span class="kw">c</span>(<span class="kw">cos</span>(alpha<span class="op">/</span><span class="dv">2</span>), <span class="op">-</span>1i<span class="op">*</span><span class="kw">sin</span>(alpha<span class="op">/</span><span class="dv">2</span>)),</span>
+<span id="cb7-4">        <span class="kw">c</span>(<span class="op">-</span>1i<span class="op">*</span><span class="kw">sin</span>(alpha<span class="op">/</span><span class="dv">2</span>), <span class="kw">cos</span>(alpha<span class="op">/</span><span class="dv">2</span>)))</span>
+<span id="cb7-5">}</span>
+<span id="cb7-6">Ry &lt;-<span class="st"> </span><span class="cf">function</span>(alpha){</span>
+<span id="cb7-7">  <span class="kw">rbind</span>(<span class="kw">c</span>(<span class="kw">cos</span>(alpha<span class="op">/</span><span class="dv">2</span>), <span class="op">-</span><span class="kw">sin</span>(alpha<span class="op">/</span><span class="dv">2</span>)),</span>
+<span id="cb7-8">        <span class="kw">c</span>(<span class="kw">sin</span>(alpha<span class="op">/</span><span class="dv">2</span>), <span class="kw">cos</span>(alpha<span class="op">/</span><span class="dv">2</span>)))</span>
+<span id="cb7-9">}</span>
+<span id="cb7-10">Rz &lt;-<span class="st"> </span><span class="cf">function</span>(alpha){</span>
+<span id="cb7-11">  <span class="kw">rbind</span>(<span class="kw">c</span>(<span class="kw">exp</span>(<span class="op">-</span>1i<span class="op">*</span>alpha<span class="op">/</span><span class="dv">2</span>), <span class="dv">0</span>),</span>
+<span id="cb7-12">        <span class="kw">c</span>(<span class="dv">0</span>, <span class="kw">exp</span>(1i<span class="op">*</span>alpha<span class="op">/</span><span class="dv">2</span>)))</span>
+<span id="cb7-13">}</span>
+<span id="cb7-14"></span>
+<span id="cb7-15"><span class="co"># 3D rotation in spherical coordinates ####</span></span>
+<span id="cb7-16"><span class="co">#' @description Rotation of a vector given in spherical coordinates.</span></span>
+<span id="cb7-17"><span class="co">#' @param theta_phi spherical coordinates, a vector containing the </span></span>
+<span id="cb7-18"><span class="co">#' colatitude (or polar angle), between 0 and pi, and the longitude </span></span>
+<span id="cb7-19"><span class="co">#' (or azimuthal angle), between 0 and 2pi</span></span>
+<span id="cb7-20"><span class="co">#' @param axis either a letter 'x', 'y' or 'z', a numeric vector of </span></span>
+<span id="cb7-21"><span class="co">#' length 2 (the spherical coordinates of the axis), or a numeric </span></span>
+<span id="cb7-22"><span class="co">#' vector of length 3 (the Cartesian coordinates of the axis)</span></span>
+<span id="cb7-23"><span class="co">#' @param alpha angle of rotation</span></span>
+<span id="cb7-24"><span class="co">#' @return The spherical coordinates of the transformed vector.</span></span>
+<span id="cb7-25">rotation &lt;-<span class="st"> </span><span class="cf">function</span>(theta_phi, <span class="dt">axis=</span><span class="st">"x"</span>, alpha){</span>
+<span id="cb7-26">  <span class="cf">if</span>(<span class="kw">is.character</span>(axis)){</span>
+<span id="cb7-27">    axis &lt;-<span class="st"> </span><span class="kw">match.arg</span>(axis, <span class="kw">c</span>(<span class="st">"x"</span>,<span class="st">"y"</span>,<span class="st">"z"</span>))</span>
+<span id="cb7-28">    R &lt;-<span class="st"> </span><span class="cf">switch</span>(axis, </span>
+<span id="cb7-29">                <span class="st">"x"</span> =<span class="st"> </span><span class="kw">Rx</span>(alpha),</span>
+<span id="cb7-30">                <span class="st">"y"</span> =<span class="st"> </span><span class="kw">Ry</span>(alpha),</span>
+<span id="cb7-31">                <span class="st">"z"</span> =<span class="st"> </span><span class="kw">Rz</span>(alpha))</span>
+<span id="cb7-32">  }<span class="cf">else</span> <span class="cf">if</span>(<span class="kw">length</span>(axis) <span class="op">==</span><span class="st"> </span><span class="dv">2</span>){</span>
+<span id="cb7-33">    Theta &lt;-<span class="st"> </span>axis[<span class="dv">1</span>]; Phi &lt;-<span class="st"> </span>axis[<span class="dv">2</span>]</span>
+<span id="cb7-34">    R &lt;-<span class="st"> </span><span class="kw">Rz</span>(Phi) <span class="op">%*%</span><span class="st"> </span><span class="kw">Ry</span>(Theta) <span class="op">%*%</span><span class="st"> </span><span class="kw">Rz</span>(alpha) <span class="op">%*%</span><span class="st"> </span></span>
+<span id="cb7-35"><span class="st">           </span><span class="kw">t</span>(<span class="kw">Ry</span>(Theta)) <span class="op">%*%</span><span class="st"> </span><span class="kw">t</span>(<span class="kw">Conj</span>(<span class="kw">Rz</span>(Phi)))</span>
+<span id="cb7-36">  }<span class="cf">else</span> <span class="cf">if</span>(<span class="kw">length</span>(axis) <span class="op">==</span><span class="st"> </span><span class="dv">3</span>){</span>
+<span id="cb7-37">    axis &lt;-<span class="st"> </span>axis <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(axis)))</span>
+<span id="cb7-38">    X &lt;-<span class="st"> </span><span class="kw">rbind</span>(<span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">0</span>))</span>
+<span id="cb7-39">    Y &lt;-<span class="st"> </span><span class="kw">rbind</span>(<span class="kw">c</span>(<span class="dv">0</span>,<span class="op">-</span>1i), <span class="kw">c</span>(1i,<span class="dv">0</span>)) </span>
+<span id="cb7-40">    Z &lt;-<span class="st"> </span><span class="kw">rbind</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">0</span>), <span class="kw">c</span>(<span class="dv">0</span>,<span class="op">-</span><span class="dv">1</span>))</span>
+<span id="cb7-41">    R &lt;-<span class="st"> </span><span class="kw">cos</span>(alpha<span class="op">/</span><span class="dv">2</span>)<span class="op">*</span><span class="kw">diag</span>(<span class="dv">2</span>) <span class="op">-</span><span class="st"> </span>1i<span class="op">*</span><span class="kw">sin</span>(alpha<span class="op">/</span><span class="dv">2</span>) <span class="op">*</span><span class="st"> </span></span>
+<span id="cb7-42"><span class="st">           </span>(axis[<span class="dv">1</span>]<span class="op">*</span>X <span class="op">+</span><span class="st"> </span>axis[<span class="dv">2</span>]<span class="op">*</span>Y <span class="op">+</span><span class="st"> </span>axis[<span class="dv">3</span>]<span class="op">*</span>Z)</span>
+<span id="cb7-43">  }<span class="cf">else</span>{</span>
+<span id="cb7-44">    <span class="kw">stop</span>(<span class="st">"`axis` must be either:</span></span>
+<span id="cb7-45"><span class="st">         - a letter ('x', 'y' or 'z')</span></span>
+<span id="cb7-46"><span class="st">         - a numeric vector of length two (spherical coordinates)</span></span>
+<span id="cb7-47"><span class="st">         - a numeric vector of length three (Cartesian coordinates)"</span>)</span>
+<span id="cb7-48">  }</span>
+<span id="cb7-49">  theta &lt;-<span class="st"> </span>theta_phi[<span class="dv">1</span>]; phi &lt;-<span class="st"> </span>theta_phi[<span class="dv">2</span>]</span>
+<span id="cb7-50">  qubit &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">cos</span>(theta<span class="op">/</span><span class="dv">2</span>), <span class="kw">exp</span>(1i<span class="op">*</span>phi)<span class="op">*</span><span class="kw">sin</span>(theta<span class="op">/</span><span class="dv">2</span>))</span>
+<span id="cb7-51">  newqubit &lt;-<span class="st"> </span>R <span class="op">%*%</span><span class="st"> </span>qubit</span>
+<span id="cb7-52">  z0 &lt;-<span class="st"> </span>newqubit[<span class="dv">1</span>,<span class="dv">1</span>]; z1 &lt;-<span class="st"> </span>newqubit[<span class="dv">2</span>,<span class="dv">1</span>]</span>
+<span id="cb7-53">  <span class="kw">c</span>(<span class="dv">2</span><span class="op">*</span><span class="kw">atan</span>(<span class="kw">Mod</span>(z1)<span class="op">/</span><span class="kw">Mod</span>(z0)), <span class="kw">Arg</span>(z1)<span class="op">-</span><span class="kw">Arg</span>(z0))</span>
+<span id="cb7-54">}</span></code></pre>
+      </div>
+      <p>Now, let’s rotate our spherical circle and plot:</p>
+      <div class="sourceCode" id="cb8">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb8-1">thph1 &lt;-<span class="st"> </span><span class="kw">rotation</span>(thph1, <span class="st">"z"</span>, <span class="dv">2</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>)</span>
+<span id="cb8-2">thph2 &lt;-<span class="st"> </span><span class="kw">rotation</span>(thph2, <span class="st">"z"</span>, <span class="dv">2</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>)</span>
+<span id="cb8-3">thph3 &lt;-<span class="st"> </span><span class="kw">rotation</span>(thph3, <span class="st">"z"</span>, <span class="dv">2</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>)</span>
+<span id="cb8-4">circ &lt;-<span class="st"> </span><span class="kw">circleOnUnitSphere</span>(thph1, thph2, thph3)</span>
+<span id="cb8-5"><span class="kw">parametric3d</span>(fx, fy, fz, <span class="dt">umin =</span> <span class="dv">0</span>, <span class="dt">umax =</span> <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">vmin =</span> <span class="dv">0</span>, <span class="dt">vmax =</span> <span class="dv">2</span><span class="op">*</span>pi, </span>
+<span id="cb8-6">             <span class="dt">n =</span> <span class="dv">250</span>, <span class="dt">smooth =</span> <span class="ot">TRUE</span>, <span class="dt">color =</span> <span class="st">"#363940"</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb8-7">thph1 &lt;-<span class="st"> </span><span class="kw">rotation</span>(thph1, <span class="st">"z"</span>, <span class="dv">2</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>)</span>
+<span id="cb8-8">thph2 &lt;-<span class="st"> </span><span class="kw">rotation</span>(thph2, <span class="st">"z"</span>, <span class="dv">2</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>)</span>
+<span id="cb8-9">thph3 &lt;-<span class="st"> </span><span class="kw">rotation</span>(thph3, <span class="st">"z"</span>, <span class="dv">2</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>)</span>
+<span id="cb8-10">circ &lt;-<span class="st"> </span><span class="kw">circleOnUnitSphere</span>(thph1, thph2, thph3)</span>
+<span id="cb8-11"><span class="kw">parametric3d</span>(fx, fy, fz, <span class="dt">umin =</span> <span class="dv">0</span>, <span class="dt">umax =</span> <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">vmin =</span> <span class="dv">0</span>, <span class="dt">vmax =</span> <span class="dv">2</span><span class="op">*</span>pi, </span>
+<span id="cb8-12">             <span class="dt">n =</span> <span class="dv">250</span>, <span class="dt">smooth =</span> <span class="ot">TRUE</span>, <span class="dt">color =</span> <span class="st">"#363940"</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/linkedCyclides_grey.png"
+        />
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Sun, 12 Apr 2020 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/HopfTorus2.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
+    <item>
       <title>Haskell is fast</title>
       <link>https://laustep.github.io/stlahblog/posts/HaskellIsFast.html</link>
       <description><![CDATA[<div class="container-fluid">
