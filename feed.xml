@@ -201,51 +201,51 @@
       <p>Let us give it a first try.</p>
       <div class="sourceCode" id="cb9">
         <pre
-          class="sourceCode cpp"
-        ><code class="sourceCode cpp"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="co">// [[Rcpp::depends(RcppEigen)]]</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="co">// [[Rcpp::depends(RcppNumerical)]]</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;RcppNumerical.h&gt;</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a><span class="kw">using</span> <span class="kw">namespace</span> Numer;</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;cmath&gt;</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true"></a><span class="dt">double</span> integrand (<span class="dt">double</span> x, <span class="dt">double</span> nu, <span class="dt">double</span> t, <span class="dt">double</span> delta) {</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true"></a>  <span class="dt">double</span> f = R::pnorm(t*x /sqrt(nu) - delta, <span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="dv">1</span>, <span class="dv">0</span>) *</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true"></a>    exp((nu-<span class="dv">1</span>)*log(x) - x*x/<span class="dv">2</span> - ((nu/<span class="dv">2</span>) - <span class="dv">1</span>) * log(<span class="dv">2</span>) - lgamma(nu/<span class="dv">2</span>));</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true"></a>  <span class="cf">return</span> f;</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true"></a>}</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true"></a></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true"></a><span class="kw">class</span> Integrand: <span class="kw">public</span> Func</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true"></a>{</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true"></a><span class="kw">private</span>:</span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true"></a>  <span class="dt">double</span> nu;</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true"></a>  <span class="dt">double</span> t;</span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true"></a>  <span class="dt">double</span> delta;</span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true"></a><span class="kw">public</span>:</span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true"></a>  Integrand(<span class="dt">double</span> <span class="va">nu_</span>, <span class="dt">double</span> <span class="va">t_</span>, <span class="dt">double</span> <span class="va">delta_</span>) : </span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true"></a>    nu(<span class="va">nu_</span>), t(<span class="va">t_</span>), delta(<span class="va">delta_</span>) {}</span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true"></a></span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true"></a>  <span class="dt">double</span> <span class="kw">operator</span>()(<span class="at">const</span> <span class="dt">double</span>&amp; x) <span class="at">const</span></span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true"></a>  {</span>
-<span id="cb9-26"><a href="#cb9-26" aria-hidden="true"></a>    <span class="cf">return</span> integrand_numer(x, nu, t, delta);</span>
-<span id="cb9-27"><a href="#cb9-27" aria-hidden="true"></a>  }</span>
-<span id="cb9-28"><a href="#cb9-28" aria-hidden="true"></a>};</span>
-<span id="cb9-29"><a href="#cb9-29" aria-hidden="true"></a></span>
-<span id="cb9-30"><a href="#cb9-30" aria-hidden="true"></a><span class="co">// [[Rcpp::export]]</span></span>
-<span id="cb9-31"><a href="#cb9-31" aria-hidden="true"></a>Rcpp::NumericVector </span>
-<span id="cb9-32"><a href="#cb9-32" aria-hidden="true"></a>OwenQ1numer(<span class="dt">double</span> nu, <span class="dt">double</span> t, <span class="dt">double</span> delta, <span class="dt">double</span> R,</span>
-<span id="cb9-33"><a href="#cb9-33" aria-hidden="true"></a>            <span class="dt">int</span> subdiv=<span class="dv">100</span>, </span>
-<span id="cb9-34"><a href="#cb9-34" aria-hidden="true"></a>            <span class="dt">double</span> eps_abs=<span class="fl">1e-14</span>, <span class="dt">double</span> eps_rel=<span class="fl">1e-14</span>){</span>
-<span id="cb9-35"><a href="#cb9-35" aria-hidden="true"></a>  Integrand f(nu, t, delta);</span>
-<span id="cb9-36"><a href="#cb9-36" aria-hidden="true"></a>  <span class="dt">double</span> err_est;</span>
-<span id="cb9-37"><a href="#cb9-37" aria-hidden="true"></a>  <span class="dt">int</span> err_code;</span>
-<span id="cb9-38"><a href="#cb9-38" aria-hidden="true"></a>  <span class="at">const</span> <span class="dt">double</span> res = integrate(f, <span class="dv">0</span>, R, err_est, err_code, </span>
-<span id="cb9-39"><a href="#cb9-39" aria-hidden="true"></a>                               subdiv, eps_abs, eps_rel);</span>
-<span id="cb9-40"><a href="#cb9-40" aria-hidden="true"></a>  Rcpp::NumericVector out = Rcpp::NumericVector::create(res);</span>
-<span id="cb9-41"><a href="#cb9-41" aria-hidden="true"></a>  out.attr(<span class="st">"err_est"</span>) = err_est;</span>
-<span id="cb9-42"><a href="#cb9-42" aria-hidden="true"></a>  out.attr(<span class="st">"err_code"</span>) = err_code;</span>
-<span id="cb9-43"><a href="#cb9-43" aria-hidden="true"></a>  <span class="cf">return</span> out;</span>
-<span id="cb9-44"><a href="#cb9-44" aria-hidden="true"></a>}</span></code></pre>
+          class="sourceCode numberSource cpp numberLines"
+        ><code class="sourceCode cpp"><span id="cb9-1"><a href="#cb9-1"></a><span class="co">// [[Rcpp::depends(RcppEigen)]]</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a><span class="co">// [[Rcpp::depends(RcppNumerical)]]</span></span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="pp">#include </span><span class="im">&lt;RcppNumerical.h&gt;</span></span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="kw">using</span> <span class="kw">namespace</span> Numer;</span>
+<span id="cb9-5"><a href="#cb9-5"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb9-6"><a href="#cb9-6"></a><span class="pp">#include </span><span class="im">&lt;cmath&gt;</span></span>
+<span id="cb9-7"><a href="#cb9-7"></a></span>
+<span id="cb9-8"><a href="#cb9-8"></a><span class="dt">double</span> integrand (<span class="dt">double</span> x, <span class="dt">double</span> nu, <span class="dt">double</span> t, <span class="dt">double</span> delta) {</span>
+<span id="cb9-9"><a href="#cb9-9"></a>  <span class="dt">double</span> f = R::pnorm(t*x /sqrt(nu) - delta, <span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="dv">1</span>, <span class="dv">0</span>) *</span>
+<span id="cb9-10"><a href="#cb9-10"></a>    exp((nu-<span class="dv">1</span>)*log(x) - x*x/<span class="dv">2</span> - ((nu/<span class="dv">2</span>) - <span class="dv">1</span>) * log(<span class="dv">2</span>) - lgamma(nu/<span class="dv">2</span>));</span>
+<span id="cb9-11"><a href="#cb9-11"></a>  <span class="cf">return</span> f;</span>
+<span id="cb9-12"><a href="#cb9-12"></a>}</span>
+<span id="cb9-13"><a href="#cb9-13"></a></span>
+<span id="cb9-14"><a href="#cb9-14"></a><span class="kw">class</span> Integrand: <span class="kw">public</span> Func</span>
+<span id="cb9-15"><a href="#cb9-15"></a>{</span>
+<span id="cb9-16"><a href="#cb9-16"></a><span class="kw">private</span>:</span>
+<span id="cb9-17"><a href="#cb9-17"></a>  <span class="dt">double</span> nu;</span>
+<span id="cb9-18"><a href="#cb9-18"></a>  <span class="dt">double</span> t;</span>
+<span id="cb9-19"><a href="#cb9-19"></a>  <span class="dt">double</span> delta;</span>
+<span id="cb9-20"><a href="#cb9-20"></a><span class="kw">public</span>:</span>
+<span id="cb9-21"><a href="#cb9-21"></a>  Integrand(<span class="dt">double</span> <span class="va">nu_</span>, <span class="dt">double</span> <span class="va">t_</span>, <span class="dt">double</span> <span class="va">delta_</span>) : </span>
+<span id="cb9-22"><a href="#cb9-22"></a>    nu(<span class="va">nu_</span>), t(<span class="va">t_</span>), delta(<span class="va">delta_</span>) {}</span>
+<span id="cb9-23"><a href="#cb9-23"></a></span>
+<span id="cb9-24"><a href="#cb9-24"></a>  <span class="dt">double</span> <span class="kw">operator</span>()(<span class="at">const</span> <span class="dt">double</span>&amp; x) <span class="at">const</span></span>
+<span id="cb9-25"><a href="#cb9-25"></a>  {</span>
+<span id="cb9-26"><a href="#cb9-26"></a>    <span class="cf">return</span> integrand_numer(x, nu, t, delta);</span>
+<span id="cb9-27"><a href="#cb9-27"></a>  }</span>
+<span id="cb9-28"><a href="#cb9-28"></a>};</span>
+<span id="cb9-29"><a href="#cb9-29"></a></span>
+<span id="cb9-30"><a href="#cb9-30"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb9-31"><a href="#cb9-31"></a>Rcpp::NumericVector </span>
+<span id="cb9-32"><a href="#cb9-32"></a>OwenQ1numer(<span class="dt">double</span> nu, <span class="dt">double</span> t, <span class="dt">double</span> delta, <span class="dt">double</span> R,</span>
+<span id="cb9-33"><a href="#cb9-33"></a>            <span class="dt">int</span> subdiv=<span class="dv">100</span>, </span>
+<span id="cb9-34"><a href="#cb9-34"></a>            <span class="dt">double</span> eps_abs=<span class="fl">1e-14</span>, <span class="dt">double</span> eps_rel=<span class="fl">1e-14</span>){</span>
+<span id="cb9-35"><a href="#cb9-35"></a>  Integrand f(nu, t, delta);</span>
+<span id="cb9-36"><a href="#cb9-36"></a>  <span class="dt">double</span> err_est;</span>
+<span id="cb9-37"><a href="#cb9-37"></a>  <span class="dt">int</span> err_code;</span>
+<span id="cb9-38"><a href="#cb9-38"></a>  <span class="at">const</span> <span class="dt">double</span> res = integrate(f, <span class="dv">0</span>, R, err_est, err_code, </span>
+<span id="cb9-39"><a href="#cb9-39"></a>                               subdiv, eps_abs, eps_rel);</span>
+<span id="cb9-40"><a href="#cb9-40"></a>  Rcpp::NumericVector out = Rcpp::NumericVector::create(res);</span>
+<span id="cb9-41"><a href="#cb9-41"></a>  out.attr(<span class="st">"err_est"</span>) = err_est;</span>
+<span id="cb9-42"><a href="#cb9-42"></a>  out.attr(<span class="st">"err_code"</span>) = err_code;</span>
+<span id="cb9-43"><a href="#cb9-43"></a>  <span class="cf">return</span> out;</span>
+<span id="cb9-44"><a href="#cb9-44"></a>}</span></code></pre>
       </div>
       <p>
         For <span class="math inline">\(R=100\)</span>, the evaluation is
@@ -296,23 +296,23 @@
       </p>
       <div class="sourceCode" id="cb13">
         <pre
-          class="sourceCode cpp"
-        ><code class="sourceCode cpp"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a><span class="co">// [[Rcpp::export]]</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true"></a>Rcpp::NumericVector </span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true"></a>OwenQ1numer201(<span class="dt">double</span> nu, <span class="dt">double</span> t, <span class="dt">double</span> delta, <span class="dt">double</span> R,</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true"></a>              <span class="dt">int</span> subdiv=<span class="dv">100</span>, </span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true"></a>              <span class="dt">double</span> eps_abs=<span class="fl">1e-14</span>, <span class="dt">double</span> eps_rel=<span class="fl">1e-14</span>){</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true"></a>  Integrand f(nu, t, delta);</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true"></a>  <span class="dt">double</span> err_est;</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true"></a>  <span class="dt">int</span> err_code;</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true"></a>  <span class="at">const</span> <span class="dt">double</span> res = integrate(f, <span class="dv">0</span>, R, err_est, err_code, subdiv, </span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true"></a>                               eps_abs, eps_rel, </span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true"></a>                               Integrator&lt;<span class="dt">double</span>&gt;::GaussKronrod201);</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true"></a>  Rcpp::NumericVector out = Rcpp::NumericVector::create(res);</span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true"></a>  out.attr(<span class="st">"err_est"</span>) = err_est;</span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true"></a>  out.attr(<span class="st">"err_code"</span>) = err_code;</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true"></a>  <span class="cf">return</span> out;</span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true"></a>}</span></code></pre>
+          class="sourceCode numberSource cpp numberLines"
+        ><code class="sourceCode cpp"><span id="cb13-1"><a href="#cb13-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a>Rcpp::NumericVector </span>
+<span id="cb13-3"><a href="#cb13-3"></a>OwenQ1numer201(<span class="dt">double</span> nu, <span class="dt">double</span> t, <span class="dt">double</span> delta, <span class="dt">double</span> R,</span>
+<span id="cb13-4"><a href="#cb13-4"></a>              <span class="dt">int</span> subdiv=<span class="dv">100</span>, </span>
+<span id="cb13-5"><a href="#cb13-5"></a>              <span class="dt">double</span> eps_abs=<span class="fl">1e-14</span>, <span class="dt">double</span> eps_rel=<span class="fl">1e-14</span>){</span>
+<span id="cb13-6"><a href="#cb13-6"></a>  Integrand f(nu, t, delta);</span>
+<span id="cb13-7"><a href="#cb13-7"></a>  <span class="dt">double</span> err_est;</span>
+<span id="cb13-8"><a href="#cb13-8"></a>  <span class="dt">int</span> err_code;</span>
+<span id="cb13-9"><a href="#cb13-9"></a>  <span class="at">const</span> <span class="dt">double</span> res = integrate(f, <span class="dv">0</span>, R, err_est, err_code, subdiv, </span>
+<span id="cb13-10"><a href="#cb13-10"></a>                               eps_abs, eps_rel, </span>
+<span id="cb13-11"><a href="#cb13-11"></a>                               Integrator&lt;<span class="dt">double</span>&gt;::GaussKronrod201);</span>
+<span id="cb13-12"><a href="#cb13-12"></a>  Rcpp::NumericVector out = Rcpp::NumericVector::create(res);</span>
+<span id="cb13-13"><a href="#cb13-13"></a>  out.attr(<span class="st">"err_est"</span>) = err_est;</span>
+<span id="cb13-14"><a href="#cb13-14"></a>  out.attr(<span class="st">"err_code"</span>) = err_code;</span>
+<span id="cb13-15"><a href="#cb13-15"></a>  <span class="cf">return</span> out;</span>
+<span id="cb13-16"><a href="#cb13-16"></a>}</span></code></pre>
       </div>
       <p>
         For <span class="math inline">\(R=3000\)</span>, the numerical
