@@ -11,10 +11,8 @@
   <link rel="stylesheet" href="../css/post.css" />
   <link rel="stylesheet" href="../css/misc.css" /> 
   
-    <link rel="stylesheet" href="../css/kate.css" /> 
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
    
-  
-    <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
@@ -78,7 +76,7 @@
 
       <div class="main col-sm-10">
         <div id="header">
-          <div id="logo" style="position:absolute;">
+          <div id="logo">
             <a href="../">
               <img src="../images/stla.jpg" alt="stla" width="100px" />
             </a>
@@ -101,24 +99,26 @@
 </div>
 <div class="info">
     
-    Tags: <a href="../tags/R.html">R</a>
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>
     
 </div>
 
 <p>There is a Java port of <code>universalchardet</code>, the encoding detector library of Mozilla. It is called <code>juniversalchardet</code>. I’m going to show how to use it with the <code>rJava</code> package.</p>
 <p>Firstly, download the <code>jar</code> file here: <a href="https://code.google.com/archive/p/juniversalchardet/downloads" class="uri">https://code.google.com/archive/p/juniversalchardet/downloads</a>. Then, proceed as follows:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">library</span>(rJava)</a>
-<a class="sourceLine" id="cb1-2" title="2"><span class="kw">.jinit</span>()</a>
-<a class="sourceLine" id="cb1-3" title="3"><span class="kw">.jaddClassPath</span>(<span class="st">&quot;path/to/juniversalchardet-1.0.3.jar&quot;</span>)</a>
-<a class="sourceLine" id="cb1-4" title="4">detector &lt;-<span class="st"> </span><span class="kw">new</span>(<span class="kw">J</span>(<span class="st">&quot;org/mozilla/universalchardet/UniversalDetector&quot;</span>), <span class="ot">NULL</span>)</a>
-<a class="sourceLine" id="cb1-5" title="5">f &lt;-<span class="st"> &quot;juniversalchardet.Rmd&quot;</span> <span class="co"># file whose encoding you want to know</span></a>
-<a class="sourceLine" id="cb1-6" title="6">flength &lt;-<span class="st"> </span><span class="kw">as.integer</span>(<span class="kw">file.size</span>(f))</a>
-<a class="sourceLine" id="cb1-7" title="7"><span class="kw">.jcall</span>(detector, <span class="st">&quot;V&quot;</span>, <span class="st">&quot;handleData&quot;</span>,</a>
-<a class="sourceLine" id="cb1-8" title="8">       <span class="kw">readBin</span>(f, <span class="dt">what=</span><span class="st">&quot;raw&quot;</span>, <span class="dt">n=</span>flength), 0L, flength)</a>
-<a class="sourceLine" id="cb1-9" title="9"><span class="kw">.jcall</span>(detector, <span class="st">&quot;V&quot;</span>, <span class="st">&quot;dataEnd&quot;</span>)</a>
-<a class="sourceLine" id="cb1-10" title="10"><span class="kw">.jcall</span>(detector, <span class="st">&quot;S&quot;</span>, <span class="st">&quot;getDetectedCharset&quot;</span>)</a>
-<a class="sourceLine" id="cb1-11" title="11"><span class="co">## [1] &quot;UTF-8&quot;</span></a>
-<a class="sourceLine" id="cb1-12" title="12"><span class="kw">.jcall</span>(detector, <span class="st">&quot;V&quot;</span>, <span class="st">&quot;reset&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">library</span>(rJava)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="kw">.jinit</span>()</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="kw">.jaddClassPath</span>(<span class="st">&quot;path/to/juniversalchardet-1.0.3.jar&quot;</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>detector &lt;-<span class="st"> </span><span class="kw">new</span>(<span class="kw">J</span>(<span class="st">&quot;org/mozilla/universalchardet/UniversalDetector&quot;</span>), <span class="ot">NULL</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>f &lt;-<span class="st"> &quot;juniversalchardet.Rmd&quot;</span> <span class="co"># file whose encoding you want to know</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>flength &lt;-<span class="st"> </span><span class="kw">as.integer</span>(<span class="kw">file.size</span>(f))</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="kw">.jcall</span>(detector, <span class="st">&quot;V&quot;</span>, <span class="st">&quot;handleData&quot;</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>       <span class="kw">readBin</span>(f, <span class="dt">what=</span><span class="st">&quot;raw&quot;</span>, <span class="dt">n=</span>flength), 0L, flength)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="kw">.jcall</span>(detector, <span class="st">&quot;V&quot;</span>, <span class="st">&quot;dataEnd&quot;</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a><span class="kw">.jcall</span>(detector, <span class="st">&quot;S&quot;</span>, <span class="st">&quot;getDetectedCharset&quot;</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a><span class="co">## [1] &quot;UTF-8&quot;</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a><span class="kw">.jcall</span>(detector, <span class="st">&quot;V&quot;</span>, <span class="st">&quot;reset&quot;</span>)</span></code></pre></div>
+<h1 id="update-2020">Update 2020</h1>
+<p>Nowadays one can achieve the same result with the R package <code>uchardet</code> (which does not use Java).</p>
 
         </div>
 
@@ -172,20 +172,6 @@
 <!-- <script>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
-
-  <!-- Google Prettify -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-  <script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
-  <script>
-    var pres = document.getElementsByTagName("pre");
-    for (var i = 0; i < pres.length; ++i) {
-      
-        pres[i].className = pres[i].className + " prettyprint";
-      
-    }
-    prettyPrint();
-  </script> 
 
 
 </html>
