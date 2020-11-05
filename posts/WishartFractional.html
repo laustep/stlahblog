@@ -11,10 +11,8 @@
   <link rel="stylesheet" href="../css/post.css" />
   <link rel="stylesheet" href="../css/misc.css" /> 
   
-    <link rel="stylesheet" href="../css/kate.css" /> 
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
    
-  
-    <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
@@ -78,7 +76,7 @@
 
       <div class="main col-sm-10">
         <div id="header">
-          <div id="logo" style="position:absolute;">
+          <div id="logo">
             <a href="../">
               <img src="../images/stla.jpg" alt="stla" width="100px" />
             </a>
@@ -101,11 +99,11 @@
 </div>
 <div class="info">
     
-    Tags: <a href="../tags/R.html">R</a>, <a href="../tags/maths.html">maths</a>, <a href="../tags/statistics.html">statistics</a>
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>, <a title="All pages tagged 'statistics'." href="../tags/statistics.html">statistics</a>
     
 </div>
 
-<p>It is well known how to simulate the noncentral Wishart distribution when the number of degrees of freedom <span class="math inline">\(\nu\)</span> and the dimension <span class="math inline">\(d\)</span> satisfy <span class="math inline">\(\nu &gt; 2d-1\)</span>, or when <span class="math inline">\(\nu \geq d\)</span> is an integer. In their paper <a href="https://arxiv.org/abs/1006.2281">Exact and high-order discretization schemes for Wishart processes and their affine extensions</a>, Ahdida &amp; Alfonsi provide a method that enables to simulate the Wishart process of dimension <span class="math inline">\(d\)</span> for any number of degrees of freedom <span class="math inline">\(\nu \geq d-1\)</span> and without restrictions on the other parameters. This method allows to simulate the noncentral Wishart distribution, in the way we will expose now.</p>
+<p>It is well known how to simulate the noncentral Wishart distribution when the number of degrees of freedom <span class="math inline">\(\nu\)</span> and the dimension <span class="math inline">\(d\)</span> satisfy <span class="math inline">\(\nu &gt; 2d-1\)</span>, or when <span class="math inline">\(\nu \geq d\)</span> is an integer. In their paper <a href="https://arxiv.org/abs/1006.2281">Exact and high-order discretization schemes for Wishart processes and their affine extensions</a>, Ahdida &amp; Alfonsi provide a method that allows to simulate the Wishart process of dimension <span class="math inline">\(d\)</span> for any number of degrees of freedom <span class="math inline">\(\nu \geq d-1\)</span> and without restrictions on the other parameters. This method allows to simulate the noncentral Wishart distribution, in the way we will expose now.</p>
 <h1 id="two-properties-of-the-noncentral-wishart-distribution">Two properties of the noncentral Wishart distribution</h1>
 <p>We will need the two following properties.</p>
 <p>Recall that the characteristic function of the noncentral Wishart distribution <span class="math inline">\(\mathcal{W}(\nu, \Sigma, \Theta)\)</span> at <span class="math inline">\(Z\)</span> is <span class="math display">\[
@@ -153,42 +151,42 @@ G &amp; I_r &amp; 0 \\
 <p><span class="math inline">\(\bullet\)</span> <strong>Simulation of <span class="math inline">\(\mathcal{W}(\nu, \Sigma, \Theta)\)</span></strong>. Finally, given any covariance matrix <span class="math inline">\(\Sigma\)</span> of rank <span class="math inline">\(n\)</span>, take the <span class="math inline">\(\widetilde{C}\)</span> matrix of an extended Cholesky decomposition of <span class="math inline">\(\Sigma\)</span> with permutation matrix <span class="math inline">\(P\)</span>, and set <span class="math inline">\(A = P'\widetilde{C}\)</span>. Simulate <span class="math inline">\(Y \sim \mathcal{W}\bigl(\nu, I_d^n, A^{-1}\Theta{(A^{-1})}'\bigr)\)</span> with the previous algorithm and finally set <span class="math inline">\(W = AYA'\)</span>, so that <span class="math inline">\(W \sim \mathcal{W}(\nu, \Sigma, \Theta)\)</span> by the first property and by the property of the Cholesky decomposition.</p>
 <h1 id="checking">Checking</h1>
 <p>The algorithm is implemented in my package <a href="https://github.com/stla/matrixsampling">matrixsampling</a>. Let’s try it.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">library</span>(matrixsampling)</a>
-<a class="sourceLine" id="cb1-2" title="2">p &lt;-<span class="st"> </span><span class="dv">6</span></a>
-<a class="sourceLine" id="cb1-3" title="3">nu &lt;-<span class="st"> </span><span class="fl">6.3</span></a>
-<a class="sourceLine" id="cb1-4" title="4">Sigma &lt;-<span class="st"> </span><span class="kw">toeplitz</span>(p<span class="op">:</span><span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb1-5" title="5">Theta &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="dv">1</span>, p, p)</a>
-<a class="sourceLine" id="cb1-6" title="6">nsims &lt;-<span class="st"> </span><span class="dv">100000</span></a>
-<a class="sourceLine" id="cb1-7" title="7">W &lt;-<span class="st"> </span><span class="kw">rwishart</span>(nsims, nu, Sigma, Theta)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">library</span>(matrixsampling)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>p &lt;-<span class="st"> </span><span class="dv">6</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>nu &lt;-<span class="st"> </span><span class="fl">6.3</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>Sigma &lt;-<span class="st"> </span><span class="kw">toeplitz</span>(p<span class="op">:</span><span class="dv">1</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>Theta &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="dv">1</span>, p, p)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>nsims &lt;-<span class="st"> </span><span class="dv">100000</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>W &lt;-<span class="st"> </span><span class="kw">rwishart</span>(nsims, nu, Sigma, Theta)</span></code></pre></div>
 <p>As expected, the average simulated matrix is close to the theoretical mean <span class="math inline">\(\nu \Sigma + \Theta\)</span>:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">round</span>((nu<span class="op">*</span>Sigma <span class="op">+</span><span class="st"> </span>Theta) <span class="op">-</span><span class="st"> </span><span class="kw">apply</span>(W, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, mean), <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb2-2" title="2"><span class="co">##       [,1]  [,2]  [,3]  [,4]  [,5]  [,6]</span></a>
-<a class="sourceLine" id="cb2-3" title="3"><span class="co">## [1,]  0.02  0.06  0.00 -0.05 -0.01 -0.04</span></a>
-<a class="sourceLine" id="cb2-4" title="4"><span class="co">## [2,]  0.06  0.06 -0.02 -0.06 -0.04 -0.06</span></a>
-<a class="sourceLine" id="cb2-5" title="5"><span class="co">## [3,]  0.00 -0.02 -0.10 -0.11 -0.07 -0.09</span></a>
-<a class="sourceLine" id="cb2-6" title="6"><span class="co">## [4,] -0.05 -0.06 -0.11 -0.07 -0.04 -0.04</span></a>
-<a class="sourceLine" id="cb2-7" title="7"><span class="co">## [5,] -0.01 -0.04 -0.07 -0.04 -0.01 -0.04</span></a>
-<a class="sourceLine" id="cb2-8" title="8"><span class="co">## [6,] -0.04 -0.06 -0.09 -0.04 -0.04 -0.08</span></a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">round</span>((nu<span class="op">*</span>Sigma <span class="op">+</span><span class="st"> </span>Theta) <span class="op">-</span><span class="st"> </span><span class="kw">apply</span>(W, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, mean), <span class="dv">2</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="co">##       [,1]  [,2]  [,3]  [,4]  [,5]  [,6]</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="co">## [1,] -0.05 -0.04  0.00  0.00  0.02  0.04</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="co">## [2,] -0.04 -0.06 -0.03 -0.03  0.00  0.01</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="co">## [3,]  0.00 -0.03 -0.04 -0.06 -0.05 -0.05</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="co">## [4,]  0.00 -0.03 -0.06 -0.07 -0.04 -0.07</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a><span class="co">## [5,]  0.02  0.00 -0.05 -0.04 -0.03 -0.05</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a><span class="co">## [6,]  0.04  0.01 -0.05 -0.07 -0.05 -0.09</span></span></code></pre></div>
 <p>Let’s compare the theoretical characteristic function to its approximation obtained from the simulations:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">z &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="fl">0.001</span>, <span class="fl">0.004</span>, <span class="dt">length.out =</span> <span class="dv">20</span>)</a>
-<a class="sourceLine" id="cb3-2" title="2">Z &lt;-<span class="st"> </span><span class="kw">sapply</span>(z, <span class="cf">function</span>(z){</a>
-<a class="sourceLine" id="cb3-3" title="3">  z<span class="op">*</span><span class="kw">diag</span>(p) <span class="op">+</span><span class="st"> </span><span class="kw">matrix</span>(z, p, p)</a>
-<a class="sourceLine" id="cb3-4" title="4">}, <span class="dt">simplify=</span><span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb3-5" title="5">tr &lt;-<span class="st"> </span><span class="cf">function</span>(A) <span class="kw">sum</span>(<span class="kw">diag</span>(A))</a>
-<a class="sourceLine" id="cb3-6" title="6">Phi_theoretical &lt;-<span class="st"> </span><span class="kw">sapply</span>(Z, <span class="cf">function</span>(Z){</a>
-<a class="sourceLine" id="cb3-7" title="7">             complexplus<span class="op">::</span><span class="kw">Det</span>(<span class="kw">diag</span>(p) <span class="op">-</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>1i<span class="op">*</span>Z<span class="op">%*%</span>Sigma)<span class="op">^</span>(<span class="op">-</span>nu<span class="op">/</span><span class="dv">2</span>) <span class="op">*</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb3-8" title="8"><span class="st">             </span><span class="kw">exp</span>(1i<span class="op">*</span><span class="kw">tr</span>(<span class="kw">solve</span>(<span class="kw">diag</span>(p) <span class="op">-</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>1i<span class="op">*</span>Z<span class="op">%*%</span>Sigma) <span class="op">%*%</span><span class="st"> </span>Z <span class="op">%*%</span><span class="st"> </span>Theta))</a>
-<a class="sourceLine" id="cb3-9" title="9">})</a>
-<a class="sourceLine" id="cb3-10" title="10">Phi_sims &lt;-<span class="st"> </span><span class="kw">sapply</span>(Z, <span class="cf">function</span>(Z){</a>
-<a class="sourceLine" id="cb3-11" title="11">  <span class="kw">mean</span>(<span class="kw">apply</span>(W, <span class="dv">3</span>, <span class="cf">function</span>(W){</a>
-<a class="sourceLine" id="cb3-12" title="12">    <span class="kw">exp</span>(1i<span class="op">*</span><span class="kw">tr</span>(Z<span class="op">%*%</span>W))</a>
-<a class="sourceLine" id="cb3-13" title="13">  }))</a>
-<a class="sourceLine" id="cb3-14" title="14">})</a>
-<a class="sourceLine" id="cb3-15" title="15"><span class="kw">layout</span>(<span class="kw">t</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>))</a>
-<a class="sourceLine" id="cb3-16" title="16"><span class="kw">plot</span>(z, <span class="kw">Re</span>(Phi_theoretical), <span class="dt">type=</span><span class="st">&quot;o&quot;</span>, <span class="dt">pch=</span><span class="dv">19</span>)</a>
-<a class="sourceLine" id="cb3-17" title="17"><span class="kw">lines</span>(z, <span class="kw">Re</span>(Phi_sims), <span class="dt">type=</span><span class="st">&quot;o&quot;</span>, <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>)</a>
-<a class="sourceLine" id="cb3-18" title="18"><span class="kw">plot</span>(z, <span class="kw">Im</span>(Phi_theoretical), <span class="dt">type=</span><span class="st">&quot;o&quot;</span>, <span class="dt">pch=</span><span class="dv">19</span>)</a>
-<a class="sourceLine" id="cb3-19" title="19"><span class="kw">lines</span>(z, <span class="kw">Im</span>(Phi_sims), <span class="dt">type=</span><span class="st">&quot;o&quot;</span>, <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>z &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="fl">0.001</span>, <span class="fl">0.004</span>, <span class="dt">length.out =</span> <span class="dv">20</span>)</span>
+<span id="cb3-2"><a href="#cb3-2"></a>Z &lt;-<span class="st"> </span><span class="kw">sapply</span>(z, <span class="cf">function</span>(z){</span>
+<span id="cb3-3"><a href="#cb3-3"></a>  z<span class="op">*</span><span class="kw">diag</span>(p) <span class="op">+</span><span class="st"> </span><span class="kw">matrix</span>(z, p, p)</span>
+<span id="cb3-4"><a href="#cb3-4"></a>}, <span class="dt">simplify=</span><span class="ot">FALSE</span>)</span>
+<span id="cb3-5"><a href="#cb3-5"></a>tr &lt;-<span class="st"> </span><span class="cf">function</span>(A) <span class="kw">sum</span>(<span class="kw">diag</span>(A))</span>
+<span id="cb3-6"><a href="#cb3-6"></a>Phi_theoretical &lt;-<span class="st"> </span><span class="kw">sapply</span>(Z, <span class="cf">function</span>(Z){</span>
+<span id="cb3-7"><a href="#cb3-7"></a>             complexplus<span class="op">::</span><span class="kw">Det</span>(<span class="kw">diag</span>(p) <span class="op">-</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>1i<span class="op">*</span>Z<span class="op">%*%</span>Sigma)<span class="op">^</span>(<span class="op">-</span>nu<span class="op">/</span><span class="dv">2</span>) <span class="op">*</span><span class="st"> </span></span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="st">             </span><span class="kw">exp</span>(1i<span class="op">*</span><span class="kw">tr</span>(<span class="kw">solve</span>(<span class="kw">diag</span>(p) <span class="op">-</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>1i<span class="op">*</span>Z<span class="op">%*%</span>Sigma) <span class="op">%*%</span><span class="st"> </span>Z <span class="op">%*%</span><span class="st"> </span>Theta))</span>
+<span id="cb3-9"><a href="#cb3-9"></a>})</span>
+<span id="cb3-10"><a href="#cb3-10"></a>Phi_sims &lt;-<span class="st"> </span><span class="kw">sapply</span>(Z, <span class="cf">function</span>(Z){</span>
+<span id="cb3-11"><a href="#cb3-11"></a>  <span class="kw">mean</span>(<span class="kw">apply</span>(W, <span class="dv">3</span>, <span class="cf">function</span>(W){</span>
+<span id="cb3-12"><a href="#cb3-12"></a>    <span class="kw">exp</span>(1i<span class="op">*</span><span class="kw">tr</span>(Z<span class="op">%*%</span>W))</span>
+<span id="cb3-13"><a href="#cb3-13"></a>  }))</span>
+<span id="cb3-14"><a href="#cb3-14"></a>})</span>
+<span id="cb3-15"><a href="#cb3-15"></a><span class="kw">layout</span>(<span class="kw">t</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>))</span>
+<span id="cb3-16"><a href="#cb3-16"></a><span class="kw">plot</span>(z, <span class="kw">Re</span>(Phi_theoretical), <span class="dt">type=</span><span class="st">&quot;o&quot;</span>, <span class="dt">pch=</span><span class="dv">19</span>)</span>
+<span id="cb3-17"><a href="#cb3-17"></a><span class="kw">lines</span>(z, <span class="kw">Re</span>(Phi_sims), <span class="dt">type=</span><span class="st">&quot;o&quot;</span>, <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>)</span>
+<span id="cb3-18"><a href="#cb3-18"></a><span class="kw">plot</span>(z, <span class="kw">Im</span>(Phi_theoretical), <span class="dt">type=</span><span class="st">&quot;o&quot;</span>, <span class="dt">pch=</span><span class="dv">19</span>)</span>
+<span id="cb3-19"><a href="#cb3-19"></a><span class="kw">lines</span>(z, <span class="kw">Im</span>(Phi_sims), <span class="dt">type=</span><span class="st">&quot;o&quot;</span>, <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>)</span></code></pre></div>
 <p><img src="./figures/WishFrac-WishartCF-1.png" /></p>
 
         </div>
@@ -243,20 +241,6 @@ G &amp; I_r &amp; 0 \\
 <!-- <script>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
-
-  <!-- Google Prettify -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-  <script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
-  <script>
-    var pres = document.getElementsByTagName("pre");
-    for (var i = 0; i < pres.length; ++i) {
-      
-        pres[i].className = pres[i].className + " prettyprint linenums";
-      
-    }
-    prettyPrint();
-  </script> 
 
 
 </html>

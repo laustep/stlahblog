@@ -7,6 +7,1369 @@
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
     <lastBuildDate>Thu, 22 Oct 2020 00:00:00 UT</lastBuildDate>
     <item>
+      <title>Drawing hyperbolic polyhedra</title>
+      <link>https://laustep.github.io/stlahblog/posts/hyperbolicPolyhedra.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        A. A. Ungar has developed the concept of <em>gyrovector space</em>. His
+        theory provides a (gyro)vector approach to hyperbolic geometry.
+      </p>
+      <p>
+        Ungar deeply studied three examples of gyrovector spaces; they
+        correspond to three models of hyperbolic geometry: the Beltrami model,
+        the Poincaré ball model, and the hyperboloid model.
+      </p>
+      <p>
+        In this blog post, I will consider the gyrovector approach to the
+        hyperboloid model. We will see how it makes easy to draw some hyperbolic
+        polyhedra.
+      </p>
+      <h2 id="gyrovector-space">Gyrovector space</h2>
+      <p>
+        A <em>point</em> is an element of
+        <span class="math inline">\(\mathbb{R}^n\)</span>. Throughout,
+        <span class="math inline">\(s\)</span> is a fixed positive number.
+      </p>
+      <p>
+        Shortly speaking, <span class="math inline">\(\mathbb{R}^n\)</span> is a
+        <em>gyrovector space</em> when it is equipped with a
+        <em>gyroaddition</em> and a <em>scalar gyromultiplication</em>.
+      </p>
+      <h3 id="gyroaddition">Gyroaddition</h3>
+      <p>
+        In order to define the gyroaddition of two points, we introduce the
+        <em>beta factor</em> of a point <span class="math inline">\(A\)</span>,
+        defined by
+        <span class="math display"
+          >\[ \beta_A = \dfrac{1}{\sqrt{1 + \dfrac{{\Vert A \Vert}^2}{s^2}}}.
+          \]</span
+        >
+      </p>
+      <p>
+        The <em>gyroaddition</em> of two points
+        <span class="math inline">\(A\)</span> and
+        <span class="math inline">\(B\)</span> is then defined by
+        <span class="math display"
+          >\[ A \oplus B = \left(1 + \frac{\beta_A}{1+\beta_A}\frac{A\cdot
+          B}{s^2} + \frac{1-\beta_B}{\beta_B} \right) A + B. \]</span
+        >
+        Later, we will resort to the (non-obvious) property
+        <span class="math display"
+          >\[ (\star)\qquad -A \oplus (A \oplus B) = B. \]</span
+        >
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># gyroaddition ####</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a>dotprod &lt;-<span class="st"> </span><span class="cf">function</span>(x, <span class="dt">y=</span><span class="ot">NULL</span>){</span>
+<span id="cb1-3"><a href="#cb1-3"></a>  <span class="kw">c</span>(<span class="kw">crossprod</span>(x, y))</span>
+<span id="cb1-4"><a href="#cb1-4"></a>}</span>
+<span id="cb1-5"><a href="#cb1-5"></a>betaF &lt;-<span class="st"> </span><span class="cf">function</span>(A, <span class="dt">s=</span><span class="dv">1</span>) <span class="dv">1</span><span class="op">/</span><span class="kw">sqrt</span>(<span class="dv">1</span><span class="op">+</span><span class="kw">dotprod</span>(A)<span class="op">/</span>s<span class="op">^</span><span class="dv">2</span>)</span>
+<span id="cb1-6"><a href="#cb1-6"></a>gyroadd &lt;-<span class="st"> </span><span class="cf">function</span>(A, B, <span class="dt">s=</span><span class="dv">1</span>){</span>
+<span id="cb1-7"><a href="#cb1-7"></a>  betaA &lt;-<span class="st"> </span><span class="kw">betaF</span>(A, s); betaB &lt;-<span class="st"> </span><span class="kw">betaF</span>(B, s)</span>
+<span id="cb1-8"><a href="#cb1-8"></a>  (<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>betaA<span class="op">/</span>(<span class="dv">1</span><span class="op">+</span>betaA)<span class="op">*</span><span class="kw">dotprod</span>(A,B)<span class="op">/</span>s<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>(<span class="dv">1</span><span class="op">-</span>betaB)<span class="op">/</span>betaB) <span class="op">*</span><span class="st"> </span>A <span class="op">+</span><span class="st"> </span>B</span>
+<span id="cb1-9"><a href="#cb1-9"></a>}</span></code></pre>
+      </div>
+      <h3 id="scalar-gyromultiplication">Scalar gyromultiplication</h3>
+      <p>
+        For <span class="math inline">\(r \in \mathbb{R}\)</span>, the
+        <em>scalar gyromultiplication</em> of a point
+        <span class="math inline">\(A\)</span> by
+        <span class="math inline">\(r\)</span> is defined by<br /><span
+          class="math display"
+          >\[ r \otimes A = \frac{s}{\Vert A \Vert} \sinh\left(r
+          \sinh^{-1}\left(\frac{\Vert A \Vert}{s}\right)\right) A. \]</span
+        >
+      </p>
+      <p>
+        It is easy to see that
+        <span class="math inline">\(0 \otimes A = \mathbf{0}\)</span> and
+        <span class="math inline">\(1 \otimes A = A\)</span>.
+      </p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># scalar gyromultiplication ####</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>gyroscalar &lt;-<span class="st"> </span><span class="cf">function</span>(r, A, <span class="dt">s=</span><span class="dv">1</span>){</span>
+<span id="cb2-3"><a href="#cb2-3"></a>  Anorm &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">dotprod</span>(A))</span>
+<span id="cb2-4"><a href="#cb2-4"></a>  s<span class="op">/</span>Anorm <span class="op">*</span><span class="st"> </span><span class="kw">sinh</span>(r<span class="op">*</span><span class="kw">asinh</span>(Anorm<span class="op">/</span>s)) <span class="op">*</span><span class="st"> </span>A</span>
+<span id="cb2-5"><a href="#cb2-5"></a>}</span></code></pre>
+      </div>
+      <h3 id="gyroline-gyrosegment-and-gyromidpoint">
+        Gyroline, gyrosegment and gyromidpoint
+      </h3>
+      <p>
+        In order to define a gyroline and the gyrosegment joining two points, we
+        introduce the notation
+        <span class="math display"
+          >\[ \overset{\oplus\longrightarrow}{AB} = (-A) \oplus B. \]</span
+        >
+      </p>
+      <p>
+        The <em>gyroline</em> passing through
+        <span class="math inline">\(A\)</span> and
+        <span class="math inline">\(B\)</span> is the set of all points having
+        form
+        <span class="math display"
+          >\[ A \oplus \Bigl(t \otimes \overset{\oplus\longrightarrow}{AB}\Bigr)
+          \]</span
+        >
+        for some <span class="math inline">\(t \in \mathbb{R}\)</span>.
+      </p>
+      <p>
+        Observe that the point
+        <span class="math inline"
+          >\(A \oplus \Bigl(t \otimes
+          \overset{\oplus\longrightarrow}{AB}\Bigr)\)</span
+        >
+        equals <span class="math inline">\(A\)</span> when
+        <span class="math inline">\(t=0\)</span> (easy) and equals
+        <span class="math inline">\(B\)</span> when
+        <span class="math inline">\(t=1\)</span> (that stems from property
+        <span class="math inline">\((\star)\)</span>).
+      </p>
+      <p>
+        The <em>gyrosegment</em> that joins
+        <span class="math inline">\(A\)</span> and
+        <span class="math inline">\(B\)</span> is the set of such points for
+        <span class="math inline">\(t \in [0,1]\)</span>:
+        <span class="math display"
+          >\[ \left\{ A \oplus \Bigl(t \otimes
+          \overset{\oplus\longrightarrow}{AB}\Bigr) \Bigm| 0 \leq t \leq
+          1\right\}. \]</span
+        >
+      </p>
+      <p>
+        The <em>gyromidpoint</em> of <span class="math inline">\(A\)</span> and
+        <span class="math inline">\(B\)</span> is the point of the gyrosegment
+        joining <span class="math inline">\(A\)</span> and
+        <span class="math inline">\(B\)</span> corresponding to
+        <span class="math inline">\(t = \frac12\)</span>:
+        <span class="math display"
+          >\[ A \oplus \left(\frac{1}{2} \otimes
+          \overset{\oplus\longrightarrow}{AB}\right). \]</span
+        >
+      </p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># gyrosegment ####</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a>gyroABt &lt;-<span class="st"> </span><span class="cf">function</span>(A, B, t, <span class="dt">s=</span><span class="dv">1</span>){</span>
+<span id="cb3-3"><a href="#cb3-3"></a>  <span class="kw">gyroadd</span>(A, <span class="kw">gyroscalar</span>(t, <span class="kw">gyroadd</span>(<span class="op">-</span>A, B, s), s), s)</span>
+<span id="cb3-4"><a href="#cb3-4"></a>}</span>
+<span id="cb3-5"><a href="#cb3-5"></a>gyromidpoint &lt;-<span class="st"> </span><span class="cf">function</span>(A, B, <span class="dt">s=</span><span class="dv">1</span>){</span>
+<span id="cb3-6"><a href="#cb3-6"></a>  <span class="kw">gyroABt</span>(A, B, <span class="fl">0.5</span>, s)</span>
+<span id="cb3-7"><a href="#cb3-7"></a>}</span>
+<span id="cb3-8"><a href="#cb3-8"></a>gyrosegment &lt;-<span class="st"> </span><span class="cf">function</span>(A, B, <span class="dt">s=</span><span class="dv">1</span>, <span class="dt">n=</span><span class="dv">50</span>){</span>
+<span id="cb3-9"><a href="#cb3-9"></a>  <span class="kw">t</span>(<span class="kw">sapply</span>(<span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">length.out =</span> n), <span class="cf">function</span>(t){</span>
+<span id="cb3-10"><a href="#cb3-10"></a>    <span class="kw">gyroABt</span>(A, B, t, s)</span>
+<span id="cb3-11"><a href="#cb3-11"></a>  }))</span>
+<span id="cb3-12"><a href="#cb3-12"></a>}</span></code></pre>
+      </div>
+      <p>Let’s plot a two-dimensional gyrosegment.</p>
+      <div class="sourceCode" id="cb4">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>A &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>); B &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>)</span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="kw">plot</span>(<span class="kw">rbind</span>(A,B), <span class="dt">type =</span> <span class="st">"p"</span>, <span class="dt">pch =</span> <span class="dv">19</span>, <span class="dt">xlab =</span> <span class="ot">NA</span>, <span class="dt">ylab =</span> <span class="ot">NA</span>, </span>
+<span id="cb4-3"><a href="#cb4-3"></a>     <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">2</span>), <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">2</span>))</span>
+<span id="cb4-4"><a href="#cb4-4"></a>s &lt;-<span class="st"> </span><span class="fl">0.2</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a>AB &lt;-<span class="st"> </span><span class="kw">gyrosegment</span>(A, B, s)</span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="kw">lines</span>(AB)</span>
+<span id="cb4-7"><a href="#cb4-7"></a><span class="kw">text</span>(<span class="kw">t</span>(A), <span class="kw">expression</span>(<span class="kw">italic</span>(A)), <span class="dt">pos=</span><span class="dv">1</span>)</span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="kw">text</span>(<span class="kw">t</span>(B), <span class="kw">expression</span>(<span class="kw">italic</span>(B)), <span class="dt">pos=</span><span class="dv">3</span>)</span>
+<span id="cb4-9"><a href="#cb4-9"></a><span class="co"># gyromidpoint</span></span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="kw">points</span>(<span class="kw">t</span>(<span class="kw">gyromidpoint</span>(A, B, s)), <span class="dt">pch =</span> <span class="dv">19</span>, <span class="dt">col =</span> <span class="st">"red"</span>)</span>
+<span id="cb4-11"><a href="#cb4-11"></a><span class="co"># asymptotes</span></span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="kw">lines</span>(<span class="kw">rbind</span>(<span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>), <span class="kw">gyroABt</span>(A, B, <span class="dt">t=</span><span class="op">-</span><span class="dv">20</span>, s)), <span class="dt">lty=</span><span class="st">"dashed"</span>)</span>
+<span id="cb4-13"><a href="#cb4-13"></a><span class="kw">lines</span>(<span class="kw">rbind</span>(<span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>), <span class="kw">gyroABt</span>(A, B, <span class="dt">t=</span><span class="dv">20</span>, s)), <span class="dt">lty=</span><span class="st">"dashed"</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/hyperbolicPolyhedra-gyrosegment2d-1.png"
+        />
+      </p>
+      <p>This is a part of a hyperbola whose asymptotes meet at the origin.</p>
+      <h2 id="hyperbolic-triangle">Hyperbolic triangle</h2>
+      <p>
+        Thanks to the gyrosegments, we can easily plot the edges of a hyperbolic
+        triangle.
+      </p>
+      <div class="sourceCode" id="cb5">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="kw">library</span>(rgl)</span>
+<span id="cb5-2"><a href="#cb5-2"></a>A &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>); B &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>); C &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb5-3"><a href="#cb5-3"></a>s &lt;-<span class="st"> </span><span class="fl">0.3</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a>AB &lt;-<span class="st"> </span><span class="kw">gyrosegment</span>(A, B, s)</span>
+<span id="cb5-5"><a href="#cb5-5"></a>AC &lt;-<span class="st"> </span><span class="kw">gyrosegment</span>(A, C, s)</span>
+<span id="cb5-6"><a href="#cb5-6"></a>BC &lt;-<span class="st"> </span><span class="kw">gyrosegment</span>(B, C, s)</span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="kw">view3d</span>(<span class="dv">30</span>, <span class="dv">30</span>, <span class="dt">zoom =</span> <span class="fl">0.75</span>)</span>
+<span id="cb5-8"><a href="#cb5-8"></a><span class="kw">lines3d</span>(AB, <span class="dt">lwd=</span><span class="dv">3</span>); <span class="kw">lines3d</span>(AC, <span class="dt">lwd=</span><span class="dv">3</span>); <span class="kw">lines3d</span>(BC, <span class="dt">lwd=</span><span class="dv">3</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/hyperbolicPolyhedra-htriangle1-1.png"
+        />
+      </p>
+      <p>
+        We can draw a prettier picture with the help of the
+        <code>cylinder3d</code> function of <code>rgl</code>:
+      </p>
+      <div class="sourceCode" id="cb6">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="kw">view3d</span>(<span class="dv">30</span>, <span class="dv">30</span>, <span class="dt">zoom =</span> <span class="fl">0.75</span>)</span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="co"># plot vertices</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="kw">spheres3d</span>(<span class="kw">rbind</span>(A,B,C), <span class="dt">radius =</span> <span class="fl">0.03</span>, <span class="dt">color =</span> <span class="st">"yellow"</span>)</span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="co"># plot edges</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="kw">shade3d</span>(</span>
+<span id="cb6-6"><a href="#cb6-6"></a>  <span class="kw">cylinder3d</span>(AB, <span class="dt">radius =</span> <span class="fl">0.015</span>, <span class="dt">sides =</span> <span class="dv">20</span>), <span class="dt">color =</span> <span class="st">"yellow"</span>)</span>
+<span id="cb6-7"><a href="#cb6-7"></a><span class="kw">shade3d</span>(</span>
+<span id="cb6-8"><a href="#cb6-8"></a>  <span class="kw">cylinder3d</span>(AC, <span class="dt">radius =</span> <span class="fl">0.015</span>, <span class="dt">sides =</span> <span class="dv">20</span>), <span class="dt">color =</span> <span class="st">"yellow"</span>)</span>
+<span id="cb6-9"><a href="#cb6-9"></a><span class="kw">shade3d</span>(</span>
+<span id="cb6-10"><a href="#cb6-10"></a>  <span class="kw">cylinder3d</span>(BC, <span class="dt">radius =</span> <span class="fl">0.015</span>, <span class="dt">sides =</span> <span class="dv">20</span>), <span class="dt">color =</span> <span class="st">"yellow"</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/hyperbolicPolyhedra-htriangle2-1.png"
+        />
+      </p>
+      <p>
+        Now, how to fill the hyperbolic triangle with a color? We will do so by
+        constructing a triangular mesh of the hyperbolic triangle.
+      </p>
+      <div class="sourceCode" id="cb7">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># a subdivision step</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a>gyrosubdiv0 &lt;-<span class="st"> </span><span class="cf">function</span>(A1, A2, A3, <span class="dt">s=</span><span class="dv">1</span>){</span>
+<span id="cb7-3"><a href="#cb7-3"></a>  M12 &lt;-<span class="st"> </span><span class="kw">gyromidpoint</span>(A1, A2, s)</span>
+<span id="cb7-4"><a href="#cb7-4"></a>  M13 &lt;-<span class="st"> </span><span class="kw">gyromidpoint</span>(A1, A3, s)</span>
+<span id="cb7-5"><a href="#cb7-5"></a>  M23 &lt;-<span class="st"> </span><span class="kw">gyromidpoint</span>(A2, A3, s)</span>
+<span id="cb7-6"><a href="#cb7-6"></a>  <span class="kw">list</span>(</span>
+<span id="cb7-7"><a href="#cb7-7"></a>    <span class="kw">list</span>(A1, M12, M13),</span>
+<span id="cb7-8"><a href="#cb7-8"></a>    <span class="kw">list</span>(A2, M23, M12),</span>
+<span id="cb7-9"><a href="#cb7-9"></a>    <span class="kw">list</span>(A3, M13, M23),</span>
+<span id="cb7-10"><a href="#cb7-10"></a>    <span class="kw">list</span>(M12, M13, M23)</span>
+<span id="cb7-11"><a href="#cb7-11"></a>  )</span>
+<span id="cb7-12"><a href="#cb7-12"></a>}</span>
+<span id="cb7-13"><a href="#cb7-13"></a><span class="co"># iterate the subdivision, and return a "mesh3d" object</span></span>
+<span id="cb7-14"><a href="#cb7-14"></a>gyrosubdiv &lt;-<span class="st"> </span><span class="cf">function</span>(A1, A2, A3, <span class="dt">s=</span><span class="dv">1</span>, <span class="dt">depth=</span><span class="dv">5</span>){</span>
+<span id="cb7-15"><a href="#cb7-15"></a>  subd &lt;-<span class="st"> </span><span class="kw">gyrosubdiv0</span>(A1, A2, A3, s)</span>
+<span id="cb7-16"><a href="#cb7-16"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_len</span>(depth<span class="dv">-1</span>)){</span>
+<span id="cb7-17"><a href="#cb7-17"></a>    subd &lt;-<span class="st"> </span>purrr<span class="op">::</span><span class="kw">flatten</span>(<span class="kw">lapply</span>(subd, <span class="cf">function</span>(triplet){</span>
+<span id="cb7-18"><a href="#cb7-18"></a>      <span class="kw">gyrosubdiv0</span>(triplet[[<span class="dv">1</span>]], triplet[[<span class="dv">2</span>]], triplet[[<span class="dv">3</span>]], s)</span>
+<span id="cb7-19"><a href="#cb7-19"></a>    }))</span>
+<span id="cb7-20"><a href="#cb7-20"></a>  }</span>
+<span id="cb7-21"><a href="#cb7-21"></a>  vertices &lt;-<span class="st"> </span></span>
+<span id="cb7-22"><a href="#cb7-22"></a><span class="st">    </span><span class="kw">do.call</span>(cbind, </span>
+<span id="cb7-23"><a href="#cb7-23"></a>            <span class="kw">lapply</span>(subd, <span class="cf">function</span>(triplet) <span class="kw">do.call</span>(cbind, triplet)))</span>
+<span id="cb7-24"><a href="#cb7-24"></a>  indices &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(vertices), <span class="dt">nrow =</span> <span class="dv">3</span>)</span>
+<span id="cb7-25"><a href="#cb7-25"></a>  <span class="kw">tmesh3d</span>(</span>
+<span id="cb7-26"><a href="#cb7-26"></a>    <span class="dt">vertices =</span> vertices,</span>
+<span id="cb7-27"><a href="#cb7-27"></a>    <span class="dt">indices =</span> indices,</span>
+<span id="cb7-28"><a href="#cb7-28"></a>    <span class="dt">homogeneous =</span> <span class="ot">FALSE</span></span>
+<span id="cb7-29"><a href="#cb7-29"></a>  )</span>
+<span id="cb7-30"><a href="#cb7-30"></a>}</span></code></pre>
+      </div>
+      <p>Here is the mesh at the first iteration:</p>
+      <div class="sourceCode" id="cb8">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>mesh &lt;-<span class="st"> </span><span class="kw">gyrosubdiv</span>(A, B, C, s, <span class="dt">depth =</span> <span class="dv">1</span>)</span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="kw">view3d</span>(<span class="dv">30</span>, <span class="dv">30</span>, <span class="dt">zoom =</span> <span class="fl">0.75</span>)</span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="kw">wire3d</span>(mesh, <span class="dt">lwd =</span> <span class="dv">3</span>, <span class="dt">specular =</span> <span class="st">"black"</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/hyperbolicPolyhedra-wire1-1.png"
+        />
+      </p>
+      <p>At the second iteration:</p>
+      <div class="sourceCode" id="cb9">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>mesh &lt;-<span class="st"> </span><span class="kw">gyrosubdiv</span>(A, B, C, s, <span class="dt">depth =</span> <span class="dv">2</span>)</span>
+<span id="cb9-2"><a href="#cb9-2"></a><span class="kw">view3d</span>(<span class="dv">30</span>, <span class="dv">30</span>, <span class="dt">zoom =</span> <span class="fl">0.75</span>)</span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="kw">wire3d</span>(mesh, <span class="dt">lwd =</span> <span class="dv">3</span>, <span class="dt">specular =</span> <span class="st">"black"</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/hyperbolicPolyhedra-wire2-1.png"
+        />
+      </p>
+      <p>Now let’s plot the shaded triangle:</p>
+      <div class="sourceCode" id="cb10">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>mesh &lt;-<span class="st"> </span><span class="kw">gyrosubdiv</span>(A, B, C, s, <span class="dt">depth =</span> <span class="dv">6</span>)</span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="kw">view3d</span>(<span class="dv">30</span>, <span class="dv">30</span>, <span class="dt">zoom =</span> <span class="fl">0.75</span>)</span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">"navy"</span>, <span class="dt">specular =</span> <span class="st">"cyan"</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/hyperbolicPolyhedra-shadedTriangle-1.png"
+        />
+      </p>
+      <h2 id="icosahedron">Icosahedron</h2>
+      <p>
+        An icosahedron is made of twenty triangular faces. So we have everything
+        needed to plot an icosahedron.
+      </p>
+      <div class="sourceCode" id="cb11">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>icosahedron &lt;-<span class="st"> </span><span class="kw">icosahedron3d</span>()</span>
+<span id="cb11-2"><a href="#cb11-2"></a>vertices &lt;-<span class="st"> </span><span class="kw">t</span>(icosahedron<span class="op">$</span>vb[<span class="op">-</span><span class="dv">4</span>,])</span>
+<span id="cb11-3"><a href="#cb11-3"></a>edges &lt;-<span class="st"> </span>Rvcg<span class="op">::</span><span class="kw">vcgGetEdge</span>(icosahedron)</span>
+<span id="cb11-4"><a href="#cb11-4"></a>faces &lt;-<span class="st"> </span><span class="kw">t</span>(icosahedron<span class="op">$</span>it)</span>
+<span id="cb11-5"><a href="#cb11-5"></a>s &lt;-<span class="st"> </span><span class="fl">0.5</span></span>
+<span id="cb11-6"><a href="#cb11-6"></a><span class="co"># plot icosahedron ####</span></span>
+<span id="cb11-7"><a href="#cb11-7"></a><span class="kw">view3d</span>(<span class="dv">30</span>, <span class="dv">30</span>, <span class="dt">zoom =</span> <span class="fl">0.7</span>)</span>
+<span id="cb11-8"><a href="#cb11-8"></a><span class="co"># plot vertices</span></span>
+<span id="cb11-9"><a href="#cb11-9"></a><span class="kw">spheres3d</span>(vertices, <span class="dt">radius =</span> <span class="fl">0.05</span>, <span class="dt">color =</span> <span class="st">"yellow"</span>)</span>
+<span id="cb11-10"><a href="#cb11-10"></a><span class="co"># plot edges</span></span>
+<span id="cb11-11"><a href="#cb11-11"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(edges)){</span>
+<span id="cb11-12"><a href="#cb11-12"></a>  A &lt;-<span class="st"> </span>vertices[edges[i,<span class="st">"vert1"</span>],]</span>
+<span id="cb11-13"><a href="#cb11-13"></a>  B &lt;-<span class="st"> </span>vertices[edges[i,<span class="st">"vert2"</span>],]</span>
+<span id="cb11-14"><a href="#cb11-14"></a>  AB &lt;-<span class="st"> </span><span class="kw">gyrosegment</span>(A, B, s)</span>
+<span id="cb11-15"><a href="#cb11-15"></a>  <span class="kw">shade3d</span>(</span>
+<span id="cb11-16"><a href="#cb11-16"></a>    <span class="kw">cylinder3d</span>(AB, <span class="dt">radius =</span> <span class="fl">0.03</span>, <span class="dt">sides =</span> <span class="dv">20</span>), <span class="dt">color =</span> <span class="st">"yellow"</span>)</span>
+<span id="cb11-17"><a href="#cb11-17"></a>}</span>
+<span id="cb11-18"><a href="#cb11-18"></a><span class="co"># plot faces</span></span>
+<span id="cb11-19"><a href="#cb11-19"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(faces)){</span>
+<span id="cb11-20"><a href="#cb11-20"></a>  idx &lt;-<span class="st"> </span>faces[i,]</span>
+<span id="cb11-21"><a href="#cb11-21"></a>  A &lt;-<span class="st"> </span>vertices[idx[<span class="dv">1</span>],]</span>
+<span id="cb11-22"><a href="#cb11-22"></a>  B &lt;-<span class="st"> </span>vertices[idx[<span class="dv">2</span>],]</span>
+<span id="cb11-23"><a href="#cb11-23"></a>  C &lt;-<span class="st"> </span>vertices[idx[<span class="dv">3</span>],]</span>
+<span id="cb11-24"><a href="#cb11-24"></a>  mesh &lt;-<span class="st"> </span><span class="kw">gyrosubdiv</span>(A, B, C, <span class="dt">s =</span> s, <span class="dt">depth =</span> <span class="dv">6</span>)</span>
+<span id="cb11-25"><a href="#cb11-25"></a>  <span class="kw">shade3d</span>(<span class="kw">addNormals</span>(mesh), <span class="dt">color =</span> <span class="st">"navy"</span>)</span>
+<span id="cb11-26"><a href="#cb11-26"></a>}</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/hyperbolicPolyhedra-icosahedron-1.png"
+        />
+      </p>
+      <h2 id="triangular-orthobicopula">Triangular orthobicopula</h2>
+      <p>
+        To plot the icosahedron, we had at our disposal its vertices, its edges,
+        and its faces, which are triangular.
+      </p>
+      <p>
+        Now consider the
+        <a href="http://eusebeia.dyndns.org/4d/J27">triangular orthobicopula</a
+        >. We only have the coordinates of its vertices, and not all its faces
+        are triangular. So, how to plot it?
+      </p>
+      <p>
+        Since this is a convex polyhedron, we can use the
+        <code>cxhull</code> package to get its edges and its faces. We use the
+        option <code>triangulate = TRUE</code> to get a triangulation of the
+        faces.
+      </p>
+      <div class="sourceCode" id="cb12">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>vertices &lt;-<span class="st"> </span><span class="kw">rbind</span>(</span>
+<span id="cb12-2"><a href="#cb12-2"></a>  <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">-1</span><span class="op">/</span><span class="kw">sqrt</span>(<span class="dv">3</span>), <span class="kw">sqrt</span>(<span class="dv">8</span><span class="op">/</span><span class="dv">3</span>)),</span>
+<span id="cb12-3"><a href="#cb12-3"></a>  <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">-1</span><span class="op">/</span><span class="kw">sqrt</span>(<span class="dv">3</span>), <span class="op">-</span><span class="kw">sqrt</span>(<span class="dv">8</span><span class="op">/</span><span class="dv">3</span>)),</span>
+<span id="cb12-4"><a href="#cb12-4"></a>  <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">-1</span><span class="op">/</span><span class="kw">sqrt</span>(<span class="dv">3</span>), <span class="kw">sqrt</span>(<span class="dv">8</span><span class="op">/</span><span class="dv">3</span>)),</span>
+<span id="cb12-5"><a href="#cb12-5"></a>  <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">-1</span><span class="op">/</span><span class="kw">sqrt</span>(<span class="dv">3</span>), <span class="op">-</span><span class="kw">sqrt</span>(<span class="dv">8</span><span class="op">/</span><span class="dv">3</span>)),</span>
+<span id="cb12-6"><a href="#cb12-6"></a>  <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">/</span><span class="kw">sqrt</span>(<span class="dv">3</span>), <span class="kw">sqrt</span>(<span class="dv">8</span><span class="op">/</span><span class="dv">3</span>)),</span>
+<span id="cb12-7"><a href="#cb12-7"></a>  <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">/</span><span class="kw">sqrt</span>(<span class="dv">3</span>), <span class="op">-</span><span class="kw">sqrt</span>(<span class="dv">8</span><span class="op">/</span><span class="dv">3</span>)),</span>
+<span id="cb12-8"><a href="#cb12-8"></a>  <span class="kw">c</span>(<span class="dv">1</span>, <span class="kw">sqrt</span>(<span class="dv">3</span>), <span class="dv">0</span>),</span>
+<span id="cb12-9"><a href="#cb12-9"></a>  <span class="kw">c</span>(<span class="dv">1</span>, <span class="op">-</span><span class="kw">sqrt</span>(<span class="dv">3</span>), <span class="dv">0</span>),</span>
+<span id="cb12-10"><a href="#cb12-10"></a>  <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="kw">sqrt</span>(<span class="dv">3</span>), <span class="dv">0</span>),</span>
+<span id="cb12-11"><a href="#cb12-11"></a>  <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="op">-</span><span class="kw">sqrt</span>(<span class="dv">3</span>), <span class="dv">0</span>),</span>
+<span id="cb12-12"><a href="#cb12-12"></a>  <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">0</span>, <span class="dv">0</span>),</span>
+<span id="cb12-13"><a href="#cb12-13"></a>  <span class="kw">c</span>(<span class="op">-</span><span class="dv">2</span>, <span class="dv">0</span>, <span class="dv">0</span>)</span>
+<span id="cb12-14"><a href="#cb12-14"></a>)</span>
+<span id="cb12-15"><a href="#cb12-15"></a><span class="co"># faces </span></span>
+<span id="cb12-16"><a href="#cb12-16"></a><span class="kw">library</span>(cxhull)</span>
+<span id="cb12-17"><a href="#cb12-17"></a>hull &lt;-<span class="st"> </span><span class="kw">cxhull</span>(vertices, <span class="dt">triangulate =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb12-18"><a href="#cb12-18"></a>faces &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">sapply</span>(hull<span class="op">$</span>facets, <span class="st">`</span><span class="dt">[[</span><span class="st">`</span>, <span class="st">"vertices"</span>))</span>
+<span id="cb12-19"><a href="#cb12-19"></a><span class="co"># edges</span></span>
+<span id="cb12-20"><a href="#cb12-20"></a>hull &lt;-<span class="st"> </span><span class="kw">cxhull</span>(vertices, <span class="dt">triangulate =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb12-21"><a href="#cb12-21"></a>edges &lt;-<span class="st"> </span>hull<span class="op">$</span>edges</span></code></pre>
+      </div>
+      <p>And now we can proceed as before:</p>
+      <div class="sourceCode" id="cb13">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>s &lt;-<span class="st"> </span><span class="fl">0.5</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a><span class="kw">view3d</span>(<span class="dv">30</span>, <span class="dv">30</span>, <span class="dt">zoom =</span> <span class="fl">0.7</span>)</span>
+<span id="cb13-3"><a href="#cb13-3"></a><span class="co"># plot vertices</span></span>
+<span id="cb13-4"><a href="#cb13-4"></a><span class="kw">spheres3d</span>(vertices, <span class="dt">radius =</span> <span class="fl">0.05</span>, <span class="dt">color =</span> <span class="st">"yellow"</span>)</span>
+<span id="cb13-5"><a href="#cb13-5"></a><span class="co"># plot edges</span></span>
+<span id="cb13-6"><a href="#cb13-6"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(edges)){</span>
+<span id="cb13-7"><a href="#cb13-7"></a>  A &lt;-<span class="st"> </span>vertices[edges[i,<span class="dv">1</span>],]</span>
+<span id="cb13-8"><a href="#cb13-8"></a>  B &lt;-<span class="st"> </span>vertices[edges[i,<span class="dv">2</span>],]</span>
+<span id="cb13-9"><a href="#cb13-9"></a>  AB &lt;-<span class="st"> </span><span class="kw">gyrosegment</span>(A, B, s)</span>
+<span id="cb13-10"><a href="#cb13-10"></a>  <span class="kw">shade3d</span>(</span>
+<span id="cb13-11"><a href="#cb13-11"></a>    <span class="kw">cylinder3d</span>(AB, <span class="dt">radius =</span> <span class="fl">0.03</span>, <span class="dt">sides =</span> <span class="dv">20</span>), <span class="dt">color =</span> <span class="st">"yellow"</span>)</span>
+<span id="cb13-12"><a href="#cb13-12"></a>}</span>
+<span id="cb13-13"><a href="#cb13-13"></a><span class="co"># plot faces</span></span>
+<span id="cb13-14"><a href="#cb13-14"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(faces)){</span>
+<span id="cb13-15"><a href="#cb13-15"></a>  idx &lt;-<span class="st"> </span>faces[i,]</span>
+<span id="cb13-16"><a href="#cb13-16"></a>  A &lt;-<span class="st"> </span>vertices[idx[<span class="dv">1</span>],]</span>
+<span id="cb13-17"><a href="#cb13-17"></a>  B &lt;-<span class="st"> </span>vertices[idx[<span class="dv">2</span>],]</span>
+<span id="cb13-18"><a href="#cb13-18"></a>  C &lt;-<span class="st"> </span>vertices[idx[<span class="dv">3</span>],]</span>
+<span id="cb13-19"><a href="#cb13-19"></a>  mesh &lt;-<span class="st"> </span><span class="kw">gyrosubdiv</span>(A, B, C, <span class="dt">s =</span> s, <span class="dt">depth =</span> <span class="dv">6</span>)</span>
+<span id="cb13-20"><a href="#cb13-20"></a>  <span class="kw">shade3d</span>(<span class="kw">addNormals</span>(mesh), <span class="dt">color =</span> <span class="st">"navy"</span>)</span>
+<span id="cb13-21"><a href="#cb13-21"></a>}</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/hyperbolicPolyhedra-triangularbicopula-1.png"
+        />
+      </p>
+      <h2 id="asymptote-hyperbolic-dodecahedron">
+        Asymptote hyperbolic dodecahedron
+      </h2>
+      <p>
+        Below is an Asymptote code which draws a hyperbolic dodecahedron. The
+        gyromidpoint is calculated differently, in a way that does not resort to
+        the scalar gyromultiplication.
+      </p>
+      <div class="sourceCode" id="cb14">
+        <pre
+          class="sourceCode numberSource c numberLines"
+        ><code class="sourceCode c"><span id="cb14-1"><a href="#cb14-1"></a>settings.render = <span class="dv">4</span>;</span>
+<span id="cb14-2"><a href="#cb14-2"></a>settings.outformat = <span class="st">"pdf"</span>;</span>
+<span id="cb14-3"><a href="#cb14-3"></a></span>
+<span id="cb14-4"><a href="#cb14-4"></a><span class="co">// modules -----------------------------------------------------------</span></span>
+<span id="cb14-5"><a href="#cb14-5"></a>import three;</span>
+<span id="cb14-6"><a href="#cb14-6"></a>import tube;</span>
+<span id="cb14-7"><a href="#cb14-7"></a></span>
+<span id="cb14-8"><a href="#cb14-8"></a><span class="co">// scene -------------------------------------------------------------</span></span>
+<span id="cb14-9"><a href="#cb14-9"></a>size(<span class="dv">10</span><span class="er">cm</span>);</span>
+<span id="cb14-10"><a href="#cb14-10"></a>currentprojection = orthographic(<span class="dv">20</span>, <span class="dv">10</span>, -<span class="dv">2</span>);</span>
+<span id="cb14-11"><a href="#cb14-11"></a>viewportmargin = (<span class="dv">10</span>,<span class="dv">10</span>);</span>
+<span id="cb14-12"><a href="#cb14-12"></a>currentlight = (<span class="dv">1000</span>,<span class="dv">500</span>,<span class="dv">100</span>);</span>
+<span id="cb14-13"><a href="#cb14-13"></a></span>
+<span id="cb14-14"><a href="#cb14-14"></a><span class="co">// gyromidpoint ------------------------------------------------------</span></span>
+<span id="cb14-15"><a href="#cb14-15"></a>real gamma(triple M, real s){</span>
+<span id="cb14-16"><a href="#cb14-16"></a>    <span class="cf">return</span> <span class="dv">1</span> / sqrt(<span class="dv">1</span> - dot(M,M)/s/s);</span>
+<span id="cb14-17"><a href="#cb14-17"></a>}</span>
+<span id="cb14-18"><a href="#cb14-18"></a></span>
+<span id="cb14-19"><a href="#cb14-19"></a>real beta(triple M, real s){</span>
+<span id="cb14-20"><a href="#cb14-20"></a>    <span class="cf">return</span> <span class="dv">1</span> / sqrt(<span class="dv">1</span> + dot(M,M)/s/s);</span>
+<span id="cb14-21"><a href="#cb14-21"></a>}</span>
+<span id="cb14-22"><a href="#cb14-22"></a></span>
+<span id="cb14-23"><a href="#cb14-23"></a>triple phiEU(triple M, real s){</span>
+<span id="cb14-24"><a href="#cb14-24"></a>    <span class="cf">return</span> gamma(M,s)*M;</span>
+<span id="cb14-25"><a href="#cb14-25"></a>}</span>
+<span id="cb14-26"><a href="#cb14-26"></a></span>
+<span id="cb14-27"><a href="#cb14-27"></a>triple phiUE(triple M, real s){</span>
+<span id="cb14-28"><a href="#cb14-28"></a>    <span class="cf">return</span> beta(M,s)*M;</span>
+<span id="cb14-29"><a href="#cb14-29"></a>}</span>
+<span id="cb14-30"><a href="#cb14-30"></a></span>
+<span id="cb14-31"><a href="#cb14-31"></a>triple gyromidpointE(triple A, triple B, real s){</span>
+<span id="cb14-32"><a href="#cb14-32"></a>    real gammaA = gamma(A,s);</span>
+<span id="cb14-33"><a href="#cb14-33"></a>    real gammaB = gamma(B,s);</span>
+<span id="cb14-34"><a href="#cb14-34"></a>    <span class="cf">return</span> (gammaA*A + gammaB*B)/(gammaA + gammaB); </span>
+<span id="cb14-35"><a href="#cb14-35"></a>}</span>
+<span id="cb14-36"><a href="#cb14-36"></a></span>
+<span id="cb14-37"><a href="#cb14-37"></a>triple gyromidpointU(triple A, triple B, real s){</span>
+<span id="cb14-38"><a href="#cb14-38"></a>    <span class="cf">return</span> phiEU(gyromidpointE(phiUE(A,s), phiUE(B,s), s), s);</span>
+<span id="cb14-39"><a href="#cb14-39"></a>}</span>
+<span id="cb14-40"><a href="#cb14-40"></a></span>
+<span id="cb14-41"><a href="#cb14-41"></a><span class="co">// mesh maker --------------------------------------------------------</span></span>
+<span id="cb14-42"><a href="#cb14-42"></a>triple[][] subdiv0(triple[] triangle, real s){</span>
+<span id="cb14-43"><a href="#cb14-43"></a>    triple m01 = gyromidpointU(triangle[<span class="dv">0</span>], triangle[<span class="dv">1</span>], s);</span>
+<span id="cb14-44"><a href="#cb14-44"></a>    triple m02 = gyromidpointU(triangle[<span class="dv">0</span>], triangle[<span class="dv">2</span>], s);</span>
+<span id="cb14-45"><a href="#cb14-45"></a>    triple m12 = gyromidpointU(triangle[<span class="dv">1</span>], triangle[<span class="dv">2</span>], s);</span>
+<span id="cb14-46"><a href="#cb14-46"></a>    <span class="cf">return</span> new triple[][] {</span>
+<span id="cb14-47"><a href="#cb14-47"></a>        {triangle[<span class="dv">0</span>], m01, m02}, </span>
+<span id="cb14-48"><a href="#cb14-48"></a>        {triangle[<span class="dv">1</span>], m12, m01}, </span>
+<span id="cb14-49"><a href="#cb14-49"></a>        {triangle[<span class="dv">2</span>], m02, m12}, </span>
+<span id="cb14-50"><a href="#cb14-50"></a>        {m01, m12, m02}</span>
+<span id="cb14-51"><a href="#cb14-51"></a>    };</span>
+<span id="cb14-52"><a href="#cb14-52"></a>}</span>
+<span id="cb14-53"><a href="#cb14-53"></a></span>
+<span id="cb14-54"><a href="#cb14-54"></a>triple[][] subdiv(<span class="dt">int</span> n, triple[] triangle, real s){</span>
+<span id="cb14-55"><a href="#cb14-55"></a>  <span class="cf">if</span>(n==<span class="dv">1</span>){</span>
+<span id="cb14-56"><a href="#cb14-56"></a>    <span class="cf">return</span> subdiv0(triangle, s);</span>
+<span id="cb14-57"><a href="#cb14-57"></a>  }</span>
+<span id="cb14-58"><a href="#cb14-58"></a>  triple[][] triangles = subdiv(n-<span class="dv">1</span>, triangle, s);</span>
+<span id="cb14-59"><a href="#cb14-59"></a>  triple[][] out = new triple[<span class="dv">0</span>][<span class="dv">3</span>];</span>
+<span id="cb14-60"><a href="#cb14-60"></a>  <span class="cf">for</span>(<span class="dt">int</span> i=<span class="dv">0</span>; i&lt;<span class="dv">4</span>^(n-<span class="dv">1</span>); ++i){</span>
+<span id="cb14-61"><a href="#cb14-61"></a>    triple[] trgl = triangles[i];</span>
+<span id="cb14-62"><a href="#cb14-62"></a>    out.append(subdiv0(trgl, s));</span>
+<span id="cb14-63"><a href="#cb14-63"></a>  }</span>
+<span id="cb14-64"><a href="#cb14-64"></a>  <span class="cf">return</span> out;</span>
+<span id="cb14-65"><a href="#cb14-65"></a>}</span>
+<span id="cb14-66"><a href="#cb14-66"></a></span>
+<span id="cb14-67"><a href="#cb14-67"></a><span class="kw">struct</span> Mesh {</span>
+<span id="cb14-68"><a href="#cb14-68"></a>    triple[] vertices;</span>
+<span id="cb14-69"><a href="#cb14-69"></a>    <span class="dt">int</span>[][] indices;</span>
+<span id="cb14-70"><a href="#cb14-70"></a>}</span>
+<span id="cb14-71"><a href="#cb14-71"></a></span>
+<span id="cb14-72"><a href="#cb14-72"></a>Mesh htriangle(<span class="dt">int</span> n, triple[] triangle, real s){</span>
+<span id="cb14-73"><a href="#cb14-73"></a>    triple[][] triangles = subdiv(n, triangle, s);</span>
+<span id="cb14-74"><a href="#cb14-74"></a>    triple[] vertices;</span>
+<span id="cb14-75"><a href="#cb14-75"></a>    <span class="dt">int</span>[][] indices;</span>
+<span id="cb14-76"><a href="#cb14-76"></a>    <span class="dt">int</span> faceIndex = <span class="dv">0</span>;</span>
+<span id="cb14-77"><a href="#cb14-77"></a>    <span class="cf">for</span>(<span class="dt">int</span> i=<span class="dv">0</span>; i&lt;triangles.length; ++i){</span>
+<span id="cb14-78"><a href="#cb14-78"></a>        var triangle = triangles[i];</span>
+<span id="cb14-79"><a href="#cb14-79"></a>        vertices.push(triangle[<span class="dv">0</span>]);</span>
+<span id="cb14-80"><a href="#cb14-80"></a>        vertices.push(triangle[<span class="dv">1</span>]);</span>
+<span id="cb14-81"><a href="#cb14-81"></a>        vertices.push(triangle[<span class="dv">2</span>]);</span>
+<span id="cb14-82"><a href="#cb14-82"></a>        <span class="dt">int</span>[] x = {faceIndex, faceIndex+<span class="dv">1</span>, faceIndex+<span class="dv">2</span>};</span>
+<span id="cb14-83"><a href="#cb14-83"></a>        indices.push(x);</span>
+<span id="cb14-84"><a href="#cb14-84"></a>        faceIndex += <span class="dv">3</span>;</span>
+<span id="cb14-85"><a href="#cb14-85"></a>    }</span>
+<span id="cb14-86"><a href="#cb14-86"></a>    Mesh out;</span>
+<span id="cb14-87"><a href="#cb14-87"></a>    out.vertices = vertices;</span>
+<span id="cb14-88"><a href="#cb14-88"></a>    out.indices = indices;</span>
+<span id="cb14-89"><a href="#cb14-89"></a>    <span class="cf">return</span> out;</span>
+<span id="cb14-90"><a href="#cb14-90"></a>}</span>
+<span id="cb14-91"><a href="#cb14-91"></a></span>
+<span id="cb14-92"><a href="#cb14-92"></a><span class="co">// gyrosegment -------------------------------------------------------</span></span>
+<span id="cb14-93"><a href="#cb14-93"></a>triple gyroadd(triple A, triple B, real s){</span>
+<span id="cb14-94"><a href="#cb14-94"></a>    real betaA = beta(A,s);</span>
+<span id="cb14-95"><a href="#cb14-95"></a>    real betaB = beta(B,s);</span>
+<span id="cb14-96"><a href="#cb14-96"></a>    <span class="cf">return</span> A + B + (betaA/(<span class="dv">1</span>+betaA)*dot(A,B)/s/s + (<span class="dv">1</span>-betaB)/betaB)*A; </span>
+<span id="cb14-97"><a href="#cb14-97"></a>}</span>
+<span id="cb14-98"><a href="#cb14-98"></a></span>
+<span id="cb14-99"><a href="#cb14-99"></a>triple gyroscalar(real r, triple X, real s){</span>
+<span id="cb14-100"><a href="#cb14-100"></a>    real Xnorm = length(X);</span>
+<span id="cb14-101"><a href="#cb14-101"></a>    <span class="cf">return</span> s*sinh(r*asinh(Xnorm/s)) * X/Xnorm;</span>
+<span id="cb14-102"><a href="#cb14-102"></a>}</span>
+<span id="cb14-103"><a href="#cb14-103"></a></span>
+<span id="cb14-104"><a href="#cb14-104"></a>triple gyroABt(triple A, triple B, real t, real s){</span>
+<span id="cb14-105"><a href="#cb14-105"></a>    <span class="cf">return</span> gyroadd(A, gyroscalar(t, gyroadd(-A, B, s=s), s=s), s=s);</span>
+<span id="cb14-106"><a href="#cb14-106"></a>}</span>
+<span id="cb14-107"><a href="#cb14-107"></a></span>
+<span id="cb14-108"><a href="#cb14-108"></a>path3 gyrosegment(triple A, triple B, real s, <span class="dt">int</span> n){</span>
+<span id="cb14-109"><a href="#cb14-109"></a>    path3 out;</span>
+<span id="cb14-110"><a href="#cb14-110"></a>    <span class="cf">for</span>(<span class="dt">int</span> i = <span class="dv">0</span>; i &lt;= n; ++i){</span>
+<span id="cb14-111"><a href="#cb14-111"></a>        out = out -- gyroABt(A, B, i/n, s);</span>
+<span id="cb14-112"><a href="#cb14-112"></a>    }</span>
+<span id="cb14-113"><a href="#cb14-113"></a>    <span class="cf">return</span> out;</span>
+<span id="cb14-114"><a href="#cb14-114"></a>}</span>
+<span id="cb14-115"><a href="#cb14-115"></a></span>
+<span id="cb14-116"><a href="#cb14-116"></a><span class="co">// dodecahedron vertices ---------------------------------------------</span></span>
+<span id="cb14-117"><a href="#cb14-117"></a>real phi = (<span class="dv">1</span> + sqrt(<span class="dv">5</span>)) / <span class="dv">2</span>;</span>
+<span id="cb14-118"><a href="#cb14-118"></a>real a = <span class="dv">1</span> / sqrt(<span class="dv">3</span>);</span>
+<span id="cb14-119"><a href="#cb14-119"></a>real b = a / phi;</span>
+<span id="cb14-120"><a href="#cb14-120"></a>real c = a * phi;</span>
+<span id="cb14-121"><a href="#cb14-121"></a>triple[] vertices = </span>
+<span id="cb14-122"><a href="#cb14-122"></a>    {(a, a, a),</span>
+<span id="cb14-123"><a href="#cb14-123"></a>    (a, a, -a),</span>
+<span id="cb14-124"><a href="#cb14-124"></a>    (a, -a, a),</span>
+<span id="cb14-125"><a href="#cb14-125"></a>    (-a, -a, a),</span>
+<span id="cb14-126"><a href="#cb14-126"></a>    (-a, a, -a),</span>
+<span id="cb14-127"><a href="#cb14-127"></a>    (-a, a, a),</span>
+<span id="cb14-128"><a href="#cb14-128"></a>    (<span class="dv">0</span>, b, -c),</span>
+<span id="cb14-129"><a href="#cb14-129"></a>    (<span class="dv">0</span>, -b, -c),</span>
+<span id="cb14-130"><a href="#cb14-130"></a>    (<span class="dv">0</span>, -b, c),</span>
+<span id="cb14-131"><a href="#cb14-131"></a>    (c, <span class="dv">0</span>, -b),</span>
+<span id="cb14-132"><a href="#cb14-132"></a>    (-c, <span class="dv">0</span>, -b),</span>
+<span id="cb14-133"><a href="#cb14-133"></a>    (-c, <span class="dv">0</span>, b),</span>
+<span id="cb14-134"><a href="#cb14-134"></a>    (b, c, <span class="dv">0</span>),</span>
+<span id="cb14-135"><a href="#cb14-135"></a>    (b, -c, <span class="dv">0</span>),</span>
+<span id="cb14-136"><a href="#cb14-136"></a>    (-b, -c, <span class="dv">0</span>),</span>
+<span id="cb14-137"><a href="#cb14-137"></a>    (-b, c, <span class="dv">0</span>),</span>
+<span id="cb14-138"><a href="#cb14-138"></a>    (<span class="dv">0</span>, b, c),</span>
+<span id="cb14-139"><a href="#cb14-139"></a>    (a, -a, -a),</span>
+<span id="cb14-140"><a href="#cb14-140"></a>    (c, <span class="dv">0</span>, b),</span>
+<span id="cb14-141"><a href="#cb14-141"></a>    (-a, -a, -a)};</span>
+<span id="cb14-142"><a href="#cb14-142"></a>    </span>
+<span id="cb14-143"><a href="#cb14-143"></a><span class="co">// dodecahedron faces ------------------------------------------------</span></span>
+<span id="cb14-144"><a href="#cb14-144"></a><span class="dt">int</span>[][] faces = </span>
+<span id="cb14-145"><a href="#cb14-145"></a>    {</span>
+<span id="cb14-146"><a href="#cb14-146"></a>        {<span class="dv">13</span>, <span class="dv">2</span>, <span class="dv">3</span>},</span>
+<span id="cb14-147"><a href="#cb14-147"></a>        {<span class="dv">3</span>, <span class="dv">14</span>, <span class="dv">13</span>},</span>
+<span id="cb14-148"><a href="#cb14-148"></a>        {<span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">8</span>},</span>
+<span id="cb14-149"><a href="#cb14-149"></a>        {<span class="dv">17</span>, <span class="dv">1</span>, <span class="dv">9</span>},</span>
+<span id="cb14-150"><a href="#cb14-150"></a>        {<span class="dv">6</span>, <span class="dv">1</span>, <span class="dv">17</span>},</span>
+<span id="cb14-151"><a href="#cb14-151"></a>        {<span class="dv">17</span>, <span class="dv">7</span>, <span class="dv">6</span>},</span>
+<span id="cb14-152"><a href="#cb14-152"></a>        {<span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">19</span>},</span>
+<span id="cb14-153"><a href="#cb14-153"></a>        {<span class="dv">19</span>, <span class="dv">4</span>, <span class="dv">6</span>},</span>
+<span id="cb14-154"><a href="#cb14-154"></a>        {<span class="dv">10</span>, <span class="dv">4</span>, <span class="dv">19</span>},</span>
+<span id="cb14-155"><a href="#cb14-155"></a>        {<span class="dv">13</span>, <span class="dv">14</span>, <span class="dv">19</span>},</span>
+<span id="cb14-156"><a href="#cb14-156"></a>        {<span class="dv">19</span>, <span class="dv">17</span>, <span class="dv">13</span>},</span>
+<span id="cb14-157"><a href="#cb14-157"></a>        {<span class="dv">7</span>, <span class="dv">17</span>, <span class="dv">19</span>},</span>
+<span id="cb14-158"><a href="#cb14-158"></a>        {<span class="dv">15</span>, <span class="dv">1</span>, <span class="dv">6</span>},</span>
+<span id="cb14-159"><a href="#cb14-159"></a>        {<span class="dv">12</span>, <span class="dv">1</span>, <span class="dv">15</span>},</span>
+<span id="cb14-160"><a href="#cb14-160"></a>        {<span class="dv">6</span>, <span class="dv">4</span>, <span class="dv">15</span>},</span>
+<span id="cb14-161"><a href="#cb14-161"></a>        {<span class="dv">15</span>, <span class="dv">0</span>, <span class="dv">12</span>},</span>
+<span id="cb14-162"><a href="#cb14-162"></a>        {<span class="dv">15</span>, <span class="dv">16</span>, <span class="dv">0</span>},</span>
+<span id="cb14-163"><a href="#cb14-163"></a>        {<span class="dv">5</span>, <span class="dv">16</span>, <span class="dv">15</span>},</span>
+<span id="cb14-164"><a href="#cb14-164"></a>        {<span class="dv">18</span>, <span class="dv">1</span>, <span class="dv">12</span>},</span>
+<span id="cb14-165"><a href="#cb14-165"></a>        {<span class="dv">12</span>, <span class="dv">0</span>, <span class="dv">18</span>},</span>
+<span id="cb14-166"><a href="#cb14-166"></a>        {<span class="dv">9</span>, <span class="dv">1</span>, <span class="dv">18</span>},</span>
+<span id="cb14-167"><a href="#cb14-167"></a>        {<span class="dv">0</span>, <span class="dv">16</span>, <span class="dv">18</span>},</span>
+<span id="cb14-168"><a href="#cb14-168"></a>        {<span class="dv">8</span>, <span class="dv">2</span>, <span class="dv">18</span>},</span>
+<span id="cb14-169"><a href="#cb14-169"></a>        {<span class="dv">18</span>, <span class="dv">16</span>, <span class="dv">8</span>},</span>
+<span id="cb14-170"><a href="#cb14-170"></a>        {<span class="dv">18</span>, <span class="dv">2</span>, <span class="dv">13</span>},</span>
+<span id="cb14-171"><a href="#cb14-171"></a>        {<span class="dv">18</span>, <span class="dv">17</span>, <span class="dv">9</span>},</span>
+<span id="cb14-172"><a href="#cb14-172"></a>        {<span class="dv">13</span>, <span class="dv">17</span>, <span class="dv">18</span>},</span>
+<span id="cb14-173"><a href="#cb14-173"></a>        {<span class="dv">8</span>, <span class="dv">16</span>, <span class="dv">11</span>},</span>
+<span id="cb14-174"><a href="#cb14-174"></a>        {<span class="dv">11</span>, <span class="dv">16</span>, <span class="dv">5</span>},</span>
+<span id="cb14-175"><a href="#cb14-175"></a>        {<span class="dv">11</span>, <span class="dv">3</span>, <span class="dv">8</span>},</span>
+<span id="cb14-176"><a href="#cb14-176"></a>        {<span class="dv">14</span>, <span class="dv">3</span>, <span class="dv">11</span>},</span>
+<span id="cb14-177"><a href="#cb14-177"></a>        {<span class="dv">11</span>, <span class="dv">19</span>, <span class="dv">14</span>},</span>
+<span id="cb14-178"><a href="#cb14-178"></a>        {<span class="dv">10</span>, <span class="dv">19</span>, <span class="dv">11</span>},</span>
+<span id="cb14-179"><a href="#cb14-179"></a>        {<span class="dv">11</span>, <span class="dv">4</span>, <span class="dv">10</span>},</span>
+<span id="cb14-180"><a href="#cb14-180"></a>        {<span class="dv">5</span>, <span class="dv">15</span>, <span class="dv">11</span>},</span>
+<span id="cb14-181"><a href="#cb14-181"></a>        {<span class="dv">11</span>, <span class="dv">15</span>, <span class="dv">4</span>}</span>
+<span id="cb14-182"><a href="#cb14-182"></a>    };</span>
+<span id="cb14-183"><a href="#cb14-183"></a></span>
+<span id="cb14-184"><a href="#cb14-184"></a><span class="co">// dodecahedron edges ------------------------------------------------</span></span>
+<span id="cb14-185"><a href="#cb14-185"></a><span class="dt">int</span>[][] edges = </span>
+<span id="cb14-186"><a href="#cb14-186"></a>    {</span>
+<span id="cb14-187"><a href="#cb14-187"></a>     {<span class="dv">13</span>, <span class="dv">2</span>},</span>
+<span id="cb14-188"><a href="#cb14-188"></a>     {<span class="dv">3</span>, <span class="dv">14</span>},</span>
+<span id="cb14-189"><a href="#cb14-189"></a>     {<span class="dv">14</span>, <span class="dv">13</span>},</span>
+<span id="cb14-190"><a href="#cb14-190"></a>     {<span class="dv">3</span>, <span class="dv">8</span>},</span>
+<span id="cb14-191"><a href="#cb14-191"></a>     {<span class="dv">2</span>, <span class="dv">8</span>},</span>
+<span id="cb14-192"><a href="#cb14-192"></a>     {<span class="dv">17</span>, <span class="dv">9</span>},</span>
+<span id="cb14-193"><a href="#cb14-193"></a>     {<span class="dv">1</span>, <span class="dv">9</span>},</span>
+<span id="cb14-194"><a href="#cb14-194"></a>     {<span class="dv">6</span>, <span class="dv">1</span>},</span>
+<span id="cb14-195"><a href="#cb14-195"></a>     {<span class="dv">17</span>, <span class="dv">7</span>},</span>
+<span id="cb14-196"><a href="#cb14-196"></a>     {<span class="dv">7</span>, <span class="dv">6</span>},</span>
+<span id="cb14-197"><a href="#cb14-197"></a>     {<span class="dv">7</span>, <span class="dv">19</span>},</span>
+<span id="cb14-198"><a href="#cb14-198"></a>     {<span class="dv">4</span>, <span class="dv">6</span>},</span>
+<span id="cb14-199"><a href="#cb14-199"></a>     {<span class="dv">10</span>, <span class="dv">4</span>},</span>
+<span id="cb14-200"><a href="#cb14-200"></a>     {<span class="dv">10</span>, <span class="dv">19</span>},</span>
+<span id="cb14-201"><a href="#cb14-201"></a>     {<span class="dv">14</span>, <span class="dv">19</span>},</span>
+<span id="cb14-202"><a href="#cb14-202"></a>     {<span class="dv">17</span>, <span class="dv">13</span>},</span>
+<span id="cb14-203"><a href="#cb14-203"></a>     {<span class="dv">12</span>, <span class="dv">1</span>},</span>
+<span id="cb14-204"><a href="#cb14-204"></a>     {<span class="dv">12</span>, <span class="dv">15</span>},</span>
+<span id="cb14-205"><a href="#cb14-205"></a>     {<span class="dv">4</span>, <span class="dv">15</span>},</span>
+<span id="cb14-206"><a href="#cb14-206"></a>     {<span class="dv">0</span>, <span class="dv">12</span>},</span>
+<span id="cb14-207"><a href="#cb14-207"></a>     {<span class="dv">16</span>, <span class="dv">0</span>},</span>
+<span id="cb14-208"><a href="#cb14-208"></a>     {<span class="dv">5</span>, <span class="dv">16</span>},</span>
+<span id="cb14-209"><a href="#cb14-209"></a>     {<span class="dv">5</span>, <span class="dv">15</span>},</span>
+<span id="cb14-210"><a href="#cb14-210"></a>     {<span class="dv">0</span>, <span class="dv">18</span>},</span>
+<span id="cb14-211"><a href="#cb14-211"></a>     {<span class="dv">9</span>, <span class="dv">18</span>},</span>
+<span id="cb14-212"><a href="#cb14-212"></a>     {<span class="dv">2</span>, <span class="dv">18</span>},</span>
+<span id="cb14-213"><a href="#cb14-213"></a>     {<span class="dv">16</span>, <span class="dv">8</span>},</span>
+<span id="cb14-214"><a href="#cb14-214"></a>     {<span class="dv">11</span>, <span class="dv">5</span>},</span>
+<span id="cb14-215"><a href="#cb14-215"></a>     {<span class="dv">11</span>, <span class="dv">3</span>},</span>
+<span id="cb14-216"><a href="#cb14-216"></a>     {<span class="dv">10</span>, <span class="dv">11</span>}</span>
+<span id="cb14-217"><a href="#cb14-217"></a>    };</span>
+<span id="cb14-218"><a href="#cb14-218"></a></span>
+<span id="cb14-219"><a href="#cb14-219"></a><span class="co">// plot --------------------------------------------------------------</span></span>
+<span id="cb14-220"><a href="#cb14-220"></a>real s = <span class="fl">0.3</span>;</span>
+<span id="cb14-221"><a href="#cb14-221"></a><span class="cf">for</span>(<span class="dt">int</span> i=<span class="dv">0</span>; i&lt;faces.length; ++i){</span>
+<span id="cb14-222"><a href="#cb14-222"></a>    <span class="dt">int</span>[] idx = faces[i];</span>
+<span id="cb14-223"><a href="#cb14-223"></a>    triple[] triangle = {vertices[idx[<span class="dv">0</span>]],vertices[idx[<span class="dv">1</span>]],vertices[idx[<span class="dv">2</span>]]};</span>
+<span id="cb14-224"><a href="#cb14-224"></a>    Mesh mesh = htriangle(<span class="dv">6</span>, triangle, s);</span>
+<span id="cb14-225"><a href="#cb14-225"></a>    draw(mesh.vertices, mesh.indices, m=rgb(<span class="st">"000080ff"</span>));</span>
+<span id="cb14-226"><a href="#cb14-226"></a>}</span>
+<span id="cb14-227"><a href="#cb14-227"></a></span>
+<span id="cb14-228"><a href="#cb14-228"></a><span class="cf">for</span>(<span class="dt">int</span> i=<span class="dv">0</span>; i&lt;edges.length; ++i){</span>
+<span id="cb14-229"><a href="#cb14-229"></a>    triple A = vertices[edges[i][<span class="dv">0</span>]];</span>
+<span id="cb14-230"><a href="#cb14-230"></a>    triple B = vertices[edges[i][<span class="dv">1</span>]];</span>
+<span id="cb14-231"><a href="#cb14-231"></a>    path3 AB = gyrosegment(A, B, s, <span class="dv">50</span>);</span>
+<span id="cb14-232"><a href="#cb14-232"></a>    draw(tube(AB, scale(<span class="fl">0.02</span>)*unitcircle), yellow);</span>
+<span id="cb14-233"><a href="#cb14-233"></a>}</span>
+<span id="cb14-234"><a href="#cb14-234"></a></span>
+<span id="cb14-235"><a href="#cb14-235"></a><span class="cf">for</span>(<span class="dt">int</span> i=<span class="dv">0</span>; i&lt;vertices.length; ++i){</span>
+<span id="cb14-236"><a href="#cb14-236"></a>    draw(shift(vertices[i])*scale3(<span class="fl">0.03</span>)*unitsphere, yellow);</span>
+<span id="cb14-237"><a href="#cb14-237"></a>}</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/hyperbolicPolyhedra-asy.png"
+        />
+      </p>
+      <h2 id="three.js-hyperbolic-dodecahedron">
+        three.js hyperbolic dodecahedron
+      </h2>
+      <p>
+        Here is a hyperbolic dodecahedron plotted with <code>three.js</code>:
+      </p>
+      <iframe
+        src="https://laustep.github.io/stlahblog/frames/threejs_hyperbolicDodecahedron2.html"
+        width="100%"
+        height="500px"
+        scrolling="no"
+        frameborder="0"
+      >
+      </iframe>
+      <h2 id="pov-ray-hyperbolic-dodecahedron">
+        POV-Ray hyperbolic dodecahedron
+      </h2>
+      <p>
+        And here is a hyperbolic dodecahedron plotted with <code>POV-Ray</code>:
+      </p>
+      <div class="sourceCode" id="cb15">
+        <pre
+          class="sourceCode numberSource povray numberLines"
+        ><code class="sourceCode povray"><span id="cb15-1"><a href="#cb15-1"></a><span class="co">// hyperbolic dodecahedron //</span></span>
+<span id="cb15-2"><a href="#cb15-2"></a><span class="ot">#version</span> <span class="fl">3.7</span>;</span>
+<span id="cb15-3"><a href="#cb15-3"></a><span class="kw">global_settings</span> { <span class="kw">assumed_gamma</span> <span class="fl">1</span> } </span>
+<span id="cb15-4"><a href="#cb15-4"></a></span>
+<span id="cb15-5"><a href="#cb15-5"></a><span class="ot">#include</span> <span class="st">"colors.inc"</span></span>
+<span id="cb15-6"><a href="#cb15-6"></a><span class="ot">#include</span> <span class="st">"textures.inc"</span></span>
+<span id="cb15-7"><a href="#cb15-7"></a></span>
+<span id="cb15-8"><a href="#cb15-8"></a><span class="co">// Camera and light source -----------------------------------------------------</span></span>
+<span id="cb15-9"><a href="#cb15-9"></a><span class="kw">camera</span> {</span>
+<span id="cb15-10"><a href="#cb15-10"></a>    <span class="kw">location</span> &lt;<span class="fl">0</span>,<span class="fl">0</span>,-<span class="fl">4</span>&gt; </span>
+<span id="cb15-11"><a href="#cb15-11"></a>    <span class="kw">look_at</span> <span class="fl">0</span></span>
+<span id="cb15-12"><a href="#cb15-12"></a>    <span class="kw">angle</span> <span class="fl">45</span></span>
+<span id="cb15-13"><a href="#cb15-13"></a>}</span>
+<span id="cb15-14"><a href="#cb15-14"></a><span class="kw">light_source</span> { &lt;<span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">-1000</span>&gt; White }</span>
+<span id="cb15-15"><a href="#cb15-15"></a></span>
+<span id="cb15-16"><a href="#cb15-16"></a><span class="co">// gyrostuff -------------------------------------------------------------------</span></span>
+<span id="cb15-17"><a href="#cb15-17"></a><span class="kw">#macro dotprod</span>(A,B)</span>
+<span id="cb15-18"><a href="#cb15-18"></a>    (A.<span class="kw">x</span>*B.<span class="kw">x</span> + A.<span class="kw">y</span>*B.<span class="kw">y</span> + A.<span class="kw">z</span>*B.<span class="kw">z</span>)</span>
+<span id="cb15-19"><a href="#cb15-19"></a><span class="ot">#end</span></span>
+<span id="cb15-20"><a href="#cb15-20"></a></span>
+<span id="cb15-21"><a href="#cb15-21"></a><span class="kw">#macro beta</span>(A,s)</span>
+<span id="cb15-22"><a href="#cb15-22"></a>    (<span class="fl">1</span> / <span class="kw">sqrt</span>(<span class="fl">1</span> + dotprod(A,A)/s/s))</span>
+<span id="cb15-23"><a href="#cb15-23"></a><span class="ot">#end</span></span>
+<span id="cb15-24"><a href="#cb15-24"></a></span>
+<span id="cb15-25"><a href="#cb15-25"></a><span class="kw">#macro gyroadd</span>(A,B,s)</span>
+<span id="cb15-26"><a href="#cb15-26"></a>    <span class="kw">#local betaA </span>= beta(A,s);</span>
+<span id="cb15-27"><a href="#cb15-27"></a>    <span class="kw">#local betaB </span>= beta(B,s);</span>
+<span id="cb15-28"><a href="#cb15-28"></a>    (<span class="fl">1</span> + betaA/(<span class="fl">1</span>+betaA)*dotprod(A,B)/s/s + (<span class="fl">1</span>-betaB)/betaB) * A + B</span>
+<span id="cb15-29"><a href="#cb15-29"></a><span class="ot">#end</span></span>
+<span id="cb15-30"><a href="#cb15-30"></a></span>
+<span id="cb15-31"><a href="#cb15-31"></a><span class="kw">#macro gyroscalar</span>(r,A,s)</span>
+<span id="cb15-32"><a href="#cb15-32"></a>    <span class="kw">#local Anorm </span>= dotprod(A,A);</span>
+<span id="cb15-33"><a href="#cb15-33"></a>    s/Anorm * <span class="kw">sinh</span>(r*<span class="kw">asinh</span>(Anorm/s)) * A</span>
+<span id="cb15-34"><a href="#cb15-34"></a><span class="ot">#end</span></span>
+<span id="cb15-35"><a href="#cb15-35"></a></span>
+<span id="cb15-36"><a href="#cb15-36"></a><span class="kw">#macro gyroABr</span>(A,B,s,r)</span>
+<span id="cb15-37"><a href="#cb15-37"></a>    gyroadd(A, gyroscalar(r, gyroadd(-A, B, s), s), s)</span>
+<span id="cb15-38"><a href="#cb15-38"></a><span class="ot">#end</span> </span>
+<span id="cb15-39"><a href="#cb15-39"></a></span>
+<span id="cb15-40"><a href="#cb15-40"></a><span class="kw">#macro gyromidpoint</span>(A,B,s)</span>
+<span id="cb15-41"><a href="#cb15-41"></a>    gyroABr(A,B,s,<span class="fl">0.5</span>)</span>
+<span id="cb15-42"><a href="#cb15-42"></a><span class="ot">#end</span> </span>
+<span id="cb15-43"><a href="#cb15-43"></a></span>
+<span id="cb15-44"><a href="#cb15-44"></a><span class="kw">#macro gyrosegment</span>(A,B,s,n)</span>
+<span id="cb15-45"><a href="#cb15-45"></a>    <span class="kw">#local out </span>= <span class="kw">array</span>[n+<span class="fl">1</span>];</span>
+<span id="cb15-46"><a href="#cb15-46"></a>    #for(i, <span class="fl">0</span>, n)</span>
+<span id="cb15-47"><a href="#cb15-47"></a>        <span class="kw">#local out</span>[i] = gyroABr(A,B,s,i/n);</span>
+<span id="cb15-48"><a href="#cb15-48"></a>    <span class="ot">#end</span></span>
+<span id="cb15-49"><a href="#cb15-49"></a>    out</span>
+<span id="cb15-50"><a href="#cb15-50"></a><span class="ot">#end</span></span>
+<span id="cb15-51"><a href="#cb15-51"></a></span>
+<span id="cb15-52"><a href="#cb15-52"></a><span class="co">// subdivision step ------------------------------------------------------------</span></span>
+<span id="cb15-53"><a href="#cb15-53"></a><span class="kw">#macro subdiv0</span>(A,B,C,s)</span>
+<span id="cb15-54"><a href="#cb15-54"></a>    <span class="kw">#local mAB </span>= gyromidpoint(A,B,s);</span>
+<span id="cb15-55"><a href="#cb15-55"></a>    <span class="kw">#local mAC </span>= gyromidpoint(A,C,s);</span>
+<span id="cb15-56"><a href="#cb15-56"></a>    <span class="kw">#local mBC </span>= gyromidpoint(B,C,s);</span>
+<span id="cb15-57"><a href="#cb15-57"></a>    <span class="kw">#local trgl1 </span>= <span class="kw">array</span>[<span class="fl">3</span>] {A, mAB, mAC};</span>
+<span id="cb15-58"><a href="#cb15-58"></a>    <span class="kw">#local trgl2 </span>= <span class="kw">array</span>[<span class="fl">3</span>] {B, mAB, mBC};</span>
+<span id="cb15-59"><a href="#cb15-59"></a>    <span class="kw">#local trgl3 </span>= <span class="kw">array</span>[<span class="fl">3</span>] {C, mBC, mAC};</span>
+<span id="cb15-60"><a href="#cb15-60"></a>    <span class="kw">#local trgl4 </span>= <span class="kw">array</span>[<span class="fl">3</span>] {mAB, mAC, mBC};</span>
+<span id="cb15-61"><a href="#cb15-61"></a>    <span class="kw">array</span>[<span class="fl">4</span>] {trgl1, trgl2, trgl3, trgl4}</span>
+<span id="cb15-62"><a href="#cb15-62"></a><span class="ot">#end</span></span>
+<span id="cb15-63"><a href="#cb15-63"></a></span>
+<span id="cb15-64"><a href="#cb15-64"></a><span class="co">// iterated subdivision --------------------------------------------------------</span></span>
+<span id="cb15-65"><a href="#cb15-65"></a><span class="kw">#macro subdiv</span>(A,B,C,s,depth)</span>
+<span id="cb15-66"><a href="#cb15-66"></a>    <span class="ot">#if</span>(depth=<span class="fl">1</span>)</span>
+<span id="cb15-67"><a href="#cb15-67"></a>        <span class="kw">#local out </span>= subdiv0(A,B,C,s);</span>
+<span id="cb15-68"><a href="#cb15-68"></a>    <span class="ot">#else</span></span>
+<span id="cb15-69"><a href="#cb15-69"></a>        <span class="kw">#local triangles </span>= subdiv(A,B,C,s,depth<span class="fl">-1</span>);</span>
+<span id="cb15-70"><a href="#cb15-70"></a>        <span class="kw">#local out </span>= <span class="kw">array</span>[<span class="kw">pow</span>(<span class="fl">4</span>,depth)];</span>
+<span id="cb15-71"><a href="#cb15-71"></a>        #for(i,<span class="fl">0</span>,<span class="kw">pow</span>(<span class="fl">4</span>,depth<span class="fl">-1</span>)-<span class="fl">1</span>)</span>
+<span id="cb15-72"><a href="#cb15-72"></a>            <span class="kw">#local trgl </span>= triangles[i];</span>
+<span id="cb15-73"><a href="#cb15-73"></a>            <span class="kw">#local trgls </span>= subdiv0(trgl[<span class="fl">0</span>], trgl[<span class="fl">1</span>], trgl[<span class="fl">2</span>], s);</span>
+<span id="cb15-74"><a href="#cb15-74"></a>            <span class="kw">#local out</span>[<span class="fl">4</span>*i] = trgls[<span class="fl">0</span>];</span>
+<span id="cb15-75"><a href="#cb15-75"></a>            <span class="kw">#local out</span>[<span class="fl">4</span>*i+<span class="fl">1</span>] = trgls[<span class="fl">1</span>];</span>
+<span id="cb15-76"><a href="#cb15-76"></a>            <span class="kw">#local out</span>[<span class="fl">4</span>*i+<span class="fl">2</span>] = trgls[<span class="fl">2</span>];</span>
+<span id="cb15-77"><a href="#cb15-77"></a>            <span class="kw">#local out</span>[<span class="fl">4</span>*i+<span class="fl">3</span>] = trgls[<span class="fl">3</span>];</span>
+<span id="cb15-78"><a href="#cb15-78"></a>        <span class="ot">#end</span></span>
+<span id="cb15-79"><a href="#cb15-79"></a>    <span class="ot">#end</span></span>
+<span id="cb15-80"><a href="#cb15-80"></a>    out</span>
+<span id="cb15-81"><a href="#cb15-81"></a><span class="ot">#end</span></span>
+<span id="cb15-82"><a href="#cb15-82"></a></span>
+<span id="cb15-83"><a href="#cb15-83"></a><span class="co">// dodecahedron ----------------------------------------------------------------</span></span>
+<span id="cb15-84"><a href="#cb15-84"></a><span class="kw">#declare phi </span>= (<span class="fl">1</span>+<span class="kw">sqrt</span>(<span class="fl">5</span>))/<span class="fl">2</span>;</span>
+<span id="cb15-85"><a href="#cb15-85"></a><span class="kw">#declare a </span>= <span class="fl">1</span>/<span class="kw">sqrt</span>(<span class="fl">3</span>);</span>
+<span id="cb15-86"><a href="#cb15-86"></a><span class="kw">#declare b </span>= a/phi;</span>
+<span id="cb15-87"><a href="#cb15-87"></a><span class="kw">#declare c </span>= a*phi;</span>
+<span id="cb15-88"><a href="#cb15-88"></a><span class="kw">#declare vs </span>= <span class="kw">array</span>[<span class="fl">20</span>]</span>
+<span id="cb15-89"><a href="#cb15-89"></a>  { &lt;a,  a,  a&gt;,</span>
+<span id="cb15-90"><a href="#cb15-90"></a>    &lt;a,  a, -a&gt;,</span>
+<span id="cb15-91"><a href="#cb15-91"></a>    &lt;a, -a,  a&gt;,</span>
+<span id="cb15-92"><a href="#cb15-92"></a>    &lt;-a, -a,  a&gt;,</span>
+<span id="cb15-93"><a href="#cb15-93"></a>    &lt;-a,  a, -a&gt;,</span>
+<span id="cb15-94"><a href="#cb15-94"></a>    &lt;-a,  a,  a&gt;,</span>
+<span id="cb15-95"><a href="#cb15-95"></a>    &lt;<span class="fl">0</span>,  b, -c&gt;,</span>
+<span id="cb15-96"><a href="#cb15-96"></a>    &lt;<span class="fl">0</span>, -b, -c&gt;,</span>
+<span id="cb15-97"><a href="#cb15-97"></a>    &lt;<span class="fl">0</span>, -b,  c&gt;,</span>
+<span id="cb15-98"><a href="#cb15-98"></a>    &lt;c,  <span class="fl">0</span>, -b&gt;,</span>
+<span id="cb15-99"><a href="#cb15-99"></a>    &lt;-c,  <span class="fl">0</span>, -b&gt;,</span>
+<span id="cb15-100"><a href="#cb15-100"></a>    &lt;-c,  <span class="fl">0</span>,  b&gt;,</span>
+<span id="cb15-101"><a href="#cb15-101"></a>    &lt;b,  c,  <span class="fl">0</span>&gt;,</span>
+<span id="cb15-102"><a href="#cb15-102"></a>    &lt;b, -c,  <span class="fl">0</span>&gt;,</span>
+<span id="cb15-103"><a href="#cb15-103"></a>    &lt;-b, -c,  <span class="fl">0</span>&gt;,</span>
+<span id="cb15-104"><a href="#cb15-104"></a>    &lt;-b,  c,  <span class="fl">0</span>&gt;,</span>
+<span id="cb15-105"><a href="#cb15-105"></a>    &lt;<span class="fl">0</span>,  b,  c&gt;,</span>
+<span id="cb15-106"><a href="#cb15-106"></a>    &lt;a, -a, -a&gt;,</span>
+<span id="cb15-107"><a href="#cb15-107"></a>    &lt;c,  <span class="fl">0</span>,  b&gt;,</span>
+<span id="cb15-108"><a href="#cb15-108"></a>    &lt;-a, -a, -a&gt; };</span>
+<span id="cb15-109"><a href="#cb15-109"></a><span class="kw">#declare faces </span>= <span class="kw">array</span>[<span class="fl">36</span>][<span class="fl">3</span>]</span>
+<span id="cb15-110"><a href="#cb15-110"></a>    {</span>
+<span id="cb15-111"><a href="#cb15-111"></a>        {<span class="fl">13</span>, <span class="fl">2</span>, <span class="fl">3</span>},</span>
+<span id="cb15-112"><a href="#cb15-112"></a>        {<span class="fl">3</span>, <span class="fl">14</span>, <span class="fl">13</span>},</span>
+<span id="cb15-113"><a href="#cb15-113"></a>        {<span class="fl">3</span>, <span class="fl">2</span>, <span class="fl">8</span>},</span>
+<span id="cb15-114"><a href="#cb15-114"></a>        {<span class="fl">17</span>, <span class="fl">1</span>, <span class="fl">9</span>},</span>
+<span id="cb15-115"><a href="#cb15-115"></a>        {<span class="fl">6</span>, <span class="fl">1</span>, <span class="fl">17</span>},</span>
+<span id="cb15-116"><a href="#cb15-116"></a>        {<span class="fl">17</span>, <span class="fl">7</span>, <span class="fl">6</span>},</span>
+<span id="cb15-117"><a href="#cb15-117"></a>        {<span class="fl">6</span>, <span class="fl">7</span>, <span class="fl">19</span>},</span>
+<span id="cb15-118"><a href="#cb15-118"></a>        {<span class="fl">19</span>, <span class="fl">4</span>, <span class="fl">6</span>},</span>
+<span id="cb15-119"><a href="#cb15-119"></a>        {<span class="fl">10</span>, <span class="fl">4</span>, <span class="fl">19</span>},</span>
+<span id="cb15-120"><a href="#cb15-120"></a>        {<span class="fl">13</span>, <span class="fl">14</span>, <span class="fl">19</span>},</span>
+<span id="cb15-121"><a href="#cb15-121"></a>        {<span class="fl">19</span>, <span class="fl">17</span>, <span class="fl">13</span>},</span>
+<span id="cb15-122"><a href="#cb15-122"></a>        {<span class="fl">7</span>, <span class="fl">17</span>, <span class="fl">19</span>},</span>
+<span id="cb15-123"><a href="#cb15-123"></a>        {<span class="fl">15</span>, <span class="fl">1</span>, <span class="fl">6</span>},</span>
+<span id="cb15-124"><a href="#cb15-124"></a>        {<span class="fl">12</span>, <span class="fl">1</span>, <span class="fl">15</span>},</span>
+<span id="cb15-125"><a href="#cb15-125"></a>        {<span class="fl">6</span>, <span class="fl">4</span>, <span class="fl">15</span>},</span>
+<span id="cb15-126"><a href="#cb15-126"></a>        {<span class="fl">15</span>, <span class="fl">0</span>, <span class="fl">12</span>},</span>
+<span id="cb15-127"><a href="#cb15-127"></a>        {<span class="fl">15</span>, <span class="fl">16</span>, <span class="fl">0</span>},</span>
+<span id="cb15-128"><a href="#cb15-128"></a>        {<span class="fl">5</span>, <span class="fl">16</span>, <span class="fl">15</span>},</span>
+<span id="cb15-129"><a href="#cb15-129"></a>        {<span class="fl">18</span>, <span class="fl">1</span>, <span class="fl">12</span>},</span>
+<span id="cb15-130"><a href="#cb15-130"></a>        {<span class="fl">12</span>, <span class="fl">0</span>, <span class="fl">18</span>},</span>
+<span id="cb15-131"><a href="#cb15-131"></a>        {<span class="fl">9</span>, <span class="fl">1</span>, <span class="fl">18</span>},</span>
+<span id="cb15-132"><a href="#cb15-132"></a>        {<span class="fl">0</span>, <span class="fl">16</span>, <span class="fl">18</span>},</span>
+<span id="cb15-133"><a href="#cb15-133"></a>        {<span class="fl">8</span>, <span class="fl">2</span>, <span class="fl">18</span>},</span>
+<span id="cb15-134"><a href="#cb15-134"></a>        {<span class="fl">18</span>, <span class="fl">16</span>, <span class="fl">8</span>},</span>
+<span id="cb15-135"><a href="#cb15-135"></a>        {<span class="fl">18</span>, <span class="fl">2</span>, <span class="fl">13</span>},</span>
+<span id="cb15-136"><a href="#cb15-136"></a>        {<span class="fl">18</span>, <span class="fl">17</span>, <span class="fl">9</span>},</span>
+<span id="cb15-137"><a href="#cb15-137"></a>        {<span class="fl">13</span>, <span class="fl">17</span>, <span class="fl">18</span>},</span>
+<span id="cb15-138"><a href="#cb15-138"></a>        {<span class="fl">8</span>, <span class="fl">16</span>, <span class="fl">11</span>},</span>
+<span id="cb15-139"><a href="#cb15-139"></a>        {<span class="fl">11</span>, <span class="fl">16</span>, <span class="fl">5</span>},</span>
+<span id="cb15-140"><a href="#cb15-140"></a>        {<span class="fl">11</span>, <span class="fl">3</span>, <span class="fl">8</span>},</span>
+<span id="cb15-141"><a href="#cb15-141"></a>        {<span class="fl">14</span>, <span class="fl">3</span>, <span class="fl">11</span>},</span>
+<span id="cb15-142"><a href="#cb15-142"></a>        {<span class="fl">11</span>, <span class="fl">19</span>, <span class="fl">14</span>},</span>
+<span id="cb15-143"><a href="#cb15-143"></a>        {<span class="fl">10</span>, <span class="fl">19</span>, <span class="fl">11</span>},</span>
+<span id="cb15-144"><a href="#cb15-144"></a>        {<span class="fl">11</span>, <span class="fl">4</span>, <span class="fl">10</span>},</span>
+<span id="cb15-145"><a href="#cb15-145"></a>        {<span class="fl">5</span>, <span class="fl">15</span>, <span class="fl">11</span>},</span>
+<span id="cb15-146"><a href="#cb15-146"></a>        {<span class="fl">11</span>, <span class="fl">15</span>, <span class="fl">4</span>}</span>
+<span id="cb15-147"><a href="#cb15-147"></a>    };</span>
+<span id="cb15-148"><a href="#cb15-148"></a><span class="kw">#declare edges </span>= <span class="kw">array</span>[<span class="fl">30</span>][<span class="fl">2</span>]</span>
+<span id="cb15-149"><a href="#cb15-149"></a>    {</span>
+<span id="cb15-150"><a href="#cb15-150"></a>     {<span class="fl">13</span>, <span class="fl">2</span>},</span>
+<span id="cb15-151"><a href="#cb15-151"></a>     {<span class="fl">3</span>, <span class="fl">14</span>},</span>
+<span id="cb15-152"><a href="#cb15-152"></a>     {<span class="fl">14</span>, <span class="fl">13</span>},</span>
+<span id="cb15-153"><a href="#cb15-153"></a>     {<span class="fl">3</span>, <span class="fl">8</span>},</span>
+<span id="cb15-154"><a href="#cb15-154"></a>     {<span class="fl">2</span>, <span class="fl">8</span>},</span>
+<span id="cb15-155"><a href="#cb15-155"></a>     {<span class="fl">17</span>, <span class="fl">9</span>},</span>
+<span id="cb15-156"><a href="#cb15-156"></a>     {<span class="fl">1</span>, <span class="fl">9</span>},</span>
+<span id="cb15-157"><a href="#cb15-157"></a>     {<span class="fl">6</span>, <span class="fl">1</span>},</span>
+<span id="cb15-158"><a href="#cb15-158"></a>     {<span class="fl">17</span>, <span class="fl">7</span>},</span>
+<span id="cb15-159"><a href="#cb15-159"></a>     {<span class="fl">7</span>, <span class="fl">6</span>},</span>
+<span id="cb15-160"><a href="#cb15-160"></a>     {<span class="fl">7</span>, <span class="fl">19</span>},</span>
+<span id="cb15-161"><a href="#cb15-161"></a>     {<span class="fl">4</span>, <span class="fl">6</span>},</span>
+<span id="cb15-162"><a href="#cb15-162"></a>     {<span class="fl">10</span>, <span class="fl">4</span>},</span>
+<span id="cb15-163"><a href="#cb15-163"></a>     {<span class="fl">10</span>, <span class="fl">19</span>},</span>
+<span id="cb15-164"><a href="#cb15-164"></a>     {<span class="fl">14</span>, <span class="fl">19</span>},</span>
+<span id="cb15-165"><a href="#cb15-165"></a>     {<span class="fl">17</span>, <span class="fl">13</span>},</span>
+<span id="cb15-166"><a href="#cb15-166"></a>     {<span class="fl">12</span>, <span class="fl">1</span>},</span>
+<span id="cb15-167"><a href="#cb15-167"></a>     {<span class="fl">12</span>, <span class="fl">15</span>},</span>
+<span id="cb15-168"><a href="#cb15-168"></a>     {<span class="fl">4</span>, <span class="fl">15</span>},</span>
+<span id="cb15-169"><a href="#cb15-169"></a>     {<span class="fl">0</span>, <span class="fl">12</span>},</span>
+<span id="cb15-170"><a href="#cb15-170"></a>     {<span class="fl">16</span>, <span class="fl">0</span>},</span>
+<span id="cb15-171"><a href="#cb15-171"></a>     {<span class="fl">5</span>, <span class="fl">16</span>},</span>
+<span id="cb15-172"><a href="#cb15-172"></a>     {<span class="fl">5</span>, <span class="fl">15</span>},</span>
+<span id="cb15-173"><a href="#cb15-173"></a>     {<span class="fl">0</span>, <span class="fl">18</span>},</span>
+<span id="cb15-174"><a href="#cb15-174"></a>     {<span class="fl">9</span>, <span class="fl">18</span>},</span>
+<span id="cb15-175"><a href="#cb15-175"></a>     {<span class="fl">2</span>, <span class="fl">18</span>},</span>
+<span id="cb15-176"><a href="#cb15-176"></a>     {<span class="fl">16</span>, <span class="fl">8</span>},</span>
+<span id="cb15-177"><a href="#cb15-177"></a>     {<span class="fl">11</span>, <span class="fl">5</span>},</span>
+<span id="cb15-178"><a href="#cb15-178"></a>     {<span class="fl">11</span>, <span class="fl">3</span>},</span>
+<span id="cb15-179"><a href="#cb15-179"></a>     {<span class="fl">10</span>, <span class="fl">11</span>}</span>
+<span id="cb15-180"><a href="#cb15-180"></a>    };</span>
+<span id="cb15-181"><a href="#cb15-181"></a>        </span>
+<span id="cb15-182"><a href="#cb15-182"></a><span class="kw">#declare s </span>= <span class="fl">0.3</span>;</span>
+<span id="cb15-183"><a href="#cb15-183"></a><span class="kw">#declare depth </span>= <span class="fl">6</span>;</span>
+<span id="cb15-184"><a href="#cb15-184"></a></span>
+<span id="cb15-185"><a href="#cb15-185"></a><span class="kw">#declare htriangles </span>= <span class="kw">array</span>[<span class="kw">dimension_size</span>(faces,<span class="fl">1</span>)];</span>
+<span id="cb15-186"><a href="#cb15-186"></a>#for(i, <span class="fl">0</span>, <span class="kw">dimension_size</span>(faces,<span class="fl">1</span>)-<span class="fl">1</span>)</span>
+<span id="cb15-187"><a href="#cb15-187"></a>    <span class="kw">#declare htriangles</span>[i] = </span>
+<span id="cb15-188"><a href="#cb15-188"></a>        subdiv(vs[faces[i][<span class="fl">0</span>]],vs[faces[i][<span class="fl">1</span>]],vs[faces[i][<span class="fl">2</span>]], s, depth);</span>
+<span id="cb15-189"><a href="#cb15-189"></a><span class="ot">#end</span></span>
+<span id="cb15-190"><a href="#cb15-190"></a></span>
+<span id="cb15-191"><a href="#cb15-191"></a><span class="kw">#declare segments </span>= <span class="kw">array</span>[<span class="kw">dimension_size</span>(edges,<span class="fl">1</span>)];</span>
+<span id="cb15-192"><a href="#cb15-192"></a>#for(i, <span class="fl">0</span>, <span class="kw">dimension_size</span>(edges,<span class="fl">1</span>)-<span class="fl">1</span>)</span>
+<span id="cb15-193"><a href="#cb15-193"></a>    <span class="kw">#declare segments</span>[i] = </span>
+<span id="cb15-194"><a href="#cb15-194"></a>        gyrosegment(vs[edges[i][<span class="fl">0</span>]],vs[edges[i][<span class="fl">1</span>]],s,<span class="fl">100</span>);</span>
+<span id="cb15-195"><a href="#cb15-195"></a><span class="ot">#end</span></span>
+<span id="cb15-196"><a href="#cb15-196"></a></span>
+<span id="cb15-197"><a href="#cb15-197"></a><span class="kw">object</span>{</span>
+<span id="cb15-198"><a href="#cb15-198"></a>    <span class="kw">union</span>{</span>
+<span id="cb15-199"><a href="#cb15-199"></a>        <span class="kw">mesh</span>{</span>
+<span id="cb15-200"><a href="#cb15-200"></a>            #for(j, <span class="fl">0</span>, <span class="kw">dimension_size</span>(faces,<span class="fl">1</span>)-<span class="fl">1</span>)</span>
+<span id="cb15-201"><a href="#cb15-201"></a>                <span class="kw">#local htriangle </span>= htriangles[j];</span>
+<span id="cb15-202"><a href="#cb15-202"></a>                #for(i, <span class="fl">0</span>, <span class="kw">dimension_size</span>(htriangle,<span class="fl">1</span>)-<span class="fl">1</span>)</span>
+<span id="cb15-203"><a href="#cb15-203"></a>                    <span class="kw">triangle</span> {</span>
+<span id="cb15-204"><a href="#cb15-204"></a>                        htriangle[i][<span class="fl">0</span>], htriangle[i][<span class="fl">1</span>], htriangle[i][<span class="fl">2</span>]</span>
+<span id="cb15-205"><a href="#cb15-205"></a>                    }</span>
+<span id="cb15-206"><a href="#cb15-206"></a>                <span class="ot">#end</span></span>
+<span id="cb15-207"><a href="#cb15-207"></a>            <span class="ot">#end</span></span>
+<span id="cb15-208"><a href="#cb15-208"></a>            <span class="kw">texture</span> {</span>
+<span id="cb15-209"><a href="#cb15-209"></a>                Chrome_Metal</span>
+<span id="cb15-210"><a href="#cb15-210"></a>                <span class="kw">finish</span> {</span>
+<span id="cb15-211"><a href="#cb15-211"></a>                    <span class="kw">ambient</span> <span class="fl">0.01</span></span>
+<span id="cb15-212"><a href="#cb15-212"></a>                    <span class="kw">diffuse</span> <span class="fl">2</span></span>
+<span id="cb15-213"><a href="#cb15-213"></a>                    <span class="kw">reflection</span> <span class="fl">0</span></span>
+<span id="cb15-214"><a href="#cb15-214"></a>                    <span class="kw">brilliance</span> <span class="fl">8</span></span>
+<span id="cb15-215"><a href="#cb15-215"></a>                    <span class="kw">specular</span> <span class="fl">0.8</span></span>
+<span id="cb15-216"><a href="#cb15-216"></a>                    <span class="kw">roughness</span> <span class="fl">0.1</span></span>
+<span id="cb15-217"><a href="#cb15-217"></a>                }</span>
+<span id="cb15-218"><a href="#cb15-218"></a>            }</span>
+<span id="cb15-219"><a href="#cb15-219"></a>        }</span>
+<span id="cb15-220"><a href="#cb15-220"></a>        #for(j, <span class="fl">0</span>, <span class="kw">dimension_size</span>(edges,<span class="fl">1</span>)-<span class="fl">1</span>)</span>
+<span id="cb15-221"><a href="#cb15-221"></a>            <span class="kw">#local segment </span>= segments[j];</span>
+<span id="cb15-222"><a href="#cb15-222"></a>            <span class="kw">sphere_sweep</span>{</span>
+<span id="cb15-223"><a href="#cb15-223"></a>                <span class="kw">linear_spline</span> <span class="fl">101</span></span>
+<span id="cb15-224"><a href="#cb15-224"></a>                #for(k,<span class="fl">0</span>,<span class="fl">100</span>)</span>
+<span id="cb15-225"><a href="#cb15-225"></a>                    segment[k] <span class="fl">0.01</span></span>
+<span id="cb15-226"><a href="#cb15-226"></a>                <span class="ot">#end</span></span>
+<span id="cb15-227"><a href="#cb15-227"></a>                <span class="kw">texture</span>{ </span>
+<span id="cb15-228"><a href="#cb15-228"></a>                    Gold_Metal</span>
+<span id="cb15-229"><a href="#cb15-229"></a>                    <span class="kw">finish</span> {</span>
+<span id="cb15-230"><a href="#cb15-230"></a>                        <span class="kw">ambient</span> <span class="fl">0.01</span></span>
+<span id="cb15-231"><a href="#cb15-231"></a>                        <span class="kw">diffuse</span> <span class="fl">2</span></span>
+<span id="cb15-232"><a href="#cb15-232"></a>                        <span class="kw">reflection</span> <span class="fl">0</span></span>
+<span id="cb15-233"><a href="#cb15-233"></a>                        <span class="kw">brilliance</span> <span class="fl">8</span></span>
+<span id="cb15-234"><a href="#cb15-234"></a>                        <span class="kw">specular</span> <span class="fl">0.8</span></span>
+<span id="cb15-235"><a href="#cb15-235"></a>                        <span class="kw">roughness</span> <span class="fl">0.1</span></span>
+<span id="cb15-236"><a href="#cb15-236"></a>                    }</span>
+<span id="cb15-237"><a href="#cb15-237"></a>                }</span>
+<span id="cb15-238"><a href="#cb15-238"></a>            }</span>
+<span id="cb15-239"><a href="#cb15-239"></a>        <span class="ot">#end</span></span>
+<span id="cb15-240"><a href="#cb15-240"></a>    }</span>
+<span id="cb15-241"><a href="#cb15-241"></a>    <span class="kw">rotate</span> &lt;<span class="fl">0</span>,-<span class="fl">20</span>,<span class="fl">0</span>&gt;</span>
+<span id="cb15-242"><a href="#cb15-242"></a>    <span class="kw">rotate</span> &lt;-<span class="fl">60</span>,<span class="fl">0</span>,<span class="fl">0</span>&gt;</span>
+<span id="cb15-243"><a href="#cb15-243"></a>}</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/hyperbolicPolyhedra-povray.png"
+        />
+      </p>
+      <h2 id="update-2019-04-09">Update 2019-04-09</h2>
+      <p>
+        I’ve realized that the <code>addNormals</code> function of the
+        <code>rgl</code> package is not appropriate when there are duplicated
+        vertices in the mesh (it adds different normals to the duplicated
+        vertices). And there are (a lot of) duplicated vertices in the mesh
+        created by the <code>gyrosubdiv</code> function.
+      </p>
+      <p>
+        To remove the duplicated vertices, one can use the
+        <code>vcgClean</code> function of the <code>Rvcg</code> package (which
+        also adds the normals). Observe the difference:
+      </p>
+      <div class="sourceCode" id="cb16">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>idx &lt;-<span class="st"> </span>faces[<span class="dv">1</span>,]</span>
+<span id="cb16-2"><a href="#cb16-2"></a>A &lt;-<span class="st"> </span>vertices[idx[<span class="dv">1</span>],]</span>
+<span id="cb16-3"><a href="#cb16-3"></a>B &lt;-<span class="st"> </span>vertices[idx[<span class="dv">2</span>],]</span>
+<span id="cb16-4"><a href="#cb16-4"></a>C &lt;-<span class="st"> </span>vertices[idx[<span class="dv">3</span>],]</span>
+<span id="cb16-5"><a href="#cb16-5"></a>mesh &lt;-<span class="st"> </span><span class="kw">gyrosubdiv</span>(A, B, C, <span class="dt">s =</span> s, <span class="dt">depth =</span> <span class="dv">4</span>)</span>
+<span id="cb16-6"><a href="#cb16-6"></a><span class="kw">view3d</span>(<span class="dv">30</span>, <span class="dv">30</span>, <span class="dt">zoom =</span> <span class="fl">0.9</span>)</span>
+<span id="cb16-7"><a href="#cb16-7"></a><span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">"navy"</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/hyperbolicPolyhedra-triangle-dupVertices-1.png"
+        />
+      </p>
+      <div class="sourceCode" id="cb17">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>mesh &lt;-<span class="st"> </span>Rvcg<span class="op">::</span><span class="kw">vcgClean</span>(mesh, <span class="dt">sel =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">7</span>), <span class="dt">silent =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb17-2"><a href="#cb17-2"></a><span class="kw">view3d</span>(<span class="dv">30</span>, <span class="dv">30</span>, <span class="dt">zoom =</span> <span class="fl">0.9</span>)</span>
+<span id="cb17-3"><a href="#cb17-3"></a><span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">"navy"</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/hyperbolicPolyhedra-triangle-undupVertices-1.png"
+        />
+      </p>
+      <p>So a better <code>gyrosubdiv</code> function is:</p>
+      <div class="sourceCode" id="cb18">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>gyrosubdiv &lt;-<span class="st"> </span><span class="cf">function</span>(A1, A2, A3, <span class="dt">s=</span><span class="dv">1</span>, <span class="dt">depth=</span><span class="dv">5</span>){</span>
+<span id="cb18-2"><a href="#cb18-2"></a>  subd &lt;-<span class="st"> </span><span class="kw">gyrosubdiv0</span>(A1, A2, A3, s)</span>
+<span id="cb18-3"><a href="#cb18-3"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_len</span>(depth<span class="dv">-1</span>)){</span>
+<span id="cb18-4"><a href="#cb18-4"></a>    subd &lt;-<span class="st"> </span>purrr<span class="op">::</span><span class="kw">flatten</span>(<span class="kw">lapply</span>(subd, <span class="cf">function</span>(triplet){</span>
+<span id="cb18-5"><a href="#cb18-5"></a>      <span class="kw">gyrosubdiv0</span>(triplet[[<span class="dv">1</span>]], triplet[[<span class="dv">2</span>]], triplet[[<span class="dv">3</span>]], s)</span>
+<span id="cb18-6"><a href="#cb18-6"></a>    }))</span>
+<span id="cb18-7"><a href="#cb18-7"></a>  }</span>
+<span id="cb18-8"><a href="#cb18-8"></a>  vertices &lt;-<span class="st"> </span></span>
+<span id="cb18-9"><a href="#cb18-9"></a><span class="st">    </span><span class="kw">do.call</span>(cbind, </span>
+<span id="cb18-10"><a href="#cb18-10"></a>            <span class="kw">lapply</span>(subd, <span class="cf">function</span>(triplet) <span class="kw">do.call</span>(cbind, triplet)))</span>
+<span id="cb18-11"><a href="#cb18-11"></a>  indices &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(vertices), <span class="dt">nrow =</span> <span class="dv">3</span>)</span>
+<span id="cb18-12"><a href="#cb18-12"></a>  mesh &lt;-<span class="st"> </span><span class="kw">tmesh3d</span>(</span>
+<span id="cb18-13"><a href="#cb18-13"></a>    <span class="dt">vertices =</span> vertices,</span>
+<span id="cb18-14"><a href="#cb18-14"></a>    <span class="dt">indices =</span> indices,</span>
+<span id="cb18-15"><a href="#cb18-15"></a>    <span class="dt">homogeneous =</span> <span class="ot">FALSE</span></span>
+<span id="cb18-16"><a href="#cb18-16"></a>  )</span>
+<span id="cb18-17"><a href="#cb18-17"></a>  Rvcg<span class="op">::</span><span class="kw">vcgClean</span>(mesh, <span class="dt">sel =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">7</span>), <span class="dt">silent =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb18-18"><a href="#cb18-18"></a>}</span></code></pre>
+      </div>
+      <h2 id="reference">Reference</h2>
+      <ul>
+        <li>
+          A. A. Ungar.
+          <em
+            >Analytic Hyperbolic Geometry: Mathematical Foundations And
+            Applications</em
+          >. World Scientific Pub Co Inc, 2005.
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Fri, 05 Apr 2019 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/hyperbolicPolyhedra.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
+    <item>
+      <title>Simulation of the fractional noncentral Wishart distribution</title>
+      <link>https://laustep.github.io/stlahblog/posts/WishartFractional.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        It is well known how to simulate the noncentral Wishart distribution
+        when the number of degrees of freedom
+        <span class="math inline">\(\nu\)</span> and the dimension
+        <span class="math inline">\(d\)</span> satisfy
+        <span class="math inline">\(\nu &gt; 2d-1\)</span>, or when
+        <span class="math inline">\(\nu \geq d\)</span> is an integer. In their
+        paper
+        <a href="https://arxiv.org/abs/1006.2281"
+          >Exact and high-order discretization schemes for Wishart processes and
+          their affine extensions</a
+        >, Ahdida &amp; Alfonsi provide a method that allows to simulate the
+        Wishart process of dimension <span class="math inline">\(d\)</span> for
+        any number of degrees of freedom
+        <span class="math inline">\(\nu \geq d-1\)</span> and without
+        restrictions on the other parameters. This method allows to simulate the
+        noncentral Wishart distribution, in the way we will expose now.
+      </p>
+      <h1 id="two-properties-of-the-noncentral-wishart-distribution">
+        Two properties of the noncentral Wishart distribution
+      </h1>
+      <p>We will need the two following properties.</p>
+      <p>
+        Recall that the characteristic function of the noncentral Wishart
+        distribution
+        <span class="math inline">\(\mathcal{W}(\nu, \Sigma, \Theta)\)</span> at
+        <span class="math inline">\(Z\)</span> is
+        <span class="math display"
+          >\[ \phi_{\nu,\Sigma,\Theta}(Z) =
+          \frac{\exp\Bigl(i\textrm{tr}\bigl({(I_d - 2i
+          Z\Sigma)}^{-1}Z\Theta\bigr)\Bigr)}{{\det(I_d - 2i
+          Z\Sigma)}^{\frac{\nu}{2}}}. \]</span
+        >
+      </p>
+      <p>
+        <span class="math inline">\(\bullet\)</span>
+        <strong>First property of the Wishart distribution</strong>. Using the
+        characteristic function, it is easy to check that
+        <span class="math inline"
+          >\(A W A' \sim \mathcal{W}(\nu, A\Sigma A', A\Theta A')\)</span
+        >
+        when
+        <span class="math inline"
+          >\(W \sim \mathcal{W}(\nu, \Sigma, \Theta)\)</span
+        >.
+      </p>
+      <p>
+        <span class="math inline">\(\bullet\)</span>
+        <strong>Second property of the Wishart distribution</strong>. Using the
+        characteristic function, it is not hard to check that if
+        <span class="math inline">\(W_1\)</span> and
+        <span class="math inline">\(W_2\)</span> are two random matrices such
+        that
+        <span class="math inline"
+          >\(W_1 \sim \mathcal{W}(\nu, \Sigma_1, \Theta)\)</span
+        >
+        and
+        <span class="math inline"
+          >\((W_2 \mid W_1) \sim \mathcal{W}(\nu, \Sigma_2, W_1)\)</span
+        >, then
+        <span class="math inline"
+          >\(W_2 \sim \mathcal{W}(\nu, \Sigma_1+\Sigma_2, \Theta)\)</span
+        >. This result is proved in A&amp;A’s paper only for the covariance
+        matrices <span class="math inline">\(J_d^i\)</span> we will see later,
+        by means of another method.
+      </p>
+      <p>
+        Let’s prove this result with the characteristic function. The
+        conditional characteristic function of
+        <span class="math inline">\(W_2\)</span> given
+        <span class="math inline">\(W_1\)</span> at
+        <span class="math inline">\(Z\)</span> is
+        <span class="math display"
+          >\[ \frac{\exp\Bigl(i\textrm{tr}\bigl({(I_d - 2i
+          Z\Sigma_2)}^{-1}ZW_1\bigr)\Bigr)}{{\det(I_d - 2i
+          Z\Sigma_2)}^{\frac{\nu}{2}}}. \]</span
+        >
+        The characteristic function of
+        <span class="math inline">\(W_2\)</span> is obtained by taking the
+        expectation of this expression, and doing so we get
+        <span class="math display"
+          >\[ \frac{\phi_{\nu,\Sigma_1,\Theta}\bigl({(I_d - 2i
+          Z\Sigma_2)}^{-1}Z\bigr)}{{\det(I_d - 2i Z\Sigma_2)}^{\frac{\nu}{2}}} =
+          \frac{\exp\left(i\textrm{tr}\Bigl({\bigr(I_d - 2i {(I_d - 2i
+          Z\Sigma_2)}^{-1}Z\Sigma_1\bigl)}^{-1}{(I_d - 2i
+          Z\Sigma_2)}^{-1}Z\Theta\Bigr)\right)}{{\det(I_d - 2i
+          Z\Sigma_2)}^{\frac{\nu}{2}} {\det(I_d - 2i {\bigl(I_d - 2i
+          Z\Sigma_2)}^{-1}Z\Sigma_1\bigr)}^{\frac{\nu}{2}}}. \]</span
+        >
+      </p>
+      <p>
+        It is easy to check that the denominator is
+        <span class="math inline"
+          >\({\det\bigl(I_d -
+          2iZ(\Sigma_1+\Sigma_2)\bigr)}^{\frac{\nu}{2}}\)</span
+        >. The expression inside
+        <span class="math inline">\(\textrm{tr}(\ldots)\)</span> at the
+        numerator is
+        <span class="math display"
+          >\[ {\Bigl((I_d - 2i Z\Sigma_2)\bigr(I_d - 2i {(I_d - 2i
+          Z\Sigma_2)}^{-1}Z\Sigma_1\bigl)\Bigr)}^{-1}Z\Theta = {\bigr(I_d -
+          2iZ(\Sigma_1+\Sigma_2)\bigl)}^{-1}Z\Theta. \]</span
+        >
+      </p>
+      <p>
+        Thus we find that the the characteristic function of
+        <span class="math inline">\(W_2\)</span> is
+        <span class="math inline">\(\phi_{\nu, \Sigma_1+\Sigma_2,\Theta}\)</span
+        >, that is to say
+        <span class="math inline"
+          >\(W_2 \sim \mathcal{W}(\nu, \Sigma_1+\Sigma_2, \Theta)\)</span
+        >.
+      </p>
+      <h1 id="aas-simulation-method">A&amp;A’s simulation method</h1>
+      <p>A&amp;A’s simulation method has three steps:</p>
+      <ul>
+        <li>
+          <p>
+            it firstly gives an algorithm to simulate
+            <span class="math inline">\(\mathcal{W}(\nu, J_d^1, \Theta)\)</span
+            >, denoting by <span class="math inline">\(J_d^i\)</span> the
+            <span class="math inline">\(d \times d\)</span> covariance matrix
+            whose all entries are equal to zero except the
+            <span class="math inline">\((i,i)\)</span>-entry which is equal to
+            one;
+          </p>
+        </li>
+        <li>
+          <p>
+            using the first step and the two properties of the Wishart
+            distribution that we have seen, it provides a way to simulate
+            <span class="math inline">\(\mathcal{W}(\nu, I_d^n, \Theta)\)</span>
+            where
+            <span class="math inline">\(I_d^n = J_d^1 + \ldots + J_d^n\)</span>;
+          </p>
+        </li>
+        <li>
+          <p>
+            using the second step and the first property of the Wishart
+            distribution that we have seen, it provides a way to simulate
+            <span class="math inline"
+              >\(\mathcal{W}(\nu, \Sigma, \Theta)\)</span
+            >
+            for any covariance matrix
+            <span class="math inline">\(\Sigma\)</span>.
+          </p>
+        </li>
+      </ul>
+      <p>
+        <span class="math inline">\(\bullet\)</span>
+        <strong
+          >Simulation of
+          <span class="math inline"
+            >\(\mathcal{W}(\nu, J_d^1, \Theta)\)</span
+          ></strong
+        >. This algorithm runs as follows. Let
+        <span class="math inline">\((L,M,P)\)</span> be an
+        <a
+          href="https://laustep.github.io/stlahblog/posts/extendedCholesky.html"
+          >extended Cholesky decomposition</a
+        >
+        of <span class="math inline">\(\Theta_{2:d,2:d}\)</span>. Set
+        <span class="math inline"
+          >\(Q = \begin{pmatrix} 1 &amp; 0 \\ 0 &amp; P \end{pmatrix}\)</span
+        >
+        and
+        <span class="math inline">\(\widetilde{\Theta} = Q\Theta Q'\)</span>,
+        then set
+        <span class="math inline"
+          >\(u = L^{-1}\widetilde{\Theta}_{1, 2:(r+1)}'\)</span
+        >
+        and
+        <span class="math inline"
+          >\(v = \widetilde{\Theta}_{1,1} - \sum_{i=1}^r u_i^2\)</span
+        >. Take
+        <span class="math inline"
+          >\(Z_1, \ldots, Z_r \sim_{\text{iid}} \mathcal{N}(0,1)\)</span
+        >
+        and set <span class="math inline">\(G_i = u_i + Z_i\)</span>. Finally,
+        take
+        <span class="math inline">\(X \sim \chi^2_{\nu-r, v}\)</span>
+        (noncentral chi-squared distribution) independent of the
+        <span class="math inline">\(Z_i\)</span>, and set
+        <span class="math display"
+          >\[ W = Q' \begin{pmatrix} 1 &amp; 0 &amp; 0 \\ 0 &amp; L &amp; 0 \\ 0
+          &amp; M &amp; I_{d-r-1} \end{pmatrix} \begin{pmatrix} X + \sum_{i=1}^r
+          G_i^2 &amp; G' &amp; 0 \\ G &amp; I_r &amp; 0 \\ 0 &amp; 0 &amp; 0
+          \end{pmatrix} \begin{pmatrix} 1 &amp; 0 &amp; 0 \\ 0 &amp; L' &amp; M'
+          \\ 0 &amp; 0 &amp; I_{d-r-1} \end{pmatrix} Q. \]</span
+        >
+        Then A&amp;A have shown that
+        <span class="math inline"
+          >\(W \sim \mathcal{W}(\nu, J_d^1, \Theta)\)</span
+        >.
+      </p>
+      <p>
+        <span class="math inline">\(\bullet\)</span>
+        <strong
+          >Simulation of
+          <span class="math inline"
+            >\(\mathcal{W}(\nu, I_d^n, \Theta)\)</span
+          ></strong
+        >. Let <span class="math inline">\(P\)</span> be the permutation matrix
+        exchanging rows <span class="math inline">\(1\)</span> and
+        <span class="math inline">\(2\)</span>. Using the previous algorithm,
+        simulate
+        <span class="math inline"
+          >\(W_1 \sim \mathcal{W}(\nu, J_d^1, \Theta)\)</span
+        >. By the first property of
+        <span class="math inline">\(\mathcal{W}\)</span> we have seen,
+        <span class="math inline"
+          >\(P W_1 P \sim \mathcal{W}(\nu, J_d^2, P\Theta P)\)</span
+        >. Then, still using the previous algorithm, simulate
+        <span class="math inline"
+          >\((W_2 \mid W_1) \sim \mathcal{W}(\nu, J_d^1, P W_1 P)\)</span
+        >. By the second property of
+        <span class="math inline">\(\mathcal{W}\)</span> we have seen,
+        <span class="math inline"
+          >\(W_2 \sim \mathcal{W}(\nu, I_d^2, P \Theta P)\)</span
+        >. And by the first property,
+        <span class="math inline"
+          >\(P W_2 P \sim \mathcal{W}(\nu, I_d^2, \Theta)\)</span
+        >. Continuing so on, we can simulate
+        <span class="math inline">\(\mathcal{W}(\nu, I_d^n, \Theta)\)</span> for
+        any <span class="math inline">\(n \leq d\)</span>.
+      </p>
+      <p>
+        <span class="math inline">\(\bullet\)</span>
+        <strong
+          >Simulation of
+          <span class="math inline"
+            >\(\mathcal{W}(\nu, \Sigma, \Theta)\)</span
+          ></strong
+        >. Finally, given any covariance matrix
+        <span class="math inline">\(\Sigma\)</span> of rank
+        <span class="math inline">\(n\)</span>, take the
+        <span class="math inline">\(\widetilde{C}\)</span> matrix of an extended
+        Cholesky decomposition of
+        <span class="math inline">\(\Sigma\)</span> with permutation matrix
+        <span class="math inline">\(P\)</span>, and set
+        <span class="math inline">\(A = P'\widetilde{C}\)</span>. Simulate
+        <span class="math inline"
+          >\(Y \sim \mathcal{W}\bigl(\nu, I_d^n,
+          A^{-1}\Theta{(A^{-1})}'\bigr)\)</span
+        >
+        with the previous algorithm and finally set
+        <span class="math inline">\(W = AYA'\)</span>, so that
+        <span class="math inline"
+          >\(W \sim \mathcal{W}(\nu, \Sigma, \Theta)\)</span
+        >
+        by the first property and by the property of the Cholesky decomposition.
+      </p>
+      <h1 id="checking">Checking</h1>
+      <p>
+        The algorithm is implemented in my package
+        <a href="https://github.com/stla/matrixsampling">matrixsampling</a>.
+        Let’s try it.
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">library</span>(matrixsampling)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>p &lt;-<span class="st"> </span><span class="dv">6</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>nu &lt;-<span class="st"> </span><span class="fl">6.3</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>Sigma &lt;-<span class="st"> </span><span class="kw">toeplitz</span>(p<span class="op">:</span><span class="dv">1</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>Theta &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="dv">1</span>, p, p)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>nsims &lt;-<span class="st"> </span><span class="dv">100000</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>W &lt;-<span class="st"> </span><span class="kw">rwishart</span>(nsims, nu, Sigma, Theta)</span></code></pre>
+      </div>
+      <p>
+        As expected, the average simulated matrix is close to the theoretical
+        mean <span class="math inline">\(\nu \Sigma + \Theta\)</span>:
+      </p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">round</span>((nu<span class="op">*</span>Sigma <span class="op">+</span><span class="st"> </span>Theta) <span class="op">-</span><span class="st"> </span><span class="kw">apply</span>(W, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, mean), <span class="dv">2</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="co">##       [,1]  [,2]  [,3]  [,4]  [,5]  [,6]</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="co">## [1,] -0.05 -0.04  0.00  0.00  0.02  0.04</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="co">## [2,] -0.04 -0.06 -0.03 -0.03  0.00  0.01</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="co">## [3,]  0.00 -0.03 -0.04 -0.06 -0.05 -0.05</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="co">## [4,]  0.00 -0.03 -0.06 -0.07 -0.04 -0.07</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a><span class="co">## [5,]  0.02  0.00 -0.05 -0.04 -0.03 -0.05</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a><span class="co">## [6,]  0.04  0.01 -0.05 -0.07 -0.05 -0.09</span></span></code></pre>
+      </div>
+      <p>
+        Let’s compare the theoretical characteristic function to its
+        approximation obtained from the simulations:
+      </p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>z &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="fl">0.001</span>, <span class="fl">0.004</span>, <span class="dt">length.out =</span> <span class="dv">20</span>)</span>
+<span id="cb3-2"><a href="#cb3-2"></a>Z &lt;-<span class="st"> </span><span class="kw">sapply</span>(z, <span class="cf">function</span>(z){</span>
+<span id="cb3-3"><a href="#cb3-3"></a>  z<span class="op">*</span><span class="kw">diag</span>(p) <span class="op">+</span><span class="st"> </span><span class="kw">matrix</span>(z, p, p)</span>
+<span id="cb3-4"><a href="#cb3-4"></a>}, <span class="dt">simplify=</span><span class="ot">FALSE</span>)</span>
+<span id="cb3-5"><a href="#cb3-5"></a>tr &lt;-<span class="st"> </span><span class="cf">function</span>(A) <span class="kw">sum</span>(<span class="kw">diag</span>(A))</span>
+<span id="cb3-6"><a href="#cb3-6"></a>Phi_theoretical &lt;-<span class="st"> </span><span class="kw">sapply</span>(Z, <span class="cf">function</span>(Z){</span>
+<span id="cb3-7"><a href="#cb3-7"></a>             complexplus<span class="op">::</span><span class="kw">Det</span>(<span class="kw">diag</span>(p) <span class="op">-</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>1i<span class="op">*</span>Z<span class="op">%*%</span>Sigma)<span class="op">^</span>(<span class="op">-</span>nu<span class="op">/</span><span class="dv">2</span>) <span class="op">*</span><span class="st"> </span></span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="st">             </span><span class="kw">exp</span>(1i<span class="op">*</span><span class="kw">tr</span>(<span class="kw">solve</span>(<span class="kw">diag</span>(p) <span class="op">-</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>1i<span class="op">*</span>Z<span class="op">%*%</span>Sigma) <span class="op">%*%</span><span class="st"> </span>Z <span class="op">%*%</span><span class="st"> </span>Theta))</span>
+<span id="cb3-9"><a href="#cb3-9"></a>})</span>
+<span id="cb3-10"><a href="#cb3-10"></a>Phi_sims &lt;-<span class="st"> </span><span class="kw">sapply</span>(Z, <span class="cf">function</span>(Z){</span>
+<span id="cb3-11"><a href="#cb3-11"></a>  <span class="kw">mean</span>(<span class="kw">apply</span>(W, <span class="dv">3</span>, <span class="cf">function</span>(W){</span>
+<span id="cb3-12"><a href="#cb3-12"></a>    <span class="kw">exp</span>(1i<span class="op">*</span><span class="kw">tr</span>(Z<span class="op">%*%</span>W))</span>
+<span id="cb3-13"><a href="#cb3-13"></a>  }))</span>
+<span id="cb3-14"><a href="#cb3-14"></a>})</span>
+<span id="cb3-15"><a href="#cb3-15"></a><span class="kw">layout</span>(<span class="kw">t</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>))</span>
+<span id="cb3-16"><a href="#cb3-16"></a><span class="kw">plot</span>(z, <span class="kw">Re</span>(Phi_theoretical), <span class="dt">type=</span><span class="st">"o"</span>, <span class="dt">pch=</span><span class="dv">19</span>)</span>
+<span id="cb3-17"><a href="#cb3-17"></a><span class="kw">lines</span>(z, <span class="kw">Re</span>(Phi_sims), <span class="dt">type=</span><span class="st">"o"</span>, <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">col=</span><span class="st">"red"</span>)</span>
+<span id="cb3-18"><a href="#cb3-18"></a><span class="kw">plot</span>(z, <span class="kw">Im</span>(Phi_theoretical), <span class="dt">type=</span><span class="st">"o"</span>, <span class="dt">pch=</span><span class="dv">19</span>)</span>
+<span id="cb3-19"><a href="#cb3-19"></a><span class="kw">lines</span>(z, <span class="kw">Im</span>(Phi_sims), <span class="dt">type=</span><span class="st">"o"</span>, <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">col=</span><span class="st">"red"</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/WishFrac-WishartCF-1.png"
+        />
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Sat, 09 Dec 2017 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/WishartFractional.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
+    <item>
       <title>Owen Q-function by numerical integration</title>
       <link>https://laustep.github.io/stlahblog/posts/OwenQintegration.html</link>
       <description><![CDATA[<div class="container-fluid">
