@@ -14,8 +14,6 @@
     <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
    
   
-    <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
-  
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
@@ -78,7 +76,7 @@
 
       <div class="main col-sm-10">
         <div id="header">
-          <div id="logo" style="position:absolute;">
+          <div id="logo">
             <a href="../">
               <img src="../images/stla.jpg" alt="stla" width="100px" />
             </a>
@@ -101,7 +99,7 @@
 </div>
 <div class="info">
     
-    Tags: <a href="../tags/R.html">R</a>, <a href="../tags/maths.html">maths</a>, <a href="../tags/geometry.html">geometry</a>
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>, <a title="All pages tagged 'geometry'." href="../tags/geometry.html">geometry</a>
     
 </div>
 
@@ -110,15 +108,15 @@
 \,\mathrm{d}z\,\mathrm{d}y\,\mathrm{d}x
 \]</span> for a certain function <span class="math inline">\(f\)</span>. How?</p>
 <p>A possibility is to nest the <code>integrate</code> function:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">f &lt;-<span class="st"> </span><span class="cf">function</span>(x,y,z) x <span class="op">+</span><span class="st"> </span>y<span class="op">*</span>z</a>
-<a class="sourceLine" id="cb1-2" title="2"><span class="kw">integrate</span>(<span class="kw">Vectorize</span>(<span class="cf">function</span>(x) { </a>
-<a class="sourceLine" id="cb1-3" title="3">  <span class="kw">integrate</span>(<span class="kw">Vectorize</span>(<span class="cf">function</span>(y) { </a>
-<a class="sourceLine" id="cb1-4" title="4">    <span class="kw">integrate</span>(<span class="cf">function</span>(z) { </a>
-<a class="sourceLine" id="cb1-5" title="5">      <span class="kw">f</span>(x,y,z) </a>
-<a class="sourceLine" id="cb1-6" title="6">    }, <span class="dv">-10</span>, <span class="dv">6</span><span class="op">-</span>x<span class="op">-</span>y)<span class="op">$</span>value</a>
-<a class="sourceLine" id="cb1-7" title="7">   }), <span class="dv">-5</span>, <span class="dv">3</span><span class="op">-</span>x)<span class="op">$</span>value </a>
-<a class="sourceLine" id="cb1-8" title="8">}), <span class="dv">-5</span>, <span class="dv">4</span>) </a>
-<a class="sourceLine" id="cb1-9" title="9"><span class="co">## -5358.3 with absolute error &lt; 9.5e-11</span></a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>f &lt;-<span class="st"> </span><span class="cf">function</span>(x,y,z) x <span class="op">+</span><span class="st"> </span>y<span class="op">*</span>z</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="kw">integrate</span>(<span class="kw">Vectorize</span>(<span class="cf">function</span>(x) { </span>
+<span id="cb1-3"><a href="#cb1-3"></a>  <span class="kw">integrate</span>(<span class="kw">Vectorize</span>(<span class="cf">function</span>(y) { </span>
+<span id="cb1-4"><a href="#cb1-4"></a>    <span class="kw">integrate</span>(<span class="cf">function</span>(z) { </span>
+<span id="cb1-5"><a href="#cb1-5"></a>      <span class="kw">f</span>(x,y,z) </span>
+<span id="cb1-6"><a href="#cb1-6"></a>    }, <span class="dv">-10</span>, <span class="dv">6</span> <span class="op">-</span><span class="st"> </span>x <span class="op">-</span><span class="st"> </span>y)<span class="op">$</span>value</span>
+<span id="cb1-7"><a href="#cb1-7"></a>   }), <span class="dv">-5</span>, <span class="dv">3</span> <span class="op">-</span><span class="st"> </span>x)<span class="op">$</span>value </span>
+<span id="cb1-8"><a href="#cb1-8"></a>}), <span class="dv">-5</span>, <span class="dv">4</span>) </span>
+<span id="cb1-9"><a href="#cb1-9"></a><span class="co">## -5358.3 with absolute error &lt; 9.5e-11</span></span></code></pre></div>
 <p>This approach works well in general. But it has one default: the estimate of the absolute error it returns is not reliable, because the estimates of the absolute errors of the inner integrals are not taken into account.</p>
 <p>We provide another way to evaluate this integral, giving a reliable estimate of the absolute error.</p>
 <p>The domain of integration is defined by the set of inequalities: <span class="math display">\[
@@ -139,84 +137,84 @@ x+y+z &amp; \leq &amp; 6
 \end{matrix}
 \right..
 \]</span> This set of inequalities defines a convex polyhedron. We can get the vertices of this polyhedron with the <code>rcdd</code> package:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">A &lt;-<span class="st"> </span><span class="kw">rbind</span>(</a>
-<a class="sourceLine" id="cb2-2" title="2">  <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="co"># -x</span></a>
-<a class="sourceLine" id="cb2-3" title="3">  <span class="kw">c</span>( <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="co"># x</span></a>
-<a class="sourceLine" id="cb2-4" title="4">  <span class="kw">c</span>( <span class="dv">0</span>,<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>), <span class="co"># -y</span></a>
-<a class="sourceLine" id="cb2-5" title="5">  <span class="kw">c</span>( <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>), <span class="co"># x+y</span></a>
-<a class="sourceLine" id="cb2-6" title="6">  <span class="kw">c</span>( <span class="dv">0</span>, <span class="dv">0</span>,<span class="op">-</span><span class="dv">1</span>), <span class="co"># -z</span></a>
-<a class="sourceLine" id="cb2-7" title="7">  <span class="kw">c</span>( <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>)  <span class="co"># x+y+z</span></a>
-<a class="sourceLine" id="cb2-8" title="8">)</a>
-<a class="sourceLine" id="cb2-9" title="9">b &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">10</span>, <span class="dv">6</span>)</a>
-<a class="sourceLine" id="cb2-10" title="10"><span class="kw">library</span>(rcdd)</a>
-<a class="sourceLine" id="cb2-11" title="11"><span class="kw">scdd</span>(<span class="kw">makeH</span>(A,b))<span class="op">$</span>output[,<span class="op">-</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>)]</a>
-<a class="sourceLine" id="cb2-12" title="12"><span class="co">##      [,1] [,2] [,3]</span></a>
-<a class="sourceLine" id="cb2-13" title="13"><span class="co">## [1,]   -5   -5   16</span></a>
-<a class="sourceLine" id="cb2-14" title="14"><span class="co">## [2,]   -5    8    3</span></a>
-<a class="sourceLine" id="cb2-15" title="15"><span class="co">## [3,]    4   -1    3</span></a>
-<a class="sourceLine" id="cb2-16" title="16"><span class="co">## [4,]    4   -5    7</span></a>
-<a class="sourceLine" id="cb2-17" title="17"><span class="co">## [5,]    4   -1  -10</span></a>
-<a class="sourceLine" id="cb2-18" title="18"><span class="co">## [6,]    4   -5  -10</span></a>
-<a class="sourceLine" id="cb2-19" title="19"><span class="co">## [7,]   -5    8  -10</span></a>
-<a class="sourceLine" id="cb2-20" title="20"><span class="co">## [8,]   -5   -5  -10</span></a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>A &lt;-<span class="st"> </span><span class="kw">rbind</span>(</span>
+<span id="cb2-2"><a href="#cb2-2"></a>  <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="co"># -x</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a>  <span class="kw">c</span>( <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="co"># x</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a>  <span class="kw">c</span>( <span class="dv">0</span>,<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>), <span class="co"># -y</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a>  <span class="kw">c</span>( <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>), <span class="co"># x+y</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a>  <span class="kw">c</span>( <span class="dv">0</span>, <span class="dv">0</span>,<span class="op">-</span><span class="dv">1</span>), <span class="co"># -z</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a>  <span class="kw">c</span>( <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>)  <span class="co"># x+y+z</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a>)</span>
+<span id="cb2-9"><a href="#cb2-9"></a>b &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">10</span>, <span class="dv">6</span>)</span>
+<span id="cb2-10"><a href="#cb2-10"></a><span class="kw">library</span>(rcdd)</span>
+<span id="cb2-11"><a href="#cb2-11"></a><span class="kw">scdd</span>(<span class="kw">makeH</span>(A,b))<span class="op">$</span>output[,<span class="op">-</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>)]</span>
+<span id="cb2-12"><a href="#cb2-12"></a><span class="co">##      [,1] [,2] [,3]</span></span>
+<span id="cb2-13"><a href="#cb2-13"></a><span class="co">## [1,]   -5   -5   16</span></span>
+<span id="cb2-14"><a href="#cb2-14"></a><span class="co">## [2,]   -5    8    3</span></span>
+<span id="cb2-15"><a href="#cb2-15"></a><span class="co">## [3,]    4   -1    3</span></span>
+<span id="cb2-16"><a href="#cb2-16"></a><span class="co">## [4,]    4   -5    7</span></span>
+<span id="cb2-17"><a href="#cb2-17"></a><span class="co">## [5,]    4   -1  -10</span></span>
+<span id="cb2-18"><a href="#cb2-18"></a><span class="co">## [6,]    4   -5  -10</span></span>
+<span id="cb2-19"><a href="#cb2-19"></a><span class="co">## [7,]   -5    8  -10</span></span>
+<span id="cb2-20"><a href="#cb2-20"></a><span class="co">## [8,]   -5   -5  -10</span></span></code></pre></div>
 <p>Alternatively, we can also get the vertices with the <code>vertexenum</code> package:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw">library</span>(vertexenum)</a>
-<a class="sourceLine" id="cb3-2" title="2"><span class="kw">enumerate.vertices</span>(A,b)</a>
-<a class="sourceLine" id="cb3-3" title="3"><span class="co">##      [,1] [,2] [,3]</span></a>
-<a class="sourceLine" id="cb3-4" title="4"><span class="co">## [1,]    4   -1    3</span></a>
-<a class="sourceLine" id="cb3-5" title="5"><span class="co">## [2,]    4   -5    7</span></a>
-<a class="sourceLine" id="cb3-6" title="6"><span class="co">## [3,]   -5   -5   16</span></a>
-<a class="sourceLine" id="cb3-7" title="7"><span class="co">## [4,]   -5    8    3</span></a>
-<a class="sourceLine" id="cb3-8" title="8"><span class="co">## [5,]    4   -1  -10</span></a>
-<a class="sourceLine" id="cb3-9" title="9"><span class="co">## [6,]    4   -5  -10</span></a>
-<a class="sourceLine" id="cb3-10" title="10"><span class="co">## [7,]   -5   -5  -10</span></a>
-<a class="sourceLine" id="cb3-11" title="11"><span class="co">## [8,]   -5    8  -10</span></a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">library</span>(vertexenum)</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="kw">enumerate.vertices</span>(A,b)</span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="co">##      [,1] [,2] [,3]</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="co">## [1,]    4   -1    3</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="co">## [2,]    4   -5    7</span></span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="co">## [3,]   -5   -5   16</span></span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="co">## [4,]   -5    8    3</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="co">## [5,]    4   -1  -10</span></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="co">## [6,]    4   -5  -10</span></span>
+<span id="cb3-10"><a href="#cb3-10"></a><span class="co">## [7,]   -5   -5  -10</span></span>
+<span id="cb3-11"><a href="#cb3-11"></a><span class="co">## [8,]   -5    8  -10</span></span></code></pre></div>
 <p>Then, to evaluate the integral, we proceed as follows:</p>
 <ul>
 <li><p>split the polyhedron into simplices (tetrahedra), with the <code>geometry</code> package;</p></li>
 <li><p>evaluate the integral over the union of these simplices with the <code>SimplicialCubature</code> package.</p></li>
 </ul>
 <p>Let’s go. We split the polyhedron:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">vertices &lt;-<span class="st"> </span><span class="kw">enumerate.vertices</span>(A,b)</a>
-<a class="sourceLine" id="cb4-2" title="2"><span class="kw">library</span>(geometry)</a>
-<a class="sourceLine" id="cb4-3" title="3">ix &lt;-<span class="st"> </span><span class="kw">delaunayn</span>(vertices)</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>vertices &lt;-<span class="st"> </span><span class="kw">enumerate.vertices</span>(A,b)</span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="kw">library</span>(geometry)</span>
+<span id="cb4-3"><a href="#cb4-3"></a>ix &lt;-<span class="st"> </span><span class="kw">delaunayn</span>(vertices)</span></code></pre></div>
 <p>Here is the polyhedron splitted into simplices:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">library</span>(rgl)</a>
-<a class="sourceLine" id="cb5-2" title="2">triangles &lt;-<span class="st"> </span><span class="kw">do.call</span>(</a>
-<a class="sourceLine" id="cb5-3" title="3">  cbind,</a>
-<a class="sourceLine" id="cb5-4" title="4">  <span class="kw">lapply</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(ix), <span class="cf">function</span>(i) <span class="kw">combn</span>(ix[i,], <span class="dv">3</span>))</a>
-<a class="sourceLine" id="cb5-5" title="5">)</a>
-<a class="sourceLine" id="cb5-6" title="6">mesh &lt;-<span class="st"> </span><span class="kw">tmesh3d</span>(<span class="kw">t</span>(vertices), triangles, <span class="dt">homogeneous =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb5-7" title="7"><span class="kw">view3d</span>(<span class="dv">80</span>, <span class="dv">10</span>, <span class="dt">zoom =</span> <span class="fl">0.6</span>)</a>
-<a class="sourceLine" id="cb5-8" title="8"><span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">&quot;yellow&quot;</span>, <span class="dt">alpha =</span> <span class="fl">0.3</span>)</a>
-<a class="sourceLine" id="cb5-9" title="9"><span class="kw">wire3d</span>(mesh)</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="kw">library</span>(rgl)</span>
+<span id="cb5-2"><a href="#cb5-2"></a>triangles &lt;-<span class="st"> </span><span class="kw">do.call</span>(</span>
+<span id="cb5-3"><a href="#cb5-3"></a>  cbind,</span>
+<span id="cb5-4"><a href="#cb5-4"></a>  <span class="kw">lapply</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(ix), <span class="cf">function</span>(i) <span class="kw">combn</span>(ix[i,], <span class="dv">3</span>))</span>
+<span id="cb5-5"><a href="#cb5-5"></a>)</span>
+<span id="cb5-6"><a href="#cb5-6"></a>mesh &lt;-<span class="st"> </span><span class="kw">tmesh3d</span>(<span class="kw">t</span>(vertices), triangles, <span class="dt">homogeneous =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="kw">view3d</span>(<span class="dv">80</span>, <span class="dv">10</span>, <span class="dt">zoom =</span> <span class="fl">0.6</span>)</span>
+<span id="cb5-8"><a href="#cb5-8"></a><span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">&quot;yellow&quot;</span>, <span class="dt">alpha =</span> <span class="fl">0.3</span>)</span>
+<span id="cb5-9"><a href="#cb5-9"></a><span class="kw">wire3d</span>(mesh)</span></code></pre></div>
 <p><img src="./figures/integralPolyhedron-polyhedron-1.png" /></p>
 <p>We store the union of the obtained simplices in an array <code>S</code>:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">S &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="ot">NA_real_</span>, <span class="dt">dim=</span><span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">4</span>,<span class="kw">nrow</span>(ix)))</a>
-<a class="sourceLine" id="cb6-2" title="2"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(ix)){</a>
-<a class="sourceLine" id="cb6-3" title="3">  S[,,i] &lt;-<span class="st"> </span><span class="kw">t</span>(vertices[ix[i,],])</a>
-<a class="sourceLine" id="cb6-4" title="4">}</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>S &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="ot">NA_real_</span>, <span class="dt">dim=</span><span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">4</span>,<span class="kw">nrow</span>(ix)))</span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(ix)){</span>
+<span id="cb6-3"><a href="#cb6-3"></a>  S[,,i] &lt;-<span class="st"> </span><span class="kw">t</span>(vertices[ix[i,],])</span>
+<span id="cb6-4"><a href="#cb6-4"></a>}</span></code></pre></div>
 <p>Now we are ready to use the <code>SimplicialCubature</code> package. Let’s define the function <span class="math inline">\(f\)</span> before, for example:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">f &lt;-<span class="st"> </span><span class="cf">function</span>(xyz){</a>
-<a class="sourceLine" id="cb7-2" title="2">  xyz[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>xyz[<span class="dv">2</span>]<span class="op">*</span>xyz[<span class="dv">3</span>] <span class="co"># f(x,y,z) = x + y*z</span></a>
-<a class="sourceLine" id="cb7-3" title="3">}</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>f &lt;-<span class="st"> </span><span class="cf">function</span>(xyz){</span>
+<span id="cb7-2"><a href="#cb7-2"></a>  xyz[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>xyz[<span class="dv">2</span>]<span class="op">*</span>xyz[<span class="dv">3</span>] <span class="co"># f(x,y,z) = x + y*z</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a>}</span></code></pre></div>
 <p>Finally:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="kw">library</span>(SimplicialCubature)</a>
-<a class="sourceLine" id="cb8-2" title="2"><span class="kw">adaptIntegrateSimplex</span>(f, S)</a>
-<a class="sourceLine" id="cb8-3" title="3"><span class="co">## $integral</span></a>
-<a class="sourceLine" id="cb8-4" title="4"><span class="co">## [1] -5358.3</span></a>
-<a class="sourceLine" id="cb8-5" title="5"><span class="co">## </span></a>
-<a class="sourceLine" id="cb8-6" title="6"><span class="co">## $estAbsError</span></a>
-<a class="sourceLine" id="cb8-7" title="7"><span class="co">## [1] 1.18797e-08</span></a>
-<a class="sourceLine" id="cb8-8" title="8"><span class="co">## </span></a>
-<a class="sourceLine" id="cb8-9" title="9"><span class="co">## $functionEvaluations</span></a>
-<a class="sourceLine" id="cb8-10" title="10"><span class="co">## [1] 330</span></a>
-<a class="sourceLine" id="cb8-11" title="11"><span class="co">## </span></a>
-<a class="sourceLine" id="cb8-12" title="12"><span class="co">## $returnCode</span></a>
-<a class="sourceLine" id="cb8-13" title="13"><span class="co">## [1] 0</span></a>
-<a class="sourceLine" id="cb8-14" title="14"><span class="co">## </span></a>
-<a class="sourceLine" id="cb8-15" title="15"><span class="co">## $message</span></a>
-<a class="sourceLine" id="cb8-16" title="16"><span class="co">## [1] &quot;OK&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="kw">library</span>(SimplicialCubature)</span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="kw">adaptIntegrateSimplex</span>(f, S)</span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="co">## $integral</span></span>
+<span id="cb8-4"><a href="#cb8-4"></a><span class="co">## [1] -5358.3</span></span>
+<span id="cb8-5"><a href="#cb8-5"></a><span class="co">## </span></span>
+<span id="cb8-6"><a href="#cb8-6"></a><span class="co">## $estAbsError</span></span>
+<span id="cb8-7"><a href="#cb8-7"></a><span class="co">## [1] 1.18797e-08</span></span>
+<span id="cb8-8"><a href="#cb8-8"></a><span class="co">## </span></span>
+<span id="cb8-9"><a href="#cb8-9"></a><span class="co">## $functionEvaluations</span></span>
+<span id="cb8-10"><a href="#cb8-10"></a><span class="co">## [1] 330</span></span>
+<span id="cb8-11"><a href="#cb8-11"></a><span class="co">## </span></span>
+<span id="cb8-12"><a href="#cb8-12"></a><span class="co">## $returnCode</span></span>
+<span id="cb8-13"><a href="#cb8-13"></a><span class="co">## [1] 0</span></span>
+<span id="cb8-14"><a href="#cb8-14"></a><span class="co">## </span></span>
+<span id="cb8-15"><a href="#cb8-15"></a><span class="co">## $message</span></span>
+<span id="cb8-16"><a href="#cb8-16"></a><span class="co">## [1] &quot;OK&quot;</span></span></code></pre></div>
 <p>We get the estimated value of the integral with a reliable estimate of the absolute error.</p>
 <p>For this example, we can do better. The function <span class="math inline">\(f\)</span> is a polynomial: <span class="math display">\[
 f(x,y,z) = x + yz.
@@ -225,14 +223,14 @@ f(x,y,z) = x + yz.
 f(x,y,z) = c_1 \times x^{\alpha_1}y^{\beta_1}z^{\gamma_1} \, + \,
 c_2 \times x^{\alpha_2}y^{\beta_2}z^{\gamma_2}
 \]</span> with <span class="math inline">\(c_1 = 1\)</span>, <span class="math inline">\(c_2=1\)</span>, <span class="math inline">\((\alpha_1,\beta_1,\gamma_1)=(1,0,0)\)</span>, <span class="math inline">\((\alpha_2,\beta_2,\gamma_2)=(0,1,1)\)</span>. Then the polynomial is defined in this way:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">P &lt;-<span class="st"> </span><span class="kw">definePoly</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>), <span class="kw">rbind</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>), <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>)))</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>P &lt;-<span class="st"> </span><span class="kw">definePoly</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>), <span class="kw">rbind</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>), <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>)))</span></code></pre></div>
 <p>And its integral is obtained in this way:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">integrateSimplexPolynomial</span>(P, S)</a>
-<a class="sourceLine" id="cb10-2" title="2"><span class="co">## $integral</span></a>
-<a class="sourceLine" id="cb10-3" title="3"><span class="co">## [1] -5358.3</span></a>
-<a class="sourceLine" id="cb10-4" title="4"><span class="co">## </span></a>
-<a class="sourceLine" id="cb10-5" title="5"><span class="co">## $functionEvaluations</span></a>
-<a class="sourceLine" id="cb10-6" title="6"><span class="co">## [1] 24</span></a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">integrateSimplexPolynomial</span>(P, S)</span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="co">## $integral</span></span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="co">## [1] -5358.3</span></span>
+<span id="cb10-4"><a href="#cb10-4"></a><span class="co">## </span></span>
+<span id="cb10-5"><a href="#cb10-5"></a><span class="co">## $functionEvaluations</span></span>
+<span id="cb10-6"><a href="#cb10-6"></a><span class="co">## [1] 24</span></span></code></pre></div>
 
         </div>
 
@@ -286,20 +284,6 @@ c_2 \times x^{\alpha_2}y^{\beta_2}z^{\gamma_2}
 <!-- <script>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
-
-  <!-- Google Prettify -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-  <script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
-  <script>
-    var pres = document.getElementsByTagName("pre");
-    for (var i = 0; i < pres.length; ++i) {
-      
-        pres[i].className = pres[i].className + " prettyprint linenums";
-      
-    }
-    prettyPrint();
-  </script> 
 
 
 </html>
