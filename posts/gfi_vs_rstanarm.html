@@ -1,0 +1,330 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Why I like generalized fiducial inference</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:26px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:22px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Why I like generalized fiducial inference</h1> 
+          <div class="info">
+    Posted on November  8, 2020
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>, <a title="All pages tagged 'statistics'." href="../tags/statistics.html">statistics</a>
+    
+</div>
+
+<p>Throughout this article, one considers the balanced one-way ANOVA model with a random factor (<code>group</code>). The between standard deviation and the within standard deviation are denoted by <span class="math inline">\(\sigma_{\mathrm{b}}\)</span> and <span class="math inline">\(\sigma_{\mathrm{w}}\)</span> respectively. The grand mean is denoted by <span class="math inline">\(\mu\)</span>. The number of levels of the <code>group</code> factor is denoted by <span class="math inline">\(I\)</span> and the number of individuals within each group is denoted by <span class="math inline">\(J\)</span>. Thus the model is: <span class="math display">\[
+\mu_i \sim_{\text{iid}} \mathcal{N}(\mu, \sigma_{\mathrm{b}}^2), \, 
+i = 1, \ldots, I \qquad 
+(y_{i,j} \mid \mu_i) \sim_{\text{iid}} 
+\mathcal{N}(\mu_i, \sigma_{\mathrm{w}}^2), \, j = 1, \ldots, J.
+\]</span></p>
+<h2 id="using-rstanarm-with-the-default-priors">Using ‘rstanarm’ with the default priors</h2>
+<p>Below I fit the model with the ‘rstanarm’ package for fifteen simulated datasets with <span class="math inline">\(I = 10\)</span>, <span class="math inline">\(J = 5\)</span>, <span class="math inline">\(\mu = 10000\)</span>, <span class="math inline">\(\sigma_{\mathrm{b}} = 50\)</span>, <span class="math inline">\(\sigma_{\mathrm{w}} = 1\)</span>. I assign a “vague” half-Cauchy prior distribution to <span class="math inline">\(\sigma_{\mathrm{w}}\)</span> and the other prior distributions are the default prior distributions of <code>stan_lmer</code>.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(rstanarm)</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="kw">options</span>(<span class="dt">mc.cores =</span> parallel<span class="op">::</span><span class="kw">detectCores</span>())</span>
+<span id="cb1-3"><a href="#cb1-3"></a></span>
+<span id="cb1-4"><a href="#cb1-4"></a>mu           &lt;-<span class="st"> </span><span class="dv">10000</span> </span>
+<span id="cb1-5"><a href="#cb1-5"></a>sigmaWithin  &lt;-<span class="st"> </span><span class="dv">1</span></span>
+<span id="cb1-6"><a href="#cb1-6"></a>ratio        &lt;-<span class="st"> </span><span class="dv">50</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a>sigmaBetween &lt;-<span class="st"> </span>sigmaWithin <span class="op">*</span><span class="st"> </span>ratio</span>
+<span id="cb1-8"><a href="#cb1-8"></a>I            &lt;-<span class="st"> </span>10L </span>
+<span id="cb1-9"><a href="#cb1-9"></a>J            &lt;-<span class="st"> </span>5L </span>
+<span id="cb1-10"><a href="#cb1-10"></a></span>
+<span id="cb1-11"><a href="#cb1-11"></a>nsims &lt;-<span class="st"> </span>15L </span>
+<span id="cb1-12"><a href="#cb1-12"></a></span>
+<span id="cb1-13"><a href="#cb1-13"></a>stanIntervals &lt;-<span class="st"> </span><span class="kw">list</span>( <span class="co"># to store the confidence intervals</span></span>
+<span id="cb1-14"><a href="#cb1-14"></a>  <span class="dt">within =</span> <span class="st">`</span><span class="dt">colnames&lt;-</span><span class="st">`</span>(<span class="kw">matrix</span>(<span class="ot">NA_real_</span>, <span class="dt">nrow =</span> nsims, <span class="dt">ncol =</span> <span class="dv">3</span>), </span>
+<span id="cb1-15"><a href="#cb1-15"></a>                      <span class="kw">c</span>(<span class="st">&quot;estimate&quot;</span>, <span class="st">&quot;lwr&quot;</span>, <span class="st">&quot;upr&quot;</span>)),</span>
+<span id="cb1-16"><a href="#cb1-16"></a>  <span class="dt">between =</span> <span class="st">`</span><span class="dt">colnames&lt;-</span><span class="st">`</span>(<span class="kw">matrix</span>(<span class="ot">NA_real_</span>, <span class="dt">nrow =</span> nsims, <span class="dt">ncol =</span> <span class="dv">3</span>), </span>
+<span id="cb1-17"><a href="#cb1-17"></a>                      <span class="kw">c</span>(<span class="st">&quot;estimate&quot;</span>, <span class="st">&quot;lwr&quot;</span>, <span class="st">&quot;upr&quot;</span>))</span>
+<span id="cb1-18"><a href="#cb1-18"></a>)</span>
+<span id="cb1-19"><a href="#cb1-19"></a></span>
+<span id="cb1-20"><a href="#cb1-20"></a><span class="kw">set.seed</span>(666L)</span>
+<span id="cb1-21"><a href="#cb1-21"></a></span>
+<span id="cb1-22"><a href="#cb1-22"></a><span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span>nsims){</span>
+<span id="cb1-23"><a href="#cb1-23"></a>  groupMeans &lt;-<span class="st"> </span><span class="kw">rnorm</span>(I, mu, sigmaBetween)</span>
+<span id="cb1-24"><a href="#cb1-24"></a>  y          &lt;-<span class="st"> </span><span class="kw">c</span>(</span>
+<span id="cb1-25"><a href="#cb1-25"></a>    <span class="kw">vapply</span>(groupMeans, <span class="cf">function</span>(gmean) <span class="kw">rnorm</span>(J, gmean, sigmaWithin), <span class="kw">numeric</span>(J))</span>
+<span id="cb1-26"><a href="#cb1-26"></a>  )</span>
+<span id="cb1-27"><a href="#cb1-27"></a>  dat        &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
+<span id="cb1-28"><a href="#cb1-28"></a>    <span class="dt">y =</span> y,</span>
+<span id="cb1-29"><a href="#cb1-29"></a>    <span class="dt">group =</span> <span class="kw">gl</span>(I, J)</span>
+<span id="cb1-30"><a href="#cb1-30"></a>  )</span>
+<span id="cb1-31"><a href="#cb1-31"></a>  </span>
+<span id="cb1-32"><a href="#cb1-32"></a>  rstanarm &lt;-<span class="st"> </span><span class="kw">stan_lmer</span>(</span>
+<span id="cb1-33"><a href="#cb1-33"></a>    y <span class="op">~</span><span class="st"> </span>(<span class="dv">1</span><span class="op">|</span>group), <span class="dt">data =</span> dat, <span class="dt">iter =</span> 5000L,</span>
+<span id="cb1-34"><a href="#cb1-34"></a>    <span class="dt">prior_aux =</span> <span class="kw">cauchy</span>(<span class="dv">0</span>, <span class="dv">5</span>)</span>
+<span id="cb1-35"><a href="#cb1-35"></a>  )</span>
+<span id="cb1-36"><a href="#cb1-36"></a>  </span>
+<span id="cb1-37"><a href="#cb1-37"></a>  pstrr &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>( <span class="co"># extract posterior draws</span></span>
+<span id="cb1-38"><a href="#cb1-38"></a>    stan,</span>
+<span id="cb1-39"><a href="#cb1-39"></a>    <span class="dt">pars =</span> <span class="kw">c</span>(</span>
+<span id="cb1-40"><a href="#cb1-40"></a>      <span class="st">&quot;(Intercept)&quot;</span>,</span>
+<span id="cb1-41"><a href="#cb1-41"></a>      <span class="st">&quot;sigma&quot;</span>,</span>
+<span id="cb1-42"><a href="#cb1-42"></a>      <span class="st">&quot;Sigma[group:(Intercept),(Intercept)]&quot;</span></span>
+<span id="cb1-43"><a href="#cb1-43"></a>    )</span>
+<span id="cb1-44"><a href="#cb1-44"></a>  )</span>
+<span id="cb1-45"><a href="#cb1-45"></a>  <span class="kw">names</span>(pstrr)[2L<span class="op">:</span>3L] &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;sigma_error&quot;</span>, <span class="st">&quot;sigma_group&quot;</span>)</span>
+<span id="cb1-46"><a href="#cb1-46"></a>  pstrr[[<span class="st">&quot;sigma_group&quot;</span>]] &lt;-<span class="st"> </span><span class="kw">sqrt</span>(pstrr[[<span class="st">&quot;sigma_group&quot;</span>]])</span>
+<span id="cb1-47"><a href="#cb1-47"></a></span>
+<span id="cb1-48"><a href="#cb1-48"></a>  x &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">vapply</span>(pstrr, quantile, <span class="kw">numeric</span>(3L), <span class="dt">probs =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="fl">2.5</span>, <span class="fl">97.5</span>)<span class="op">/</span><span class="dv">100</span>))</span>
+<span id="cb1-49"><a href="#cb1-49"></a>  stanIntervals<span class="op">$</span>within[i, ] &lt;-<span class="st"> </span>x[<span class="st">&quot;sigma_error&quot;</span>, ]</span>
+<span id="cb1-50"><a href="#cb1-50"></a>  stanIntervals<span class="op">$</span>between[i, ] &lt;-<span class="st"> </span>x[<span class="st">&quot;sigma_group&quot;</span>, ]</span>
+<span id="cb1-51"><a href="#cb1-51"></a>}</span></code></pre></div>
+<p>Let’s plot the intervals now.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">library</span>(ggplot2)</span>
+<span id="cb2-2"><a href="#cb2-2"></a>stanWithin &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(stanIntervals[[<span class="st">&quot;within&quot;</span>]])</span>
+<span id="cb2-3"><a href="#cb2-3"></a>stanWithin[[<span class="st">&quot;simulation&quot;</span>]] &lt;-<span class="st"> </span><span class="kw">factor</span>(1L<span class="op">:</span>nsims)</span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="kw">ggplot</span>(</span>
+<span id="cb2-5"><a href="#cb2-5"></a>  stanWithin, </span>
+<span id="cb2-6"><a href="#cb2-6"></a>  <span class="kw">aes</span>(</span>
+<span id="cb2-7"><a href="#cb2-7"></a>    <span class="dt">x =</span> simulation, <span class="dt">y =</span> estimate, <span class="dt">ymin =</span> lwr, <span class="dt">ymax =</span> upr</span>
+<span id="cb2-8"><a href="#cb2-8"></a>  )</span>
+<span id="cb2-9"><a href="#cb2-9"></a>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb2-10"><a href="#cb2-10"></a><span class="st">  </span><span class="kw">geom_pointrange</span>() <span class="op">+</span><span class="st"> </span></span>
+<span id="cb2-11"><a href="#cb2-11"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;interval&quot;</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb2-12"><a href="#cb2-12"></a><span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept =</span> <span class="dv">1</span>, <span class="dt">linetype =</span> <span class="st">&quot;dashed&quot;</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb2-13"><a href="#cb2-13"></a><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;Confidence intervals about the within standard deviation&quot;</span>)</span></code></pre></div>
+<p><img src="./figures/gfi_rstanarm-stanIntervalsWithin-1.png" /></p>
+<p>The horizontal line shows the value of <span class="math inline">\(\sigma_{\mathrm{w}}\)</span>. As you can see, the confidence intervals dramatically fail to catch this value.</p>
+<p>And this is also the case for <span class="math inline">\(\sigma_{\mathrm{b}}\)</span>:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>stanBetween &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(stanIntervals[[<span class="st">&quot;between&quot;</span>]])</span>
+<span id="cb3-2"><a href="#cb3-2"></a>stanBetween[[<span class="st">&quot;simulation&quot;</span>]] &lt;-<span class="st"> </span><span class="kw">factor</span>(1L<span class="op">:</span>nsims)</span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="kw">ggplot</span>(</span>
+<span id="cb3-4"><a href="#cb3-4"></a>  stanBetween, </span>
+<span id="cb3-5"><a href="#cb3-5"></a>  <span class="kw">aes</span>(</span>
+<span id="cb3-6"><a href="#cb3-6"></a>    <span class="dt">x =</span> simulation, <span class="dt">y =</span> estimate, <span class="dt">ymin =</span> lwr, <span class="dt">ymax =</span> upr</span>
+<span id="cb3-7"><a href="#cb3-7"></a>  )</span>
+<span id="cb3-8"><a href="#cb3-8"></a>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="st">  </span><span class="kw">geom_pointrange</span>() <span class="op">+</span><span class="st"> </span></span>
+<span id="cb3-10"><a href="#cb3-10"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;interval&quot;</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb3-11"><a href="#cb3-11"></a><span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept =</span> <span class="dv">1</span>, <span class="dt">linetype =</span> <span class="st">&quot;dashed&quot;</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb3-12"><a href="#cb3-12"></a><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;Confidence intervals about the between standard deviation&quot;</span>)</span></code></pre></div>
+<p><img src="./figures/gfi_rstanarm-stanIntervalsBetween-1.png" /></p>
+<h2 id="resolving-the-issue">Resolving the issue</h2>
+<p>Why? The explanation is simple: <code>stan_lmer</code> assigns a unit exponential prior distribution to the between standard deviation, which is equal to <span class="math inline">\(50\)</span>.</p>
+<p>So we have to change this prior distribution, and <code>stan_lmer</code> allows to use a Gamma distribution as the prior distribution of the between standard deviation. Its parameters <code>shape</code> and <code>scale</code> are settable in the <code>decov</code> function which is passed on to the <code>prior_covariance</code> option:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>rstanarm &lt;-<span class="st"> </span><span class="kw">stan_lmer</span>(</span>
+<span id="cb4-2"><a href="#cb4-2"></a>  y <span class="op">~</span><span class="st"> </span>(<span class="dv">1</span><span class="op">|</span>group), <span class="dt">data =</span> dat, <span class="dt">iter =</span> 5000L,</span>
+<span id="cb4-3"><a href="#cb4-3"></a>  <span class="dt">prior_aux =</span> <span class="kw">cauchy</span>(<span class="dv">0</span>, <span class="dv">5</span>),</span>
+<span id="cb4-4"><a href="#cb4-4"></a>  <span class="dt">prior_covariance =</span> <span class="kw">decov</span>(<span class="dt">shape =</span> <span class="dv">2</span>, <span class="dt">scale =</span> <span class="dv">30</span>)</span>
+<span id="cb4-5"><a href="#cb4-5"></a>)</span></code></pre></div>
+<p>I choose the <span class="math inline">\(\textrm{Gamma}(\textrm{shape}=2, \textrm{scale=30})\)</span> distribution because it has median <span class="math inline">\(\approx 50\)</span> and is “vague” enough: its equi-tailed <span class="math inline">\(95\%\)</span>-dispersion interval is <span class="math inline">\(\approx (7, 167)\)</span>.</p>
+<p><span style="color:firebrick;font-size:1.25em">☛ <em>However it took me some time to pick up these parameters. I firstly tried a more dispersed Gamma distribution but <code>stan_lmer</code> returned a bunch of warnings and non-sensible results.</em></span></p>
+<p>Below are the confidence intervals obtained with this Gamma prior distribution. I compare them with the frequentist intervals obtained with the ‘AOV1R’ package.</p>
+<p><img src="./figures/gfi_rstanarm-stanIntervals2Within-1.png" /></p>
+<p><img src="./figures/gfi_rstanarm-stanIntervals2Between-1.png" /></p>
+<p>Quite good.</p>
+<p><span style="color:firebrick;font-size:1.25em">☛ <em>I also noticed that the sampling was slower with this Gamma distribution.</em></span></p>
+<h2 id="try-the-generalized-fiducial-inference.">Try the generalized fiducial inference.</h2>
+<p>My new package ‘gfilmm’ allows to perform the <em>generalized fiducial inference</em> for any Gaussian linear mixed model with categorical random effects.</p>
+<p>Fiducial inference and Bayesian inference have something in common: they are both based on a distribution representing the uncertainty about the parameters: the fiducial distribution and the posterior distribution, respectively.</p>
+<p>A notable difference between these two methods of inference is that <em>there’s no prior distribution in fiducial statistics</em>.</p>
+<p>Here is how to run the fiducial sampler:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="kw">library</span>(gfilmm)</span>
+<span id="cb5-2"><a href="#cb5-2"></a>fiducialSimulations &lt;-<span class="st"> </span><span class="kw">gfilmm</span>(</span>
+<span id="cb5-3"><a href="#cb5-3"></a>  <span class="dt">y =</span> <span class="op">~</span><span class="st"> </span><span class="kw">cbind</span>(y <span class="op">-</span><span class="st"> </span><span class="fl">0.01</span>, y <span class="op">+</span><span class="st"> </span><span class="fl">0.01</span>), <span class="dt">fixed =</span> <span class="op">~</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">random =</span> <span class="op">~</span><span class="st"> </span>group, </span>
+<span id="cb5-4"><a href="#cb5-4"></a>  <span class="dt">data=</span> dat, <span class="dt">N =</span> 10000L</span>
+<span id="cb5-5"><a href="#cb5-5"></a>)</span></code></pre></div>
+<p>Note the form of the response variable: <code>~ cbind(y - 0.01, y + 0.01)</code>. That’s because the generalized fiducial inference applies to interval data.</p>
+<p>Below are the fiducial confidence intervals for the same simulated datasets as before.</p>
+<p><img src="./figures/gfi_rstanarm-fidIntervalsWithin-1.png" /></p>
+<p><img src="./figures/gfi_rstanarm-fidIntervalsBetween-1.png" /></p>
+<p>Quite good too. And let me insist on this point: <em>there is no prior distribution, there is nothing to set, except the number of simulations</em>. I implemented the algorithm (due to J. Cisewski and J. Hannig) in C++ and it takes less than 1000 lines of code.</p>
+<p>Let’s increase the between standard deviation now.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>ratio &lt;-<span class="st"> </span><span class="dv">1000</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a>sigmaBetween &lt;-<span class="st"> </span>ratio <span class="op">*</span><span class="st"> </span>sigmaWithin</span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="kw">set.seed</span>(31415926L)</span>
+<span id="cb6-4"><a href="#cb6-4"></a>groupMeans &lt;-<span class="st"> </span><span class="kw">rnorm</span>(I, mu, sigmaBetween)</span>
+<span id="cb6-5"><a href="#cb6-5"></a>y          &lt;-<span class="st"> </span><span class="kw">c</span>(</span>
+<span id="cb6-6"><a href="#cb6-6"></a>  <span class="kw">vapply</span>(groupMeans, <span class="cf">function</span>(gmean) <span class="kw">rnorm</span>(J, gmean, sigmaWithin), <span class="kw">numeric</span>(J))</span>
+<span id="cb6-7"><a href="#cb6-7"></a>)</span>
+<span id="cb6-8"><a href="#cb6-8"></a>dat        &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
+<span id="cb6-9"><a href="#cb6-9"></a>  <span class="dt">y =</span> y,</span>
+<span id="cb6-10"><a href="#cb6-10"></a>  <span class="dt">group =</span> <span class="kw">gl</span>(I, J)</span>
+<span id="cb6-11"><a href="#cb6-11"></a>)</span>
+<span id="cb6-12"><a href="#cb6-12"></a><span class="kw">library</span>(AOV1R)</span>
+<span id="cb6-13"><a href="#cb6-13"></a><span class="kw">library</span>(gfilmm)</span>
+<span id="cb6-14"><a href="#cb6-14"></a>aovfit &lt;-<span class="st"> </span><span class="kw">aov1r</span>(y <span class="op">~</span><span class="st"> </span>group, <span class="dt">data =</span> dat)</span>
+<span id="cb6-15"><a href="#cb6-15"></a>gf &lt;-<span class="st"> </span><span class="kw">gfilmm</span>(<span class="op">~</span><span class="st"> </span><span class="kw">cbind</span>(y<span class="fl">-0.01</span>, y<span class="fl">+0.01</span>), <span class="op">~</span><span class="st"> </span><span class="dv">1</span>, <span class="op">~</span><span class="st"> </span>group, <span class="dt">data =</span> dat, <span class="dt">N =</span> 5000L)</span>
+<span id="cb6-16"><a href="#cb6-16"></a><span class="kw">confint</span>(aovfit)</span>
+<span id="cb6-17"><a href="#cb6-17"></a><span class="co">##               estimate          lwr          upr</span></span>
+<span id="cb6-18"><a href="#cb6-18"></a><span class="co">## grandMean 9783.4770335 9227.6673527 10339.286714</span></span>
+<span id="cb6-19"><a href="#cb6-19"></a><span class="co">## within       0.9454425    0.7762205     1.209696</span></span>
+<span id="cb6-20"><a href="#cb6-20"></a><span class="co">## between    776.9682432  534.4260219  1418.441282</span></span>
+<span id="cb6-21"><a href="#cb6-21"></a><span class="co">## total      776.9688185  534.4268604  1418.441598</span></span>
+<span id="cb6-22"><a href="#cb6-22"></a><span class="co">## </span></span>
+<span id="cb6-23"><a href="#cb6-23"></a><span class="co">## attr(,&quot;confidence level&quot;)</span></span>
+<span id="cb6-24"><a href="#cb6-24"></a><span class="co">## [1] 0.95</span></span>
+<span id="cb6-25"><a href="#cb6-25"></a><span class="co">## attr(,&quot;standard deviations&quot;)</span></span>
+<span id="cb6-26"><a href="#cb6-26"></a><span class="co">## [1] TRUE</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">gfiSummary</span>(gf)</span>
+<span id="cb7-2"><a href="#cb7-2"></a><span class="co">##                    mean      median         lwr          upr Pr(=0)</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a><span class="co">## (Intercept) 9786.579629 9787.161625 9247.718851 10344.743737     NA</span></span>
+<span id="cb7-4"><a href="#cb7-4"></a><span class="co">## sigma_group  854.314055  807.650667  528.463101  1485.287694      0</span></span>
+<span id="cb7-5"><a href="#cb7-5"></a><span class="co">## sigma_error    1.557918    1.543563    1.273913     1.931306      0</span></span>
+<span id="cb7-6"><a href="#cb7-6"></a><span class="co">## attr(,&quot;confidence level&quot;)</span></span>
+<span id="cb7-7"><a href="#cb7-7"></a><span class="co">## [1] 0.95</span></span></code></pre></div>
+<p>The fiducial confidence interval about the within standard deviation does not match the frequentist interval, and does not catch the true value. Nothing to tinker with, except the number of simulations:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>gf &lt;-<span class="st"> </span><span class="kw">gfilmm</span>(<span class="op">~</span><span class="st"> </span><span class="kw">cbind</span>(y<span class="fl">-0.01</span>, y<span class="fl">+0.01</span>), <span class="op">~</span><span class="st"> </span><span class="dv">1</span>, <span class="op">~</span><span class="st"> </span>group, <span class="dt">data =</span> dat, <span class="dt">N =</span> 30000L)</span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="kw">gfiSummary</span>(gf)</span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="co">##                     mean       median          lwr          upr Pr(=0)</span></span>
+<span id="cb8-4"><a href="#cb8-4"></a><span class="co">## (Intercept) 9780.0741293 9779.1304187 9230.1017080 10333.801655     NA</span></span>
+<span id="cb8-5"><a href="#cb8-5"></a><span class="co">## sigma_group  847.3551078  805.8588214  536.0212551  1401.862597      0</span></span>
+<span id="cb8-6"><a href="#cb8-6"></a><span class="co">## sigma_error    0.9540852    0.9455375    0.7762872     1.185648      0</span></span>
+<span id="cb8-7"><a href="#cb8-7"></a><span class="co">## attr(,&quot;confidence level&quot;)</span></span>
+<span id="cb8-8"><a href="#cb8-8"></a><span class="co">## [1] 0.95</span></span></code></pre></div>
+<p>Now the fiducial intervals match the frequentist ones.</p>
+<h2 id="epilogue">Epilogue</h2>
+<p>As you have seen, using the generalized fiducial inference is easy, easier than the Bayesian inference. The difficulty I mentioned regarding the Bayesian inference is not severe, but this is because the one-way ANOVA model with a random factor is the simplest Gaussian linear mixed model. Namely, it has only one between standard deviation. Things get more complicated for a mixed model with multiple random effects. With <code>rstanarm::stan_lmer</code>, one has to assign a Gamma prior distribution on the total between standard deviation, and then to specify a dispersion parameter of the between standard deviations.</p>
+<h2 id="note">Note</h2>
+<p>My package ‘gfilmm’ is already on CRAN (version <code>0.1.0</code>) but this version is not safe and there’s a mistake in the algorithm. If you want to use this package now, install the development version:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;stla/AOV1R&quot;</span>, <span class="dt">build_vignettes =</span> <span class="ot">TRUE</span>) <span class="co"># soon on CRAN</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;stla/gfilmm&quot;</span>, <span class="dt">build_vignettes =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
