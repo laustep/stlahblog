@@ -7,6 +7,593 @@
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
     <lastBuildDate>Sun, 08 Nov 2020 00:00:00 UT</lastBuildDate>
     <item>
+      <title>Drawing nested Steiner chains</title>
+      <link>https://laustep.github.io/stlahblog/posts/SteinerChains.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>This is a Steiner chain with its enveloping cyclide:</p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/SteinerChain0.png"
+        />
+      </p>
+      <p>And these are nested Steiner chains:</p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/SteinerChain.png"
+        />
+      </p>
+      <h1 id="with-r">With R</h1>
+      <p>
+        We will include the cyclides in the plot. We firstly write a function
+        returning a mesh of a cyclide. It is obtained by applying an inversion
+        to the mesh of a torus.
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb1-1"><span class="kw">library</span>(rgl)</span>
+<span id="cb1-2"></span>
+<span id="cb1-3">torusMesh &lt;-<span class="st"> </span><span class="cf">function</span>(R, r, S, s, arc, ...){</span>
+<span id="cb1-4">  vertices &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="ot">NA_real_</span>, <span class="dt">nrow =</span> 3L, <span class="dt">ncol =</span> S<span class="op">*</span>s)</span>
+<span id="cb1-5">  Normals &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="ot">NA_real_</span>, <span class="dt">nrow =</span> 3L, <span class="dt">ncol =</span> S<span class="op">*</span>s)</span>
+<span id="cb1-6">  full &lt;-<span class="st"> </span>arc <span class="op">==</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>pi</span>
+<span id="cb1-7">  SS &lt;-<span class="st"> </span><span class="kw">ifelse</span>(full, S, S<span class="dv">-1</span>)</span>
+<span id="cb1-8">  indices &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="ot">NA_integer_</span>, <span class="dt">nrow =</span> 4L, <span class="dt">ncol =</span> SS<span class="op">*</span>s)</span>
+<span id="cb1-9">  u_ &lt;-<span class="st"> </span><span class="cf">if</span>(full){</span>
+<span id="cb1-10">    <span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> S<span class="op">+</span><span class="dv">1</span>)[<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb1-11">  }<span class="cf">else</span>{</span>
+<span id="cb1-12">    <span class="kw">seq</span>(<span class="dv">0</span>, arc, <span class="dt">length.out =</span> S)</span>
+<span id="cb1-13">  }</span>
+<span id="cb1-14">  v_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> s<span class="op">+</span><span class="dv">1</span>)[<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb1-15">  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>S){</span>
+<span id="cb1-16">    cos_ui &lt;-<span class="st"> </span><span class="kw">cos</span>(u_[i])</span>
+<span id="cb1-17">    sin_ui &lt;-<span class="st"> </span><span class="kw">sin</span>(u_[i])</span>
+<span id="cb1-18">    cx &lt;-<span class="st"> </span>R <span class="op">*</span><span class="st"> </span>cos_ui</span>
+<span id="cb1-19">    cy &lt;-<span class="st"> </span>R <span class="op">*</span><span class="st"> </span>sin_ui</span>
+<span id="cb1-20">    <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>s){</span>
+<span id="cb1-21">      rcos_vj &lt;-<span class="st"> </span>r<span class="op">*</span><span class="kw">cos</span>(v_[j])</span>
+<span id="cb1-22">      n &lt;-<span class="st"> </span><span class="kw">c</span>(rcos_vj<span class="op">*</span>cos_ui, rcos_vj<span class="op">*</span>sin_ui, r<span class="op">*</span><span class="kw">sin</span>(v_[j]))</span>
+<span id="cb1-23">      Normals[, (i<span class="dv">-1</span>)<span class="op">*</span>s<span class="op">+</span>j] &lt;-<span class="st"> </span><span class="op">-</span>n</span>
+<span id="cb1-24">      vertices[, (i<span class="dv">-1</span>)<span class="op">*</span>s<span class="op">+</span>j] &lt;-<span class="st"> </span><span class="kw">c</span>(cx,cy,<span class="dv">0</span>) <span class="op">+</span><span class="st"> </span>n </span>
+<span id="cb1-25">    }</span>
+<span id="cb1-26">  }</span>
+<span id="cb1-27">  <span class="co"># quads</span></span>
+<span id="cb1-28">  s &lt;-<span class="st"> </span><span class="kw">as.integer</span>(s)</span>
+<span id="cb1-29">  <span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span>SS){</span>
+<span id="cb1-30">    ip1 &lt;-<span class="st"> </span><span class="kw">ifelse</span>(i<span class="op">==</span>S, 1L, i<span class="op">+</span>1L)</span>
+<span id="cb1-31">    <span class="cf">for</span>(j <span class="cf">in</span> 1L<span class="op">:</span>s){</span>
+<span id="cb1-32">      jp1 &lt;-<span class="st"> </span><span class="kw">ifelse</span>(j<span class="op">==</span>s, 1L, j<span class="op">+</span>1L)</span>
+<span id="cb1-33">      indices[,(i<span class="dv">-1</span>)<span class="op">*</span>s<span class="op">+</span>j] &lt;-<span class="st"> </span></span>
+<span id="cb1-34"><span class="st">        </span><span class="kw">c</span>((i<span class="op">-</span>1L)<span class="op">*</span>s<span class="op">+</span>j, (i<span class="op">-</span>1L)<span class="op">*</span>s<span class="op">+</span>jp1, (ip1<span class="op">-</span>1L)<span class="op">*</span>s<span class="op">+</span>jp1, (ip1<span class="op">-</span>1L)<span class="op">*</span>s<span class="op">+</span>j)   </span>
+<span id="cb1-35">    }</span>
+<span id="cb1-36">  }</span>
+<span id="cb1-37">  <span class="kw">qmesh3d</span>(</span>
+<span id="cb1-38">    <span class="dt">vertices =</span> vertices,</span>
+<span id="cb1-39">    <span class="dt">indices =</span> indices,</span>
+<span id="cb1-40">    <span class="dt">homogeneous =</span> <span class="ot">FALSE</span>,</span>
+<span id="cb1-41">    <span class="dt">material =</span> <span class="kw">list</span>(...),</span>
+<span id="cb1-42">    <span class="dt">normals =</span> <span class="kw">t</span>(Normals)</span>
+<span id="cb1-43">  )</span>
+<span id="cb1-44">}</span>
+<span id="cb1-45"></span>
+<span id="cb1-46"><span class="co"># only for mu&gt;c (ring cyclide)</span></span>
+<span id="cb1-47">cyclideMesh &lt;-<span class="st"> </span><span class="cf">function</span>(mu, a, c, <span class="dt">S=</span><span class="dv">128</span>, <span class="dt">s=</span><span class="dv">64</span>, <span class="dt">arc=</span><span class="dv">2</span><span class="op">*</span>pi, ...){</span>
+<span id="cb1-48">  b &lt;-<span class="st"> </span><span class="kw">sqrt</span>(a<span class="op">^</span><span class="dv">2</span><span class="op">-</span>c<span class="op">^</span><span class="dv">2</span>)</span>
+<span id="cb1-49">  bb &lt;-<span class="st"> </span>b<span class="op">*</span><span class="kw">sqrt</span>(mu<span class="op">^</span><span class="dv">2</span><span class="op">-</span>c<span class="op">^</span><span class="dv">2</span>)</span>
+<span id="cb1-50">  omega &lt;-<span class="st"> </span>(a<span class="op">*</span>mu <span class="op">+</span><span class="st"> </span>bb)<span class="op">/</span>c</span>
+<span id="cb1-51">  Omega &lt;-<span class="st"> </span><span class="kw">c</span>(omega,<span class="dv">0</span>,<span class="dv">0</span>)</span>
+<span id="cb1-52">  inversion &lt;-<span class="st"> </span><span class="cf">function</span>(M){</span>
+<span id="cb1-53">    Omega <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="kw">c</span>(<span class="kw">crossprod</span>(M<span class="op">-</span>Omega)) <span class="op">*</span><span class="st"> </span>(M<span class="op">-</span>Omega)</span>
+<span id="cb1-54">  }</span>
+<span id="cb1-55">  d &lt;-<span class="st"> </span>(a<span class="op">-</span>c)<span class="op">*</span>(mu<span class="op">-</span>c)<span class="op">+</span>bb</span>
+<span id="cb1-56">  r &lt;-<span class="st"> </span>c<span class="op">*</span>c<span class="op">*</span>(mu<span class="op">-</span>c) <span class="op">/</span><span class="st"> </span>((a<span class="op">+</span>c)<span class="op">*</span>(mu<span class="op">-</span>c)<span class="op">+</span>bb) <span class="op">/</span><span class="st"> </span>d</span>
+<span id="cb1-57">  R &lt;-<span class="st"> </span>c<span class="op">*</span>c<span class="op">*</span>(a<span class="op">-</span>c) <span class="op">/</span><span class="st"> </span>((a<span class="op">-</span>c)<span class="op">*</span>(mu<span class="op">+</span>c)<span class="op">+</span>bb) <span class="op">/</span><span class="st"> </span>d</span>
+<span id="cb1-58">  bb2 &lt;-<span class="st"> </span>b<span class="op">*</span>b<span class="op">*</span>(mu<span class="op">*</span>mu<span class="op">-</span>c<span class="op">*</span>c)</span>
+<span id="cb1-59">  denb1 &lt;-<span class="st"> </span>c<span class="op">*</span>(a<span class="op">*</span>c<span class="op">-</span>mu<span class="op">*</span>c<span class="op">+</span>c<span class="op">*</span>c<span class="op">-</span>a<span class="op">*</span>mu<span class="op">-</span>bb)</span>
+<span id="cb1-60">  b1 &lt;-<span class="st"> </span>(a<span class="op">*</span>mu<span class="op">*</span>(c<span class="op">-</span>mu)<span class="op">*</span>(a<span class="op">+</span>c)<span class="op">-</span>bb2<span class="op">+</span>c<span class="op">*</span>c<span class="op">+</span>bb<span class="op">*</span>(c<span class="op">*</span>(a<span class="op">-</span>mu<span class="op">+</span>c)<span class="op">-</span><span class="dv">2</span><span class="op">*</span>a<span class="op">*</span>mu))<span class="op">/</span>denb1</span>
+<span id="cb1-61">  denb2 &lt;-<span class="st"> </span>c<span class="op">*</span>(a<span class="op">*</span>c<span class="op">-</span>mu<span class="op">*</span>c<span class="op">-</span>c<span class="op">*</span>c<span class="op">+</span>a<span class="op">*</span>mu<span class="op">+</span>bb)</span>
+<span id="cb1-62">  b2 &lt;-<span class="st"> </span>(a<span class="op">*</span>mu<span class="op">*</span>(c<span class="op">+</span>mu)<span class="op">*</span>(a<span class="op">-</span>c)<span class="op">+</span>bb2<span class="op">-</span>c<span class="op">*</span>c<span class="op">+</span>bb<span class="op">*</span>(c<span class="op">*</span>(a<span class="op">-</span>mu<span class="op">-</span>c)<span class="op">+</span><span class="dv">2</span><span class="op">*</span>a<span class="op">*</span>mu))<span class="op">/</span>denb2</span>
+<span id="cb1-63">  omegaT &lt;-<span class="st"> </span>(b1<span class="op">+</span>b2)<span class="op">/</span><span class="dv">2</span></span>
+<span id="cb1-64">  tmesh &lt;-<span class="st"> </span><span class="kw">torusMesh</span>(R, r, S, s, arc, ...)</span>
+<span id="cb1-65">  tmesh<span class="op">$</span>normals &lt;-<span class="st"> </span></span>
+<span id="cb1-66"><span class="st">    </span><span class="kw">apply</span>(tmesh<span class="op">$</span>normals <span class="op">+</span><span class="st"> </span>tmesh<span class="op">$</span>vb[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>,] <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(omegaT,<span class="dv">0</span>,<span class="dv">0</span>), <span class="dv">2</span>, inversion)</span>
+<span id="cb1-67">  tmesh<span class="op">$</span>vb[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>,] &lt;-<span class="st"> </span><span class="kw">apply</span>(tmesh<span class="op">$</span>vb[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>,] <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(omegaT,<span class="dv">0</span>,<span class="dv">0</span>), <span class="dv">2</span>, inversion)</span>
+<span id="cb1-68">  tmesh<span class="op">$</span>normals &lt;-<span class="st"> </span>tmesh<span class="op">$</span>vb[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>,] <span class="op">-</span><span class="st"> </span>tmesh<span class="op">$</span>normals  </span>
+<span id="cb1-69">  tmesh</span>
+<span id="cb1-70">}</span></code></pre>
+      </div>
+      <p>Now here is the code which plots the nested Steiner chains:</p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb2-1"><span class="co"># make a smooth unit sphere</span></span>
+<span id="cb2-2">unitSphere &lt;-<span class="st"> </span><span class="kw">subdivision3d</span>(<span class="kw">icosahedron3d</span>(), <span class="dt">depth=</span><span class="dv">4</span>)</span>
+<span id="cb2-3">unitSphere<span class="op">$</span>vb[<span class="dv">4</span>,] &lt;-<span class="st"> </span></span>
+<span id="cb2-4"><span class="st">  </span><span class="kw">apply</span>(unitSphere<span class="op">$</span>vb[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>,], <span class="dv">2</span>, <span class="cf">function</span>(x) <span class="kw">sqrt</span>(<span class="kw">sum</span>(x<span class="op">^</span><span class="dv">2</span>)))</span>
+<span id="cb2-5">unitSphere<span class="op">$</span>normals &lt;-<span class="st"> </span>unitSphere<span class="op">$</span>vb</span>
+<span id="cb2-6"><span class="co"># draw a sphere in the x-y plane</span></span>
+<span id="cb2-7">drawSphere &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, radius, ...){</span>
+<span id="cb2-8">  <span class="kw">shade3d</span>(</span>
+<span id="cb2-9">    <span class="kw">translate3d</span>(</span>
+<span id="cb2-10">      <span class="kw">scale3d</span>(unitSphere, radius, radius, radius), </span>
+<span id="cb2-11">      x, y, <span class="dv">0</span>), </span>
+<span id="cb2-12">    ...)</span>
+<span id="cb2-13">}</span>
+<span id="cb2-14"></span>
+<span id="cb2-15"><span class="co"># draw a cyclide translated by (x,y,0)</span></span>
+<span id="cb2-16">drawCyclide &lt;-<span class="st"> </span><span class="cf">function</span>(mu, a, c, x, y, ...){</span>
+<span id="cb2-17">  mesh &lt;-<span class="st"> </span><span class="kw">cyclideMesh</span>(mu, a, c)</span>
+<span id="cb2-18">  <span class="kw">shade3d</span>(<span class="kw">translate3d</span>(mesh, x, y, <span class="dv">0</span>), ...)</span>
+<span id="cb2-19">}</span>
+<span id="cb2-20"></span>
+<span id="cb2-21"><span class="co"># image of circle (center, radius) by the inversion </span></span>
+<span id="cb2-22"><span class="co">#   with center c and power k</span></span>
+<span id="cb2-23">iotaCircle &lt;-<span class="st"> </span><span class="cf">function</span>(c, k, center, radius){</span>
+<span id="cb2-24">  r &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">abs</span>(k)) </span>
+<span id="cb2-25">  z1 &lt;-<span class="st"> </span><span class="kw">sign</span>(k) <span class="op">*</span><span class="st"> </span>(center<span class="op">-</span>c)<span class="op">/</span>r </span>
+<span id="cb2-26">  D1 &lt;-<span class="st"> </span>(radius<span class="op">/</span>r)<span class="op">^</span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span><span class="kw">c</span>(<span class="kw">crossprod</span>(z1))</span>
+<span id="cb2-27">  z2 &lt;-<span class="st"> </span><span class="op">-</span>z1<span class="op">/</span>D1</span>
+<span id="cb2-28">  R2 &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(z2)) <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span>D1)</span>
+<span id="cb2-29">  <span class="kw">list</span>(<span class="dt">center =</span> r<span class="op">*</span>z2<span class="op">+</span>c, <span class="dt">radius =</span> r<span class="op">*</span>R2)</span>
+<span id="cb2-30">}</span>
+<span id="cb2-31"></span>
+<span id="cb2-32"><span class="co"># n: vector, the numbers of spheres at each step</span></span>
+<span id="cb2-33"><span class="co"># -1 &lt; phi &lt; 1, phi != 0</span></span>
+<span id="cb2-34">steiner &lt;-<span class="st"> </span><span class="cf">function</span>(n, phi, <span class="dt">color=</span><span class="st">"red"</span>, <span class="dt">shift=</span><span class="dv">0</span>, </span>
+<span id="cb2-35">                    <span class="dt">Center=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>), <span class="dt">radius=</span><span class="dv">2</span>, <span class="dt">epsilon =</span> <span class="fl">0.005</span>){</span>
+<span id="cb2-36">  depth &lt;-<span class="st"> </span><span class="kw">length</span>(n)</span>
+<span id="cb2-37">  invphi &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">/</span>phi </span>
+<span id="cb2-38">  I &lt;-<span class="st"> </span><span class="kw">c</span>(radius<span class="op">*</span>invphi, <span class="dv">0</span>) <span class="op">+</span><span class="st"> </span>Center</span>
+<span id="cb2-39">  k &lt;-<span class="st"> </span>radius<span class="op">*</span>radius<span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>invphi<span class="op">*</span>invphi)</span>
+<span id="cb2-40">  m &lt;-<span class="st"> </span>n[<span class="dv">1</span>]</span>
+<span id="cb2-41">  sine &lt;-<span class="st"> </span><span class="kw">sin</span>(pi<span class="op">/</span>m)</span>
+<span id="cb2-42">  Coef &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span><span class="op">+</span>sine)</span>
+<span id="cb2-43">  O1x &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span>radius<span class="op">*</span>invphi</span>
+<span id="cb2-44">  CRadius &lt;-<span class="st"> </span>Coef<span class="op">*</span>radius</span>
+<span id="cb2-45">  CSide &lt;-<span class="st"> </span>CRadius<span class="op">*</span>sine</span>
+<span id="cb2-46">  <span class="cf">if</span>(depth <span class="op">==</span><span class="st"> </span><span class="dv">1</span>){</span>
+<span id="cb2-47">    circle &lt;-<span class="st"> </span><span class="kw">iotaCircle</span>(I<span class="op">-</span>Center, k, <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>), CRadius <span class="op">-</span><span class="st"> </span>CSide)</span>
+<span id="cb2-48">    mu &lt;-<span class="st"> </span>(radius <span class="op">-</span><span class="st"> </span>circle<span class="op">$</span>radius)<span class="op">/</span><span class="dv">2</span>;</span>
+<span id="cb2-49">    a &lt;-<span class="st"> </span>(radius <span class="op">+</span><span class="st"> </span>circle<span class="op">$</span>radius)<span class="op">/</span><span class="dv">2</span>;</span>
+<span id="cb2-50">    c &lt;-<span class="st"> </span>(circle<span class="op">$</span>center[<span class="dv">1</span>] <span class="op">-</span><span class="st"> </span>O1x)<span class="op">/</span><span class="dv">2</span>;</span>
+<span id="cb2-51">    pt &lt;-<span class="st"> </span>Center <span class="op">+</span><span class="st"> </span>circle<span class="op">$</span>center<span class="op">/</span><span class="dv">2</span>;</span>
+<span id="cb2-52">    <span class="kw">drawCyclide</span>(mu, a, c, pt[<span class="dv">1</span>]<span class="op">-</span>O1x<span class="op">/</span><span class="dv">2</span>, pt[<span class="dv">2</span>], </span>
+<span id="cb2-53">                <span class="dt">color =</span> <span class="st">"yellow"</span>, <span class="dt">alpha =</span> <span class="fl">0.2</span>)</span>
+<span id="cb2-54">  }</span>
+<span id="cb2-55">  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>m){</span>
+<span id="cb2-56">    beta &lt;-<span class="st"> </span>(i<span class="op">+</span>shift)<span class="op">*</span><span class="dv">2</span><span class="op">*</span>pi<span class="op">/</span>m </span>
+<span id="cb2-57">    pti &lt;-<span class="st"> </span><span class="kw">c</span>(CRadius<span class="op">*</span><span class="kw">cos</span>(beta), CRadius<span class="op">*</span><span class="kw">sin</span>(beta)) <span class="op">+</span><span class="st"> </span>Center</span>
+<span id="cb2-58">    cc &lt;-<span class="st"> </span><span class="kw">iotaCircle</span>(I, k, pti, CSide)</span>
+<span id="cb2-59">    center &lt;-<span class="st"> </span>cc<span class="op">$</span>center <span class="op">-</span><span class="st"> </span><span class="kw">c</span>(O1x,<span class="dv">0</span>)</span>
+<span id="cb2-60">    r &lt;-<span class="st"> </span>cc<span class="op">$</span>radius</span>
+<span id="cb2-61">    <span class="cf">if</span>(depth <span class="op">==</span><span class="st"> </span><span class="dv">1</span>){</span>
+<span id="cb2-62">      <span class="kw">drawSphere</span>(center[<span class="dv">1</span>], center[<span class="dv">2</span>], r<span class="op">-</span>epsilon, <span class="dt">color =</span> color)</span>
+<span id="cb2-63">    }</span>
+<span id="cb2-64">    <span class="cf">if</span>(depth<span class="op">&gt;</span><span class="dv">1</span>){</span>
+<span id="cb2-65">      <span class="kw">steiner</span>(n[<span class="op">-</span><span class="dv">1</span>], phi, <span class="dt">color=</span>color, </span>
+<span id="cb2-66">              <span class="dt">Center=</span>center, <span class="dt">radius=</span>r, <span class="dt">shift =</span> <span class="op">-</span>shift)</span>
+<span id="cb2-67">    }</span>
+<span id="cb2-68">  }</span>
+<span id="cb2-69">  <span class="kw">return</span>(<span class="kw">invisible</span>())</span>
+<span id="cb2-70">}</span>
+<span id="cb2-71"></span>
+<span id="cb2-72"><span class="co"># background color</span></span>
+<span id="cb2-73">bgColor &lt;-<span class="st"> </span><span class="kw">rgb</span>(<span class="dv">54</span>, <span class="dv">57</span>, <span class="dv">64</span>, <span class="dt">maxColorValue =</span> <span class="dv">255</span>)</span>
+<span id="cb2-74"></span>
+<span id="cb2-75"><span class="co"># plot</span></span>
+<span id="cb2-76"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>,<span class="dv">50</span>,<span class="dv">550</span>,<span class="dv">550</span>))</span>
+<span id="cb2-77"><span class="kw">bg3d</span>(bgColor)</span>
+<span id="cb2-78"><span class="kw">view3d</span>(<span class="dv">0</span>, <span class="dv">-40</span>, <span class="dt">zoom =</span> <span class="fl">0.75</span>)</span>
+<span id="cb2-79"><span class="kw">steiner</span>(<span class="dt">n =</span> <span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">4</span>), <span class="dt">phi =</span> <span class="fl">0.3</span>, <span class="dt">color =</span> <span class="st">"#B12A90FF"</span>, <span class="dt">shift =</span> <span class="fl">0.25</span>)</span></code></pre>
+      </div>
+      <p>Here is how to make a gif animation the nested Steiner chains:</p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb3-1"><span class="co"># "bounding box"</span></span>
+<span id="cb3-2">bBox &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb3-3">  r &lt;-<span class="st"> </span><span class="dv">2</span></span>
+<span id="cb3-4">  <span class="kw">lines3d</span>(</span>
+<span id="cb3-5">    <span class="kw">rbind</span>(</span>
+<span id="cb3-6">      <span class="kw">c</span>(r, r, <span class="dv">0</span>), <span class="kw">c</span>(<span class="op">-</span>r, r, <span class="dv">0</span>), <span class="kw">c</span>(<span class="op">-</span>r, <span class="op">-</span>r, <span class="dv">0</span>), <span class="kw">c</span>(r, <span class="op">-</span>r, <span class="dv">0</span>)</span>
+<span id="cb3-7">    ),</span>
+<span id="cb3-8">    <span class="dt">color =</span> bgColor, <span class="dt">alpha =</span> <span class="dv">0</span></span>
+<span id="cb3-9">  )</span>
+<span id="cb3-10">}</span>
+<span id="cb3-11"></span>
+<span id="cb3-12">shifts &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">length.out =</span> <span class="dv">46</span>)[<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb3-13"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>,<span class="dv">50</span>,<span class="dv">550</span>,<span class="dv">550</span>))</span>
+<span id="cb3-14"><span class="kw">bg3d</span>(bgColor)</span>
+<span id="cb3-15"><span class="kw">view3d</span>(<span class="dv">0</span>, <span class="dv">-40</span>, <span class="dt">zoom =</span> <span class="fl">0.75</span>)</span>
+<span id="cb3-16"><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_along</span>(shifts)){</span>
+<span id="cb3-17">  <span class="kw">steiner</span>(<span class="dt">n =</span> <span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">5</span>), <span class="dt">phi =</span> <span class="fl">0.3</span>, <span class="dt">color =</span> <span class="st">"#B12A90FF"</span>, </span>
+<span id="cb3-18">          <span class="dt">shift =</span> shifts[i])</span>
+<span id="cb3-19">  <span class="kw">bBox</span>()</span>
+<span id="cb3-20">  <span class="kw">snapshot3d</span>(<span class="kw">sprintf</span>(<span class="st">"img-%03d.png"</span>, i))</span>
+<span id="cb3-21">  <span class="kw">clear3d</span>()</span>
+<span id="cb3-22">}</span>
+<span id="cb3-23"></span>
+<span id="cb3-24">pngs &lt;-<span class="st"> </span><span class="kw">list.files</span>(<span class="dt">pattern =</span> <span class="st">"^img-.*png$"</span>)</span>
+<span id="cb3-25">gifski<span class="op">::</span><span class="kw">gifski</span>(pngs, <span class="st">"SteinerChain_R.gif"</span>, </span>
+<span id="cb3-26">               <span class="dt">width =</span> <span class="dv">500</span>, <span class="dt">height =</span> <span class="dv">500</span>, <span class="dt">delay =</span> <span class="fl">0.04</span>)</span>
+<span id="cb3-27"><span class="kw">file.remove</span>(pngs)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/SteinerChain_R.gif"
+        />
+      </p>
+      <h1 id="with-pov-ray">With POV-Ray</h1>
+      <div class="sourceCode" id="cb4">
+        <pre
+          class="sourceCode numberSource povray numberLines"
+        ><code class="sourceCode povray"><span id="cb4-1"><span class="ot">#version</span> <span class="fl">3.7</span>;</span>
+<span id="cb4-2"><span class="kw">global_settings</span> { <span class="kw">assumed_gamma</span> <span class="fl">1</span> }</span>
+<span id="cb4-3"><span class="ot">#include</span> <span class="st">"colors.inc"</span></span>
+<span id="cb4-4"><span class="ot">#include</span> <span class="st">"textures.inc"</span></span>
+<span id="cb4-5"><span class="ot">#include</span> <span class="st">"glass.inc"</span></span>
+<span id="cb4-6"></span>
+<span id="cb4-7"><span class="co">// image of the circle (Center,Radius) by inversion pole c power k ---</span></span>
+<span id="cb4-8"><span class="kw">#macro invertedCircle</span>(c, k, Center, Radius)</span>
+<span id="cb4-9">  <span class="kw">#local r </span>= <span class="kw">sqrt</span>(<span class="kw">abs</span>(k));</span>
+<span id="cb4-10">  <span class="kw">#local sign </span>= (k&gt;<span class="fl">0</span> ? <span class="fl">1</span> : <span class="fl">-1</span>);</span>
+<span id="cb4-11">  <span class="kw">#local z1 </span>= sign * (Center-c)/r;</span>
+<span id="cb4-12">  <span class="kw">#local D1 </span>= Radius*Radius/r/r - <span class="kw">vdot</span>(z1,z1);</span>
+<span id="cb4-13">  <span class="kw">#local z2 </span>= -z1/D1;</span>
+<span id="cb4-14">  <span class="kw">#local R2 </span>= <span class="kw">sqrt</span>(<span class="kw">vdot</span>(z2,z2) + <span class="fl">1</span>/D1);</span>
+<span id="cb4-15">  <span class="kw">#local z3 </span>= r*z2+c;</span>
+<span id="cb4-16">  &lt;z3.<span class="kw">x</span>, z3.<span class="kw">y</span>, r*R2&gt;</span>
+<span id="cb4-17"><span class="ot">#end</span></span>
+<span id="cb4-18"></span>
+<span id="cb4-19"><span class="co">// delete first element of an array ----------------------------------</span></span>
+<span id="cb4-20"><span class="kw">#macro tail</span>(Array)</span>
+<span id="cb4-21">  <span class="kw">#local l </span>= <span class="kw">dimension_size</span>(Array, <span class="fl">1</span>);</span>
+<span id="cb4-22">  <span class="kw">#local out </span>= <span class="kw">array</span>[l<span class="fl">-1</span>];</span>
+<span id="cb4-23">  #for(i, <span class="fl">0</span>, l<span class="fl">-2</span>)</span>
+<span id="cb4-24">    <span class="kw">#local out</span>[i] = Array[i+<span class="fl">1</span>];</span>
+<span id="cb4-25">  <span class="ot">#end</span></span>
+<span id="cb4-26">  out</span>
+<span id="cb4-27"><span class="ot">#end</span></span>
+<span id="cb4-28"></span>
+<span id="cb4-29"><span class="co">// main macro --------------------------------------------------------</span></span>
+<span id="cb4-30"><span class="co">// n: array of integers &gt;1, the numbers of spheres at each step</span></span>
+<span id="cb4-31"><span class="co">// phi: number -1 &lt; phi &lt; 1, phi /= 0 </span></span>
+<span id="cb4-32"><span class="co">// shift: number 0 &lt;= shift &lt; 1</span></span>
+<span id="cb4-33"><span class="kw">#macro Steiner3D</span>(n, phi, shift, Center, Radius, epsilon)</span>
+<span id="cb4-34">  <span class="kw">#local Depth </span>= <span class="kw">dimension_size</span>(n, <span class="fl">1</span>);</span>
+<span id="cb4-35">  <span class="kw">#local m </span>= n[<span class="fl">0</span>];</span>
+<span id="cb4-36">  <span class="kw">#local sine </span>= <span class="kw">sin</span>(<span class="fl">pi</span>/m);</span>
+<span id="cb4-37">  <span class="kw">#local Side </span>= Radius*sine; <span class="co">// side length of the m-gon </span></span>
+<span id="cb4-38">  <span class="kw">#local Coef </span>= <span class="fl">1</span>/(<span class="fl">1</span>+sine); <span class="co">// Radius/(Radius+Side)</span></span>
+<span id="cb4-39">  <span class="kw">#local CSide </span>= Coef*Side;</span>
+<span id="cb4-40">  <span class="kw">#local CRadius </span>= Coef*Radius;</span>
+<span id="cb4-41">  <span class="kw">#local invphi </span>= <span class="fl">1</span>/phi;</span>
+<span id="cb4-42">  <span class="kw">#local I </span>= &lt;Radius*invphi,<span class="fl">0</span>&gt; + Center; <span class="co">// inversion pole</span></span>
+<span id="cb4-43">  <span class="kw">#local k </span>= Radius*Radius*(<span class="fl">1</span>-invphi*invphi); <span class="co">// inversion power</span></span>
+<span id="cb4-44">  <span class="kw">#local O1 </span>= &lt;<span class="fl">2</span>*invphi*Radius,<span class="fl">0</span>,<span class="fl">0</span>&gt;; <span class="co">// center of exterior sphere          </span></span>
+<span id="cb4-45">  <span class="co">// -----------------------------------------------------------------</span></span>
+<span id="cb4-46">  <span class="kw">union</span> { </span>
+<span id="cb4-47">    <span class="co">// cyclides ------------------------------------------------------</span></span>
+<span id="cb4-48">    <span class="ot">#if</span>(Depth=<span class="fl">1</span>)</span>
+<span id="cb4-49">      <span class="kw">#local circle </span>= invertedCircle(I-Center, k, &lt;<span class="fl">0</span>,<span class="fl">0</span>&gt;, CRadius-CSide);</span>
+<span id="cb4-50">      <span class="kw">#local r </span>= circle.<span class="kw">z</span>;</span>
+<span id="cb4-51">      <span class="kw">#local center </span>= &lt;circle.<span class="kw">x</span>, circle.<span class="kw">y</span>&gt;;</span>
+<span id="cb4-52">      <span class="kw">#local mu </span>= (Radius - r)/<span class="fl">2</span>;</span>
+<span id="cb4-53">      <span class="kw">#local a </span>= (Radius + r)/<span class="fl">2</span>;</span>
+<span id="cb4-54">      <span class="kw">#local c </span>= (circle.<span class="kw">x</span> - O1.<span class="kw">x</span>)/<span class="fl">2</span>;</span>
+<span id="cb4-55">      <span class="kw">#local b </span>= <span class="kw">sqrt</span>(a*a-c*c);</span>
+<span id="cb4-56">      <span class="kw">#local pt </span>= Center + center/<span class="fl">2</span>;</span>
+<span id="cb4-57">      <span class="kw">#local O </span>= &lt;pt.<span class="kw">x</span> - O1.<span class="kw">x</span>/<span class="fl">2</span>, pt.<span class="kw">y</span>, <span class="fl">0</span>&gt;;</span>
+<span id="cb4-58">      polynomial {<span class="fl">4</span> </span>
+<span id="cb4-59">        xyz(<span class="fl">2</span>,<span class="fl">0</span>,<span class="fl">0</span>): <span class="fl">-2</span>*mu*mu+<span class="fl">2</span>*b*b<span class="fl">-4</span>*a*a,</span>
+<span id="cb4-60">        xyz(<span class="fl">1</span>,<span class="fl">0</span>,<span class="fl">0</span>): <span class="fl">8</span>*a*c*mu,</span>
+<span id="cb4-61">        xyz(<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0</span>): <span class="fl">-4</span>*c*c*mu*mu+mu*mu*mu*mu+b*b*b*b<span class="fl">-2</span>*mu*mu*b*b,</span>
+<span id="cb4-62">        xyz(<span class="fl">0</span>,<span class="fl">2</span>,<span class="fl">0</span>): <span class="fl">-2</span>*mu*mu<span class="fl">-2</span>*b*b,</span>
+<span id="cb4-63">        xyz(<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">2</span>): <span class="fl">-2</span>*mu*mu+<span class="fl">2</span>*b*b,</span>
+<span id="cb4-64">        xyz(<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">0</span>): <span class="fl">2</span>,</span>
+<span id="cb4-65">        xyz(<span class="fl">2</span>,<span class="fl">0</span>,<span class="fl">2</span>): <span class="fl">2</span>,</span>
+<span id="cb4-66">        xyz(<span class="fl">0</span>,<span class="fl">2</span>,<span class="fl">2</span>): <span class="fl">2</span>,</span>
+<span id="cb4-67">        xyz(<span class="fl">4</span>,<span class="fl">0</span>,<span class="fl">0</span>): <span class="fl">1</span>,</span>
+<span id="cb4-68">        xyz(<span class="fl">0</span>,<span class="fl">4</span>,<span class="fl">0</span>): <span class="fl">1</span>,</span>
+<span id="cb4-69">        xyz(<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">4</span>): <span class="fl">1</span></span>
+<span id="cb4-70">        <span class="kw">texture</span> { </span>
+<span id="cb4-71">          Dark_Green_Glass </span>
+<span id="cb4-72">          <span class="kw">finish</span> {</span>
+<span id="cb4-73">            <span class="kw">reflection</span> <span class="fl">0</span></span>
+<span id="cb4-74">          }</span>
+<span id="cb4-75">        }</span>
+<span id="cb4-76">        <span class="kw">translate</span> O</span>
+<span id="cb4-77">      }</span>
+<span id="cb4-78">    <span class="ot">#end</span></span>
+<span id="cb4-79">    <span class="co">// spheres -------------------------------------------------------</span></span>
+<span id="cb4-80">    <span class="kw">#local i</span>=<span class="fl">1</span>;</span>
+<span id="cb4-81">    <span class="ot">#while</span>(i&lt;=m)</span>
+<span id="cb4-82">      <span class="kw">#local beta </span>= <span class="fl">2</span>*(i+shift)*<span class="fl">pi</span>/m; </span>
+<span id="cb4-83">      <span class="kw">#local pti </span>= &lt;CRadius*<span class="kw">cos</span>(beta), CRadius*<span class="kw">sin</span>(beta)&gt; + Center;</span>
+<span id="cb4-84">      <span class="kw">#local circle </span>= invertedCircle(I, k, pti, CSide);</span>
+<span id="cb4-85">      <span class="kw">#local center </span>= &lt;circle.<span class="kw">x</span>, circle.<span class="kw">y</span>, <span class="fl">0</span>&gt; - O1;</span>
+<span id="cb4-86">      <span class="kw">#local r </span>= circle.<span class="kw">z</span>;</span>
+<span id="cb4-87">      <span class="ot">#if</span>(Depth=<span class="fl">1</span>)</span>
+<span id="cb4-88">        <span class="kw">sphere</span> {</span>
+<span id="cb4-89">          center, r-epsilon</span>
+<span id="cb4-90">          <span class="kw">texture</span> {</span>
+<span id="cb4-91">            Chrome_Metal</span>
+<span id="cb4-92">            <span class="kw">finish</span> {</span>
+<span id="cb4-93">              <span class="kw">ambient</span> <span class="fl">0.05</span></span>
+<span id="cb4-94">              <span class="kw">diffuse</span> <span class="fl">2</span></span>
+<span id="cb4-95">              <span class="kw">reflection</span> <span class="fl">0</span></span>
+<span id="cb4-96">              <span class="kw">brilliance</span> <span class="fl">1</span></span>
+<span id="cb4-97">              <span class="kw">specular</span> <span class="fl">1.08</span></span>
+<span id="cb4-98">              <span class="kw">roughness</span> <span class="fl">0.01</span></span>
+<span id="cb4-99">            }</span>
+<span id="cb4-100">          }</span>
+<span id="cb4-101">        }</span>
+<span id="cb4-102">      <span class="ot">#else</span></span>
+<span id="cb4-103">        Steiner3D(tail(n), phi, -shift, center, r, epsilon)</span>
+<span id="cb4-104">      <span class="ot">#end</span></span>
+<span id="cb4-105">      <span class="kw">#local i </span>= i+<span class="fl">1</span>;</span>
+<span id="cb4-106">    <span class="ot">#end</span></span>
+<span id="cb4-107">  } <span class="co">// end of union</span></span>
+<span id="cb4-108"><span class="ot">#end</span></span>
+<span id="cb4-109"></span>
+<span id="cb4-110"><span class="co">// ----------------------------- SCENE ---------------------------- //</span></span>
+<span id="cb4-111"><span class="co">// sky ---------------------------------------------------------------</span></span>
+<span id="cb4-112"><span class="kw">#declare D </span>= <span class="fl">.5</span>;</span>
+<span id="cb4-113"><span class="kw">sky_sphere</span> {</span>
+<span id="cb4-114">  <span class="kw">pigment</span> {</span>
+<span id="cb4-115">    <span class="kw">crackle</span></span>
+<span id="cb4-116">    <span class="kw">color_map</span> {</span>
+<span id="cb4-117">      [<span class="kw">pow</span>(<span class="fl">0.5</span>, D) <span class="kw">color</span> Black]</span>
+<span id="cb4-118">      [<span class="kw">pow</span>(<span class="fl">0.6</span>, D) <span class="kw">color</span> White*<span class="fl">10</span>]</span>
+<span id="cb4-119">    }</span>
+<span id="cb4-120">    <span class="kw">scale</span> <span class="fl">.005</span>/D</span>
+<span id="cb4-121">  }</span>
+<span id="cb4-122">}</span>
+<span id="cb4-123"></span>
+<span id="cb4-124"><span class="co">// ----------------------------- plot ----------------------------- //</span></span>
+<span id="cb4-125"><span class="kw">#declare Center </span>= &lt;<span class="fl">0</span>,<span class="fl">0</span>&gt;; <span class="co">// arbitrary </span></span>
+<span id="cb4-126"><span class="kw">#declare Radius </span>= <span class="fl">3</span>; <span class="co">// arbitrary &gt;0</span></span>
+<span id="cb4-127"></span>
+<span id="cb4-128"><span class="co">// camera and light source -------------------------------------------</span></span>
+<span id="cb4-129"><span class="kw">camera</span> {</span>
+<span id="cb4-130">  <span class="kw">location</span> &lt;<span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">-12</span>&gt;</span>
+<span id="cb4-131">  <span class="kw">look_at</span> &lt;Center.<span class="kw">x</span>, Center.<span class="kw">y</span>, <span class="fl">0</span>&gt;</span>
+<span id="cb4-132">  <span class="kw">angle</span> <span class="fl">40</span></span>
+<span id="cb4-133">  <span class="kw">rotate</span> &lt;<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0</span>&gt;</span>
+<span id="cb4-134">}</span>
+<span id="cb4-135"><span class="kw">light_source</span> { &lt;<span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">-60</span>&gt; White }</span>
+<span id="cb4-136"></span>
+<span id="cb4-137"><span class="co">//</span></span>
+<span id="cb4-138"><span class="kw">#declare n </span>= <span class="kw">array</span>[<span class="fl">3</span>] {<span class="fl">3</span>,<span class="fl">4</span>,<span class="fl">6</span>};</span>
+<span id="cb4-139"><span class="kw">#declare phi </span>= <span class="fl">0.3</span>;</span>
+<span id="cb4-140"><span class="kw">#declare nframes </span>= <span class="fl">45</span>;</span>
+<span id="cb4-141"><span class="kw">#declare shift </span>= <span class="kw">frame_number</span>/nframes; </span>
+<span id="cb4-142"><span class="kw">object</span> {</span>
+<span id="cb4-143">  Steiner3D(n, phi, shift, Center, Radius, <span class="fl">0.005</span>)</span>
+<span id="cb4-144">  <span class="kw">rotate</span> &lt;<span class="fl">50</span>, <span class="fl">0</span>, <span class="fl">0</span>&gt;</span>
+<span id="cb4-145">  <span class="kw">translate</span> &lt;<span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">5</span>&gt;</span>
+<span id="cb4-146">  <span class="kw">scale</span> <span class="fl">1.85</span></span>
+<span id="cb4-147">}</span>
+<span id="cb4-148"></span>
+<span id="cb4-149"><span class="co">/* ini file ----------------------------------------------------------</span></span>
+<span id="cb4-150"><span class="co">Antialias = On</span></span>
+<span id="cb4-151"><span class="co">Antialias_Threshold = 0.3</span></span>
+<span id="cb4-152"><span class="co">Antialias_Depth = 3</span></span>
+<span id="cb4-153"><span class="co">Input_File_Name = SteinerChain.pov</span></span>
+<span id="cb4-154"><span class="co">Initial_Frame = 1</span></span>
+<span id="cb4-155"><span class="co">Final_Frame = 45</span></span>
+<span id="cb4-156"><span class="co">Cyclic_Animation = on</span></span>
+<span id="cb4-157"><span class="co">Pause_when_Done = off</span></span>
+<span id="cb4-158"><span class="co">------------------------------------------------------------------- */</span></span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/SteinerChain_POVRAY.gif"
+        />
+      </p>
+      <p><br /></p>
+      <p>We get a nice result when we map a picture to the spheres:</p>
+      <div class="sourceCode" id="cb5">
+        <pre
+          class="sourceCode numberSource povray numberLines"
+        ><code class="sourceCode povray"><span id="cb5-1"><span class="ot">#if</span>(Depth=<span class="fl">1</span>)</span>
+<span id="cb5-2">  <span class="kw">sphere</span> {</span>
+<span id="cb5-3">    center, r-epsilon</span>
+<span id="cb5-4">    <span class="kw">pigment</span>{</span>
+<span id="cb5-5">      <span class="kw">image_map</span> {</span>
+<span id="cb5-6">        <span class="dt">png</span> <span class="st">"R-Ladies.png"</span></span>
+<span id="cb5-7">        <span class="kw">interpolate</span> <span class="fl">2</span></span>
+<span id="cb5-8">      }</span>
+<span id="cb5-9">      <span class="kw">scale</span> <span class="fl">1.1</span>*<span class="kw">sqrt</span>(r)</span>
+<span id="cb5-10">    }</span>
+<span id="cb5-11">  }</span>
+<span id="cb5-12"><span class="ot">#else</span></span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/SteinerChain_POVRAY2.gif"
+        />
+      </p>
+      <h1 id="with-asymptote">With Asymptote</h1>
+      <p>This Asymptote program produces the frames of the animation:</p>
+      <div class="sourceCode" id="cb6">
+        <pre
+          class="sourceCode numberSource cpp numberLines"
+        ><code class="sourceCode cpp"><span id="cb6-1">settings.render = <span class="dv">4</span>;</span>
+<span id="cb6-2">settings.outformat = <span class="st">"eps"</span>;</span>
+<span id="cb6-3"></span>
+<span id="cb6-4"><span class="co">// -------------------------------------------------------------------</span></span>
+<span id="cb6-5"><span class="kw">import</span> solids;</span>
+<span id="cb6-6"></span>
+<span id="cb6-7"><span class="co">// files to create</span></span>
+<span id="cb6-8">string[] files = {</span>
+<span id="cb6-9">    <span class="st">"SC-000"</span>, <span class="st">"SC-001"</span>, <span class="st">"SC-002"</span>, <span class="st">"SC-003"</span>, <span class="st">"SC-004"</span>, <span class="st">"SC-005"</span>,</span>
+<span id="cb6-10">    <span class="st">"SC-006"</span>, <span class="st">"SC-007"</span>, <span class="st">"SC-008"</span>, <span class="st">"SC-009"</span>, <span class="st">"SC-010"</span>, <span class="st">"SC-011"</span>,</span>
+<span id="cb6-11">    <span class="st">"SC-012"</span>, <span class="st">"SC-013"</span>, <span class="st">"SC-014"</span>, <span class="st">"SC-015"</span>, <span class="st">"SC-016"</span>, <span class="st">"SC-017"</span>,</span>
+<span id="cb6-12">    <span class="st">"SC-018"</span>, <span class="st">"SC-019"</span>, <span class="st">"SC-020"</span>, <span class="st">"SC-021"</span>, <span class="st">"SC-022"</span>, <span class="st">"SC-023"</span>,</span>
+<span id="cb6-13">    <span class="st">"SC-024"</span>, <span class="st">"SC-025"</span>, <span class="st">"SC-026"</span>, <span class="st">"SC-027"</span>, <span class="st">"SC-028"</span>, <span class="st">"SC-029"</span>,</span>
+<span id="cb6-14">    <span class="st">"SC-030"</span>, <span class="st">"SC-031"</span>, <span class="st">"SC-032"</span>, <span class="st">"SC-033"</span>, <span class="st">"SC-034"</span>, <span class="st">"SC-035"</span>,</span>
+<span id="cb6-15">    <span class="st">"SC-036"</span>, <span class="st">"SC-037"</span>, <span class="st">"SC-038"</span>, <span class="st">"SC-039"</span>, <span class="st">"SC-040"</span>, <span class="st">"SC-041"</span>,</span>
+<span id="cb6-16">    <span class="st">"SC-042"</span>, <span class="st">"SC-043"</span>, <span class="st">"SC-044"</span>};</span>
+<span id="cb6-17"></span>
+<span id="cb6-18"><span class="co">// camera and light --------------------------------------------------</span></span>
+<span id="cb6-19">size(<span class="dv">10</span><span class="er">cm</span>);</span>
+<span id="cb6-20">currentprojection = orthographic(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">6</span>);</span>
+<span id="cb6-21">currentlight = (<span class="dv">20</span>,<span class="dv">20</span>,<span class="dv">60</span>);</span>
+<span id="cb6-22">currentlight.background = black;</span>
+<span id="cb6-23">viewportmargin = (<span class="dv">10</span>,<span class="dv">10</span>);</span>
+<span id="cb6-24"></span>
+<span id="cb6-25"><span class="co">// image of the circle (Center,Radius) by inversion pole c power k ---</span></span>
+<span id="cb6-26"><span class="kw">struct</span> Circle {</span>
+<span id="cb6-27">  pair center;</span>
+<span id="cb6-28">  real radius;</span>
+<span id="cb6-29">}</span>
+<span id="cb6-30">Circle invertedCircle(pair c, real k, pair Center, real Radius){</span>
+<span id="cb6-31">    real r = sqrt(abs(k));</span>
+<span id="cb6-32">    pair z1 = sgn(k) * (Center-c)/r;</span>
+<span id="cb6-33">    real D1 = Radius*Radius/r/r - dot(z1,z1);</span>
+<span id="cb6-34">    pair z2 = -z1/D1;</span>
+<span id="cb6-35">    real R2 = sqrt(dot(z2,z2) + <span class="dv">1</span>/D1);</span>
+<span id="cb6-36">    Circle out;</span>
+<span id="cb6-37">    out.center = r*z2 + c;</span>
+<span id="cb6-38">    out.radius = r*R2;</span>
+<span id="cb6-39">    <span class="cf">return</span> out;</span>
+<span id="cb6-40">}</span>
+<span id="cb6-41"></span>
+<span id="cb6-42"><span class="co">// -------------------------------------------------------------------</span></span>
+<span id="cb6-43"><span class="kw">struct</span> Sphere {</span>
+<span id="cb6-44">    triple center;</span>
+<span id="cb6-45">    real radius;</span>
+<span id="cb6-46">}</span>
+<span id="cb6-47"></span>
+<span id="cb6-48"><span class="co">// -------------------------------------------------------------------</span></span>
+<span id="cb6-49"><span class="kw">struct</span> Cyclide {</span>
+<span id="cb6-50">  real mu;</span>
+<span id="cb6-51">  real a;</span>
+<span id="cb6-52">  real c;</span>
+<span id="cb6-53">  triple shift;</span>
+<span id="cb6-54">}</span>
+<span id="cb6-55"></span>
+<span id="cb6-56"><span class="co">// -------------------------------------------------------------------</span></span>
+<span id="cb6-57"><span class="co">// n: array of length depth, the numbers of spheres for each step</span></span>
+<span id="cb6-58"><span class="co">// phi: number -1 &lt; phi &lt; 1, phi /= 0 </span></span>
+<span id="cb6-59"><span class="co">// shift: number 0 &lt;= shift &lt; 1</span></span>
+<span id="cb6-60"><span class="dt">void</span> Steiner3D(Sphere[] spheres, Cyclide[] cyclides, <span class="dt">int</span>[] n, real phi, </span>
+<span id="cb6-61">                <span class="dt">int</span> depth, real shift, pair Center = (<span class="dv">0</span>,<span class="dv">0</span>), real Radius = <span class="dv">2</span>){</span>
+<span id="cb6-62">    real m = n[<span class="dv">0</span>];</span>
+<span id="cb6-63">    real sine = sin(pi/m);</span>
+<span id="cb6-64">    real Side = Radius*sine; <span class="co">// side length of the m-gon </span></span>
+<span id="cb6-65">    real Coef = <span class="dv">1</span>/(<span class="dv">1</span>+sine); <span class="co">// Radius/(Radius+Side)</span></span>
+<span id="cb6-66">    real CSide = Coef*Side;</span>
+<span id="cb6-67">    real CRadius = Coef*Radius;</span>
+<span id="cb6-68">    real invphi = <span class="dv">1</span>/phi;</span>
+<span id="cb6-69">    pair I = (Radius*invphi,<span class="dv">0</span>) + Center; <span class="co">// inversion pole</span></span>
+<span id="cb6-70">    real k = Radius*Radius*(<span class="dv">1</span>-invphi*invphi); <span class="co">// inversion power</span></span>
+<span id="cb6-71">    real O1x = <span class="dv">2</span>*invphi*Radius; <span class="co">// (O1x,0,0) center of exterior sphere </span></span>
+<span id="cb6-72">    <span class="co">// -----------------------------------------------------------------</span></span>
+<span id="cb6-73">    <span class="cf">if</span>(depth == <span class="dv">1</span>){</span>
+<span id="cb6-74">        Cyclide newcyclide;</span>
+<span id="cb6-75">        Circle circle = invertedCircle(I-Center, k, (<span class="dv">0</span>,<span class="dv">0</span>), CRadius-CSide);</span>
+<span id="cb6-76">        newcyclide.mu = (Radius - circle.radius)/<span class="dv">2</span>;</span>
+<span id="cb6-77">        newcyclide.a = (Radius + circle.radius)/<span class="dv">2</span>;</span>
+<span id="cb6-78">        newcyclide.c = (circle.center.x - O1x)/<span class="dv">2</span>;</span>
+<span id="cb6-79">        pair pt = Center + circle.center/<span class="dv">2</span>;</span>
+<span id="cb6-80">        newcyclide.shift = (pt.x - O1x/<span class="dv">2</span>, pt.y, <span class="dv">0</span>);</span>
+<span id="cb6-81">        cyclides.push(newcyclide);</span>
+<span id="cb6-82">    } </span>
+<span id="cb6-83">    <span class="co">// -----------------------------------------------------------------</span></span>
+<span id="cb6-84">    <span class="cf">for</span>(<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; m; ++i){</span>
+<span id="cb6-85">        real beta = <span class="dv">2</span>*(i+shift)*pi/m;</span>
+<span id="cb6-86">        pair pti = (CRadius*cos(beta), CRadius*sin(beta)) + Center;</span>
+<span id="cb6-87">        Circle circle = invertedCircle(I, k, pti, CSide);</span>
+<span id="cb6-88">        pair center = (circle.center.x - O1x, circle.center.y);</span>
+<span id="cb6-89">        real r = circle.radius;</span>
+<span id="cb6-90">        <span class="cf">if</span>(depth == <span class="dv">1</span>){</span>
+<span id="cb6-91">            Sphere newsphere;</span>
+<span id="cb6-92">            newsphere.center = (center.x, center.y, <span class="dv">0</span>);</span>
+<span id="cb6-93">            newsphere.radius = r;</span>
+<span id="cb6-94">            spheres.push(newsphere);</span>
+<span id="cb6-95">        }<span class="cf">else</span>{</span>
+<span id="cb6-96">            Steiner3D(spheres, cyclides, n[<span class="dv">1</span>:], phi, depth-<span class="dv">1</span>, -shift, </span>
+<span id="cb6-97">                center, r);</span>
+<span id="cb6-98">        }</span>
+<span id="cb6-99">    }</span>
+<span id="cb6-100">}</span>
+<span id="cb6-101"></span>
+<span id="cb6-102"><span class="co">// -------------------------------------------------------------------</span></span>
+<span id="cb6-103"><span class="dt">int</span>[] n = {<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>};</span>
+<span id="cb6-104">real phi = <span class="fl">0.4</span>;</span>
+<span id="cb6-105"><span class="dt">int</span> depth = n.length;</span>
+<span id="cb6-106"></span>
+<span id="cb6-107">path3 boundingbox = circle(c=O, r=<span class="fl">2.1</span>, normal=Z);</span>
+<span id="cb6-108"></span>
+<span id="cb6-109">real epsilon = <span class="fl">0.005</span>;</span>
+<span id="cb6-110"></span>
+<span id="cb6-111"><span class="cf">for</span>(<span class="dt">int</span> k = <span class="dv">0</span>; k &lt; files.length; ++k){</span>
+<span id="cb6-112">    <span class="co">// compute spheres and cyclides ------------------------------------</span></span>
+<span id="cb6-113">    Sphere[] spheres = <span class="kw">new</span> Sphere[<span class="dv">0</span>];</span>
+<span id="cb6-114">    Cyclide[] cyclides = <span class="kw">new</span> Cyclide[<span class="dv">0</span>];</span>
+<span id="cb6-115">    real shift = k/files.length;</span>
+<span id="cb6-116">    Steiner3D(spheres, cyclides, n, phi, depth, shift);</span>
+<span id="cb6-117">    <span class="co">//</span></span>
+<span id="cb6-118">    picture pic;</span>
+<span id="cb6-119">    draw(pic, boundingbox, black+opacity(<span class="dv">0</span>));</span>
+<span id="cb6-120">    <span class="co">// draw the spheres ------------------------------------------------</span></span>
+<span id="cb6-121">    <span class="cf">for</span>(<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; spheres.length; ++i){</span>
+<span id="cb6-122">        Sphere s = spheres[i];</span>
+<span id="cb6-123">        draw(pic, surface(sphere(s.center, s.radius-epsilon)), </span>
+<span id="cb6-124">          rgb(<span class="st">"8c2981ff"</span>));</span>
+<span id="cb6-125">    }</span>
+<span id="cb6-126">    <span class="co">// draw the cyclides -----------------------------------------------</span></span>
+<span id="cb6-127">    <span class="cf">for</span>(<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; cyclides.length; ++i){</span>
+<span id="cb6-128">        Cyclide c = cyclides[i];</span>
+<span id="cb6-129">        real b = sqrt(c.a*c.a-c.c*c.c);</span>
+<span id="cb6-130">        triple F(pair uv){</span>
+<span id="cb6-131">            real h = c.a-c.c*cos(uv.x)*cos(uv.y);</span>
+<span id="cb6-132">            real x = (c.mu*(c.c-c.a*cos(uv.x)*cos(uv.y))+b*b*cos(uv.x))/h;</span>
+<span id="cb6-133">            real y = (b*sin(uv.x)*(c.a-c.mu*cos(uv.y)))/h;</span>
+<span id="cb6-134">            real z = b*sin(uv.y)*(c.c*cos(uv.x)-c.mu)/h;</span>
+<span id="cb6-135">            <span class="cf">return</span> (x,y,z);</span>
+<span id="cb6-136">        }</span>
+<span id="cb6-137">        surface s = surface(F, (<span class="dv">0</span>,<span class="dv">0</span>), (<span class="dv">2</span><span class="er">pi</span>,<span class="dv">2</span><span class="er">pi</span>), <span class="dv">40</span>, <span class="dv">40</span>, Spline);</span>
+<span id="cb6-138">        draw(pic, shift(c.shift)*s, yellow+opacity(<span class="fl">0.2</span>));</span>
+<span id="cb6-139">    }</span>
+<span id="cb6-140">    <span class="co">// -----------------------------------------------------------------</span></span>
+<span id="cb6-141">    add(pic);</span>
+<span id="cb6-142">    shipout(files[k], bbox(black, FillDraw(black)));</span>
+<span id="cb6-143">    erase();</span>
+<span id="cb6-144">}</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/SteinerChain_Asymptote.gif"
+        />
+      </p>
+      <h1 id="with-three.js">With three.js</h1>
+      <p>
+        Here is a variant with <code>three.js</code>. I replaced the spheres
+        with “Barth polyedra”.
+      </p>
+      <iframe
+        src="https://laustep.github.io/stlahblog/frames/threejs_BarthPolyhedronSteiner.html"
+        width="100%"
+        height="500px"
+        scrolling="no"
+        frameborder="0"
+      >
+      </iframe>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Sat, 13 Jul 2019 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/SteinerChains.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
+    <item>
       <title>Why I like generalized fiducial inference</title>
       <link>https://laustep.github.io/stlahblog/posts/gfi_vs_rstanarm.html</link>
       <description><![CDATA[<div class="container-fluid">
