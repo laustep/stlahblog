@@ -267,11 +267,7 @@ i = 1, \ldots, I \qquad
 <span id="cb8-8"><a href="#cb8-8"></a><span class="co">## [1] 0.95</span></span></code></pre></div>
 <p>Now the fiducial intervals match the frequentist ones.</p>
 <h2 id="epilogue">Epilogue</h2>
-<p>As you have seen, using the generalized fiducial inference is easy, easier than the Bayesian inference. The difficulty I mentioned regarding the Bayesian inference is not severe, but this is because the one-way ANOVA model with a random factor is the simplest Gaussian linear mixed model. Namely, it has only one between standard deviation. Things get more complicated for a mixed model with multiple random effects. With <code>rstanarm::stan_lmer</code>, one has to assign a Gamma prior distribution on the total between standard deviation, and then to specify a dispersion parameter of the between standard deviations.</p>
-<h2 id="note">Note</h2>
-<p>My package ‘gfilmm’ is already on CRAN (version <code>0.1.0</code>) but this version is not safe and there’s a mistake in the algorithm. If you want to use this package now, install the development version:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;stla/AOV1R&quot;</span>, <span class="dt">build_vignettes =</span> <span class="ot">TRUE</span>) <span class="co"># soon on CRAN</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;stla/gfilmm&quot;</span>, <span class="dt">build_vignettes =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<p>As you have seen, using the generalized fiducial inference is easy, easier than the Bayesian inference. The difficulty I mentioned regarding the Bayesian inference is not severe, but this is because the one-way ANOVA model with a random factor is the simplest Gaussian linear mixed model. Namely, it has only one between standard deviation. Things get more complicated for a mixed model with multiple random effects. With <code>rstanarm::stan_lmer</code>, one has to assign a Gamma prior distribution on each between standard deviation. I cheated for the above example: I did multiple attempts to select the parameters of the Gamma prior, until I found results close to the frequentist ones!</p>
 
         </div>
 
