@@ -1,0 +1,302 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Generalized fiducial inference on quantiles</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:26px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:22px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Generalized fiducial inference on quantiles</h1> 
+          <div class="info">
+    Posted on November 27, 2020
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'statistics'." href="../tags/statistics.html">statistics</a>
+    
+</div>
+
+<p>My new package ‘gfiExtremes’ is on <a href="https://cran.r-project.org/web/packages/gfiExtremes/index.html">CRAN</a> now. So it is time to present it.</p>
+<p>This package allows to get confidence intervals about the quantiles of any reasonable distribution (although the inference is based on a parametric model). The statistical inference is fiducial.</p>
+<p>To give an illustration, I’m taking a sample of length 100 randomly generated from a Weibull distribution:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">set.seed</span>(1111111111L)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>X &lt;-<span class="st"> </span><span class="kw">rweibull</span>(100L, <span class="dt">shape =</span> <span class="fl">1.5</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="kw">plot</span>(X, <span class="dt">pch =</span> <span class="dv">19</span>, <span class="dt">main =</span> <span class="st">&quot;Data&quot;</span>)</span></code></pre></div>
+<p><img src="./figures/gfiExtremes-weibullSample-1.png" /></p>
+<p>The model used for the fiducial inference assumes a generalized Pareto distribution above a certain threshold. For an unknown value of this threshold, the function to use is <code>gfigpd2</code>. It runs a MCMC sampler, and one has to specify the length of the burnin phase, the desired length of the MCMC chains after the burnin, and the thin value (e.g. a thin of 2 means that one sampled value over two is dropped). One also has to specify the desired probability levels of the quantiles we are interested in.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">library</span>(gfiExtremes)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>chains &lt;-<span class="st"> </span><span class="kw">gfigpd2</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>  X,                                         <span class="co"># data</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>  <span class="dt">beta =</span> <span class="kw">c</span>(<span class="dv">99</span>, <span class="fl">99.5</span>, <span class="fl">99.9</span>)<span class="op">/</span><span class="dv">100</span>,              <span class="co"># probability levels</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>  <span class="dt">threshold.init =</span> <span class="fl">0.7</span>,                      <span class="co"># initial threshold value</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>  <span class="dt">burnin =</span> 20000L, <span class="dt">iter =</span> 20000L, <span class="dt">thin =</span> 10L <span class="co"># MCMC chains</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>)</span></code></pre></div>
+<p>By default, <code>gfigpd2</code> runs four MCMC chains and they are generated in parallel.</p>
+<p>The output of <code>gfigpd2</code> is a R object ready for analysis with the ‘coda’ package, which is loaded by ‘gfiExtremes’. In particular, it has a <code>summary</code> method:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">summary</span>(chains)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="co">## </span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="co">## Iterations = 20001:219991</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="co">## Thinning interval = 10 </span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a><span class="co">## Number of chains = 4 </span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a><span class="co">## Sample size per chain = 20000 </span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a><span class="co">## </span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a><span class="co">## 1. Empirical mean and standard deviation for each variable,</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a><span class="co">##    plus standard error of the mean:</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a><span class="co">## </span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a><span class="co">##        Mean     SD Naive SE Time-series SE</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a><span class="co">## beta1 3.297  1.172 0.004145        0.01229</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a><span class="co">## beta2 3.892  3.539 0.012513        0.03705</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a><span class="co">## beta3 6.789 80.903 0.286035        0.72901</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a><span class="co">## </span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a><span class="co">## 2. Quantiles for each variable:</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a><span class="co">## </span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a><span class="co">##        2.5%   25%   50%   75%  97.5%</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true"></a><span class="co">## beta1 2.512 2.858 3.096 3.444  5.240</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true"></a><span class="co">## beta2 2.765 3.157 3.459 3.963  7.307</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true"></a><span class="co">## beta3 3.250 3.740 4.268 5.362 17.127</span></span></code></pre></div>
+<p>The ‘coda’ package provides the <code>HPDinterval</code> function which gives the shortest confidence intervals:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">HPDinterval</span>(<span class="kw">joinMCMCchains</span>(chains))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="co">##          lower     upper</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="co">## beta1 2.371387  4.591365</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a><span class="co">## beta2 2.524189  5.910930</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a><span class="co">## beta3 2.893593 11.091305</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a><span class="co">## attr(,&quot;Probability&quot;)</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a><span class="co">## [1] 0.95</span></span></code></pre></div>
+<p>Below are the true values of the Weibull quantiles; they are caught by the confidence intervals:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="kw">qweibull</span>(<span class="kw">c</span>(<span class="dv">99</span>, <span class="fl">99.5</span>, <span class="fl">99.9</span>)<span class="op">/</span><span class="dv">100</span>, <span class="dt">shape =</span> <span class="fl">1.5</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="co">## [1] 2.767985 3.039196 3.627087</span></span></code></pre></div>
+<h2 id="convergence-diagnostics">Convergence diagnostics</h2>
+<p>Now one has to check that the MCMC chains have entered in their stationary phase. It is better to take the logarithm of the simulations of the fiducial distributions of the quantiles:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>logChains &lt;-<span class="st"> </span><span class="kw">as.mcmc.list</span>(<span class="kw">lapply</span>(chains, log))</span></code></pre></div>
+<p>The ‘ggmcmc’ package is helpful here. Firstly, let’s have a look at the traces:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="kw">library</span>(ggmcmc)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>gglogChains &lt;-<span class="st"> </span><span class="kw">ggs</span>(logChains)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a><span class="kw">library</span>(ggthemes)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a><span class="kw">ggs_traceplot</span>(gglogChains) <span class="op">+</span><span class="st"> </span><span class="kw">theme_fivethirtyeight</span>()</span></code></pre></div>
+<p><img src="./figures/gfiExtremes-traceplot-1.png" /></p>
+<p>Visually, nothing indicates a departure from the convergence. Let’s look at the estimated densities now:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="kw">ggs_density</span>(gglogChains) <span class="op">+</span><span class="st"> </span><span class="kw">theme_fivethirtyeight</span>()</span></code></pre></div>
+<p><img src="./figures/gfiExtremes-densities-1.png" /></p>
+<p>The running means quickly stabilize:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="kw">ggs_running</span>(gglogChains) <span class="op">+</span><span class="st"> </span><span class="kw">theme_fivethirtyeight</span>()</span></code></pre></div>
+<p><img src="./figures/gfiExtremes-runningMeans-1.png" /></p>
+<p>Below are the densities of the whole chains compared with the densities of their last part:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="kw">ggs_compare_partial</span>(gglogChains) <span class="op">+</span><span class="st"> </span><span class="kw">theme_fivethirtyeight</span>()</span></code></pre></div>
+<p><img src="./figures/gfiExtremes-comparePartial-1.png" /></p>
+<p>The autocorrelations nicely decrease:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="kw">ggs_autocorrelation</span>(gglogChains) <span class="op">+</span><span class="st"> </span><span class="kw">theme_fivethirtyeight</span>()</span></code></pre></div>
+<p><img src="./figures/gfiExtremes-autocorrelations-1.png" /></p>
+<p>Let’s also have a look at the Gelman-Rubin diagnostic:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a><span class="kw">gelman.diag</span>(logChains)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a><span class="co">## Potential scale reduction factors:</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true"></a><span class="co">## </span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true"></a><span class="co">##       Point est. Upper C.I.</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true"></a><span class="co">## beta1          1       1.00</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true"></a><span class="co">## beta2          1       1.01</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true"></a><span class="co">## beta3          1       1.01</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true"></a><span class="co">## </span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true"></a><span class="co">## Multivariate psrf</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true"></a><span class="co">## </span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true"></a><span class="co">## 1</span></span></code></pre></div>
+<p>The upper <code>Rhat</code> are close to 1, thereby indicating a successful diagnostic.</p>
+<p>Finally, let’s look at the Heidelberger &amp; Welch diagnostic:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a><span class="kw">heidel.diag</span>(logChains)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true"></a><span class="co">## [[1]]</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true"></a><span class="co">##                                     </span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true"></a><span class="co">##       Stationarity start     p-value</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true"></a><span class="co">##       test         iteration        </span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true"></a><span class="co">## beta1 passed       1         0.591  </span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true"></a><span class="co">## beta2 passed       1         0.356  </span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true"></a><span class="co">## beta3 passed       1         0.189  </span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true"></a><span class="co">##                               </span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true"></a><span class="co">##       Halfwidth Mean Halfwidth</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true"></a><span class="co">##       test                    </span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true"></a><span class="co">## beta1 passed    1.17 0.00818  </span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true"></a><span class="co">## beta2 passed    1.31 0.01201  </span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true"></a><span class="co">## beta3 passed    1.60 0.03032  </span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true"></a><span class="co">## </span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true"></a><span class="co">## [[2]]</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true"></a><span class="co">##                                     </span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true"></a><span class="co">##       Stationarity start     p-value</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true"></a><span class="co">##       test         iteration        </span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true"></a><span class="co">## beta1 passed       1         0.652  </span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true"></a><span class="co">## beta2 passed       1         0.571  </span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true"></a><span class="co">## beta3 passed       1         0.400  </span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true"></a><span class="co">##                               </span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true"></a><span class="co">##       Halfwidth Mean Halfwidth</span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true"></a><span class="co">##       test                    </span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true"></a><span class="co">## beta1 passed    1.17 0.00713  </span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true"></a><span class="co">## beta2 passed    1.30 0.01047  </span></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true"></a><span class="co">## beta3 passed    1.58 0.02423  </span></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true"></a><span class="co">## </span></span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true"></a><span class="co">## [[3]]</span></span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true"></a><span class="co">##                                     </span></span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true"></a><span class="co">##       Stationarity start     p-value</span></span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true"></a><span class="co">##       test         iteration        </span></span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true"></a><span class="co">## beta1 passed       1         0.0720 </span></span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true"></a><span class="co">## beta2 passed       1         0.0687 </span></span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true"></a><span class="co">## beta3 passed       1         0.0789 </span></span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true"></a><span class="co">##                               </span></span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true"></a><span class="co">##       Halfwidth Mean Halfwidth</span></span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true"></a><span class="co">##       test                    </span></span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true"></a><span class="co">## beta1 passed    1.17 0.00856  </span></span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true"></a><span class="co">## beta2 passed    1.31 0.01278  </span></span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true"></a><span class="co">## beta3 passed    1.59 0.03042  </span></span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true"></a><span class="co">## </span></span>
+<span id="cb13-44"><a href="#cb13-44" aria-hidden="true"></a><span class="co">## [[4]]</span></span>
+<span id="cb13-45"><a href="#cb13-45" aria-hidden="true"></a><span class="co">##                                     </span></span>
+<span id="cb13-46"><a href="#cb13-46" aria-hidden="true"></a><span class="co">##       Stationarity start     p-value</span></span>
+<span id="cb13-47"><a href="#cb13-47" aria-hidden="true"></a><span class="co">##       test         iteration        </span></span>
+<span id="cb13-48"><a href="#cb13-48" aria-hidden="true"></a><span class="co">## beta1 passed       1         0.444  </span></span>
+<span id="cb13-49"><a href="#cb13-49" aria-hidden="true"></a><span class="co">## beta2 passed       1         0.276  </span></span>
+<span id="cb13-50"><a href="#cb13-50" aria-hidden="true"></a><span class="co">## beta3 passed       1         0.164  </span></span>
+<span id="cb13-51"><a href="#cb13-51" aria-hidden="true"></a><span class="co">##                               </span></span>
+<span id="cb13-52"><a href="#cb13-52" aria-hidden="true"></a><span class="co">##       Halfwidth Mean Halfwidth</span></span>
+<span id="cb13-53"><a href="#cb13-53" aria-hidden="true"></a><span class="co">##       test                    </span></span>
+<span id="cb13-54"><a href="#cb13-54" aria-hidden="true"></a><span class="co">## beta1 passed    1.16 0.00709  </span></span>
+<span id="cb13-55"><a href="#cb13-55" aria-hidden="true"></a><span class="co">## beta2 passed    1.30 0.01008  </span></span>
+<span id="cb13-56"><a href="#cb13-56" aria-hidden="true"></a><span class="co">## beta3 passed    1.57 0.01926</span></span></code></pre></div>
+<p>All tests passed.</p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
