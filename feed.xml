@@ -7,6 +7,354 @@
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
     <lastBuildDate>Wed, 09 Dec 2020 00:00:00 UT</lastBuildDate>
     <item>
+      <title>Five-parameters logistic regression</title>
+      <link>https://laustep.github.io/stlahblog/posts/5pl.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        The five-parameters logistic curve is commonly defined by
+        <span class="math display"
+          >\[ f(x) = A + \frac{D-A}{\Bigl(1+\exp\bigl(B(C-x)\bigr)\Bigr)^S}.
+          \]</span
+        >
+        Assuming <span class="math inline">\(B&gt;0\)</span> and
+        <span class="math inline">\(S&gt;0\)</span>,
+      </p>
+      <ul>
+        <li>
+          <p>
+            <span class="math inline">\(A\)</span> is the value of the
+            horizontal asymptote when
+            <span class="math inline">\(x \to -\infty\)</span>;
+          </p>
+        </li>
+        <li>
+          <p>
+            <span class="math inline">\(D\)</span> is the value of the
+            horizontal asymptote when
+            <span class="math inline">\(x \to +\infty\)</span>;
+          </p>
+        </li>
+        <li>
+          <p>
+            <span class="math inline">\(B\)</span> describes how rapidly the
+            curve makes its transition between the two asymptotes;
+          </p>
+        </li>
+        <li>
+          <p>
+            <span class="math inline">\(C\)</span> is a location parameter,
+            which does not have a nice interpretation (except if
+            <span class="math inline">\(S=1\)</span>);
+          </p>
+        </li>
+        <li>
+          <p>
+            <span class="math inline">\(S\)</span> describes the asymmetry of
+            the curve (the curve is symmetric when
+            <span class="math inline">\(S=1\)</span>).
+          </p>
+        </li>
+      </ul>
+      <p>
+        In the case when <span class="math inline">\(S=1\)</span>, the parameter
+        <span class="math inline">\(C\)</span> is the value of
+        <span class="math inline">\(x\)</span> for which the corresponding value
+        <span class="math inline">\(f(x)\)</span> is the midpoint between the
+        two asymptotes; moreover, the curve has an inflection point at
+        <span class="math inline">\(x = C\)</span>.
+      </p>
+      <p>
+        In the general case, the value of
+        <span class="math inline">\(x\)</span> for which the corresponding value
+        <span class="math inline">\(f(x)\)</span> is the midpoint between the
+        two asymptotes is
+        <span class="math display"
+          >\[ x_{\text{mid}} = C - \frac{\log\Bigl(2^{\frac{1}{S}}-1\Bigr)}{B}.
+          \]</span
+        >
+        It is obtained by solving
+        <span class="math inline"
+          >\(\Bigl(1+\exp\bigl(B(C-x)\bigr)\Bigr)^S = 2\)</span
+        >.
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb1-1">n &lt;-<span class="st"> </span><span class="dv">100</span></span>
+<span id="cb1-2">x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">49</span>, <span class="dv">60</span>, <span class="dt">length.out =</span> n)</span>
+<span id="cb1-3">A &lt;-<span class="st"> </span><span class="dv">30</span>; D &lt;-<span class="st"> </span><span class="dv">100</span>; B &lt;-<span class="st"> </span><span class="dv">1</span>; C &lt;-<span class="st"> </span><span class="dv">50</span>; S &lt;-<span class="st"> </span><span class="dv">10</span></span>
+<span id="cb1-4">f &lt;-<span class="st"> </span><span class="cf">function</span>(x) A <span class="op">+</span><span class="st"> </span>(D<span class="op">-</span>A) <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(B<span class="op">*</span>(C<span class="op">-</span>x)))<span class="op">^</span>S</span>
+<span id="cb1-5">y0 &lt;-<span class="st"> </span><span class="kw">f</span>(x) </span>
+<span id="cb1-6"><span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">4</span>, <span class="fl">0.5</span>, <span class="dv">1</span>))</span>
+<span id="cb1-7"><span class="kw">plot</span>(x, y0, <span class="dt">type =</span> <span class="st">"l"</span>, <span class="dt">cex.axis =</span> <span class="fl">0.5</span>, <span class="dt">ylab =</span> <span class="st">"f(x)"</span>)</span>
+<span id="cb1-8"><span class="kw">abline</span>(<span class="dt">v =</span> C, <span class="dt">col =</span> <span class="st">"green"</span>, <span class="dt">lty =</span> <span class="st">"dashed"</span>)</span>
+<span id="cb1-9">( xmid &lt;-<span class="st"> </span>C <span class="op">-</span><span class="st"> </span><span class="kw">log</span>(<span class="dv">2</span><span class="op">^</span>(<span class="dv">1</span><span class="op">/</span>S) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)<span class="op">/</span>B )</span>
+<span id="cb1-10"><span class="co">## [1] 52.63424</span></span></code></pre>
+      </div>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb2-1"><span class="kw">abline</span>(<span class="dt">v =</span> xmid, <span class="dt">col =</span> <span class="st">"red"</span>, <span class="dt">lwd =</span> <span class="dv">2</span>) </span>
+<span id="cb2-2"><span class="kw">abline</span>(<span class="dt">h =</span> (A<span class="op">+</span>D)<span class="op">/</span><span class="dv">2</span>, <span class="dt">col =</span> <span class="st">"red"</span>, <span class="dt">lwd =</span> <span class="dv">2</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/5pl-plot_5pl-1.png"
+          style="display: block; margin: auto"
+        />
+      </p>
+      <p>
+        Note that the inflection point of the curve is <em>not</em> the point
+        correspoding to <span class="math inline">\(x_{\text{mid}}\)</span>:
+      </p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb3-1"><span class="kw">library</span>(numDeriv)</span>
+<span id="cb3-2">df &lt;-<span class="st"> </span><span class="kw">grad</span>(f, x)</span>
+<span id="cb3-3"><span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">4</span>, <span class="fl">0.5</span>, <span class="dv">1</span>))</span>
+<span id="cb3-4"><span class="kw">plot</span>(x, df, <span class="dt">type =</span> <span class="st">"l"</span>, <span class="dt">cex.axis =</span> <span class="fl">0.5</span>, <span class="dt">ylab=</span><span class="st">"f'(x)"</span>)</span>
+<span id="cb3-5"><span class="kw">abline</span>(<span class="dt">v =</span> xmid, <span class="dt">col =</span> <span class="st">"red"</span>, <span class="dt">lwd =</span> <span class="dv">2</span>) </span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/5pl-inflection-1.png"
+          style="display: block; margin: auto"
+        />
+      </p>
+      <p>
+        In practice, we are often interested in estimating
+        <span class="math inline">\(x_{\text{mid}}\)</span>. So it is better to
+        use this other parameterization of the five-parameters logistic curve:
+        <span class="math display"
+          >\[ g(x) = A +
+          \frac{D-A}{{\biggl(1+\exp\Bigl(\log\bigl(2^{\frac{1}{S}}-1\bigr) +
+          B(x_{\text{mid}}-x)\Bigr)\biggr)}^S} \]</span
+        >
+        because fitting this curve will directly give the estimate of
+        <span class="math inline">\(x_{\text{mid}}\)</span> and its standard
+        error.
+      </p>
+      <p>
+        Another advantage of this parameterization is that there is a way to get
+        a good starting value of
+        <span class="math inline">\(x_{\text{mid}}\)</span> when one wants to
+        fit the five-parameters logistic regression model:
+      </p>
+      <div class="sourceCode" id="cb4">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb4-1">getInitial1 &lt;-<span class="st"> </span><span class="cf">function</span>(x, y){</span>
+<span id="cb4-2">  s &lt;-<span class="st"> </span><span class="kw">getInitial</span>(y <span class="op">~</span><span class="st"> </span><span class="kw">SSfpl</span>(x, A, D, xmid, inverseB),</span>
+<span id="cb4-3">             <span class="dt">data =</span> <span class="kw">data.frame</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y))</span>
+<span id="cb4-4">  <span class="kw">c</span>(<span class="dt">A =</span> s[[<span class="st">"A"</span>]], </span>
+<span id="cb4-5">    <span class="dt">B =</span> <span class="dv">1</span><span class="op">/</span>s[[<span class="st">"inverseB"</span>]], </span>
+<span id="cb4-6">    <span class="dt">xmid =</span> s[[<span class="st">"xmid"</span>]], </span>
+<span id="cb4-7">    <span class="dt">D =</span> s[[<span class="st">"D"</span>]], </span>
+<span id="cb4-8">    <span class="dt">S =</span> <span class="dv">1</span>)</span>
+<span id="cb4-9">}</span></code></pre>
+      </div>
+      <p>
+        I don’t know how to get a good starting value for
+        <span class="math inline">\(S\)</span>, so I always take
+        <span class="math inline">\(1\)</span>.
+      </p>
+      <p>
+        Sometimes, <code>SSfpl</code> can fail. Here is another function which
+        returns some starting values:
+      </p>
+      <div class="sourceCode" id="cb5">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb5-1">getInitial2 &lt;-<span class="st"> </span><span class="cf">function</span>(x, y){</span>
+<span id="cb5-2">  NAs &lt;-<span class="st"> </span><span class="kw">union</span>(<span class="kw">which</span>(<span class="kw">is.na</span>(x)), <span class="kw">which</span>(<span class="kw">is.na</span>(y)))</span>
+<span id="cb5-3">  <span class="cf">if</span>(<span class="kw">length</span>(NAs)){</span>
+<span id="cb5-4">    x &lt;-<span class="st"> </span>x[<span class="op">-</span>NAs]</span>
+<span id="cb5-5">    y &lt;-<span class="st"> </span>y[<span class="op">-</span>NAs]</span>
+<span id="cb5-6">  }</span>
+<span id="cb5-7">  low_init &lt;-<span class="st"> </span><span class="kw">min</span>(y)</span>
+<span id="cb5-8">  high_init &lt;-<span class="st"> </span><span class="kw">max</span>(y)</span>
+<span id="cb5-9">  minmax &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">which</span>(y <span class="op">==</span><span class="st"> </span>low_init), <span class="kw">which</span>(y <span class="op">==</span><span class="st"> </span>high_init))</span>
+<span id="cb5-10">  X &lt;-<span class="st"> </span><span class="kw">cbind</span>(<span class="dv">1</span>, x[<span class="op">-</span>minmax])</span>
+<span id="cb5-11">  Y &lt;-<span class="st"> </span><span class="kw">log</span>((high_init<span class="op">-</span>y[<span class="op">-</span>minmax])<span class="op">/</span>(y[<span class="op">-</span>minmax]<span class="op">-</span>low_init))</span>
+<span id="cb5-12">  fit &lt;-<span class="st"> </span><span class="kw">lm.fit</span>(<span class="dt">x =</span> X, <span class="dt">y =</span> Y)</span>
+<span id="cb5-13">  b_init &lt;-<span class="st"> </span>fit<span class="op">$</span>coefficients[[<span class="dv">2</span>]]</span>
+<span id="cb5-14">  xmid_init &lt;-<span class="st"> </span><span class="op">-</span>fit<span class="op">$</span>coefficients[[<span class="dv">1</span>]] <span class="op">/</span><span class="st"> </span>b_init</span>
+<span id="cb5-15">  <span class="cf">if</span>(b_init <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>){</span>
+<span id="cb5-16">    b_init &lt;-<span class="st"> </span><span class="op">-</span>b_init</span>
+<span id="cb5-17">    A &lt;-<span class="st"> </span>low_init</span>
+<span id="cb5-18">    D &lt;-<span class="st"> </span>high_init</span>
+<span id="cb5-19">  }<span class="cf">else</span>{</span>
+<span id="cb5-20">    A &lt;-<span class="st"> </span>high_init</span>
+<span id="cb5-21">    D &lt;-<span class="st"> </span>low_init</span>
+<span id="cb5-22">  }</span>
+<span id="cb5-23">  <span class="kw">c</span>(<span class="dt">A =</span> A, <span class="dt">B =</span> b_init, <span class="dt">xmid =</span> xmid_init, <span class="dt">D =</span> D, <span class="dt">S =</span> <span class="dv">1</span>)</span>
+<span id="cb5-24">}</span></code></pre>
+      </div>
+      <p>Now we wrap these two functions into a single one:</p>
+      <div class="sourceCode" id="cb6">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb6-1">getInitial5PL &lt;-<span class="st"> </span><span class="cf">function</span>(x, y){</span>
+<span id="cb6-2">  <span class="kw">tryCatch</span>({</span>
+<span id="cb6-3">    <span class="kw">getInitial1</span>(x, y)</span>
+<span id="cb6-4">  }, <span class="dt">error =</span> <span class="cf">function</span>(e){</span>
+<span id="cb6-5">    <span class="kw">getInitial2</span>(x, y)</span>
+<span id="cb6-6">  })</span>
+<span id="cb6-7">}</span></code></pre>
+      </div>
+      <p>And finally we can write a function for the fitting:</p>
+      <div class="sourceCode" id="cb7">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb7-1"><span class="kw">library</span>(minpack.lm)</span>
+<span id="cb7-2">fit5pl &lt;-<span class="st"> </span><span class="cf">function</span>(x, y){</span>
+<span id="cb7-3">  startingValues &lt;-<span class="st"> </span><span class="kw">getInitial5PL</span>(x, y)</span>
+<span id="cb7-4">  fit &lt;-<span class="st"> </span><span class="kw">tryCatch</span>({</span>
+<span id="cb7-5">    <span class="kw">nlsLM</span>(</span>
+<span id="cb7-6">      y <span class="op">~</span><span class="st"> </span>A <span class="op">+</span><span class="st"> </span>(D<span class="op">-</span>A)<span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(<span class="kw">log</span>(<span class="dv">2</span><span class="op">^</span>(<span class="dv">1</span><span class="op">/</span>S)<span class="op">-</span><span class="dv">1</span>) <span class="op">+</span><span class="st"> </span>B<span class="op">*</span>(xmid<span class="op">-</span>x)))<span class="op">^</span>S,</span>
+<span id="cb7-7">      <span class="dt">data =</span> <span class="kw">data.frame</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y),</span>
+<span id="cb7-8">      <span class="dt">start =</span> startingValues,</span>
+<span id="cb7-9">      <span class="dt">lower =</span> <span class="kw">c</span>(<span class="op">-</span><span class="ot">Inf</span>, <span class="dv">0</span>, <span class="op">-</span><span class="ot">Inf</span>, <span class="op">-</span><span class="ot">Inf</span>, <span class="dv">0</span>),</span>
+<span id="cb7-10">      <span class="dt">control =</span> <span class="kw">nls.lm.control</span>(<span class="dt">maxiter =</span> <span class="dv">1024</span>, <span class="dt">maxfev=</span><span class="dv">10000</span>))</span>
+<span id="cb7-11">  }, <span class="dt">error =</span> <span class="cf">function</span>(e){</span>
+<span id="cb7-12">    <span class="kw">paste0</span>(<span class="st">"Failure of model fitting: "</span>, e<span class="op">$</span>message)</span>
+<span id="cb7-13">  })</span>
+<span id="cb7-14">  <span class="cf">if</span>(<span class="kw">class</span>(fit) <span class="op">==</span><span class="st"> "nls"</span> <span class="op">&amp;&amp;</span><span class="st"> </span>fit[[<span class="st">"convInfo"</span>]][[<span class="st">"isConv"</span>]]){</span>
+<span id="cb7-15">    fit</span>
+<span id="cb7-16">  }<span class="cf">else</span> <span class="cf">if</span>(<span class="kw">class</span>(fit) <span class="op">==</span><span class="st"> "nls"</span> <span class="op">&amp;&amp;</span><span class="st"> </span><span class="op">!</span>fit[[<span class="st">"convInfo"</span>]][[<span class="st">"isConv"</span>]]){</span>
+<span id="cb7-17">    <span class="st">"Convergence not achieved"</span></span>
+<span id="cb7-18">  }<span class="cf">else</span>{ <span class="co"># in this case, 'fit' is the error message</span></span>
+<span id="cb7-19">    fit</span>
+<span id="cb7-20">  }</span>
+<span id="cb7-21">}</span></code></pre>
+      </div>
+      <p>Let’s try it on a couple of simulated samples:</p>
+      <div class="sourceCode" id="cb8">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb8-1"><span class="kw">set.seed</span>(<span class="dv">666</span>)</span>
+<span id="cb8-2">nsims &lt;-<span class="st"> </span><span class="dv">25</span></span>
+<span id="cb8-3">epsilon &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(nsims<span class="op">*</span>n, <span class="dv">0</span>, <span class="dv">5</span>), <span class="dt">nrow =</span> nsims, <span class="dt">ncol =</span> n)</span>
+<span id="cb8-4">estimates &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="ot">NA_real_</span>, <span class="dt">nrow =</span> nsims, <span class="dt">ncol =</span> <span class="dv">5</span>)</span>
+<span id="cb8-5"><span class="kw">colnames</span>(estimates) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"xmid"</span>, <span class="st">"D"</span>, <span class="st">"S"</span>)</span>
+<span id="cb8-6"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>nsims){</span>
+<span id="cb8-7">  fit &lt;-<span class="st"> </span><span class="kw">fit5pl</span>(x, y0 <span class="op">+</span><span class="st"> </span>epsilon[i,])</span>
+<span id="cb8-8">  <span class="cf">if</span>(<span class="kw">class</span>(fit) <span class="op">==</span><span class="st"> "nls"</span>){</span>
+<span id="cb8-9">    estimates[i, ] &lt;-<span class="st"> </span><span class="kw">coef</span>(fit)</span>
+<span id="cb8-10">  }<span class="cf">else</span>{</span>
+<span id="cb8-11">    estimates[i, ] &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="ot">NaN</span>, <span class="ot">NaN</span>, <span class="ot">NaN</span>, <span class="ot">NaN</span>, <span class="ot">NaN</span>)</span>
+<span id="cb8-12">  }</span>
+<span id="cb8-13">}</span>
+<span id="cb8-14"><span class="kw">summary</span>(estimates)</span></code></pre>
+      </div>
+      <pre><code>##        A               B               xmid             D         
+##  Min.   :24.19   Min.   :0.8918   Min.   :52.52   Min.   : 98.63  
+##  1st Qu.:27.99   1st Qu.:0.9566   1st Qu.:52.58   1st Qu.: 99.71  
+##  Median :29.54   Median :1.0121   Median :52.64   Median :100.31  
+##  Mean   :29.22   Mean   :1.0367   Mean   :52.63   Mean   :100.22  
+##  3rd Qu.:30.18   3rd Qu.:1.1207   3rd Qu.:52.67   3rd Qu.:100.64  
+##  Max.   :32.23   Max.   :1.2599   Max.   :52.76   Max.   :101.80  
+##        S           
+##  Min.   :   1.001  
+##  1st Qu.:   2.262  
+##  Median :  36.444  
+##  Mean   :1357.639  
+##  3rd Qu.:2003.601  
+##  Max.   :7261.694</code></pre>
+      <p>
+        The estimate of <span class="math inline">\(x_{\text{mid}}\)</span> is
+        excellent. As you can see, the estimate of
+        <span class="math inline">\(S\)</span> is sometimes much larger than the
+        true value. Let’s have a look at the worst case:
+      </p>
+      <div class="sourceCode" id="cb10">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb10-1">i0 &lt;-<span class="st"> </span><span class="kw">match</span>(<span class="kw">max</span>(estimates[, <span class="st">"S"</span>]), estimates[, <span class="st">"S"</span>])</span>
+<span id="cb10-2">estimates[i0, ]</span>
+<span id="cb10-3"><span class="co">##            A            B         xmid            D            S </span></span>
+<span id="cb10-4"><span class="co">##   29.9159582    0.8917679   52.5992848  100.0519760 7261.6944532</span></span></code></pre>
+      </div>
+      <div class="sourceCode" id="cb11">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb11-1"><span class="co"># sample</span></span>
+<span id="cb11-2"><span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">4</span>, <span class="fl">0.5</span>, <span class="dv">1</span>))</span>
+<span id="cb11-3"><span class="kw">plot</span>(x, y0 <span class="op">+</span><span class="st"> </span>epsilon[i0, ], <span class="dt">col =</span> <span class="st">"yellow"</span>, <span class="dt">cex.axis =</span> <span class="fl">0.6</span>)</span>
+<span id="cb11-4"><span class="co"># true curve</span></span>
+<span id="cb11-5"><span class="kw">curve</span>(A <span class="op">+</span><span class="st"> </span>(D<span class="op">-</span>A)<span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(<span class="kw">log</span>(<span class="dv">2</span><span class="op">^</span>(<span class="dv">1</span><span class="op">/</span>S)<span class="op">-</span><span class="dv">1</span>) <span class="op">+</span><span class="st"> </span>B<span class="op">*</span>(xmid<span class="op">-</span>x)))<span class="op">^</span>S, </span>
+<span id="cb11-6">      <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">col =</span> <span class="st">"red"</span>, <span class="dt">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb11-7"><span class="co"># fitted curve</span></span>
+<span id="cb11-8"><span class="kw">with</span>(<span class="kw">as.list</span>(estimates[i0, ]), </span>
+<span id="cb11-9">     <span class="kw">curve</span>(A <span class="op">+</span><span class="st"> </span>(D<span class="op">-</span>A)<span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(<span class="kw">log</span>(<span class="dv">2</span><span class="op">^</span>(<span class="dv">1</span><span class="op">/</span>S)<span class="op">-</span><span class="dv">1</span>) <span class="op">+</span><span class="st"> </span>B<span class="op">*</span>(xmid<span class="op">-</span>x)))<span class="op">^</span>S, </span>
+<span id="cb11-10">           <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">col =</span> <span class="st">"blue"</span>, <span class="dt">lwd =</span> <span class="dv">2</span>, <span class="dt">lty =</span> <span class="st">"dashed"</span>)</span>
+<span id="cb11-11">)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/5pl-worstcase-1.png"
+          style="display: block; margin: auto"
+        />
+      </p>
+      <p>
+        Thus, while the estimate of <span class="math inline">\(S\)</span> is
+        very far from the true value of <span class="math inline">\(S\)</span>,
+        the fitted curve correctly estimates the true curve. And in such cases,
+        the standard error of the estimate of
+        <span class="math inline">\(S\)</span> is big:
+      </p>
+      <div class="sourceCode" id="cb12">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb12-1">fit &lt;-<span class="st"> </span><span class="kw">fit5pl</span>(x, y0 <span class="op">+</span><span class="st"> </span>epsilon[i0,])</span>
+<span id="cb12-2"><span class="kw">summary</span>(fit)</span></code></pre>
+      </div>
+      <pre><code>## 
+## Formula: y ~ A + (D - A)/(1 + exp(log(2^(1/S) - 1) + B * (xmid - x)))^S
+## 
+## Parameters:
+##       Estimate Std. Error t value Pr(&gt;|t|)    
+## A    2.992e+01  1.334e+00  22.424   &lt;2e-16 ***
+## B    8.918e-01  7.058e-02  12.635   &lt;2e-16 ***
+## xmid 5.260e+01  7.310e-02 719.542   &lt;2e-16 ***
+## D    1.001e+02  9.347e-01 107.038   &lt;2e-16 ***
+## S    7.262e+03  1.757e+06   0.004    0.997    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 5.224 on 95 degrees of freedom
+## 
+## Number of iterations to convergence: 27 
+## Achieved convergence tolerance: 1.49e-08</code></pre>
+      <p>
+        Note that <code>nlsLM</code> provides a test of the nullity of
+        <span class="math inline">\(S\)</span>. This is not interesting, whereas
+        the equality <span class="math inline">\(S = 1\)</span> is of interest.
+        So it is better to parametrize the logistic function with
+        <span class="math inline">\(L = \log(S)\)</span> instead of
+        <span class="math inline">\(S\)</span>:
+        <span class="math display"
+          >\[ h(x) = A +
+          \frac{D-A}{{\biggl(1+\exp\Bigl(\log\bigl(2^{\exp(-L)}-1\bigr) +
+          B(x_{\text{mid}}-x)\Bigr)\biggr)}^{\exp(L)}}. \]</span
+        >
+        In this way we can get a test of
+        <span class="math inline">\(L = 0\)</span>, that is
+        <span class="math inline">\(S = 1\)</span>.
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Wed, 20 Nov 2019 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/5pl.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
+    <item>
       <title>Bookmarking a Shiny app without Shiny bookmarking</title>
       <link>https://laustep.github.io/stlahblog/posts/shinyBookmarking.html</link>
       <description><![CDATA[<div class="container-fluid">

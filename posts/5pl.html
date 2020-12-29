@@ -14,8 +14,6 @@
     <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
    
   
-    <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
-  
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
@@ -78,7 +76,7 @@
 
       <div class="main col-sm-10">
         <div id="header">
-          <div id="logo" style="position:absolute;">
+          <div id="logo">
             <a href="../">
               <img src="../images/stla.jpg" alt="stla" width="100px" />
             </a>
@@ -101,7 +99,7 @@
 </div>
 <div class="info">
     
-    Tags: <a href="../tags/maths.html">maths</a>, <a href="../tags/statistics.html">statistics</a>, <a href="../tags/R.html">R</a>
+    Tags: <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>, <a title="All pages tagged 'statistics'." href="../tags/statistics.html">statistics</a>, <a title="All pages tagged 'R'." href="../tags/R.html">R</a>
     
 </div>
 
@@ -119,111 +117,111 @@ f(x) = A + \frac{D-A}{\Bigl(1+\exp\bigl(B(C-x)\bigr)\Bigr)^S}.
 <p>In the general case, the value of <span class="math inline">\(x\)</span> for which the corresponding value <span class="math inline">\(f(x)\)</span> is the midpoint between the two asymptotes is <span class="math display">\[
 x_{\text{mid}} = C - \frac{\log\Bigl(2^{\frac{1}{S}}-1\Bigr)}{B}.
 \]</span> It is obtained by solving <span class="math inline">\(\Bigl(1+\exp\bigl(B(C-x)\bigr)\Bigr)^S = 2\)</span>.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">n &lt;-<span class="st"> </span><span class="dv">100</span></a>
-<a class="sourceLine" id="cb1-2" title="2">x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">49</span>, <span class="dv">60</span>, <span class="dt">length.out =</span> n)</a>
-<a class="sourceLine" id="cb1-3" title="3">A &lt;-<span class="st"> </span><span class="dv">30</span>; D &lt;-<span class="st"> </span><span class="dv">100</span>; B &lt;-<span class="st"> </span><span class="dv">1</span>; C &lt;-<span class="st"> </span><span class="dv">50</span>; S &lt;-<span class="st"> </span><span class="dv">10</span></a>
-<a class="sourceLine" id="cb1-4" title="4">f &lt;-<span class="st"> </span><span class="cf">function</span>(x) A <span class="op">+</span><span class="st"> </span>(D<span class="op">-</span>A) <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(B<span class="op">*</span>(C<span class="op">-</span>x)))<span class="op">^</span>S</a>
-<a class="sourceLine" id="cb1-5" title="5">y0 &lt;-<span class="st"> </span><span class="kw">f</span>(x) </a>
-<a class="sourceLine" id="cb1-6" title="6"><span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">4</span>, <span class="fl">0.5</span>, <span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb1-7" title="7"><span class="kw">plot</span>(x, y0, <span class="dt">type =</span> <span class="st">&quot;l&quot;</span>, <span class="dt">cex.axis =</span> <span class="fl">0.5</span>, <span class="dt">ylab =</span> <span class="st">&quot;f(x)&quot;</span>)</a>
-<a class="sourceLine" id="cb1-8" title="8"><span class="kw">abline</span>(<span class="dt">v =</span> C, <span class="dt">col =</span> <span class="st">&quot;green&quot;</span>, <span class="dt">lty =</span> <span class="st">&quot;dashed&quot;</span>)</a>
-<a class="sourceLine" id="cb1-9" title="9">( xmid &lt;-<span class="st"> </span>C <span class="op">-</span><span class="st"> </span><span class="kw">log</span>(<span class="dv">2</span><span class="op">^</span>(<span class="dv">1</span><span class="op">/</span>S) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)<span class="op">/</span>B )</a>
-<a class="sourceLine" id="cb1-10" title="10"><span class="co">## [1] 52.63424</span></a>
-<a class="sourceLine" id="cb1-11" title="11"><span class="kw">abline</span>(<span class="dt">v =</span> xmid, <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>, <span class="dt">lwd =</span> <span class="dv">2</span>) </a>
-<a class="sourceLine" id="cb1-12" title="12"><span class="kw">abline</span>(<span class="dt">h =</span> (A<span class="op">+</span>D)<span class="op">/</span><span class="dv">2</span>, <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>, <span class="dt">lwd =</span> <span class="dv">2</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>n &lt;-<span class="st"> </span><span class="dv">100</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a>x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">49</span>, <span class="dv">60</span>, <span class="dt">length.out =</span> n)</span>
+<span id="cb1-3"><a href="#cb1-3"></a>A &lt;-<span class="st"> </span><span class="dv">30</span>; D &lt;-<span class="st"> </span><span class="dv">100</span>; B &lt;-<span class="st"> </span><span class="dv">1</span>; C &lt;-<span class="st"> </span><span class="dv">50</span>; S &lt;-<span class="st"> </span><span class="dv">10</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a>f &lt;-<span class="st"> </span><span class="cf">function</span>(x) A <span class="op">+</span><span class="st"> </span>(D<span class="op">-</span>A) <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(B<span class="op">*</span>(C<span class="op">-</span>x)))<span class="op">^</span>S</span>
+<span id="cb1-5"><a href="#cb1-5"></a>y0 &lt;-<span class="st"> </span><span class="kw">f</span>(x) </span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">4</span>, <span class="fl">0.5</span>, <span class="dv">1</span>))</span>
+<span id="cb1-7"><a href="#cb1-7"></a><span class="kw">plot</span>(x, y0, <span class="dt">type =</span> <span class="st">&quot;l&quot;</span>, <span class="dt">cex.axis =</span> <span class="fl">0.5</span>, <span class="dt">ylab =</span> <span class="st">&quot;f(x)&quot;</span>)</span>
+<span id="cb1-8"><a href="#cb1-8"></a><span class="kw">abline</span>(<span class="dt">v =</span> C, <span class="dt">col =</span> <span class="st">&quot;green&quot;</span>, <span class="dt">lty =</span> <span class="st">&quot;dashed&quot;</span>)</span>
+<span id="cb1-9"><a href="#cb1-9"></a>( xmid &lt;-<span class="st"> </span>C <span class="op">-</span><span class="st"> </span><span class="kw">log</span>(<span class="dv">2</span><span class="op">^</span>(<span class="dv">1</span><span class="op">/</span>S) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)<span class="op">/</span>B )</span>
+<span id="cb1-10"><a href="#cb1-10"></a><span class="co">## [1] 52.63424</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">abline</span>(<span class="dt">v =</span> xmid, <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>, <span class="dt">lwd =</span> <span class="dv">2</span>) </span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="kw">abline</span>(<span class="dt">h =</span> (A<span class="op">+</span>D)<span class="op">/</span><span class="dv">2</span>, <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>, <span class="dt">lwd =</span> <span class="dv">2</span>)</span></code></pre></div>
 <p><img src="./figures/5pl-plot_5pl-1.png" style="display: block; margin: auto;" /></p>
 <p>Note that the inflection point of the curve is <em>not</em> the point correspoding to <span class="math inline">\(x_{\text{mid}}\)</span>:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">library</span>(numDeriv)</a>
-<a class="sourceLine" id="cb2-2" title="2">df &lt;-<span class="st"> </span><span class="kw">grad</span>(f, x)</a>
-<a class="sourceLine" id="cb2-3" title="3"><span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">4</span>, <span class="fl">0.5</span>, <span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb2-4" title="4"><span class="kw">plot</span>(x, df, <span class="dt">type =</span> <span class="st">&quot;l&quot;</span>, <span class="dt">cex.axis =</span> <span class="fl">0.5</span>, <span class="dt">ylab=</span><span class="st">&quot;f'(x)&quot;</span>)</a>
-<a class="sourceLine" id="cb2-5" title="5"><span class="kw">abline</span>(<span class="dt">v =</span> xmid, <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>, <span class="dt">lwd =</span> <span class="dv">2</span>) </a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">library</span>(numDeriv)</span>
+<span id="cb3-2"><a href="#cb3-2"></a>df &lt;-<span class="st"> </span><span class="kw">grad</span>(f, x)</span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">4</span>, <span class="fl">0.5</span>, <span class="dv">1</span>))</span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="kw">plot</span>(x, df, <span class="dt">type =</span> <span class="st">&quot;l&quot;</span>, <span class="dt">cex.axis =</span> <span class="fl">0.5</span>, <span class="dt">ylab=</span><span class="st">&quot;f'(x)&quot;</span>)</span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="kw">abline</span>(<span class="dt">v =</span> xmid, <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>, <span class="dt">lwd =</span> <span class="dv">2</span>) </span></code></pre></div>
 <p><img src="./figures/5pl-inflection-1.png" style="display: block; margin: auto;" /></p>
 <p>In practice, we are often interested in estimating <span class="math inline">\(x_{\text{mid}}\)</span>. So it is better to use this other parameterization of the five-parameters logistic curve: <span class="math display">\[
 g(x) = 
 A + \frac{D-A}{{\biggl(1+\exp\Bigl(\log\bigl(2^{\frac{1}{S}}-1\bigr) + B(x_{\text{mid}}-x)\Bigr)\biggr)}^S}
 \]</span> because fitting this curve will directly give the estimate of <span class="math inline">\(x_{\text{mid}}\)</span> and its standard error.</p>
 <p>Another advantage of this parameterization is that there is a way to get a good starting value of <span class="math inline">\(x_{\text{mid}}\)</span> when one wants to fit the five-parameters logistic regression model:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">getInitial1 &lt;-<span class="st"> </span><span class="cf">function</span>(x, y){</a>
-<a class="sourceLine" id="cb3-2" title="2">  s &lt;-<span class="st"> </span><span class="kw">getInitial</span>(y <span class="op">~</span><span class="st"> </span><span class="kw">SSfpl</span>(x, A, D, xmid, inverseB),</a>
-<a class="sourceLine" id="cb3-3" title="3">             <span class="dt">data =</span> <span class="kw">data.frame</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y))</a>
-<a class="sourceLine" id="cb3-4" title="4">  <span class="kw">c</span>(<span class="dt">A =</span> s[[<span class="st">&quot;A&quot;</span>]], </a>
-<a class="sourceLine" id="cb3-5" title="5">    <span class="dt">B =</span> <span class="dv">1</span><span class="op">/</span>s[[<span class="st">&quot;inverseB&quot;</span>]], </a>
-<a class="sourceLine" id="cb3-6" title="6">    <span class="dt">xmid =</span> s[[<span class="st">&quot;xmid&quot;</span>]], </a>
-<a class="sourceLine" id="cb3-7" title="7">    <span class="dt">D =</span> s[[<span class="st">&quot;D&quot;</span>]], </a>
-<a class="sourceLine" id="cb3-8" title="8">    <span class="dt">S =</span> <span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb3-9" title="9">}</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>getInitial1 &lt;-<span class="st"> </span><span class="cf">function</span>(x, y){</span>
+<span id="cb4-2"><a href="#cb4-2"></a>  s &lt;-<span class="st"> </span><span class="kw">getInitial</span>(y <span class="op">~</span><span class="st"> </span><span class="kw">SSfpl</span>(x, A, D, xmid, inverseB),</span>
+<span id="cb4-3"><a href="#cb4-3"></a>             <span class="dt">data =</span> <span class="kw">data.frame</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y))</span>
+<span id="cb4-4"><a href="#cb4-4"></a>  <span class="kw">c</span>(<span class="dt">A =</span> s[[<span class="st">&quot;A&quot;</span>]], </span>
+<span id="cb4-5"><a href="#cb4-5"></a>    <span class="dt">B =</span> <span class="dv">1</span><span class="op">/</span>s[[<span class="st">&quot;inverseB&quot;</span>]], </span>
+<span id="cb4-6"><a href="#cb4-6"></a>    <span class="dt">xmid =</span> s[[<span class="st">&quot;xmid&quot;</span>]], </span>
+<span id="cb4-7"><a href="#cb4-7"></a>    <span class="dt">D =</span> s[[<span class="st">&quot;D&quot;</span>]], </span>
+<span id="cb4-8"><a href="#cb4-8"></a>    <span class="dt">S =</span> <span class="dv">1</span>)</span>
+<span id="cb4-9"><a href="#cb4-9"></a>}</span></code></pre></div>
 <p>I don’t know how to get a good starting value for <span class="math inline">\(S\)</span>, so I always take <span class="math inline">\(1\)</span>.</p>
 <p>Sometimes, <code>SSfpl</code> can fail. Here is another function which returns some starting values:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">getInitial2 &lt;-<span class="st"> </span><span class="cf">function</span>(x, y){</a>
-<a class="sourceLine" id="cb4-2" title="2">  NAs &lt;-<span class="st"> </span><span class="kw">union</span>(<span class="kw">which</span>(<span class="kw">is.na</span>(x)), <span class="kw">which</span>(<span class="kw">is.na</span>(y)))</a>
-<a class="sourceLine" id="cb4-3" title="3">  <span class="cf">if</span>(<span class="kw">length</span>(NAs)){</a>
-<a class="sourceLine" id="cb4-4" title="4">    x &lt;-<span class="st"> </span>x[<span class="op">-</span>NAs]</a>
-<a class="sourceLine" id="cb4-5" title="5">    y &lt;-<span class="st"> </span>y[<span class="op">-</span>NAs]</a>
-<a class="sourceLine" id="cb4-6" title="6">  }</a>
-<a class="sourceLine" id="cb4-7" title="7">  low_init &lt;-<span class="st"> </span><span class="kw">min</span>(y)</a>
-<a class="sourceLine" id="cb4-8" title="8">  high_init &lt;-<span class="st"> </span><span class="kw">max</span>(y)</a>
-<a class="sourceLine" id="cb4-9" title="9">  minmax &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">which</span>(y <span class="op">==</span><span class="st"> </span>low_init), <span class="kw">which</span>(y <span class="op">==</span><span class="st"> </span>high_init))</a>
-<a class="sourceLine" id="cb4-10" title="10">  X &lt;-<span class="st"> </span><span class="kw">cbind</span>(<span class="dv">1</span>, x[<span class="op">-</span>minmax])</a>
-<a class="sourceLine" id="cb4-11" title="11">  Y &lt;-<span class="st"> </span><span class="kw">log</span>((high_init<span class="op">-</span>y[<span class="op">-</span>minmax])<span class="op">/</span>(y[<span class="op">-</span>minmax]<span class="op">-</span>low_init))</a>
-<a class="sourceLine" id="cb4-12" title="12">  fit &lt;-<span class="st"> </span><span class="kw">lm.fit</span>(<span class="dt">x =</span> X, <span class="dt">y =</span> Y)</a>
-<a class="sourceLine" id="cb4-13" title="13">  b_init &lt;-<span class="st"> </span>fit<span class="op">$</span>coefficients[[<span class="dv">2</span>]]</a>
-<a class="sourceLine" id="cb4-14" title="14">  xmid_init &lt;-<span class="st"> </span><span class="op">-</span>fit<span class="op">$</span>coefficients[[<span class="dv">1</span>]] <span class="op">/</span><span class="st"> </span>b_init</a>
-<a class="sourceLine" id="cb4-15" title="15">  <span class="cf">if</span>(b_init <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>){</a>
-<a class="sourceLine" id="cb4-16" title="16">    b_init &lt;-<span class="st"> </span><span class="op">-</span>b_init</a>
-<a class="sourceLine" id="cb4-17" title="17">    A &lt;-<span class="st"> </span>low_init</a>
-<a class="sourceLine" id="cb4-18" title="18">    D &lt;-<span class="st"> </span>high_init</a>
-<a class="sourceLine" id="cb4-19" title="19">  }<span class="cf">else</span>{</a>
-<a class="sourceLine" id="cb4-20" title="20">    A &lt;-<span class="st"> </span>high_init</a>
-<a class="sourceLine" id="cb4-21" title="21">    D &lt;-<span class="st"> </span>low_init</a>
-<a class="sourceLine" id="cb4-22" title="22">  }</a>
-<a class="sourceLine" id="cb4-23" title="23">  <span class="kw">c</span>(<span class="dt">A =</span> A, <span class="dt">B =</span> b_init, <span class="dt">xmid =</span> xmid_init, <span class="dt">D =</span> D, <span class="dt">S =</span> <span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb4-24" title="24">}</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>getInitial2 &lt;-<span class="st"> </span><span class="cf">function</span>(x, y){</span>
+<span id="cb5-2"><a href="#cb5-2"></a>  NAs &lt;-<span class="st"> </span><span class="kw">union</span>(<span class="kw">which</span>(<span class="kw">is.na</span>(x)), <span class="kw">which</span>(<span class="kw">is.na</span>(y)))</span>
+<span id="cb5-3"><a href="#cb5-3"></a>  <span class="cf">if</span>(<span class="kw">length</span>(NAs)){</span>
+<span id="cb5-4"><a href="#cb5-4"></a>    x &lt;-<span class="st"> </span>x[<span class="op">-</span>NAs]</span>
+<span id="cb5-5"><a href="#cb5-5"></a>    y &lt;-<span class="st"> </span>y[<span class="op">-</span>NAs]</span>
+<span id="cb5-6"><a href="#cb5-6"></a>  }</span>
+<span id="cb5-7"><a href="#cb5-7"></a>  low_init &lt;-<span class="st"> </span><span class="kw">min</span>(y)</span>
+<span id="cb5-8"><a href="#cb5-8"></a>  high_init &lt;-<span class="st"> </span><span class="kw">max</span>(y)</span>
+<span id="cb5-9"><a href="#cb5-9"></a>  minmax &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">which</span>(y <span class="op">==</span><span class="st"> </span>low_init), <span class="kw">which</span>(y <span class="op">==</span><span class="st"> </span>high_init))</span>
+<span id="cb5-10"><a href="#cb5-10"></a>  X &lt;-<span class="st"> </span><span class="kw">cbind</span>(<span class="dv">1</span>, x[<span class="op">-</span>minmax])</span>
+<span id="cb5-11"><a href="#cb5-11"></a>  Y &lt;-<span class="st"> </span><span class="kw">log</span>((high_init<span class="op">-</span>y[<span class="op">-</span>minmax])<span class="op">/</span>(y[<span class="op">-</span>minmax]<span class="op">-</span>low_init))</span>
+<span id="cb5-12"><a href="#cb5-12"></a>  fit &lt;-<span class="st"> </span><span class="kw">lm.fit</span>(<span class="dt">x =</span> X, <span class="dt">y =</span> Y)</span>
+<span id="cb5-13"><a href="#cb5-13"></a>  b_init &lt;-<span class="st"> </span>fit<span class="op">$</span>coefficients[[<span class="dv">2</span>]]</span>
+<span id="cb5-14"><a href="#cb5-14"></a>  xmid_init &lt;-<span class="st"> </span><span class="op">-</span>fit<span class="op">$</span>coefficients[[<span class="dv">1</span>]] <span class="op">/</span><span class="st"> </span>b_init</span>
+<span id="cb5-15"><a href="#cb5-15"></a>  <span class="cf">if</span>(b_init <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>){</span>
+<span id="cb5-16"><a href="#cb5-16"></a>    b_init &lt;-<span class="st"> </span><span class="op">-</span>b_init</span>
+<span id="cb5-17"><a href="#cb5-17"></a>    A &lt;-<span class="st"> </span>low_init</span>
+<span id="cb5-18"><a href="#cb5-18"></a>    D &lt;-<span class="st"> </span>high_init</span>
+<span id="cb5-19"><a href="#cb5-19"></a>  }<span class="cf">else</span>{</span>
+<span id="cb5-20"><a href="#cb5-20"></a>    A &lt;-<span class="st"> </span>high_init</span>
+<span id="cb5-21"><a href="#cb5-21"></a>    D &lt;-<span class="st"> </span>low_init</span>
+<span id="cb5-22"><a href="#cb5-22"></a>  }</span>
+<span id="cb5-23"><a href="#cb5-23"></a>  <span class="kw">c</span>(<span class="dt">A =</span> A, <span class="dt">B =</span> b_init, <span class="dt">xmid =</span> xmid_init, <span class="dt">D =</span> D, <span class="dt">S =</span> <span class="dv">1</span>)</span>
+<span id="cb5-24"><a href="#cb5-24"></a>}</span></code></pre></div>
 <p>Now we wrap these two functions into a single one:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">getInitial5PL &lt;-<span class="st"> </span><span class="cf">function</span>(x, y){</a>
-<a class="sourceLine" id="cb5-2" title="2">  <span class="kw">tryCatch</span>({</a>
-<a class="sourceLine" id="cb5-3" title="3">    <span class="kw">getInitial1</span>(x, y)</a>
-<a class="sourceLine" id="cb5-4" title="4">  }, <span class="dt">error =</span> <span class="cf">function</span>(e){</a>
-<a class="sourceLine" id="cb5-5" title="5">    <span class="kw">getInitial2</span>(x, y)</a>
-<a class="sourceLine" id="cb5-6" title="6">  })</a>
-<a class="sourceLine" id="cb5-7" title="7">}</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>getInitial5PL &lt;-<span class="st"> </span><span class="cf">function</span>(x, y){</span>
+<span id="cb6-2"><a href="#cb6-2"></a>  <span class="kw">tryCatch</span>({</span>
+<span id="cb6-3"><a href="#cb6-3"></a>    <span class="kw">getInitial1</span>(x, y)</span>
+<span id="cb6-4"><a href="#cb6-4"></a>  }, <span class="dt">error =</span> <span class="cf">function</span>(e){</span>
+<span id="cb6-5"><a href="#cb6-5"></a>    <span class="kw">getInitial2</span>(x, y)</span>
+<span id="cb6-6"><a href="#cb6-6"></a>  })</span>
+<span id="cb6-7"><a href="#cb6-7"></a>}</span></code></pre></div>
 <p>And finally we can write a function for the fitting:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="kw">library</span>(minpack.lm)</a>
-<a class="sourceLine" id="cb6-2" title="2">fit5pl &lt;-<span class="st"> </span><span class="cf">function</span>(x, y){</a>
-<a class="sourceLine" id="cb6-3" title="3">  startingValues &lt;-<span class="st"> </span><span class="kw">getInitial5PL</span>(x, y)</a>
-<a class="sourceLine" id="cb6-4" title="4">  fit &lt;-<span class="st"> </span><span class="kw">tryCatch</span>({</a>
-<a class="sourceLine" id="cb6-5" title="5">    <span class="kw">nlsLM</span>(</a>
-<a class="sourceLine" id="cb6-6" title="6">      y <span class="op">~</span><span class="st"> </span>A <span class="op">+</span><span class="st"> </span>(D<span class="op">-</span>A)<span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(<span class="kw">log</span>(<span class="dv">2</span><span class="op">^</span>(<span class="dv">1</span><span class="op">/</span>S)<span class="op">-</span><span class="dv">1</span>) <span class="op">+</span><span class="st"> </span>B<span class="op">*</span>(xmid<span class="op">-</span>x)))<span class="op">^</span>S,</a>
-<a class="sourceLine" id="cb6-7" title="7">      <span class="dt">data =</span> <span class="kw">data.frame</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y),</a>
-<a class="sourceLine" id="cb6-8" title="8">      <span class="dt">start =</span> startingValues,</a>
-<a class="sourceLine" id="cb6-9" title="9">      <span class="dt">lower =</span> <span class="kw">c</span>(<span class="op">-</span><span class="ot">Inf</span>, <span class="dv">0</span>, <span class="op">-</span><span class="ot">Inf</span>, <span class="op">-</span><span class="ot">Inf</span>, <span class="dv">0</span>),</a>
-<a class="sourceLine" id="cb6-10" title="10">      <span class="dt">control =</span> <span class="kw">nls.lm.control</span>(<span class="dt">maxiter =</span> <span class="dv">1024</span>, <span class="dt">maxfev=</span><span class="dv">10000</span>))</a>
-<a class="sourceLine" id="cb6-11" title="11">  }, <span class="dt">error =</span> <span class="cf">function</span>(e){</a>
-<a class="sourceLine" id="cb6-12" title="12">    <span class="kw">paste0</span>(<span class="st">&quot;Failure of model fitting: &quot;</span>, e<span class="op">$</span>message)</a>
-<a class="sourceLine" id="cb6-13" title="13">  })</a>
-<a class="sourceLine" id="cb6-14" title="14">  <span class="cf">if</span>(<span class="kw">class</span>(fit) <span class="op">==</span><span class="st"> &quot;nls&quot;</span> <span class="op">&amp;&amp;</span><span class="st"> </span>fit[[<span class="st">&quot;convInfo&quot;</span>]][[<span class="st">&quot;isConv&quot;</span>]]){</a>
-<a class="sourceLine" id="cb6-15" title="15">    fit</a>
-<a class="sourceLine" id="cb6-16" title="16">  }<span class="cf">else</span> <span class="cf">if</span>(<span class="kw">class</span>(fit) <span class="op">==</span><span class="st"> &quot;nls&quot;</span> <span class="op">&amp;&amp;</span><span class="st"> </span><span class="op">!</span>fit[[<span class="st">&quot;convInfo&quot;</span>]][[<span class="st">&quot;isConv&quot;</span>]]){</a>
-<a class="sourceLine" id="cb6-17" title="17">    <span class="st">&quot;Convergence not achieved&quot;</span></a>
-<a class="sourceLine" id="cb6-18" title="18">  }<span class="cf">else</span>{ <span class="co"># in this case, 'fit' is the error message</span></a>
-<a class="sourceLine" id="cb6-19" title="19">    fit</a>
-<a class="sourceLine" id="cb6-20" title="20">  }</a>
-<a class="sourceLine" id="cb6-21" title="21">}</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">library</span>(minpack.lm)</span>
+<span id="cb7-2"><a href="#cb7-2"></a>fit5pl &lt;-<span class="st"> </span><span class="cf">function</span>(x, y){</span>
+<span id="cb7-3"><a href="#cb7-3"></a>  startingValues &lt;-<span class="st"> </span><span class="kw">getInitial5PL</span>(x, y)</span>
+<span id="cb7-4"><a href="#cb7-4"></a>  fit &lt;-<span class="st"> </span><span class="kw">tryCatch</span>({</span>
+<span id="cb7-5"><a href="#cb7-5"></a>    <span class="kw">nlsLM</span>(</span>
+<span id="cb7-6"><a href="#cb7-6"></a>      y <span class="op">~</span><span class="st"> </span>A <span class="op">+</span><span class="st"> </span>(D<span class="op">-</span>A)<span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(<span class="kw">log</span>(<span class="dv">2</span><span class="op">^</span>(<span class="dv">1</span><span class="op">/</span>S)<span class="op">-</span><span class="dv">1</span>) <span class="op">+</span><span class="st"> </span>B<span class="op">*</span>(xmid<span class="op">-</span>x)))<span class="op">^</span>S,</span>
+<span id="cb7-7"><a href="#cb7-7"></a>      <span class="dt">data =</span> <span class="kw">data.frame</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y),</span>
+<span id="cb7-8"><a href="#cb7-8"></a>      <span class="dt">start =</span> startingValues,</span>
+<span id="cb7-9"><a href="#cb7-9"></a>      <span class="dt">lower =</span> <span class="kw">c</span>(<span class="op">-</span><span class="ot">Inf</span>, <span class="dv">0</span>, <span class="op">-</span><span class="ot">Inf</span>, <span class="op">-</span><span class="ot">Inf</span>, <span class="dv">0</span>),</span>
+<span id="cb7-10"><a href="#cb7-10"></a>      <span class="dt">control =</span> <span class="kw">nls.lm.control</span>(<span class="dt">maxiter =</span> <span class="dv">1024</span>, <span class="dt">maxfev=</span><span class="dv">10000</span>))</span>
+<span id="cb7-11"><a href="#cb7-11"></a>  }, <span class="dt">error =</span> <span class="cf">function</span>(e){</span>
+<span id="cb7-12"><a href="#cb7-12"></a>    <span class="kw">paste0</span>(<span class="st">&quot;Failure of model fitting: &quot;</span>, e<span class="op">$</span>message)</span>
+<span id="cb7-13"><a href="#cb7-13"></a>  })</span>
+<span id="cb7-14"><a href="#cb7-14"></a>  <span class="cf">if</span>(<span class="kw">class</span>(fit) <span class="op">==</span><span class="st"> &quot;nls&quot;</span> <span class="op">&amp;&amp;</span><span class="st"> </span>fit[[<span class="st">&quot;convInfo&quot;</span>]][[<span class="st">&quot;isConv&quot;</span>]]){</span>
+<span id="cb7-15"><a href="#cb7-15"></a>    fit</span>
+<span id="cb7-16"><a href="#cb7-16"></a>  }<span class="cf">else</span> <span class="cf">if</span>(<span class="kw">class</span>(fit) <span class="op">==</span><span class="st"> &quot;nls&quot;</span> <span class="op">&amp;&amp;</span><span class="st"> </span><span class="op">!</span>fit[[<span class="st">&quot;convInfo&quot;</span>]][[<span class="st">&quot;isConv&quot;</span>]]){</span>
+<span id="cb7-17"><a href="#cb7-17"></a>    <span class="st">&quot;Convergence not achieved&quot;</span></span>
+<span id="cb7-18"><a href="#cb7-18"></a>  }<span class="cf">else</span>{ <span class="co"># in this case, 'fit' is the error message</span></span>
+<span id="cb7-19"><a href="#cb7-19"></a>    fit</span>
+<span id="cb7-20"><a href="#cb7-20"></a>  }</span>
+<span id="cb7-21"><a href="#cb7-21"></a>}</span></code></pre></div>
 <p>Let’s try it on a couple of simulated samples:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="kw">set.seed</span>(<span class="dv">666</span>)</a>
-<a class="sourceLine" id="cb7-2" title="2">nsims &lt;-<span class="st"> </span><span class="dv">25</span></a>
-<a class="sourceLine" id="cb7-3" title="3">epsilon &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(nsims<span class="op">*</span>n, <span class="dv">0</span>, <span class="dv">5</span>), <span class="dt">nrow =</span> nsims, <span class="dt">ncol =</span> n)</a>
-<a class="sourceLine" id="cb7-4" title="4">estimates &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="ot">NA_real_</span>, <span class="dt">nrow =</span> nsims, <span class="dt">ncol =</span> <span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb7-5" title="5"><span class="kw">colnames</span>(estimates) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;xmid&quot;</span>, <span class="st">&quot;D&quot;</span>, <span class="st">&quot;S&quot;</span>)</a>
-<a class="sourceLine" id="cb7-6" title="6"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>nsims){</a>
-<a class="sourceLine" id="cb7-7" title="7">  fit &lt;-<span class="st"> </span><span class="kw">fit5pl</span>(x, y0 <span class="op">+</span><span class="st"> </span>epsilon[i,])</a>
-<a class="sourceLine" id="cb7-8" title="8">  <span class="cf">if</span>(<span class="kw">class</span>(fit) <span class="op">==</span><span class="st"> &quot;nls&quot;</span>){</a>
-<a class="sourceLine" id="cb7-9" title="9">    estimates[i, ] &lt;-<span class="st"> </span><span class="kw">coef</span>(fit)</a>
-<a class="sourceLine" id="cb7-10" title="10">  }<span class="cf">else</span>{</a>
-<a class="sourceLine" id="cb7-11" title="11">    estimates[i, ] &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="ot">NaN</span>, <span class="ot">NaN</span>, <span class="ot">NaN</span>, <span class="ot">NaN</span>, <span class="ot">NaN</span>)</a>
-<a class="sourceLine" id="cb7-12" title="12">  }</a>
-<a class="sourceLine" id="cb7-13" title="13">}</a>
-<a class="sourceLine" id="cb7-14" title="14"><span class="kw">summary</span>(estimates)</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="kw">set.seed</span>(<span class="dv">666</span>)</span>
+<span id="cb8-2"><a href="#cb8-2"></a>nsims &lt;-<span class="st"> </span><span class="dv">25</span></span>
+<span id="cb8-3"><a href="#cb8-3"></a>epsilon &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(nsims<span class="op">*</span>n, <span class="dv">0</span>, <span class="dv">5</span>), <span class="dt">nrow =</span> nsims, <span class="dt">ncol =</span> n)</span>
+<span id="cb8-4"><a href="#cb8-4"></a>estimates &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="ot">NA_real_</span>, <span class="dt">nrow =</span> nsims, <span class="dt">ncol =</span> <span class="dv">5</span>)</span>
+<span id="cb8-5"><a href="#cb8-5"></a><span class="kw">colnames</span>(estimates) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;xmid&quot;</span>, <span class="st">&quot;D&quot;</span>, <span class="st">&quot;S&quot;</span>)</span>
+<span id="cb8-6"><a href="#cb8-6"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>nsims){</span>
+<span id="cb8-7"><a href="#cb8-7"></a>  fit &lt;-<span class="st"> </span><span class="kw">fit5pl</span>(x, y0 <span class="op">+</span><span class="st"> </span>epsilon[i,])</span>
+<span id="cb8-8"><a href="#cb8-8"></a>  <span class="cf">if</span>(<span class="kw">class</span>(fit) <span class="op">==</span><span class="st"> &quot;nls&quot;</span>){</span>
+<span id="cb8-9"><a href="#cb8-9"></a>    estimates[i, ] &lt;-<span class="st"> </span><span class="kw">coef</span>(fit)</span>
+<span id="cb8-10"><a href="#cb8-10"></a>  }<span class="cf">else</span>{</span>
+<span id="cb8-11"><a href="#cb8-11"></a>    estimates[i, ] &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="ot">NaN</span>, <span class="ot">NaN</span>, <span class="ot">NaN</span>, <span class="ot">NaN</span>, <span class="ot">NaN</span>)</span>
+<span id="cb8-12"><a href="#cb8-12"></a>  }</span>
+<span id="cb8-13"><a href="#cb8-13"></a>}</span>
+<span id="cb8-14"><a href="#cb8-14"></a><span class="kw">summary</span>(estimates)</span></code></pre></div>
 <pre><code>##        A               B               xmid             D         
 ##  Min.   :24.19   Min.   :0.8918   Min.   :52.52   Min.   : 98.63  
 ##  1st Qu.:27.99   1st Qu.:0.9566   1st Qu.:52.58   1st Qu.: 99.71  
@@ -239,25 +237,25 @@ A + \frac{D-A}{{\biggl(1+\exp\Bigl(\log\bigl(2^{\frac{1}{S}}-1\bigr) + B(x_{\tex
 ##  3rd Qu.:2003.601  
 ##  Max.   :7261.694</code></pre>
 <p>The estimate of <span class="math inline">\(x_{\text{mid}}\)</span> is excellent. As you can see, the estimate of <span class="math inline">\(S\)</span> is sometimes much larger than the true value. Let’s have a look at the worst case:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">i0 &lt;-<span class="st"> </span><span class="kw">match</span>(<span class="kw">max</span>(estimates[, <span class="st">&quot;S&quot;</span>]), estimates[, <span class="st">&quot;S&quot;</span>])</a>
-<a class="sourceLine" id="cb9-2" title="2">estimates[i0, ]</a>
-<a class="sourceLine" id="cb9-3" title="3"><span class="co">##            A            B         xmid            D            S </span></a>
-<a class="sourceLine" id="cb9-4" title="4"><span class="co">##   29.9159582    0.8917679   52.5992848  100.0519760 7261.6944532</span></a>
-<a class="sourceLine" id="cb9-5" title="5"><span class="co"># sample</span></a>
-<a class="sourceLine" id="cb9-6" title="6"><span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">4</span>, <span class="fl">0.5</span>, <span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb9-7" title="7"><span class="kw">plot</span>(x, y0 <span class="op">+</span><span class="st"> </span>epsilon[i0, ], <span class="dt">col =</span> <span class="st">&quot;yellow&quot;</span>, <span class="dt">cex.axis =</span> <span class="fl">0.6</span>)</a>
-<a class="sourceLine" id="cb9-8" title="8"><span class="co"># true curve</span></a>
-<a class="sourceLine" id="cb9-9" title="9"><span class="kw">curve</span>(A <span class="op">+</span><span class="st"> </span>(D<span class="op">-</span>A)<span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(<span class="kw">log</span>(<span class="dv">2</span><span class="op">^</span>(<span class="dv">1</span><span class="op">/</span>S)<span class="op">-</span><span class="dv">1</span>) <span class="op">+</span><span class="st"> </span>B<span class="op">*</span>(xmid<span class="op">-</span>x)))<span class="op">^</span>S, </a>
-<a class="sourceLine" id="cb9-10" title="10">      <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>, <span class="dt">lwd =</span> <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb9-11" title="11"><span class="co"># fitted curve</span></a>
-<a class="sourceLine" id="cb9-12" title="12"><span class="kw">with</span>(<span class="kw">as.list</span>(estimates[i0, ]), </a>
-<a class="sourceLine" id="cb9-13" title="13">     <span class="kw">curve</span>(A <span class="op">+</span><span class="st"> </span>(D<span class="op">-</span>A)<span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(<span class="kw">log</span>(<span class="dv">2</span><span class="op">^</span>(<span class="dv">1</span><span class="op">/</span>S)<span class="op">-</span><span class="dv">1</span>) <span class="op">+</span><span class="st"> </span>B<span class="op">*</span>(xmid<span class="op">-</span>x)))<span class="op">^</span>S, </a>
-<a class="sourceLine" id="cb9-14" title="14">           <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="dt">lwd =</span> <span class="dv">2</span>, <span class="dt">lty =</span> <span class="st">&quot;dashed&quot;</span>)</a>
-<a class="sourceLine" id="cb9-15" title="15">)</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>i0 &lt;-<span class="st"> </span><span class="kw">match</span>(<span class="kw">max</span>(estimates[, <span class="st">&quot;S&quot;</span>]), estimates[, <span class="st">&quot;S&quot;</span>])</span>
+<span id="cb10-2"><a href="#cb10-2"></a>estimates[i0, ]</span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="co">##            A            B         xmid            D            S </span></span>
+<span id="cb10-4"><a href="#cb10-4"></a><span class="co">##   29.9159582    0.8917679   52.5992848  100.0519760 7261.6944532</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># sample</span></span>
+<span id="cb11-2"><a href="#cb11-2"></a><span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">4</span>, <span class="fl">0.5</span>, <span class="dv">1</span>))</span>
+<span id="cb11-3"><a href="#cb11-3"></a><span class="kw">plot</span>(x, y0 <span class="op">+</span><span class="st"> </span>epsilon[i0, ], <span class="dt">col =</span> <span class="st">&quot;yellow&quot;</span>, <span class="dt">cex.axis =</span> <span class="fl">0.6</span>)</span>
+<span id="cb11-4"><a href="#cb11-4"></a><span class="co"># true curve</span></span>
+<span id="cb11-5"><a href="#cb11-5"></a><span class="kw">curve</span>(A <span class="op">+</span><span class="st"> </span>(D<span class="op">-</span>A)<span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(<span class="kw">log</span>(<span class="dv">2</span><span class="op">^</span>(<span class="dv">1</span><span class="op">/</span>S)<span class="op">-</span><span class="dv">1</span>) <span class="op">+</span><span class="st"> </span>B<span class="op">*</span>(xmid<span class="op">-</span>x)))<span class="op">^</span>S, </span>
+<span id="cb11-6"><a href="#cb11-6"></a>      <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>, <span class="dt">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb11-7"><a href="#cb11-7"></a><span class="co"># fitted curve</span></span>
+<span id="cb11-8"><a href="#cb11-8"></a><span class="kw">with</span>(<span class="kw">as.list</span>(estimates[i0, ]), </span>
+<span id="cb11-9"><a href="#cb11-9"></a>     <span class="kw">curve</span>(A <span class="op">+</span><span class="st"> </span>(D<span class="op">-</span>A)<span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(<span class="kw">log</span>(<span class="dv">2</span><span class="op">^</span>(<span class="dv">1</span><span class="op">/</span>S)<span class="op">-</span><span class="dv">1</span>) <span class="op">+</span><span class="st"> </span>B<span class="op">*</span>(xmid<span class="op">-</span>x)))<span class="op">^</span>S, </span>
+<span id="cb11-10"><a href="#cb11-10"></a>           <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="dt">lwd =</span> <span class="dv">2</span>, <span class="dt">lty =</span> <span class="st">&quot;dashed&quot;</span>)</span>
+<span id="cb11-11"><a href="#cb11-11"></a>)</span></code></pre></div>
 <p><img src="./figures/5pl-worstcase-1.png" style="display: block; margin: auto;" /></p>
 <p>Thus, while the estimate of <span class="math inline">\(S\)</span> is very far from the true value of <span class="math inline">\(S\)</span>, the fitted curve correctly estimates the true curve. And in such cases, the standard error of the estimate of <span class="math inline">\(S\)</span> is big:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">fit &lt;-<span class="st"> </span><span class="kw">fit5pl</span>(x, y0 <span class="op">+</span><span class="st"> </span>epsilon[i0,])</a>
-<a class="sourceLine" id="cb10-2" title="2"><span class="kw">summary</span>(fit)</a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>fit &lt;-<span class="st"> </span><span class="kw">fit5pl</span>(x, y0 <span class="op">+</span><span class="st"> </span>epsilon[i0,])</span>
+<span id="cb12-2"><a href="#cb12-2"></a><span class="kw">summary</span>(fit)</span></code></pre></div>
 <pre><code>## 
 ## Formula: y ~ A + (D - A)/(1 + exp(log(2^(1/S) - 1) + B * (xmid - x)))^S
 ## 
@@ -275,6 +273,10 @@ A + \frac{D-A}{{\biggl(1+\exp\Bigl(\log\bigl(2^{\frac{1}{S}}-1\bigr) + B(x_{\tex
 ## 
 ## Number of iterations to convergence: 27 
 ## Achieved convergence tolerance: 1.49e-08</code></pre>
+<p>Note that <code>nlsLM</code> provides a test of the nullity of <span class="math inline">\(S\)</span>. This is not interesting, whereas the equality <span class="math inline">\(S = 1\)</span> is of interest. So it is better to parametrize the logistic function with <span class="math inline">\(L = \log(S)\)</span> instead of <span class="math inline">\(S\)</span>: <span class="math display">\[
+h(x) = 
+A + \frac{D-A}{{\biggl(1+\exp\Bigl(\log\bigl(2^{\exp(-L)}-1\bigr) + B(x_{\text{mid}}-x)\Bigr)\biggr)}^{\exp(L)}}.
+\]</span> In this way we can get a test of <span class="math inline">\(L = 0\)</span>, that is <span class="math inline">\(S = 1\)</span>.</p>
 
         </div>
 
@@ -328,20 +330,6 @@ A + \frac{D-A}{{\biggl(1+\exp\Bigl(\log\bigl(2^{\frac{1}{S}}-1\bigr) + B(x_{\tex
 <!-- <script>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
-
-  <!-- Google Prettify -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-  <script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
-  <script>
-    var pres = document.getElementsByTagName("pre");
-    for (var i = 0; i < pres.length; ++i) {
-      
-        pres[i].className = pres[i].className + " prettyprint linenums";
-      
-    }
-    prettyPrint();
-  </script> 
 
 
 </html>
