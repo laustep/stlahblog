@@ -1,0 +1,301 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Clipping an isosurface to a ball, and more</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:26px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:22px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Clipping an isosurface to a ball, and more</h1> 
+          <div class="info">
+    Posted on January 14, 2022
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'geometry'." href="../tags/geometry.html">geometry</a>, <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'rgl'." href="../tags/rgl.html">rgl</a>, <a title="All pages tagged 'graphics'." href="../tags/graphics.html">graphics</a>, <a title="All pages tagged 'python'." href="../tags/python.html">python</a>
+    
+</div>
+
+<p>We will firstly show how to clip an isosurface to a ball with R, and then, more generally, how to clip a surface to an arbitrary region. In the last part we show how to achieve the same with Python.</p>
+<h1 id="using-r">Using R</h1>
+<h2 id="the-togliatti-isosurface-clipped-to-a-box">The Togliatti isosurface, clipped to a box</h2>
+<p>The Togliatti surface is the isosurface <span class="math inline">\(f(x, y, z) = 0\)</span>, where the function <span class="math inline">\(f\)</span> is defined as follows in R:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>f &lt;-<span class="st"> </span><span class="cf">function</span>(x,y,z){</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>  <span class="dv">64</span><span class="op">*</span>(x<span class="dv">-1</span>)<span class="op">*</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="st">    </span>(x<span class="op">^</span><span class="dv">4-4</span><span class="op">*</span>x<span class="op">^</span><span class="dv">3-10</span><span class="op">*</span>x<span class="op">^</span><span class="dv">2</span><span class="op">*</span>y<span class="op">^</span><span class="dv">2-4</span><span class="op">*</span>x<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">16</span><span class="op">*</span>x<span class="dv">-20</span><span class="op">*</span>x<span class="op">*</span>y<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">5</span><span class="op">*</span>y<span class="op">^</span><span class="dv">4</span><span class="op">+</span><span class="dv">16-20</span><span class="op">*</span>y<span class="op">^</span><span class="dv">2</span>) <span class="op">-</span><span class="st"> </span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="st">    </span><span class="dv">5</span><span class="op">*</span><span class="kw">sqrt</span>(<span class="dv">5</span><span class="op">-</span><span class="kw">sqrt</span>(<span class="dv">5</span>))<span class="op">*</span>(<span class="dv">2</span><span class="op">*</span>z<span class="op">-</span><span class="kw">sqrt</span>(<span class="dv">5</span><span class="op">-</span><span class="kw">sqrt</span>(<span class="dv">5</span>)))<span class="op">*</span>(<span class="dv">4</span><span class="op">*</span>(x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span><span class="op">-</span>z<span class="op">^</span><span class="dv">2</span>)<span class="op">+</span>(<span class="dv">1</span><span class="op">+</span><span class="dv">3</span><span class="op">*</span><span class="kw">sqrt</span>(<span class="dv">5</span>)))<span class="op">^</span><span class="dv">2</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>}</span></code></pre></div>
+<p>To plot an isosurface in R, there is the <strong>misc3d</strong> package. Below we plot the Togliatti surface clipped to the box <span class="math inline">\([-5,5] \times [-5,5] \times [-4,4]\)</span>.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">library</span>(misc3d)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="co"># make grid</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>nx &lt;-<span class="st"> </span>220L; ny &lt;-<span class="st"> </span>220L; nz &lt;-<span class="st"> </span>220L</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">5</span>, <span class="dv">5</span>, <span class="dt">length.out =</span> nx) </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>y &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">5</span>, <span class="dv">5</span>, <span class="dt">length.out =</span> ny)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>z &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">4</span>, <span class="dv">4</span>, <span class="dt">length.out =</span> nz) </span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>G &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">z =</span> z)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a><span class="co"># calculate voxel</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>voxel &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="kw">with</span>(G, <span class="kw">f</span>(x, y, z)), <span class="dt">dim =</span> <span class="kw">c</span>(nx, ny, nz))</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a><span class="co"># compute isosurface</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>surf1 &lt;-<span class="st"> </span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a><span class="st">  </span><span class="kw">computeContour3d</span>(voxel, <span class="dt">maxvol =</span> <span class="kw">max</span>(voxel), <span class="dt">level =</span> <span class="dv">0</span>, <span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">z =</span> z)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a><span class="co"># make triangles</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a>triangles &lt;-<span class="st"> </span><span class="kw">makeTriangles</span>(surf1, <span class="dt">smooth =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">drawScene.rgl</span>(triangles, <span class="dt">color =</span> <span class="st">&quot;yellowgreen&quot;</span>)</span></code></pre></div>
+<p><img src="figures/Togliatti_box.gif" /></p>
+<p>It is fun, but you will see later that it is prettier when clipped to a ball. And it is desirable to get rid of the isolated components at the top.</p>
+<p>The simplest way to clip the surface to a ball consists in using the <code>mask</code> argument of the function <code>computeContour3d</code>. We use <span class="math inline">\(4.8\)</span> as the radius.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>mask &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="kw">with</span>(G, x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span><span class="op">+</span>z<span class="op">^</span><span class="dv">2</span> <span class="op">&lt;</span><span class="st"> </span><span class="fl">4.8</span><span class="op">^</span><span class="dv">2</span>), <span class="dt">dim =</span> <span class="kw">c</span>(nx, ny, nz))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>surf2 &lt;-<span class="st"> </span><span class="kw">computeContour3d</span>(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>  voxel, <span class="dt">maxvol =</span> <span class="kw">max</span>(voxel), <span class="dt">level =</span> <span class="dv">0</span>, <span class="dt">mask =</span> mask, <span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">z =</span> z</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>triangles &lt;-<span class="st"> </span><span class="kw">makeTriangles</span>(surf2, <span class="dt">smooth =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a><span class="kw">drawScene.rgl</span>(triangles, <span class="dt">color =</span> <span class="st">&quot;orange&quot;</span>)</span></code></pre></div>
+<p><img src="figures/Togliatti_mask.gif" /></p>
+<p>That’s not bad, but you see the problem: the borders are not smooth.</p>
+<h2 id="resorting-to-spherical-coordinates">Resorting to spherical coordinates</h2>
+<p>Using spherical coordinates will allow us to get the surface clipped to the ball with smooth borders. Here is the method:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="co"># Togliatti surface equation with spherical coordinates</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>h &lt;-<span class="st"> </span><span class="cf">function</span>(ρ, θ, ϕ){</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>  x &lt;-<span class="st"> </span>ρ <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(θ) <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(ϕ)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>  y &lt;-<span class="st"> </span>ρ <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(θ) <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(ϕ)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>  z &lt;-<span class="st"> </span>ρ <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(ϕ)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>  <span class="kw">f</span>(x, y, z)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a>}</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a><span class="co"># make grid</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a>nρ &lt;-<span class="st"> </span>300L; nθ &lt;-<span class="st"> </span>300L; nϕ &lt;-<span class="st"> </span>300L</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a>ρ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="fl">4.8</span>, <span class="dt">length.out =</span> nρ) <span class="co"># ρ runs from 0 to the desired radius</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true"></a>θ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> nθ)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true"></a>ϕ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, pi, <span class="dt">length.out =</span> nϕ) </span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true"></a>G &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(ρ=ρ, θ=θ, ϕ=ϕ)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true"></a><span class="co"># calculate voxel</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true"></a>voxel &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="kw">with</span>(G, <span class="kw">h</span>(ρ, θ, ϕ)), <span class="dt">dim =</span> <span class="kw">c</span>(nρ, nθ, nϕ))</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true"></a><span class="co"># calculate isosurface</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true"></a>surf3 &lt;-<span class="st"> </span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true"></a><span class="st">  </span><span class="kw">computeContour3d</span>(voxel, <span class="dt">maxvol =</span> <span class="kw">max</span>(voxel), <span class="dt">level =</span> <span class="dv">0</span>, <span class="dt">x =</span> ρ, <span class="dt">y =</span> θ, <span class="dt">z =</span> ϕ)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true"></a><span class="co"># transform to Cartesian coordinates</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true"></a>surf3 &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">apply</span>(surf3, 1L, <span class="cf">function</span>(ρθϕ){</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true"></a>  ρ &lt;-<span class="st"> </span>ρθϕ[1L]; θ &lt;-<span class="st"> </span>ρθϕ[2L]; ϕ &lt;-<span class="st"> </span>ρθϕ[3L] </span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true"></a>  <span class="kw">c</span>(</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true"></a>    ρ <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(θ) <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(ϕ),</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true"></a>    ρ <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(θ) <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(ϕ),</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true"></a>    ρ <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(ϕ)</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true"></a>  )</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true"></a>}))</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true"></a><span class="co"># draw isosurface</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true"></a><span class="kw">drawScene.rgl</span>(<span class="kw">makeTriangles</span>(surf3, <span class="dt">smooth=</span><span class="ot">TRUE</span>), <span class="dt">color =</span> <span class="st">&quot;violetred&quot;</span>)</span></code></pre></div>
+<p><img src="figures/Togliatti_spherical.gif" /></p>
+<p>Now the surface is pretty nice. The borders are smooth.</p>
+<h2 id="another-way-using-the-rgl-package">Another way: using the rgl package</h2>
+<p>Nowadays, in the <strong>rgl</strong> package, there is the function <code>clipMesh3d</code> which allows to <em>clip a mesh to a general region</em>. In order to use it, we need a <code>mesh3d</code> object. There is an unexported function in <strong>misc3d</strong> which allows to easily get a <code>mesh3d</code> object; it is called <code>t2ve</code>.</p>
+<p>We start with the isosurface clipped to the box:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>triangles &lt;-<span class="st"> </span><span class="kw">makeTriangles</span>(surf1)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="co"># convert to rgl `mesh3d`</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>mesh &lt;-<span class="st"> </span>misc3d<span class="op">:::</span><span class="kw">t2ve</span>(triangles)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>rglmesh &lt;-<span class="st"> </span><span class="kw">tmesh3d</span>(mesh<span class="op">$</span>vb, mesh<span class="op">$</span>ib)</span></code></pre></div>
+<p>To define the region to which we want to clip the mesh, one has to introduce a function and to give a bound for this function. Here the region is <span class="math inline">\(x^2 + y^2 + z^2 &lt; 4.8^2\)</span>, so we proceed as follows:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>fn &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, z) x<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>y<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>z<span class="op">^</span><span class="dv">2</span> <span class="co"># or function(xyz) rowSums(xyz^2)</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>clippedmesh &lt;-<span class="st"> </span><span class="kw">addNormals</span>(<span class="kw">clipMesh3d</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>  rglmesh, fn, <span class="dt">bound =</span> <span class="fl">4.8</span><span class="op">^</span><span class="dv">2</span>, <span class="dt">greater =</span> <span class="ot">FALSE</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>))</span></code></pre></div>
+<p>It is a bit slow. Probably the algorithm is not very easy. But we get our desired result:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="kw">shade3d</span>(clippedmesh, <span class="dt">color =</span> <span class="st">&quot;magenta&quot;</span>)</span></code></pre></div>
+<p><img src="figures/Togliatti_clipped.gif" /></p>
+<h1 id="using-python">Using Python</h1>
+<p>With the wonderful Python library <strong>PyVista</strong>, we proceed as follows to create the mesh of the Togliatti isosurface:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="im">from</span> math <span class="im">import</span> sqrt</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="im">import</span> pyvista <span class="im">as</span> pv</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a><span class="kw">def</span> f(x, y, z):</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a>    <span class="cf">return</span> (</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a>        <span class="dv">64</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true"></a>        <span class="op">*</span> (x <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true"></a>        <span class="op">*</span> (</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true"></a>            x <span class="op">**</span> <span class="dv">4</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true"></a>            <span class="op">-</span> <span class="dv">4</span> <span class="op">*</span> x <span class="op">**</span> <span class="dv">3</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true"></a>            <span class="op">-</span> <span class="dv">10</span> <span class="op">*</span> x <span class="op">**</span> <span class="dv">2</span> <span class="op">*</span> y <span class="op">**</span> <span class="dv">2</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true"></a>            <span class="op">-</span> <span class="dv">4</span> <span class="op">*</span> x <span class="op">**</span> <span class="dv">2</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true"></a>            <span class="op">+</span> <span class="dv">16</span> <span class="op">*</span> x</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true"></a>            <span class="op">-</span> <span class="dv">20</span> <span class="op">*</span> x <span class="op">*</span> y <span class="op">**</span> <span class="dv">2</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true"></a>            <span class="op">+</span> <span class="dv">5</span> <span class="op">*</span> y <span class="op">**</span> <span class="dv">4</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true"></a>            <span class="op">+</span> <span class="dv">16</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true"></a>            <span class="op">-</span> <span class="dv">20</span> <span class="op">*</span> y <span class="op">**</span> <span class="dv">2</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true"></a>        )</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true"></a>        <span class="op">-</span> <span class="dv">5</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true"></a>        <span class="op">*</span> sqrt(<span class="dv">5</span> <span class="op">-</span> sqrt(<span class="dv">5</span>))</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true"></a>        <span class="op">*</span> (<span class="dv">2</span> <span class="op">*</span> z <span class="op">-</span> sqrt(<span class="dv">5</span> <span class="op">-</span> sqrt(<span class="dv">5</span>)))</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true"></a>        <span class="op">*</span> (<span class="dv">4</span> <span class="op">*</span> (x <span class="op">**</span> <span class="dv">2</span> <span class="op">+</span> y <span class="op">**</span> <span class="dv">2</span> <span class="op">-</span> z <span class="op">**</span> <span class="dv">2</span>) <span class="op">+</span> (<span class="dv">1</span> <span class="op">+</span> <span class="dv">3</span> <span class="op">*</span> sqrt(<span class="dv">5</span>))) <span class="op">**</span> <span class="dv">2</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true"></a>    )</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true"></a></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true"></a><span class="co"># generate data grid for computing the values</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true"></a>X, Y, Z <span class="op">=</span> np.mgrid[(<span class="op">-</span><span class="dv">5</span>):<span class="dv">5</span>:<span class="ot">250j</span>, (<span class="op">-</span><span class="dv">5</span>):<span class="dv">5</span>:<span class="ot">250j</span>, (<span class="op">-</span><span class="dv">4</span>):<span class="dv">4</span>:<span class="ot">250j</span>]</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true"></a><span class="co"># create a structured grid</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true"></a>grid <span class="op">=</span> pv.StructuredGrid(X, Y, Z)</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true"></a><span class="co"># compute and assign the values</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true"></a>values <span class="op">=</span> f(X, Y, Z)</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true"></a>grid.point_data[<span class="st">&quot;values&quot;</span>] <span class="op">=</span> values.ravel(order<span class="op">=</span><span class="st">&quot;F&quot;</span>)</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true"></a><span class="co"># compute the isosurface f(x, y, z) = 0</span></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true"></a>isosurf <span class="op">=</span> grid.contour(isosurfaces<span class="op">=</span>[<span class="dv">0</span>])</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true"></a>mesh <span class="op">=</span> isosurf.extract_geometry()</span></code></pre></div>
+<p>To plot the mesh clipped to the box:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="co"># surface clipped to the box:</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>mesh.plot(smooth_shading<span class="op">=</span><span class="va">True</span>, color<span class="op">=</span><span class="st">&quot;yellowgreen&quot;</span>, specular<span class="op">=</span><span class="dv">15</span>)</span></code></pre></div>
+<p>The <code>remove_points</code> method is similar to the <code>mask</code> approach with <strong>misc3d</strong> (it produces non-smooth borders):</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="co"># surface clipped to the ball of radius 4.8, with the help of `remove_points`:</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a>lengths <span class="op">=</span> np.linalg.norm(mesh.points, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true"></a>toremove <span class="op">=</span> lengths <span class="op">&gt;=</span> <span class="fl">4.8</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true"></a>masked_mesh, idx <span class="op">=</span> mesh.remove_points(toremove)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true"></a>masked_mesh.plot(smooth_shading<span class="op">=</span><span class="va">True</span>, color<span class="op">=</span><span class="st">&quot;orange&quot;</span>, specular<span class="op">=</span><span class="dv">15</span>)</span></code></pre></div>
+<p>To get smooth borders, you have to use the <code>clip_scalar</code> method:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a><span class="co"># surface clipped to the ball of radius 4.8, with the help of `clip_scalar`:</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a>mesh[<span class="st">&quot;dist&quot;</span>] <span class="op">=</span> lengths</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true"></a>clipped_mesh <span class="op">=</span> mesh.clip_scalar(<span class="st">&quot;dist&quot;</span>, value<span class="op">=</span><span class="fl">4.8</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true"></a>clipped_mesh.plot(</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true"></a>    smooth_shading<span class="op">=</span><span class="va">True</span>, cmap<span class="op">=</span><span class="st">&quot;inferno&quot;</span>, window_size<span class="op">=</span>[<span class="dv">512</span>, <span class="dv">512</span>],</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true"></a>    show_scalar_bar<span class="op">=</span><span class="va">False</span>, specular<span class="op">=</span><span class="dv">15</span>, show_axes<span class="op">=</span><span class="va">False</span>, zoom<span class="op">=</span><span class="fl">1.2</span>,</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true"></a>    background<span class="op">=</span><span class="st">&quot;#363940&quot;</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true"></a>)</span></code></pre></div>
+<p><img src="figures/Togliatti_python.png" /></p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
