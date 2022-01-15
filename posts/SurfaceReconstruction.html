@@ -1,0 +1,342 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Surface reconstruction with R(CGAL)</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:26px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:22px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Surface reconstruction with R(CGAL)</h1> 
+          <div class="info">
+    Posted on January 15, 2022
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'geometry'." href="../tags/geometry.html">geometry</a>, <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'rgl'." href="../tags/rgl.html">rgl</a>, <a title="All pages tagged 'graphics'." href="../tags/graphics.html">graphics</a>, <a title="All pages tagged 'C++'." href="../tags/C%2B%2B.html">C++</a>
+    
+</div>
+
+<p>Eric Dunipace recently released a new package on CRAN: <strong>RcppCGAL</strong>. It allows to link to the C++ library <strong>CGAL</strong> in <strong>Rcpp</strong>. The <strong>CGAL</strong> library provides an extensive set of algorithms for computational geometry.</p>
+<p>I made a package based on <strong>RcppCGAL</strong>, which I called <strong>RCGAL</strong>. Unfortunately, R CMD CHECK throws some warnings on Windows, so the package is not acceptable by CRAN, until this issue will be resolved. To install it:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>  <span class="st">&quot;stla/RCGAL&quot;</span>, <span class="dt">dependencies =</span> <span class="ot">TRUE</span>, <span class="dt">build_opts =</span> <span class="st">&quot;--no-multiarch&quot;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>)</span></code></pre></div>
+<p>The compilation fails on Windows for R 32-bits, that is why I set the option <code>build_opts = "--no-multiarch"</code>. Fortunately, CRAN will soon abandon the 32-bits version of R.</p>
+<p>The <strong>RCGAL</strong> package allows to do convex hulls and Delaunay tessellations in 2D or 3D, and provides two techniques of surface reconstruction: the <em>advanced front surface reconstruction</em> and the <em>Poisson surface reconstruction</em>. That is <strong>CGAL</strong> which does almost all the job, but the package also resorts to pure R programming.</p>
+<p>Here we will have a look at the surface reconstruction methods.</p>
+<h1 id="the-solid-möbius-strip-construction-sampling-reconstruction">The solid Möbius strip: construction, sampling, reconstruction</h1>
+<p>The <em>solid Möbius strip</em> is an isosurface I found in <a href="http://data.imaginary-exhibition.com/IMAGINARY-Moebiusband-Stephan-Klaus.pdf">this paper</a>, and I like it.</p>
+<p>Here is the code I use to construct a <strong>rgl</strong> mesh of the solid Möbius strip:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="co"># solid Möbius strip: f(x,y,z)=0</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>f &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, z, <span class="dt">a =</span> <span class="fl">0.4</span>, <span class="dt">b =</span> <span class="fl">0.1</span>){</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>  ((x<span class="op">*</span>x<span class="op">+</span>y<span class="op">*</span>y<span class="op">+</span><span class="dv">1</span>)<span class="op">*</span>(a<span class="op">*</span>x<span class="op">*</span>x<span class="op">+</span>b<span class="op">*</span>y<span class="op">*</span>y)<span class="op">+</span>z<span class="op">*</span>z<span class="op">*</span>(b<span class="op">*</span>x<span class="op">*</span>x<span class="op">+</span>a<span class="op">*</span>y<span class="op">*</span>y)<span class="op">-</span><span class="dv">2</span><span class="op">*</span>(a<span class="op">-</span>b)<span class="op">*</span>x<span class="op">*</span>y<span class="op">*</span>z<span class="op">-</span>a<span class="op">*</span>b<span class="op">*</span>(x<span class="op">*</span>x<span class="op">+</span>y<span class="op">*</span>y))<span class="op">^</span><span class="dv">2</span> <span class="op">-</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="st">    </span><span class="dv">4</span><span class="op">*</span>(x<span class="op">*</span>x<span class="op">+</span>y<span class="op">*</span>y)<span class="op">*</span>(a<span class="op">*</span>x<span class="op">*</span>x<span class="op">+</span>b<span class="op">*</span>y<span class="op">*</span>y<span class="op">-</span>x<span class="op">*</span>y<span class="op">*</span>z<span class="op">*</span>(a<span class="op">-</span>b))<span class="op">^</span><span class="dv">2</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>}</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="co"># run the marching cubes algorithm ####</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a><span class="kw">library</span>(misc3d)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>nx &lt;-<span class="st"> </span><span class="dv">120</span>; ny &lt;-<span class="st"> </span><span class="dv">120</span>; nz &lt;-<span class="st"> </span><span class="dv">120</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="fl">1.4</span>, <span class="fl">1.4</span>, <span class="dt">length.out =</span> nx)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>y &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="fl">1.7</span>, <span class="fl">1.7</span>, <span class="dt">length.out =</span> ny)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>z &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="fl">0.7</span>, <span class="fl">0.7</span>, <span class="dt">length.out =</span> nz)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>G &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">z =</span> z)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a>voxel &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="kw">with</span>(G, <span class="kw">f</span>(x, y, z)), <span class="dt">dim =</span> <span class="kw">c</span>(nx, ny, nz))</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a>surface &lt;-<span class="st"> </span><span class="kw">computeContour3d</span>(</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a>  voxel, <span class="dt">maxvol =</span> <span class="kw">max</span>(voxel), <span class="dt">level =</span> <span class="dv">0</span>, <span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">z =</span> z</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a><span class="co"># make rgl mesh</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true"></a><span class="kw">library</span>(rgl)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true"></a>mesh0 &lt;-<span class="st"> </span>misc3d<span class="op">:::</span><span class="kw">t2ve</span>(<span class="kw">makeTriangles</span>(surface))</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true"></a>mesh &lt;-<span class="st"> </span><span class="kw">addNormals</span>(<span class="kw">tmesh3d</span>(</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true"></a>  <span class="dt">vertices =</span> mesh0[[<span class="st">&quot;vb&quot;</span>]],</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true"></a>  <span class="dt">indices =</span> mesh0[[<span class="st">&quot;ib&quot;</span>]]</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true"></a>))</span></code></pre></div>
+<p><img src="figures/SolidMobiusStrip_original.gif" /></p>
+<p>This mesh is quite smooth. It has <span class="math inline">\(73544\)</span> (non-duplicated) vertices:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>mesh</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="co">##  mesh3d object with 73544 vertices, 147088 triangles.</span></span></code></pre></div>
+<h2 id="sampling-the-solid-möbius-strip">Sampling the solid Möbius strip</h2>
+<p>Here we sample a subset of the vertices of the solid Möbius strip mesh, and later we will reconstruct the surface from this sample. I could select some vertices at random, but I prefer to use the uniform sampling performed by the <code>vcgUniformRemesh</code> function of the <strong>Rvcg</strong> package:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">library</span>(Rvcg)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="co">## </span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="co">## Attaching package: 'Rvcg'</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a><span class="co">## The following object is masked _by_ '.GlobalEnv':</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a><span class="co">## </span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a><span class="co">##     nverts</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>resample_mesh &lt;-<span class="st"> </span><span class="kw">vcgUniformRemesh</span>(mesh, <span class="dt">voxelSize =</span> <span class="fl">0.06</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a><span class="co">##      Resampling mesh using a volume of 58 x 69 x 35</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a><span class="co">##      VoxelSize is 0.060000, offset is 0.000000</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a><span class="co">##      Mesh Box is 2.630913 3.263203 1.264488</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a><span class="kw">str</span>(resample_mesh)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a><span class="co">## List of 3</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a><span class="co">##  $ vb     : num [1:4, 1:7948] -0.302 -1.59 -0.118 1 -0.322 ...</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a><span class="co">##  $ it     : int [1:3, 1:15896] 1 2 3 3 2 4 1 5 6 3 ...</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a><span class="co">##  $ normals: num [1:4, 1:7948] 0.207 0.951 0.23 1 0.271 ...</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true"></a><span class="co">##  - attr(*, &quot;class&quot;)= chr &quot;mesh3d&quot;</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true"></a>SolidMobiusStrip_cloud &lt;-<span class="st"> </span><span class="kw">t</span>(resample_mesh[[<span class="st">&quot;vb&quot;</span>]][<span class="op">-</span>4L, ])</span></code></pre></div>
+<p>Here is our points cloud (I mean the sample):</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="kw">view3d</span>(<span class="dv">0</span>, <span class="dv">-50</span>, <span class="dt">zoom =</span> <span class="fl">0.75</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="kw">spheres3d</span>(SolidMobiusStrip_cloud, <span class="dt">radius =</span> <span class="fl">0.015</span>)</span></code></pre></div>
+<p><img src="figures/SolidMobiusStrip_cloud.png" /></p>
+<p>It has <span class="math inline">\(7948\)</span> points:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">nrow</span>(SolidMobiusStrip_cloud)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="co">## [1] 7948</span></span></code></pre></div>
+<h2 id="advanced-front-surface-reconstruction">Advanced front surface reconstruction</h2>
+<p>We run the first surface reconstruction algorithm, the <em>advanced front surface reconstruction</em>. Is is performed by the <code>AFSreconstruction</code> function of the <strong>RCGAL</strong> package, which has no parameters arguments; it only takes the points cloud as argument:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="kw">library</span>(RCGAL)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>afs_mesh &lt;-<span class="st"> </span><span class="kw">AFSreconstruction</span>(SolidMobiusStrip_cloud)</span></code></pre></div>
+<p>Let’s plot this mesh (this is a triangular <strong>rgl</strong> mesh, of class <code>mesh3d</code>):</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a><span class="kw">view3d</span>(<span class="dv">0</span>, <span class="dv">-50</span>, <span class="dt">zoom =</span> <span class="fl">0.75</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a><span class="kw">shade3d</span>(afs_mesh, <span class="dt">color =</span> <span class="st">&quot;darkred&quot;</span>)</span></code></pre></div>
+<p><img src="figures/SolidMobiusStrip_AFS.png" /></p>
+<p>Well it is not very smooth, but not too bad. Note that the advanced front surface reconstruction algorithm does not alter the vertices of the given points cloud, it doesn’t change them at all. So this mesh has <span class="math inline">\(7948\)</span> vertices:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a>afs_mesh</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="co">##  mesh3d object with 7948 vertices, 15896 triangles.</span></span></code></pre></div>
+<p>Remember that the original mesh had <span class="math inline">\(73544\)</span> vertices.</p>
+<p>Let’s compare with the <em>ball-pivoting</em> algorithm provided by the <strong>Rvcg</strong> package:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a>bp_mesh &lt;-<span class="st"> </span><span class="kw">addNormals</span>(<span class="kw">vcgBallPivoting</span>(</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>  SolidMobiusStrip_cloud, <span class="dt">angle =</span> pi<span class="op">/</span><span class="dv">6</span>, <span class="dt">clustering =</span> <span class="fl">0.01</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a>))</span></code></pre></div>
+<p>The smoothness is similar but there is a couple of holes in the mesh:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a><span class="kw">view3d</span>(<span class="dv">0</span>, <span class="dv">-50</span>, <span class="dt">zoom =</span> <span class="fl">0.75</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true"></a><span class="kw">shade3d</span>(bp_mesh, <span class="dt">color =</span> <span class="st">&quot;firebrick&quot;</span>) </span></code></pre></div>
+<p><img src="figures/SolidMobiusStrip_BP.png" /></p>
+<p>We can get a smoother mesh and get rid of these holes by applying a mesh smoothing technique, such as the ones offered by the <code>vcgSmooth</code> function of the <strong>Rvcg</strong> package:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a>smooth_bp_mesh &lt;-<span class="st"> </span><span class="kw">vcgSmooth</span>(bp_mesh, <span class="dt">iteration =</span> <span class="dv">50</span>)</span></code></pre></div>
+<p>This is indeed better:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true"></a><span class="kw">view3d</span>(<span class="dv">0</span>, <span class="dv">-50</span>, <span class="dt">zoom =</span> <span class="fl">0.75</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true"></a><span class="kw">shade3d</span>(smooth_bp_mesh, <span class="dt">color =</span> <span class="st">&quot;firebrick1&quot;</span>)</span></code></pre></div>
+<p><img src="figures/SolidMobiusStrip_BP_smooth.png" /></p>
+<p>The smooth mesh still has <span class="math inline">\(7948\)</span> vertices:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a>smooth_bp_mesh</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true"></a><span class="co">##  mesh3d object with 7948 vertices, 15822 triangles.</span></span></code></pre></div>
+<p>Of course we could apply <code>vcgSmooth</code> to our <code>afs_mesh</code> as well.</p>
+<h2 id="poisson-reconstruction-of-the-solid-möbius-strip">Poisson reconstruction of the solid Möbius strip</h2>
+<p>Now let’s try the <em>Poisson surface reconstruction</em>, available in <strong>RCGAL</strong>.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a>psr_mesh &lt;-<span class="st"> </span><span class="kw">PoissonReconstruction</span>(SolidMobiusStrip_cloud)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true"></a><span class="co">## Poisson reconstruction using average spacing: 0.04682.</span></span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true"></a><span class="kw">view3d</span>(<span class="dv">0</span>, <span class="dv">-50</span>, <span class="dt">zoom =</span> <span class="fl">0.75</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true"></a><span class="kw">shade3d</span>(psr_mesh, <span class="dt">color =</span> <span class="st">&quot;orangered&quot;</span>)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true"></a><span class="kw">wire3d</span>(psr_mesh)</span></code></pre></div>
+<p><img src="figures/SolidMobiusStrip_Poisson_default.png" /></p>
+<p>Clearly, that’s not smooth! But wait, there are only <span class="math inline">\(604\)</span> vertices in this mesh:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true"></a>psr_mesh</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true"></a><span class="co">##  mesh3d object with 604 vertices, 1208 triangles.</span></span></code></pre></div>
+<p>The Poisson reconstruction algorithm takes some parameters as input, and we can reduce the <code>spacing</code> parameter to get a more precise mesh, at the cost of a higher computation time:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true"></a>psr_mesh &lt;-<span class="st"> </span><span class="kw">PoissonReconstruction</span>(SolidMobiusStrip_cloud, <span class="dt">spacing =</span> <span class="fl">0.005</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true"></a><span class="kw">view3d</span>(<span class="dv">0</span>, <span class="dv">-50</span>, <span class="dt">zoom =</span> <span class="fl">0.75</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true"></a><span class="kw">shade3d</span>(psr_mesh, <span class="dt">color =</span> <span class="st">&quot;orangered&quot;</span>)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true"></a><span class="kw">wire3d</span>(psr_mesh)</span></code></pre></div>
+<p><img src="figures/SolidMobiusStrip_Poisson_spacing005.png" /></p>
+<p>On one hand, the mesh is better, but on the other hand it has some small defaults (not highly visible on this view, try to reproduce the mesh and rotate it, you’ll see). It has <span class="math inline">\(28726\)</span> vertices:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true"></a>psr_mesh</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true"></a><span class="co">##  mesh3d object with 28726 vertices, 57556 triangles.</span></span></code></pre></div>
+<p>It has some defaults because, I think, some triangles are too small. We can increase the trianges while keeping the <code>spacing</code> parameter by increasing the <code>sm_distance</code> parameter (whose defaut value is <span class="math inline">\(0.375\)</span>):</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true"></a>psr_mesh &lt;-<span class="st"> </span><span class="kw">PoissonReconstruction</span>(</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true"></a>  SolidMobiusStrip_cloud, <span class="dt">spacing =</span> <span class="fl">0.005</span>, <span class="dt">sm_distance =</span> <span class="fl">0.9</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true"></a>)</span></code></pre></div>
+<p>This reduces the computation time. Here is the result:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true"></a><span class="kw">view3d</span>(<span class="dv">0</span>, <span class="dv">-50</span>, <span class="dt">zoom =</span> <span class="fl">0.75</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true"></a><span class="kw">shade3d</span>(psr_mesh, <span class="dt">color =</span> <span class="st">&quot;darkorange&quot;</span>)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true"></a><span class="kw">wire3d</span>(psr_mesh)</span></code></pre></div>
+<p><img src="figures/SolidMobiusStrip_Poisson_spacing005_smdistance09.png" /></p>
+<p>Quite good! And the mesh has only <span class="math inline">\(3055\)</span> vertices:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true"></a>psr_mesh</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true"></a><span class="co">##  mesh3d object with 3055 vertices, 6110 triangles.</span></span></code></pre></div>
+<h1 id="the-stanford-bunny">The Stanford bunny</h1>
+<p>Now let’s try these surface reconstruction techniques to another points cloud, a famous one: the <em>Stanford bunny</em> points cloud. It has <span class="math inline">\(35947\)</span> points:</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true"></a><span class="kw">data</span>(bunny, <span class="dt">package =</span> <span class="st">&quot;onion&quot;</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true"></a><span class="kw">nrow</span>(bunny)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true"></a><span class="co">## [1] 35947</span></span></code></pre></div>
+<p>This set of points is dense. Plotting it almost gives a totally black shape:</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true"></a><span class="kw">view3d</span>(<span class="dt">zoom =</span> <span class="fl">0.75</span>)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true"></a><span class="kw">points3d</span>(bunny)</span></code></pre></div>
+<p><img src="figures/Bunny_cloud.png" /></p>
+<p>Firstly, let’s try the advanced front surface reconstruction:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true"></a>afs_mesh &lt;-<span class="st"> </span><span class="kw">AFSreconstruction</span>(bunny)</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true"></a><span class="kw">view3d</span>(<span class="dt">zoom =</span> <span class="fl">0.75</span>)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true"></a><span class="kw">shade3d</span>(afs_mesh, <span class="dt">color =</span> <span class="st">&quot;violetred&quot;</span>)</span></code></pre></div>
+<p><img src="figures/Bunny_AFS.png" /></p>
+<p>Quite nice. Now here is a Poisson reconstruction, with some parameters chosen by myself (the mesh is not precise enough with the default values of the parameters):</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true"></a>psr_mesh &lt;-<span class="st"> </span><span class="kw">PoissonReconstruction</span>(bunny, <span class="dt">spacing =</span> <span class="fl">0.0001</span>, <span class="dt">sm_distance =</span> <span class="fl">0.9</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true"></a><span class="kw">view3d</span>(<span class="dt">zoom =</span> <span class="fl">0.75</span>)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true"></a><span class="kw">shade3d</span>(psr_mesh, <span class="dt">color =</span> <span class="st">&quot;darkviolet&quot;</span>)</span></code></pre></div>
+<p><img src="figures/Bunny_Poisson.png" /></p>
+<p>The mesh has less details than the previous one but it has only <span class="math inline">\(20693\)</span> vertices:</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true"></a>psr_mesh</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true"></a><span class="co">##  mesh3d object with 20693 vertices, 41382 triangles.</span></span></code></pre></div>
+<h1 id="the-stanford-dragon">The Stanford dragon</h1>
+<p>Finally, let’s play with the <em>Stanford dragon</em>. I found a points cloud of it containing <span class="math inline">\(100250\)</span> points. It is so dense that its plot is a totally black shape:</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true"></a><span class="kw">view3d</span>(<span class="dt">zoom =</span> <span class="fl">0.75</span>)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true"></a><span class="kw">points3d</span>(StanfordDragon)</span></code></pre></div>
+<p><img src="figures/StanfordDragon_cloud.png" /></p>
+<p>Let’s start with the advanced front surface reconstruction (the <code>StanfordDragon</code> matrix is provided by <strong>RCGAL</strong>):</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true"></a>afs_mesh &lt;-<span class="st"> </span><span class="kw">AFSreconstruction</span>(StanfordDragon)</span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true"></a><span class="kw">view3d</span>(<span class="op">-</span><span class="dv">20</span>, <span class="dt">zoom =</span> <span class="fl">0.8</span>)</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true"></a><span class="kw">shade3d</span>(afs_mesh, <span class="dt">color =</span> <span class="st">&quot;darkolivegreen4&quot;</span>)</span></code></pre></div>
+<p><img src="figures/StanfordDragon_AFS.png" /></p>
+<p>Very nice. And to finish, let’s try a Poisson reconstruction.</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true"></a>psr_mesh &lt;-<span class="st"> </span><span class="kw">PoissonReconstruction</span>(StanfordDragon, <span class="dt">spacing =</span> <span class="fl">0.0003</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true"></a><span class="kw">view3d</span>(<span class="op">-</span><span class="dv">20</span>, <span class="dt">zoom =</span> <span class="fl">0.8</span>)</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true"></a><span class="kw">shade3d</span>(psr_mesh, <span class="dt">color =</span> <span class="st">&quot;forestgreen&quot;</span>)</span></code></pre></div>
+<p><img src="figures/StanfordDragon_Poisson.png" /></p>
+<p>Less vertices, less details!</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true"></a>psr_mesh</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true"></a><span class="co">##  mesh3d object with 32064 vertices, 64152 triangles.</span></span></code></pre></div>
+<h1 id="acknowledgments">Acknowledgments</h1>
+<p>I am grateful to the <strong>CGAL</strong> members, especially <strong><span class="citation" data-cites="sloriot">@sloriot</span></strong> and <strong><span class="citation" data-cites="afabri">@afabri</span></strong>, for the help they provided to me and for the attention they pay to my questions.</p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
