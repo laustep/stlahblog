@@ -5,7 +5,116 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Sat, 15 Jan 2022 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Wed, 19 Jan 2022 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>Funny 3D Voronoï diagrams</title>
+      <link>https://laustep.github.io/stlahblog/posts/Voronoi_tessellation.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        Four years ago I wrapped the C library <strong>Qhull</strong> in a
+        <a href="https://github.com/stla/qhull">Haskell package</a>. Thanks to
+        <strong>Qhull</strong>, this package can do some convex hulls and some
+        Delaunay tessellations. The <strong>Qhull</strong> library also allows
+        to do some Voronoï tessellations, but I never understood how that works.
+        So I programmed the Voronoï tessellation in Haskell, by deriving it from
+        the Delaunay tessellation.
+      </p>
+      <p>
+        Recently, I released the R package <strong>tessellation</strong>. It
+        uses the C code of my Haskell package to contruct Delaunay
+        tessellations, and I programmed the Voronoï tessellation in R.
+      </p>
+      <p>
+        I discovered something interesting with my Haskell package: take a
+        classical polyhedron (e.g. a tetrahedron, or a cube), enclose it with
+        two or three circles (I mean with some points on the circles), and do
+        the Voronoï diagram of all these points (the vertices of the polyhedron
+        and the points on the circles). Then you get a funny Voronoï diagram.
+        You can see some examples on
+        <a href="https://stla.github.io/tessellation/"
+          >the website I made for the <strong>tessellation</strong> package</a
+        >
+        (thanks to the <strong>pkgdown</strong> package).
+      </p>
+      <p>
+        Let’s make another example here. This time, I take a cuboctahedron and I
+        enclose it with three circles:
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1"><span class="kw">library</span>(rgl) <span class="co"># provides `cuboctahedron3d()`</span></span>
+<span id="cb1-2">cuboctahedron_vertices &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">cuboctahedron3d</span>()<span class="op">$</span>vb[<span class="op">-</span>4L, ])</span>
+<span id="cb1-3">xi_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> <span class="dv">91</span>)[<span class="op">-</span>1L]</span>
+<span id="cb1-4">R &lt;-<span class="st"> </span><span class="fl">1.5</span></span>
+<span id="cb1-5">circle1 &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">vapply</span>(xi_, <span class="cf">function</span>(xi) R<span class="op">*</span><span class="kw">c</span>(<span class="kw">cos</span>(xi), <span class="kw">sin</span>(xi), <span class="dv">0</span>), <span class="kw">numeric</span>(3L)))</span>
+<span id="cb1-6">circle2 &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">vapply</span>(xi_, <span class="cf">function</span>(xi) R<span class="op">*</span><span class="kw">c</span>(<span class="kw">cos</span>(xi), <span class="dv">0</span>, <span class="kw">sin</span>(xi)), <span class="kw">numeric</span>(3L)))</span>
+<span id="cb1-7">circle3 &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">vapply</span>(xi_, <span class="cf">function</span>(xi) R<span class="op">*</span><span class="kw">c</span>(<span class="dv">0</span>, <span class="kw">cos</span>(xi), <span class="kw">sin</span>(xi)), <span class="kw">numeric</span>(3L)))</span>
+<span id="cb1-8">enclosedCuboctahedron &lt;-<span class="st"> </span></span>
+<span id="cb1-9"><span class="st">  </span><span class="kw">rbind</span>(cuboctahedron_vertices, circle1, circle2, circle3)</span></code></pre>
+      </div>
+      <p>Here is the picture:</p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
+<span id="cb2-2"><span class="kw">view3d</span>(<span class="dv">20</span>, <span class="dt">zoom =</span> <span class="fl">0.65</span>)</span>
+<span id="cb2-3"><span class="kw">shade3d</span>(<span class="kw">cuboctahedron3d</span>(), <span class="dt">color =</span> <span class="st">"darkorange"</span>, <span class="dt">shininess =</span> <span class="dv">10</span>)</span>
+<span id="cb2-4"><span class="kw">wire3d</span>(<span class="kw">cuboctahedron3d</span>(), <span class="dt">color =</span> <span class="st">"darkslategray4"</span>, <span class="dt">lwd =</span> <span class="dv">4</span>)</span>
+<span id="cb2-5"><span class="kw">spheres3d</span>(<span class="kw">rbind</span>(circle1, circle2, circle3), <span class="dt">radius =</span> <span class="fl">0.04</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/enclosedCuboctahedron.png"
+        />
+      </p>
+      <p>
+        Now let’s make the Voronoï diagram with the
+        <strong>tessellation</strong> package:
+      </p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb3-1"><span class="kw">library</span>(tessellation)</span>
+<span id="cb3-2">del &lt;-<span class="st"> </span><span class="kw">delaunay</span>(enclosedCuboctahedron, <span class="dt">degenerate =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb3-3">v &lt;-<span class="st"> </span><span class="kw">voronoi</span>(del)</span>
+<span id="cb3-4"><span class="co">## Voronoï diagram with twelve bounded cells.</span></span></code></pre>
+      </div>
+      <p>
+        I have not checked whether the option <code>degenerate = TRUE</code> is
+        necessary, but it is often necessary in order to get a correct Voronoï
+        diagram, and I never understood why. Now let’s plot the Voronoï diagram:
+      </p>
+      <div class="sourceCode" id="cb4">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb4-1"><span class="kw">library</span>(paletteer) <span class="co"># provides many color palettes</span></span>
+<span id="cb4-2"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
+<span id="cb4-3"><span class="kw">bg3d</span>(<span class="st">"palegoldenrod"</span>)</span>
+<span id="cb4-4"><span class="kw">plotVoronoiDiagram</span>(v, <span class="dt">colors =</span> <span class="kw">paletteer_c</span>(<span class="st">"grDevices::Dark 3"</span>, 12L))</span></code></pre>
+      </div>
+      <p>I animated it. Here is the result:</p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/voronoi_enclosed_cuboctahedron.gif"
+        />
+      </p>
+      <p>
+        This is not my favorite one (I prefer the one derived from the cube,
+        that you can see on the <strong>tessellation</strong> website), but
+        nevertheless it is nice.
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Wed, 19 Jan 2022 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/Voronoi_tessellation.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>Surface reconstruction with R(CGAL)</title>
       <link>https://laustep.github.io/stlahblog/posts/SurfaceReconstruction.html</link>
