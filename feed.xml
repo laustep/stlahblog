@@ -29,7 +29,7 @@
       <p>Here is the script:</p>
       <div class="sourceCode" id="cb1">
         <pre
-          class="sourceCode r"
+          class="sourceCode numberSource r numberLines"
         ><code class="sourceCode r"><span id="cb1-1"><span class="kw">suppressPackageStartupMessages</span>(<span class="kw">library</span>(<span class="st">"optparse"</span>))</span>
 <span id="cb1-2"><span class="kw">suppressPackageStartupMessages</span>(<span class="kw">library</span>(<span class="st">"gifski"</span>))</span>
 <span id="cb1-3"></span>
@@ -132,10 +132,38 @@
       <p>
         That’s all. Put this <code>bat</code> file in a folder available in the
         PATH environment variable and you can use the bash command
-        <strong>gifski</strong>. Note that it has an additional feature as
-        compared to the original <strong>gifski</strong> tool: the
-        <code>--backward</code> option, which allows to loop forward and
-        backward.
+        <strong>gifski</strong>. Here is the help which is displayed by the
+        command <code>gifski --help</code>:
+      </p>
+      <pre><code>Usage: gifski [options]
+
+
+Options:
+        --frames=FRAMES
+                png files given by a glob (e.g. pic*.png)
+
+        --fps=FPS
+                frames per second (default 20)
+
+        -l NUMBER, --loop=NUMBER
+                number of loops, 0 for infinite (the default)
+
+        -s WXH, --size=WXH
+                size of the gif given in the form WxH where W is the width in pixels 
+                and H is the height in pixels (default 512x512)
+
+        -b, --backward
+                loop forward and backward
+
+        -o OUTPUT.GIF, --output=OUTPUT.GIF
+                output gif file (default animation.gif)
+
+        -h, --help
+                Show this help message and exit</code></pre>
+      <p>
+        Note that there is an additional feature as compared to the original
+        <strong>gifski</strong> tool: the <code>--backward</code> option, which
+        allows to loop forward and backward.
       </p>
       <p>
         <img
