@@ -1,0 +1,233 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Hopf torus with dynamic colors</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Hopf torus with dynamic colors</h1> 
+          <div class="info">
+    Posted on January 29, 2022
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'rgl'." href="../tags/rgl.html">rgl</a>, <a title="All pages tagged 'misc3d'." href="../tags/misc3d.html">misc3d</a>, <a title="All pages tagged 'graphics'." href="../tags/graphics.html">graphics</a>
+    
+</div>
+
+<p>In a <a href="https://laustep.github.io/stlahblog/posts/PyVistaDynamicCmap.html">recent post</a> I explained how to decorate a surface with moving colors with the Python library <strong>PyVista</strong>. Here I expose this method for the R package <strong>rgl</strong>.</p>
+<p>I will take a Hopf torus with fives lobes for the illustration. The following R function is a slight modification of the <code>parametric3d</code> function of the <strong>misc3d</strong> package. It is more efficient for the Hopf torus parameterization and it returns a <strong>rgl</strong> object of class <code>mesh3d</code>.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">library</span>(misc3d)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="kw">library</span>(rgl)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>parametricMesh3d &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>  Fxyz, umin, umax, vmin, vmax, nu, nv </span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>){</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>  u &lt;-<span class="st"> </span><span class="kw">seq</span>(umin, umax, <span class="dt">length.out =</span> nu)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>  v &lt;-<span class="st"> </span><span class="kw">seq</span>(vmin, vmax, <span class="dt">length.out =</span> nv)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>  tg &lt;-<span class="st"> </span>misc3d<span class="op">:::</span><span class="kw">expandTriangleGrid</span>(u, v)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>  f &lt;-<span class="st"> </span><span class="cf">function</span>(uv) <span class="kw">Fxyz</span>(uv[, 1L], uv[, 2L])</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>  v1 &lt;-<span class="st"> </span><span class="kw">f</span>(tg<span class="op">$</span>v1)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>  v2 &lt;-<span class="st"> </span><span class="kw">f</span>(tg<span class="op">$</span>v2)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>  v3 &lt;-<span class="st"> </span><span class="kw">f</span>(tg<span class="op">$</span>v3)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>  tris &lt;-<span class="st"> </span><span class="kw">makeTriangles</span>(v1, v2, v3)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a>  mesh0 &lt;-<span class="st"> </span>misc3d<span class="op">:::</span><span class="kw">t2ve</span>(tris)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>  <span class="kw">addNormals</span>(</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a>    <span class="kw">tmesh3d</span>(</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a>      <span class="dt">vertices =</span> mesh0<span class="op">$</span>vb,</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a>      <span class="dt">indices  =</span> mesh0<span class="op">$</span>ib</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a>    )</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a>  )</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a>}</span></code></pre></div>
+<p>The R function below is the parameterization of the Hopf torus.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>HTxyz &lt;-<span class="st"> </span><span class="cf">function</span>(u, v, <span class="dt">nlobes =</span> <span class="dv">5</span>, <span class="dt">A =</span> <span class="fl">0.38</span>){</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>  C &lt;-<span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span>(pi<span class="op">/</span><span class="dv">2</span><span class="op">-</span>A)<span class="op">*</span><span class="kw">cos</span>(u<span class="op">*</span>nlobes)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>  sinC &lt;-<span class="st"> </span><span class="kw">sin</span>(C)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>  D &lt;-<span class="st"> </span>u <span class="op">+</span><span class="st"> </span>A<span class="op">*</span><span class="kw">sin</span>(<span class="dv">2</span><span class="op">*</span>u<span class="op">*</span>nlobes)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>  p1 &lt;-<span class="st"> </span><span class="kw">cos</span>(C) <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>  p2 &lt;-<span class="st"> </span>sinC <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(D)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>  p3 &lt;-<span class="st"> </span>sinC <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(D)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>  cos_v &lt;-<span class="st"> </span><span class="kw">cos</span>(v)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>  sin_v &lt;-<span class="st"> </span><span class="kw">sin</span>(v)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>  x1 &lt;-<span class="st"> </span>cos_v<span class="op">*</span>p3 <span class="op">+</span><span class="st"> </span>sin_v<span class="op">*</span>p2</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>  x2 &lt;-<span class="st"> </span>cos_v<span class="op">*</span>p2 <span class="op">-</span><span class="st"> </span>sin_v<span class="op">*</span>p3</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>  x3 &lt;-<span class="st"> </span>sin_v <span class="op">*</span><span class="st"> </span>p1</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a>  xden &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="dv">2</span><span class="op">*</span>p1) <span class="op">-</span><span class="st"> </span>cos_v<span class="op">*</span>p1</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a>  <span class="kw">cbind</span>(x1<span class="op">/</span>xden, x2<span class="op">/</span>xden, x3<span class="op">/</span>xden)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a>}</span></code></pre></div>
+<p>Let’s make the Hopf torus mesh now.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>mesh &lt;-<span class="st"> </span><span class="kw">parametricMesh3d</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>  HTxyz, <span class="dt">umin =</span> <span class="dv">0</span>, <span class="dt">umax =</span> <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">vmin =</span> <span class="op">-</span>pi, <span class="dt">vmax =</span> pi, <span class="dt">nu =</span> <span class="dv">600</span>, <span class="dt">nv =</span> <span class="dv">400</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>)</span></code></pre></div>
+<p>We will assign a color to each point on the surface, according to the distance from the point to the origin. We calculate these distances below, and we linearly map them to the interval $[0, 2].</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>d &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">apply</span>(mesh<span class="op">$</span>vb[<span class="op">-</span>4L, ], 2L, crossprod))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>d &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span>pi <span class="op">*</span><span class="st"> </span>(d <span class="op">-</span><span class="st"> </span><span class="kw">min</span>(d)) <span class="op">/</span><span class="st"> </span><span class="kw">diff</span>(<span class="kw">range</span>(d))</span></code></pre></div>
+<p>Now we introduce a color palette function. The <strong>trekcolors</strong> package has nice color palettes. I’m taking the <code>dominion</code> palette.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="kw">library</span>(trekcolors)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>fpalette &lt;-<span class="st"> </span><span class="kw">colorRamp</span>(</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>  <span class="kw">trek_pal</span>(<span class="st">&quot;dominion&quot;</span>), <span class="dt">bias =</span> <span class="fl">0.6</span>, <span class="dt">interpolate =</span> <span class="st">&quot;spline&quot;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>)</span></code></pre></div>
+<p>This function <code>fpalette</code> assign a color, given by its RGB values, to each number between <span class="math inline">\(0\)</span> and <span class="math inline">\(1\)</span>. As in Python, we will calculate <span class="math inline">\(\sin(d -t)\)</span> to move the colors, with <span class="math inline">\(t\)</span> varying from <span class="math inline">\(0\)</span> to <span class="math inline">\(2\pi\)</span>. The sine function takes its values in <span class="math inline">\([-1, 1]\)</span> so we will map this interval to <span class="math inline">\([0,1]\)</span> with the affine function <span class="math inline">\(x \mapsto \frac{x+1}{2}\)</span> in order to apply the <code>fpalette</code> function.</p>
+<p>We will also rotate the Hopf torus around the <span class="math inline">\(z\)</span>-axis. By the symmetry of the Hopf torus, it suffices to make the rotation with an angle varying from <span class="math inline">\(0\)</span> to <span class="math inline">\(2\pi/5\)</span>.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>t_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> <span class="dv">73</span>)[<span class="op">-</span>1L]</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>angle_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">5</span>, <span class="dt">length.out =</span> <span class="dv">73</span>)[<span class="op">-</span>1L]</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_along</span>(t_)){</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>  RGB &lt;-<span class="st"> </span><span class="kw">fpalette</span>( (<span class="kw">sin</span>(d<span class="op">-</span>t_[i])<span class="op">+</span><span class="dv">1</span>)<span class="op">/</span><span class="dv">2</span> )</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>  mesh[[<span class="st">&quot;material&quot;</span>]] &lt;-<span class="st"> </span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a><span class="st">    </span><span class="kw">list</span>(<span class="dt">color =</span> <span class="kw">rgb</span>(RGB[, 1L], RGB[, 2L], RGB[, 3L], <span class="dt">maxColorValue =</span> <span class="dv">255</span>))</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a>  rmesh &lt;-<span class="st"> </span><span class="kw">rotate3d</span>(mesh, angle_[i], <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a>  <span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a>  <span class="kw">view3d</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dt">zoom =</span> <span class="fl">0.55</span>)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a>  <span class="kw">spheres3d</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dt">radius =</span> <span class="dv">11</span>, <span class="dt">color =</span> <span class="st">&quot;white&quot;</span>, <span class="dt">alpha =</span> <span class="dv">0</span>) <span class="co"># to fix the view</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a>  <span class="kw">shade3d</span>(rmesh)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a>  <span class="kw">rgl.snapshot</span>(<span class="kw">sprintf</span>(<span class="st">&quot;pic%03d.png&quot;</span>, i))</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a>  <span class="kw">close3d</span>()</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a>}</span></code></pre></div>
+<p>This code generates a series of <code>png</code> files <code>pic001.png</code>, …, <code>pic072.png</code>. Using <strong>ImageMagick</strong> or <strong>gifski</strong>, we obtain this <code>gif</code> animation from these files:</p>
+<p><img src="figures/HTdominion.gif" /></p>
+<p>Very well. But these are not my favorite colors. And I prefer the Hopf torus with three lobes. Below it is, decorated with the <code>klingon</code> color palette of <strong>trekcolors</strong>; I prefer this one.</p>
+<p><img src="figures/HTklingon2.gif" /></p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
