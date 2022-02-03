@@ -5,7 +5,78 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Sat, 29 Jan 2022 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Thu, 03 Feb 2022 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>Some simple RStudio addins</title>
+      <link>https://laustep.github.io/stlahblog/posts/rstudioAddins.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        In this blog post I introduce three small
+        <strong>RStudio</strong> addins I did.
+      </p>
+      <h2 id="bracketify">‘bracketify’</h2>
+      <p>
+        I prefer subsetting with the double brackets than with the dollar in R,
+        because this is more readable in <strong>RStudio</strong> thanks to the
+        syntax highlighting. That’s why I did
+        <a href="https://github.com/stla/bracketify">bracketify</a>. This addin
+        replaces all occurrences of <code>foo$bar</code> with
+        <code>foo[["bar"]]</code>, either in a whole file or only in the current
+        selection.
+      </p>
+      <p>
+        <img
+          src="https://raw.githubusercontent.com/stla/bracketify/main/inst/screenshots/bracketify.gif"
+        />
+      </p>
+      <p>
+        To use carefully: if you have some dollar symbols in your code which are
+        not used for subsetting (e.g. in a regular expression), they can be
+        transformed by <strong>bracketify</strong>.
+      </p>
+      <h2 id="pasteascomment">‘pasteAsComment’</h2>
+      <p>
+        Originally, I made
+        <a href="https://github.com/stla/pasteAsComment">pasteAsComment</a> to
+        paste the content of the clipboard as a comment:
+      </p>
+      <p>
+        <img
+          src="https://raw.githubusercontent.com/stla/pasteAsComment/main/inst/screenshots/pasteAsComment.gif"
+        />
+      </p>
+      <p>
+        I updated this package today. Now it also allows to paste the content of
+        the clipboard as <strong>roxygen</strong> lines. This is particularly
+        useful to write some code in the <code>@examples</code> field:
+      </p>
+      <p>
+        <img
+          src="https://raw.githubusercontent.com/stla/pasteAsComment/main/inst/screenshots/pasteAsRoxygen.gif"
+        />
+      </p>
+      <h2 id="jsconsole">‘JSconsole’</h2>
+      <p>
+        <a href="https://github.com/stla/JSconsole">JSconsole</a> is available
+        on CRAN. This addin allows to send some selected JavaScript code to the
+        V8 console. This is useful when you want to test a function.
+      </p>
+      <p>
+        <img
+          src="https://raw.githubusercontent.com/stla/JSconsole/master/inst/screenshots/JSconsole.gif"
+        />
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Thu, 03 Feb 2022 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/rstudioAddins.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>Hopf torus with dynamic colors</title>
       <link>https://laustep.github.io/stlahblog/posts/HopfTorusDynamicColors.html</link>
@@ -11876,338 +11947,6 @@ Options:
 ]]></description>
       <pubDate>Wed, 27 Feb 2019 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/integralPolyhedron.html</guid>
-      <dc:creator>Stéphane Laurent</dc:creator>
-      <category>R</category>
-    </item>
-    <item>
-      <title>Simulation of the fractional noncentral Wishart distribution</title>
-      <link>https://laustep.github.io/stlahblog/posts/WishartFractional.html</link>
-      <description><![CDATA[<div class="container-fluid">
-  <div class="main col-sm-12">
-    <div class="content">
-      <p>
-        It is well known how to simulate the noncentral Wishart distribution
-        when the number of degrees of freedom
-        <span class="math inline">\(\nu\)</span> and the dimension
-        <span class="math inline">\(d\)</span> satisfy
-        <span class="math inline">\(\nu &gt; 2d-1\)</span>, or when
-        <span class="math inline">\(\nu \geq d\)</span> is an integer. In their
-        paper
-        <a href="https://arxiv.org/abs/1006.2281"
-          >Exact and high-order discretization schemes for Wishart processes and
-          their affine extensions</a
-        >, Ahdida &amp; Alfonsi provide a method that allows to simulate the
-        Wishart process of dimension <span class="math inline">\(d\)</span> for
-        any number of degrees of freedom
-        <span class="math inline">\(\nu \geq d-1\)</span> and without
-        restrictions on the other parameters. This method allows to simulate the
-        noncentral Wishart distribution, in the way we will expose now.
-      </p>
-      <h1 id="two-properties-of-the-noncentral-wishart-distribution">
-        Two properties of the noncentral Wishart distribution
-      </h1>
-      <p>We will need the two following properties.</p>
-      <p>
-        Recall that the characteristic function of the noncentral Wishart
-        distribution
-        <span class="math inline">\(\mathcal{W}(\nu, \Sigma, \Theta)\)</span> at
-        <span class="math inline">\(Z\)</span> is
-        <span class="math display"
-          >\[ \phi_{\nu,\Sigma,\Theta}(Z) =
-          \frac{\exp\Bigl(i\textrm{tr}\bigl({(I_d - 2i
-          Z\Sigma)}^{-1}Z\Theta\bigr)\Bigr)}{{\det(I_d - 2i
-          Z\Sigma)}^{\frac{\nu}{2}}}. \]</span
-        >
-      </p>
-      <p>
-        <span class="math inline">\(\bullet\)</span>
-        <strong>First property of the Wishart distribution</strong>. Using the
-        characteristic function, it is easy to check that
-        <span class="math inline"
-          >\(A W A' \sim \mathcal{W}(\nu, A\Sigma A', A\Theta A')\)</span
-        >
-        when
-        <span class="math inline"
-          >\(W \sim \mathcal{W}(\nu, \Sigma, \Theta)\)</span
-        >.
-      </p>
-      <p>
-        <span class="math inline">\(\bullet\)</span>
-        <strong>Second property of the Wishart distribution</strong>. Using the
-        characteristic function, it is not hard to check that if
-        <span class="math inline">\(W_1\)</span> and
-        <span class="math inline">\(W_2\)</span> are two random matrices such
-        that
-        <span class="math inline"
-          >\(W_1 \sim \mathcal{W}(\nu, \Sigma_1, \Theta)\)</span
-        >
-        and
-        <span class="math inline"
-          >\((W_2 \mid W_1) \sim \mathcal{W}(\nu, \Sigma_2, W_1)\)</span
-        >, then
-        <span class="math inline"
-          >\(W_2 \sim \mathcal{W}(\nu, \Sigma_1+\Sigma_2, \Theta)\)</span
-        >. This result is proved in A&amp;A’s paper only for the covariance
-        matrices <span class="math inline">\(J_d^i\)</span> we will see later,
-        by means of another method.
-      </p>
-      <p>
-        Let’s prove this result with the characteristic function. The
-        conditional characteristic function of
-        <span class="math inline">\(W_2\)</span> given
-        <span class="math inline">\(W_1\)</span> at
-        <span class="math inline">\(Z\)</span> is
-        <span class="math display"
-          >\[ \frac{\exp\Bigl(i\textrm{tr}\bigl({(I_d - 2i
-          Z\Sigma_2)}^{-1}ZW_1\bigr)\Bigr)}{{\det(I_d - 2i
-          Z\Sigma_2)}^{\frac{\nu}{2}}}. \]</span
-        >
-        The characteristic function of
-        <span class="math inline">\(W_2\)</span> is obtained by taking the
-        expectation of this expression, and doing so we get
-        <span class="math display"
-          >\[ \frac{\phi_{\nu,\Sigma_1,\Theta}\bigl({(I_d - 2i
-          Z\Sigma_2)}^{-1}Z\bigr)}{{\det(I_d - 2i Z\Sigma_2)}^{\frac{\nu}{2}}} =
-          \frac{\exp\left(i\textrm{tr}\Bigl({\bigr(I_d - 2i {(I_d - 2i
-          Z\Sigma_2)}^{-1}Z\Sigma_1\bigl)}^{-1}{(I_d - 2i
-          Z\Sigma_2)}^{-1}Z\Theta\Bigr)\right)}{{\det(I_d - 2i
-          Z\Sigma_2)}^{\frac{\nu}{2}} {\det(I_d - 2i {\bigl(I_d - 2i
-          Z\Sigma_2)}^{-1}Z\Sigma_1\bigr)}^{\frac{\nu}{2}}}. \]</span
-        >
-      </p>
-      <p>
-        It is easy to check that the denominator is
-        <span class="math inline"
-          >\({\det\bigl(I_d -
-          2iZ(\Sigma_1+\Sigma_2)\bigr)}^{\frac{\nu}{2}}\)</span
-        >. The expression inside
-        <span class="math inline">\(\textrm{tr}(\ldots)\)</span> at the
-        numerator is
-        <span class="math display"
-          >\[ {\Bigl((I_d - 2i Z\Sigma_2)\bigr(I_d - 2i {(I_d - 2i
-          Z\Sigma_2)}^{-1}Z\Sigma_1\bigl)\Bigr)}^{-1}Z\Theta = {\bigr(I_d -
-          2iZ(\Sigma_1+\Sigma_2)\bigl)}^{-1}Z\Theta. \]</span
-        >
-      </p>
-      <p>
-        Thus we find that the the characteristic function of
-        <span class="math inline">\(W_2\)</span> is
-        <span class="math inline">\(\phi_{\nu, \Sigma_1+\Sigma_2,\Theta}\)</span
-        >, that is to say
-        <span class="math inline"
-          >\(W_2 \sim \mathcal{W}(\nu, \Sigma_1+\Sigma_2, \Theta)\)</span
-        >.
-      </p>
-      <h1 id="aas-simulation-method">A&amp;A’s simulation method</h1>
-      <p>A&amp;A’s simulation method has three steps:</p>
-      <ul>
-        <li>
-          <p>
-            it firstly gives an algorithm to simulate
-            <span class="math inline">\(\mathcal{W}(\nu, J_d^1, \Theta)\)</span
-            >, denoting by <span class="math inline">\(J_d^i\)</span> the
-            <span class="math inline">\(d \times d\)</span> covariance matrix
-            whose all entries are equal to zero except the
-            <span class="math inline">\((i,i)\)</span>-entry which is equal to
-            one;
-          </p>
-        </li>
-        <li>
-          <p>
-            using the first step and the two properties of the Wishart
-            distribution that we have seen, it provides a way to simulate
-            <span class="math inline">\(\mathcal{W}(\nu, I_d^n, \Theta)\)</span>
-            where
-            <span class="math inline">\(I_d^n = J_d^1 + \ldots + J_d^n\)</span>;
-          </p>
-        </li>
-        <li>
-          <p>
-            using the second step and the first property of the Wishart
-            distribution that we have seen, it provides a way to simulate
-            <span class="math inline"
-              >\(\mathcal{W}(\nu, \Sigma, \Theta)\)</span
-            >
-            for any covariance matrix
-            <span class="math inline">\(\Sigma\)</span>.
-          </p>
-        </li>
-      </ul>
-      <p>
-        <span class="math inline">\(\bullet\)</span>
-        <strong
-          >Simulation of
-          <span class="math inline"
-            >\(\mathcal{W}(\nu, J_d^1, \Theta)\)</span
-          ></strong
-        >. This algorithm runs as follows. Let
-        <span class="math inline">\((L,M,P)\)</span> be an
-        <a
-          href="https://laustep.github.io/stlahblog/posts/extendedCholesky.html"
-          >extended Cholesky decomposition</a
-        >
-        of <span class="math inline">\(\Theta_{2:d,2:d}\)</span>. Set
-        <span class="math inline"
-          >\(Q = \begin{pmatrix} 1 &amp; 0 \\ 0 &amp; P \end{pmatrix}\)</span
-        >
-        and
-        <span class="math inline">\(\widetilde{\Theta} = Q\Theta Q'\)</span>,
-        then set
-        <span class="math inline"
-          >\(u = L^{-1}\widetilde{\Theta}_{1, 2:(r+1)}'\)</span
-        >
-        and
-        <span class="math inline"
-          >\(v = \widetilde{\Theta}_{1,1} - \sum_{i=1}^r u_i^2\)</span
-        >. Take
-        <span class="math inline"
-          >\(Z_1, \ldots, Z_r \sim_{\text{iid}} \mathcal{N}(0,1)\)</span
-        >
-        and set <span class="math inline">\(G_i = u_i + Z_i\)</span>. Finally,
-        take
-        <span class="math inline">\(X \sim \chi^2_{\nu-r, v}\)</span>
-        (noncentral chi-squared distribution) independent of the
-        <span class="math inline">\(Z_i\)</span>, and set
-        <span class="math display"
-          >\[ W = Q' \begin{pmatrix} 1 &amp; 0 &amp; 0 \\ 0 &amp; L &amp; 0 \\ 0
-          &amp; M &amp; I_{d-r-1} \end{pmatrix} \begin{pmatrix} X + \sum_{i=1}^r
-          G_i^2 &amp; G' &amp; 0 \\ G &amp; I_r &amp; 0 \\ 0 &amp; 0 &amp; 0
-          \end{pmatrix} \begin{pmatrix} 1 &amp; 0 &amp; 0 \\ 0 &amp; L' &amp; M'
-          \\ 0 &amp; 0 &amp; I_{d-r-1} \end{pmatrix} Q. \]</span
-        >
-        Then A&amp;A have shown that
-        <span class="math inline"
-          >\(W \sim \mathcal{W}(\nu, J_d^1, \Theta)\)</span
-        >.
-      </p>
-      <p>
-        <span class="math inline">\(\bullet\)</span>
-        <strong
-          >Simulation of
-          <span class="math inline"
-            >\(\mathcal{W}(\nu, I_d^n, \Theta)\)</span
-          ></strong
-        >. Let <span class="math inline">\(P\)</span> be the permutation matrix
-        exchanging rows <span class="math inline">\(1\)</span> and
-        <span class="math inline">\(2\)</span>. Using the previous algorithm,
-        simulate
-        <span class="math inline"
-          >\(W_1 \sim \mathcal{W}(\nu, J_d^1, \Theta)\)</span
-        >. By the first property of
-        <span class="math inline">\(\mathcal{W}\)</span> we have seen,
-        <span class="math inline"
-          >\(P W_1 P \sim \mathcal{W}(\nu, J_d^2, P\Theta P)\)</span
-        >. Then, still using the previous algorithm, simulate
-        <span class="math inline"
-          >\((W_2 \mid W_1) \sim \mathcal{W}(\nu, J_d^1, P W_1 P)\)</span
-        >. By the second property of
-        <span class="math inline">\(\mathcal{W}\)</span> we have seen,
-        <span class="math inline"
-          >\(W_2 \sim \mathcal{W}(\nu, I_d^2, P \Theta P)\)</span
-        >. And by the first property,
-        <span class="math inline"
-          >\(P W_2 P \sim \mathcal{W}(\nu, I_d^2, \Theta)\)</span
-        >. Continuing so on, we can simulate
-        <span class="math inline">\(\mathcal{W}(\nu, I_d^n, \Theta)\)</span> for
-        any <span class="math inline">\(n \leq d\)</span>.
-      </p>
-      <p>
-        <span class="math inline">\(\bullet\)</span>
-        <strong
-          >Simulation of
-          <span class="math inline"
-            >\(\mathcal{W}(\nu, \Sigma, \Theta)\)</span
-          ></strong
-        >. Finally, given any covariance matrix
-        <span class="math inline">\(\Sigma\)</span> of rank
-        <span class="math inline">\(n\)</span>, take the
-        <span class="math inline">\(\widetilde{C}\)</span> matrix of an extended
-        Cholesky decomposition of
-        <span class="math inline">\(\Sigma\)</span> with permutation matrix
-        <span class="math inline">\(P\)</span>, and set
-        <span class="math inline">\(A = P'\widetilde{C}\)</span>. Simulate
-        <span class="math inline"
-          >\(Y \sim \mathcal{W}\bigl(\nu, I_d^n,
-          A^{-1}\Theta{(A^{-1})}'\bigr)\)</span
-        >
-        with the previous algorithm and finally set
-        <span class="math inline">\(W = AYA'\)</span>, so that
-        <span class="math inline"
-          >\(W \sim \mathcal{W}(\nu, \Sigma, \Theta)\)</span
-        >
-        by the first property and by the property of the Cholesky decomposition.
-      </p>
-      <h1 id="checking">Checking</h1>
-      <p>
-        The algorithm is implemented in my package
-        <a href="https://github.com/stla/matrixsampling">matrixsampling</a>.
-        Let’s try it.
-      </p>
-      <div class="sourceCode" id="cb1">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb1-1"><span class="kw">library</span>(matrixsampling)</span>
-<span id="cb1-2">p &lt;-<span class="st"> </span><span class="dv">6</span></span>
-<span id="cb1-3">nu &lt;-<span class="st"> </span><span class="fl">6.3</span></span>
-<span id="cb1-4">Sigma &lt;-<span class="st"> </span><span class="kw">toeplitz</span>(p<span class="op">:</span><span class="dv">1</span>)</span>
-<span id="cb1-5">Theta &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="dv">1</span>, p, p)</span>
-<span id="cb1-6">nsims &lt;-<span class="st"> </span><span class="dv">100000</span></span>
-<span id="cb1-7">W &lt;-<span class="st"> </span><span class="kw">rwishart</span>(nsims, nu, Sigma, Theta)</span></code></pre>
-      </div>
-      <p>
-        As expected, the average simulated matrix is close to the theoretical
-        mean <span class="math inline">\(\nu \Sigma + \Theta\)</span>:
-      </p>
-      <div class="sourceCode" id="cb2">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb2-1"><span class="kw">round</span>((nu<span class="op">*</span>Sigma <span class="op">+</span><span class="st"> </span>Theta) <span class="op">-</span><span class="st"> </span><span class="kw">apply</span>(W, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, mean), <span class="dv">2</span>)</span>
-<span id="cb2-2"><span class="co">##       [,1]  [,2]  [,3]  [,4]  [,5]  [,6]</span></span>
-<span id="cb2-3"><span class="co">## [1,] -0.05 -0.04  0.00  0.00  0.02  0.04</span></span>
-<span id="cb2-4"><span class="co">## [2,] -0.04 -0.06 -0.03 -0.03  0.00  0.01</span></span>
-<span id="cb2-5"><span class="co">## [3,]  0.00 -0.03 -0.04 -0.06 -0.05 -0.05</span></span>
-<span id="cb2-6"><span class="co">## [4,]  0.00 -0.03 -0.06 -0.07 -0.04 -0.07</span></span>
-<span id="cb2-7"><span class="co">## [5,]  0.02  0.00 -0.05 -0.04 -0.03 -0.05</span></span>
-<span id="cb2-8"><span class="co">## [6,]  0.04  0.01 -0.05 -0.07 -0.05 -0.09</span></span></code></pre>
-      </div>
-      <p>
-        Let’s compare the theoretical characteristic function to its
-        approximation obtained from the simulations:
-      </p>
-      <div class="sourceCode" id="cb3">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb3-1">z &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="fl">0.001</span>, <span class="fl">0.004</span>, <span class="dt">length.out =</span> <span class="dv">20</span>)</span>
-<span id="cb3-2">Z &lt;-<span class="st"> </span><span class="kw">sapply</span>(z, <span class="cf">function</span>(z){</span>
-<span id="cb3-3">  z<span class="op">*</span><span class="kw">diag</span>(p) <span class="op">+</span><span class="st"> </span><span class="kw">matrix</span>(z, p, p)</span>
-<span id="cb3-4">}, <span class="dt">simplify=</span><span class="ot">FALSE</span>)</span>
-<span id="cb3-5">tr &lt;-<span class="st"> </span><span class="cf">function</span>(A) <span class="kw">sum</span>(<span class="kw">diag</span>(A))</span>
-<span id="cb3-6">Phi_theoretical &lt;-<span class="st"> </span><span class="kw">sapply</span>(Z, <span class="cf">function</span>(Z){</span>
-<span id="cb3-7">             complexplus<span class="op">::</span><span class="kw">Det</span>(<span class="kw">diag</span>(p) <span class="op">-</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>1i<span class="op">*</span>Z<span class="op">%*%</span>Sigma)<span class="op">^</span>(<span class="op">-</span>nu<span class="op">/</span><span class="dv">2</span>) <span class="op">*</span><span class="st"> </span></span>
-<span id="cb3-8"><span class="st">             </span><span class="kw">exp</span>(1i<span class="op">*</span><span class="kw">tr</span>(<span class="kw">solve</span>(<span class="kw">diag</span>(p) <span class="op">-</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>1i<span class="op">*</span>Z<span class="op">%*%</span>Sigma) <span class="op">%*%</span><span class="st"> </span>Z <span class="op">%*%</span><span class="st"> </span>Theta))</span>
-<span id="cb3-9">})</span>
-<span id="cb3-10">Phi_sims &lt;-<span class="st"> </span><span class="kw">sapply</span>(Z, <span class="cf">function</span>(Z){</span>
-<span id="cb3-11">  <span class="kw">mean</span>(<span class="kw">apply</span>(W, <span class="dv">3</span>, <span class="cf">function</span>(W){</span>
-<span id="cb3-12">    <span class="kw">exp</span>(1i<span class="op">*</span><span class="kw">tr</span>(Z<span class="op">%*%</span>W))</span>
-<span id="cb3-13">  }))</span>
-<span id="cb3-14">})</span>
-<span id="cb3-15"><span class="kw">layout</span>(<span class="kw">t</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>))</span>
-<span id="cb3-16"><span class="kw">plot</span>(z, <span class="kw">Re</span>(Phi_theoretical), <span class="dt">type=</span><span class="st">"o"</span>, <span class="dt">pch=</span><span class="dv">19</span>)</span>
-<span id="cb3-17"><span class="kw">lines</span>(z, <span class="kw">Re</span>(Phi_sims), <span class="dt">type=</span><span class="st">"o"</span>, <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">col=</span><span class="st">"red"</span>)</span>
-<span id="cb3-18"><span class="kw">plot</span>(z, <span class="kw">Im</span>(Phi_theoretical), <span class="dt">type=</span><span class="st">"o"</span>, <span class="dt">pch=</span><span class="dv">19</span>)</span>
-<span id="cb3-19"><span class="kw">lines</span>(z, <span class="kw">Im</span>(Phi_sims), <span class="dt">type=</span><span class="st">"o"</span>, <span class="dt">pch=</span><span class="dv">19</span>, <span class="dt">col=</span><span class="st">"red"</span>)</span></code></pre>
-      </div>
-      <p>
-        <img
-          src="https://laustep.github.io/stlahblog/posts/figures/WishFrac-WishartCF-1.png"
-        />
-      </p>
-    </div>
-  </div>
-</div>
-]]></description>
-      <pubDate>Sat, 09 Dec 2017 00:00:00 UT</pubDate>
-      <guid>https://laustep.github.io/stlahblog/posts/WishartFractional.html</guid>
       <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
