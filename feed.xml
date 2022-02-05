@@ -5,7 +5,148 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Thu, 03 Feb 2022 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Sat, 05 Feb 2022 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>Gyrotriangle (aka hyperbolic triangle) with moving colors</title>
+      <link>https://laustep.github.io/stlahblog/posts/gyrotriangle.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        My package <a href="https://github.com/stla/gyro">gyro</a> has been
+        freshly released on CRAN. I implemented the ideas given in
+        <a
+          href="https://laustep.github.io/stlahblog/posts/hyperbolicPolyhedra.html"
+          >this blog post</a
+        >
+        in this package. It has a short
+        <a
+          href="https://cran.r-project.org/web/packages/gyro/vignettes/getstarted.html"
+          >vignette</a
+        >.
+      </p>
+      <p>
+        The <code>gyrodemos</code> function provides some examples. But none of
+        them explains how I did the moving colors on this polyhedra that you can
+        see on the Github repo:
+      </p>
+      <p>
+        <img
+          src="https://raw.githubusercontent.com/stla/gyro/main/inst/images/icosahedron_dynamic_colors.gif"
+        />
+      </p>
+      <p>
+        So I will explain here. In fact, this is similar to the method I
+        presented
+        <a
+          href="https://laustep.github.io/stlahblog/posts/PyVistaDynamicCmap.html"
+          >here</a
+        >
+        for <strong>PyVista</strong> and
+        <a
+          href="https://laustep.github.io/stlahblog/posts/HopfTorusDynamicColors.html"
+          >here</a
+        >
+        for <strong>rgl</strong>.
+      </p>
+      <p>
+        The <code>gyrotriangle</code> function of the
+        <strong>gyro</strong> package has a <code>palette</code> argument, in
+        which the user provides a vector of colors. Here is an example:
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1"><span class="kw">library</span>(gyro)</span>
+<span id="cb1-2"><span class="kw">library</span>(rgl)</span>
+<span id="cb1-3"></span>
+<span id="cb1-4">s &lt;-<span class="st"> </span><span class="fl">0.6</span> <span class="co"># hyperbolic curvature</span></span>
+<span id="cb1-5">A &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>); B &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>); C &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb1-6">ABC &lt;-<span class="st"> </span><span class="kw">gyrotriangle</span>(</span>
+<span id="cb1-7">  A, B, C, <span class="dt">s =</span> s,</span>
+<span id="cb1-8">  <span class="dt">palette =</span> <span class="kw">hcl.colors</span>(<span class="dt">n =</span> <span class="dv">256</span>, <span class="dt">palette =</span> <span class="st">"Berlin"</span>)</span>
+<span id="cb1-9">)</span>
+<span id="cb1-10"></span>
+<span id="cb1-11"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
+<span id="cb1-12"><span class="kw">material3d</span>(<span class="dt">lit =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb1-13"><span class="kw">view3d</span>(<span class="dv">10</span>, <span class="dv">40</span>, <span class="dt">zoom =</span> <span class="fl">0.8</span>)</span>
+<span id="cb1-14"><span class="kw">shade3d</span>(ABC)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/gyrotriangle.png"
+        />
+      </p>
+      <p>
+        Under the hood, the <code>gyrotriangle</code> function uses the
+        <a
+          href="https://www.rdocumentation.org/packages/grDevices/versions/3.6.2/topics/colorRamp"
+          >colorRamp</a
+        >
+        with the vector of colors passed to the <code>palette</code> argument.
+        This creates a function, let’s call it <code>fpalette</code>, that
+        assigns a color to each number in the interval
+        <span class="math inline">\([0, 1]\)</span>. Then,
+        <code>gyrotriangle</code> calculates all the distances from the points
+        in the mesh forming the triangle to the gyrocentroid of the triangle.
+        Finally, it linearly normalizes these distances to the interval
+        <span class="math inline">\([0, 1]\)</span>, and it applies the
+        <code>fpalette</code> function to the normalized distances.
+      </p>
+      <p>
+        Now, the <code>gyrotriangle</code> function has a
+        <code>g</code> argument. This is the key to make the moving colors. This
+        argument <code>g</code> must be a function from
+        <span class="math inline">\([0, 1]\)</span> to
+        <span class="math inline">\([0, 1]\)</span>, by default it is the
+        <code>identity</code> function, and <code>fpalette</code> is actually
+        applied to the normalized distances transformed by <code>g</code>.
+      </p>
+      <p>So, here is how we can do to get some moving colors:</p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1">shift_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">length.out =</span> <span class="dv">61</span>)[<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb2-2"><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_along</span>(shift_)){</span>
+<span id="cb2-3">  ABC &lt;-<span class="st"> </span><span class="kw">gyrotriangle</span>(</span>
+<span id="cb2-4">    A, B, C, s,</span>
+<span id="cb2-5">    <span class="dt">palette =</span> <span class="kw">hcl.colors</span>(<span class="dt">n =</span> <span class="dv">256</span>, <span class="dt">palette =</span> <span class="st">"Berlin"</span>), </span>
+<span id="cb2-6">    <span class="dt">g =</span> <span class="cf">function</span>(u) (<span class="kw">sin</span>(<span class="dv">2</span><span class="op">*</span>pi<span class="op">*</span>(u <span class="op">-</span><span class="st"> </span>shift_[i])) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span></span>
+<span id="cb2-7">  )</span>
+<span id="cb2-8">  <span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
+<span id="cb2-9">  <span class="kw">material3d</span>(<span class="dt">lit =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb2-10">  <span class="kw">view3d</span>(<span class="dv">10</span>, <span class="dv">40</span>, <span class="dt">zoom =</span> <span class="fl">0.8</span>)</span>
+<span id="cb2-11">  <span class="kw">shade3d</span>(ABC)</span>
+<span id="cb2-12">  <span class="kw">rgl.snapshot</span>(<span class="kw">sprintf</span>(<span class="st">"snapshot%03d"</span>, i))</span>
+<span id="cb2-13">  <span class="kw">close3d</span>()</span>
+<span id="cb2-14">}</span>
+<span id="cb2-15"></span>
+<span id="cb2-16"><span class="kw">library</span>(gifski)</span>
+<span id="cb2-17">pngs &lt;-<span class="st"> </span><span class="kw">list.files</span>(<span class="dt">pattern =</span> <span class="st">"^snapshot"</span>)</span>
+<span id="cb2-18"><span class="kw">gifski</span>(</span>
+<span id="cb2-19">  pngs,</span>
+<span id="cb2-20">  <span class="dt">gif_file =</span> <span class="st">"gyrotriangle.gif"</span>,</span>
+<span id="cb2-21">  <span class="dt">width =</span> <span class="dv">512</span>,</span>
+<span id="cb2-22">  <span class="dt">height =</span> <span class="dv">512</span>,</span>
+<span id="cb2-23">  <span class="dt">delay =</span> <span class="dv">1</span><span class="op">/</span><span class="dv">8</span></span>
+<span id="cb2-24">)</span>
+<span id="cb2-25"></span>
+<span id="cb2-26"><span class="kw">file.remove</span>(pngs)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/gyrotriangle.gif"
+        />
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Sat, 05 Feb 2022 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/gyrotriangle.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>Some simple RStudio addins</title>
       <link>https://laustep.github.io/stlahblog/posts/rstudioAddins.html</link>
@@ -45,6 +186,7 @@
       <p>
         <img
           src="https://raw.githubusercontent.com/stla/pasteAsComment/main/inst/screenshots/pasteAsComment.gif"
+          style="width: 75%"
         />
       </p>
       <p>
@@ -55,6 +197,7 @@
       <p>
         <img
           src="https://raw.githubusercontent.com/stla/pasteAsComment/main/inst/screenshots/pasteAsRoxygen.gif"
+          style="width: 75%"
         />
       </p>
       <h2 id="jsconsole">‘JSconsole’</h2>

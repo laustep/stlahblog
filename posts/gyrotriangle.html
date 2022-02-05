@@ -1,0 +1,211 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Gyrotriangle (aka hyperbolic triangle) with moving colors</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Gyrotriangle (aka hyperbolic triangle) with moving colors</h1> 
+          <div class="info">
+    Posted on February  5, 2022
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>, <a title="All pages tagged 'geometry'." href="../tags/geometry.html">geometry</a>, <a title="All pages tagged 'graphics'." href="../tags/graphics.html">graphics</a>, <a title="All pages tagged 'rgl'." href="../tags/rgl.html">rgl</a>
+    
+</div>
+
+<p>My package <a href="https://github.com/stla/gyro">gyro</a> has been freshly released on CRAN. I implemented the ideas given in <a href="https://laustep.github.io/stlahblog/posts/hyperbolicPolyhedra.html">this blog post</a> in this package. It has a short <a href="https://cran.r-project.org/web/packages/gyro/vignettes/getstarted.html">vignette</a>.</p>
+<p>The <code>gyrodemos</code> function provides some examples. But none of them explains how I did the moving colors on this polyhedra that you can see on the Github repo:</p>
+<p><img src="https://raw.githubusercontent.com/stla/gyro/main/inst/images/icosahedron_dynamic_colors.gif" /></p>
+<p>So I will explain here. In fact, this is similar to the method I presented <a href="https://laustep.github.io/stlahblog/posts/PyVistaDynamicCmap.html">here</a> for <strong>PyVista</strong> and <a href="https://laustep.github.io/stlahblog/posts/HopfTorusDynamicColors.html">here</a> for <strong>rgl</strong>.</p>
+<p>The <code>gyrotriangle</code> function of the <strong>gyro</strong> package has a <code>palette</code> argument, in which the user provides a vector of colors. Here is an example:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">library</span>(gyro)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="kw">library</span>(rgl)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>s &lt;-<span class="st"> </span><span class="fl">0.6</span> <span class="co"># hyperbolic curvature</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>A &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>); B &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>); C &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>ABC &lt;-<span class="st"> </span><span class="kw">gyrotriangle</span>(</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>  A, B, C, <span class="dt">s =</span> s,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>  <span class="dt">palette =</span> <span class="kw">hcl.colors</span>(<span class="dt">n =</span> <span class="dv">256</span>, <span class="dt">palette =</span> <span class="st">&quot;Berlin&quot;</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a><span class="kw">material3d</span>(<span class="dt">lit =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a><span class="kw">view3d</span>(<span class="dv">10</span>, <span class="dv">40</span>, <span class="dt">zoom =</span> <span class="fl">0.8</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a><span class="kw">shade3d</span>(ABC)</span></code></pre></div>
+<p><img src="figures/gyrotriangle.png" /></p>
+<p>Under the hood, the <code>gyrotriangle</code> function uses the <a href="https://www.rdocumentation.org/packages/grDevices/versions/3.6.2/topics/colorRamp">colorRamp</a> with the vector of colors passed to the <code>palette</code> argument. This creates a function, let’s call it <code>fpalette</code>, that assigns a color to each number in the interval <span class="math inline">\([0, 1]\)</span>. Then, <code>gyrotriangle</code> calculates all the distances from the points in the mesh forming the triangle to the gyrocentroid of the triangle. Finally, it linearly normalizes these distances to the interval <span class="math inline">\([0, 1]\)</span>, and it applies the <code>fpalette</code> function to the normalized distances.</p>
+<p>Now, the <code>gyrotriangle</code> function has a <code>g</code> argument. This is the key to make the moving colors. This argument <code>g</code> must be a function from <span class="math inline">\([0, 1]\)</span> to <span class="math inline">\([0, 1]\)</span>, by default it is the <code>identity</code> function, and <code>fpalette</code> is actually applied to the normalized distances transformed by <code>g</code>.</p>
+<p>So, here is how we can do to get some moving colors:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>shift_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">length.out =</span> <span class="dv">61</span>)[<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_along</span>(shift_)){</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>  ABC &lt;-<span class="st"> </span><span class="kw">gyrotriangle</span>(</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>    A, B, C, s,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>    <span class="dt">palette =</span> <span class="kw">hcl.colors</span>(<span class="dt">n =</span> <span class="dv">256</span>, <span class="dt">palette =</span> <span class="st">&quot;Berlin&quot;</span>), </span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>    <span class="dt">g =</span> <span class="cf">function</span>(u) (<span class="kw">sin</span>(<span class="dv">2</span><span class="op">*</span>pi<span class="op">*</span>(u <span class="op">-</span><span class="st"> </span>shift_[i])) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>  )</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>  <span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>  <span class="kw">material3d</span>(<span class="dt">lit =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>  <span class="kw">view3d</span>(<span class="dv">10</span>, <span class="dv">40</span>, <span class="dt">zoom =</span> <span class="fl">0.8</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>  <span class="kw">shade3d</span>(ABC)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>  <span class="kw">rgl.snapshot</span>(<span class="kw">sprintf</span>(<span class="st">&quot;snapshot%03d&quot;</span>, i))</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a>  <span class="kw">close3d</span>()</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a>}</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a><span class="kw">library</span>(gifski)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a>pngs &lt;-<span class="st"> </span><span class="kw">list.files</span>(<span class="dt">pattern =</span> <span class="st">&quot;^snapshot&quot;</span>)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true"></a><span class="kw">gifski</span>(</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true"></a>  pngs,</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true"></a>  <span class="dt">gif_file =</span> <span class="st">&quot;gyrotriangle.gif&quot;</span>,</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true"></a>  <span class="dt">width =</span> <span class="dv">512</span>,</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true"></a>  <span class="dt">height =</span> <span class="dv">512</span>,</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true"></a>  <span class="dt">delay =</span> <span class="dv">1</span><span class="op">/</span><span class="dv">8</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true"></a>)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true"></a></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true"></a><span class="kw">file.remove</span>(pngs)</span></code></pre></div>
+<p><img src="figures/gyrotriangle.gif" /></p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
