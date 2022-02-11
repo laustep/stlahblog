@@ -1,0 +1,234 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Nice DT filters</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Nice DT filters</h1> 
+          <div class="info">
+    Posted on February 11, 2022
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'datatables'." href="../tags/datatables.html">datatables</a>, <a title="All pages tagged 'shiny'." href="../tags/shiny.html">shiny</a>, <a title="All pages tagged 'javascript'." href="../tags/javascript.html">javascript</a>
+    
+</div>
+
+<p>I am not a big fan of the built-in filters of <strong>DT</strong>. I prefer the ones below, made with the help of the JavaScript library <strong>select2</strong>.</p>
+<p><img src="figures/DTselect2Filters.gif" /></p>
+<p>First, <a href="https://cdnjs.com/libraries/select2">download</a> the files <strong>select2.min.js</strong> and <strong>select2.min.css</strong>. Now, here is the code:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(DT)</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="kw">library</span>(htmltools)</span>
+<span id="cb1-3"><a href="#cb1-3"></a></span>
+<span id="cb1-4"><a href="#cb1-4"></a>dat &lt;-<span class="st"> </span>iris</span>
+<span id="cb1-5"><a href="#cb1-5"></a></span>
+<span id="cb1-6"><a href="#cb1-6"></a>sketch &lt;-<span class="st"> </span>tags<span class="op">$</span><span class="kw">table</span>(</span>
+<span id="cb1-7"><a href="#cb1-7"></a>  tags<span class="op">$</span><span class="kw">thead</span>(</span>
+<span id="cb1-8"><a href="#cb1-8"></a>    tags<span class="op">$</span><span class="kw">tr</span>(</span>
+<span id="cb1-9"><a href="#cb1-9"></a>      tags<span class="op">$</span><span class="kw">th</span>(), <span class="kw">lapply</span>(<span class="kw">names</span>(dat), tags<span class="op">$</span>th)</span>
+<span id="cb1-10"><a href="#cb1-10"></a>    ),</span>
+<span id="cb1-11"><a href="#cb1-11"></a>    tags<span class="op">$</span><span class="kw">tr</span>(</span>
+<span id="cb1-12"><a href="#cb1-12"></a>      <span class="kw">lapply</span>(<span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(dat)), <span class="cf">function</span>(i) tags<span class="op">$</span><span class="kw">th</span>(<span class="dt">id =</span> <span class="kw">paste0</span>(<span class="st">&quot;th&quot;</span>, i)))</span>
+<span id="cb1-13"><a href="#cb1-13"></a>    )</span>
+<span id="cb1-14"><a href="#cb1-14"></a>  )</span>
+<span id="cb1-15"><a href="#cb1-15"></a>)</span>
+<span id="cb1-16"><a href="#cb1-16"></a></span>
+<span id="cb1-17"><a href="#cb1-17"></a>js &lt;-<span class="st"> </span><span class="kw">c</span>(</span>
+<span id="cb1-18"><a href="#cb1-18"></a>  <span class="st">&quot;function(){&quot;</span>, </span>
+<span id="cb1-19"><a href="#cb1-19"></a>  <span class="st">&quot;  this.api().columns().every(function(i){&quot;</span>,</span>
+<span id="cb1-20"><a href="#cb1-20"></a>  <span class="st">&quot;    var column = this;&quot;</span>,</span>
+<span id="cb1-21"><a href="#cb1-21"></a>  <span class="st">&quot;    var $select =&quot;</span>,</span>
+<span id="cb1-22"><a href="#cb1-22"></a>  <span class="st">&quot;      $('&lt;select multiple=</span><span class="ch">\&quot;</span><span class="st">multiple</span><span class="ch">\&quot;</span><span class="st">&gt;' +&quot;</span>,</span>
+<span id="cb1-23"><a href="#cb1-23"></a>  <span class="st">&quot;         '&lt;option value=</span><span class="ch">\&quot;\&quot;</span><span class="st">&gt;&lt;/option&gt;' +&quot;</span>,</span>
+<span id="cb1-24"><a href="#cb1-24"></a>  <span class="st">&quot;      '&lt;/select&gt;')&quot;</span>,</span>
+<span id="cb1-25"><a href="#cb1-25"></a>  <span class="st">&quot;      .appendTo($('#th'+i).empty())&quot;</span>, </span>
+<span id="cb1-26"><a href="#cb1-26"></a>  <span class="st">&quot;      .on('change', function(){&quot;</span>,</span>
+<span id="cb1-27"><a href="#cb1-27"></a>  <span class="st">&quot;        var vals = $('option:selected', this).map(function(idx, element){&quot;</span>,</span>
+<span id="cb1-28"><a href="#cb1-28"></a>  <span class="st">&quot;          return $.fn.dataTable.util.escapeRegex($(element).val());&quot;</span>,</span>
+<span id="cb1-29"><a href="#cb1-29"></a>  <span class="st">&quot;        }).toArray().join('|');&quot;</span>,</span>
+<span id="cb1-30"><a href="#cb1-30"></a>  <span class="st">&quot;        column.search(&quot;</span>,</span>
+<span id="cb1-31"><a href="#cb1-31"></a>  <span class="st">&quot;          vals.length &gt; 0 ? '^(' + vals + ')$' : '', true, false&quot;</span>,</span>
+<span id="cb1-32"><a href="#cb1-32"></a>  <span class="st">&quot;        ).draw();&quot;</span>,</span>
+<span id="cb1-33"><a href="#cb1-33"></a>  <span class="st">&quot;      });&quot;</span>,</span>
+<span id="cb1-34"><a href="#cb1-34"></a>  <span class="st">&quot;    var data = column.data();&quot;</span>,</span>
+<span id="cb1-35"><a href="#cb1-35"></a>  <span class="st">&quot;    if(i == 0){&quot;</span>,</span>
+<span id="cb1-36"><a href="#cb1-36"></a>  <span class="st">&quot;      data.each(function(d, j){&quot;</span>,</span>
+<span id="cb1-37"><a href="#cb1-37"></a>  <span class="st">&quot;        $select.append('&lt;option value=</span><span class="ch">\&quot;</span><span class="st">' + d + '</span><span class="ch">\&quot;</span><span class="st">&gt;' + d + '&lt;/option&gt;');&quot;</span>,</span>
+<span id="cb1-38"><a href="#cb1-38"></a>  <span class="st">&quot;      });&quot;</span>,</span>
+<span id="cb1-39"><a href="#cb1-39"></a>  <span class="st">&quot;    }else{&quot;</span>,</span>
+<span id="cb1-40"><a href="#cb1-40"></a>  <span class="st">&quot;      data.unique().sort().each(function(d, j){&quot;</span>,</span>
+<span id="cb1-41"><a href="#cb1-41"></a>  <span class="st">&quot;        $select.append('&lt;option value=</span><span class="ch">\&quot;</span><span class="st">' + d + '</span><span class="ch">\&quot;</span><span class="st">&gt;' + d + '&lt;/option&gt;');&quot;</span>,</span>
+<span id="cb1-42"><a href="#cb1-42"></a>  <span class="st">&quot;      });&quot;</span>,</span>
+<span id="cb1-43"><a href="#cb1-43"></a>  <span class="st">&quot;    }&quot;</span>,</span>
+<span id="cb1-44"><a href="#cb1-44"></a>  <span class="st">&quot;    $select.select2({width: '100%', closeOnSelect: false});&quot;</span>,</span>
+<span id="cb1-45"><a href="#cb1-45"></a>  <span class="st">&quot;  });&quot;</span>,</span>
+<span id="cb1-46"><a href="#cb1-46"></a>  <span class="st">&quot;}&quot;</span>)</span>
+<span id="cb1-47"><a href="#cb1-47"></a></span>
+<span id="cb1-48"><a href="#cb1-48"></a>htmlDep &lt;-<span class="st"> </span><span class="kw">htmlDependency</span>(</span>
+<span id="cb1-49"><a href="#cb1-49"></a>  <span class="dt">name =</span> <span class="st">&quot;select2&quot;</span>, </span>
+<span id="cb1-50"><a href="#cb1-50"></a>  <span class="dt">version =</span> <span class="st">&quot;4.0.13&quot;</span>, </span>
+<span id="cb1-51"><a href="#cb1-51"></a>  <span class="dt">src =</span> <span class="st">&quot;path/to/select2&quot;</span>, <span class="co"># path to the folder containing the 'select2' files </span></span>
+<span id="cb1-52"><a href="#cb1-52"></a>  <span class="dt">script =</span> <span class="st">&quot;select2.min.js&quot;</span>, </span>
+<span id="cb1-53"><a href="#cb1-53"></a>  <span class="dt">stylesheet =</span> <span class="st">&quot;select2.min.css&quot;</span>, </span>
+<span id="cb1-54"><a href="#cb1-54"></a>  <span class="dt">all_files =</span> <span class="ot">FALSE</span></span>
+<span id="cb1-55"><a href="#cb1-55"></a>)</span>
+<span id="cb1-56"><a href="#cb1-56"></a></span>
+<span id="cb1-57"><a href="#cb1-57"></a>dtable &lt;-<span class="st"> </span></span>
+<span id="cb1-58"><a href="#cb1-58"></a><span class="st">  </span><span class="kw">datatable</span>(</span>
+<span id="cb1-59"><a href="#cb1-59"></a>    dat, </span>
+<span id="cb1-60"><a href="#cb1-60"></a>    <span class="dt">container =</span> sketch, </span>
+<span id="cb1-61"><a href="#cb1-61"></a>    <span class="dt">options =</span> <span class="kw">list</span>(</span>
+<span id="cb1-62"><a href="#cb1-62"></a>      <span class="dt">orderCellsTop =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb1-63"><a href="#cb1-63"></a>      <span class="dt">initComplete =</span> <span class="kw">JS</span>(js),</span>
+<span id="cb1-64"><a href="#cb1-64"></a>      <span class="dt">columnDefs =</span> <span class="kw">list</span>(</span>
+<span id="cb1-65"><a href="#cb1-65"></a>        <span class="kw">list</span>(<span class="dt">targets =</span> <span class="st">&quot;_all&quot;</span>, <span class="dt">className =</span> <span class="st">&quot;dt-center&quot;</span>)</span>
+<span id="cb1-66"><a href="#cb1-66"></a>      )</span>
+<span id="cb1-67"><a href="#cb1-67"></a>    )</span>
+<span id="cb1-68"><a href="#cb1-68"></a>  )</span>
+<span id="cb1-69"><a href="#cb1-69"></a>dtable[[<span class="st">&quot;dependencies&quot;</span>]] &lt;-<span class="st"> </span><span class="kw">c</span>(dtable[[<span class="st">&quot;dependencies&quot;</span>]], <span class="kw">list</span>(htmlDep))</span>
+<span id="cb1-70"><a href="#cb1-70"></a>dtable</span></code></pre></div>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
