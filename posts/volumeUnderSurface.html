@@ -1,0 +1,224 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Volume under surface from points</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Volume under surface from points</h1> 
+          <div class="info">
+    Posted on February 26, 2022
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>, <a title="All pages tagged 'geometry'." href="../tags/geometry.html">geometry</a>, <a title="All pages tagged 'rgl'." href="../tags/rgl.html">rgl</a>
+    
+</div>
+
+<h2 id="the-problem">The problem</h2>
+<p>Suppose you want to get the volume under a surface but you only have some points on this surface. For the illustration, I will take the surface defined by <span class="math inline">\(z = \exp\bigl(-(x^2 + y^2)\bigr)\)</span> on the square <span class="math inline">\([-5, 5] \times [-5, 5]\)</span>. Then the volume we’re looking for is close to <span class="math inline">\(\pi\)</span> (the integral on <span class="math inline">\([-\infty, +\infty] \times [-\infty, +\infty]\)</span> is exactly <span class="math inline">\(\pi\)</span>).</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>f &lt;-<span class="st"> </span><span class="cf">function</span>(x, y){</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>  <span class="kw">exp</span>(<span class="op">-</span>(x<span class="op">*</span>x <span class="op">+</span><span class="st"> </span>y<span class="op">*</span>y))</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p>Now let’s define a grid on <span class="math inline">\([-5, 5] \times [-5, 5]\)</span> and the value of <span class="math inline">\(z\)</span> for each point on this grid:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">5</span>, <span class="dv">5</span>, <span class="dt">length.out =</span> <span class="dv">100</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>y &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">5</span>, <span class="dv">5</span>, <span class="dt">length.out =</span> <span class="dv">100</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>grd &lt;-<span class="st"> </span><span class="kw">transform</span>( <span class="co"># data (x_i, y_i, z_i)</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>  <span class="kw">expand.grid</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y), <span class="dt">z =</span> <span class="kw">f</span>(x, y)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>) </span></code></pre></div>
+<h2 id="elevated-delaunay-tessellation---using-deldir">Elevated Delaunay tessellation - using ‘deldir’</h2>
+<p>A solution consists in constructing a Delaunay tessellation of the surface and then to sum the volumes under the Delaunay triangles. The <strong>deldir</strong> package allows to construct such a Delaunay tessellation (which I call an <em>elevated Delaunay tessellation</em>).</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">library</span>(deldir)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>del &lt;-<span class="st"> </span><span class="kw">deldir</span>( <span class="co"># Delaunay</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>  <span class="dt">x =</span> grd[[<span class="st">&quot;x&quot;</span>]], <span class="dt">y =</span> grd[[<span class="st">&quot;y&quot;</span>]], <span class="dt">z =</span> grd[[<span class="st">&quot;z&quot;</span>]],</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>  <span class="dt">rw =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">-5</span>, <span class="dv">5</span>), <span class="dt">round =</span> <span class="ot">FALSE</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>) </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>trgls &lt;-<span class="st"> </span><span class="kw">triang.list</span>(del) <span class="co"># extracts all triangles</span></span></code></pre></div>
+<p>The function below calculates the volume under a triangle:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>volume_under_triangle &lt;-<span class="st"> </span><span class="cf">function</span>(trgl){</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>  <span class="kw">with</span>(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>    trgl, </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>    <span class="kw">sum</span>(z) <span class="op">*</span><span class="st"> </span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a><span class="st">      </span>(x[1L]<span class="op">*</span>y[2L] <span class="op">-</span><span class="st"> </span>x[2L]<span class="op">*</span>y[1L] <span class="op">+</span><span class="st"> </span>x[2L]<span class="op">*</span>y[3L] <span class="op">-</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a><span class="st">         </span>x[3L]<span class="op">*</span>y[2L] <span class="op">+</span><span class="st"> </span>x[3L]<span class="op">*</span>y[1L] <span class="op">-</span><span class="st"> </span>x[1L]<span class="op">*</span>y[3L]) <span class="op">/</span><span class="st"> </span><span class="dv">6</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>  )</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>}</span></code></pre></div>
+<p>So here is our approximation of the volume:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>volumes &lt;-<span class="st"> </span><span class="kw">vapply</span>(trgls, volume_under_triangle, <span class="kw">numeric</span>(1L))</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="kw">sum</span>(volumes)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="co">## [1] 3.141592</span></span></code></pre></div>
+<h2 id="using-rcgal">Using ‘RCGAL’</h2>
+<p>If you ran the above code, you noticed that the <code>deldir</code> function as well as the <code>triang.list</code> functions are a bit slow. My package <a href="https://laustep.github.io/stlahblog/posts/SurfaceReconstruction.html">RCGAL</a> (not on CRAN) can construct an elevated Delaunay tessellation, and it is faster.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">library</span>(RCGAL)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>points &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(grd)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>del &lt;-<span class="st"> </span><span class="kw">delaunay</span>(points, <span class="dt">elevation =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<p>You can directly get the volume:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>del[[<span class="st">&quot;volume&quot;</span>]]</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="co">## [1] 3.141593</span></span></code></pre></div>
+<p>And you can easily plot the elevated Delaunay tessellation with the help of the <strong>rgl</strong> package:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>mesh &lt;-<span class="st"> </span>del[[<span class="st">&quot;mesh&quot;</span>]]</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a><span class="kw">library</span>(rgl)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">306</span>), <span class="dt">zoom =</span> <span class="fl">0.5</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a><span class="kw">aspect3d</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">3</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a><span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">&quot;limegreen&quot;</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true"></a><span class="kw">wire3d</span>(mesh)</span></code></pre></div>
+<p><img src="figures/rgl_elevated_delaunay.png" /></p>
+<h2 id="interactive-plot-with-deldir">Interactive plot with ‘deldir’</h2>
+<p>The <strong>deldir</strong> also allows to get an interactive graphic from the elevated Delaunay tessellation. This requires the <strong>rgl</strong> package. I do it below with a less fine grid, otherwise the visualization is not nice (too dense):</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dt">length.out =</span> <span class="dv">20</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a>y &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dt">length.out =</span> <span class="dv">20</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a>grd &lt;-<span class="st"> </span><span class="kw">transform</span>(</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a>  <span class="kw">expand.grid</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y), <span class="dt">z =</span> <span class="kw">f</span>(x, y)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a>) </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a>del &lt;-<span class="st"> </span><span class="kw">deldir</span>(</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a>  <span class="dt">x =</span> grd[[<span class="st">&quot;x&quot;</span>]], <span class="dt">y =</span> grd[[<span class="st">&quot;y&quot;</span>]], <span class="dt">z =</span> grd[[<span class="st">&quot;z&quot;</span>]],</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true"></a>  <span class="dt">rw =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">-3</span>, <span class="dv">3</span>), <span class="dt">round =</span> <span class="ot">FALSE</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true"></a>) </span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="kw">library</span>(rgl)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a><span class="kw">persp3d</span>(del, <span class="dt">front =</span> <span class="st">&quot;lines&quot;</span>, <span class="dt">back =</span> <span class="st">&quot;lines&quot;</span>, <span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a><span class="kw">aspect3d</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">1</span>)</span></code></pre></div>
+<p><img src="figures/deldir_elevated_delaunay.gif" /></p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
