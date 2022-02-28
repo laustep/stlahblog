@@ -1,0 +1,265 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Hyperbolic gircope - using 'cxhull' and 'gyro'</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Hyperbolic gircope - using 'cxhull' and 'gyro'</h1> 
+          <div class="info">
+    Posted on February 28, 2022
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>, <a title="All pages tagged 'geometry'." href="../tags/geometry.html">geometry</a>, <a title="All pages tagged 'rgl'." href="../tags/rgl.html">rgl</a>, <a title="All pages tagged 'graphics'." href="../tags/graphics.html">graphics</a>
+    
+</div>
+
+<p>This post is a demonstration of the <strong>cxhull</strong> and <strong>gyro</strong> packages. I will use these packages (and others) to draw an hyperbolic version of the stereographic projection of a convex 4D polytope, the <em>gircope</em> or <em>great rhombicuboctahedral prism</em>. The gircope has twenty-eight cells, but I will only draw the twelve cubes among them.</p>
+<p>As said in <a href="https://polytope.miraheze.org/wiki/Great_rhombicuboctahedral_prism">this wiki</a>, the vertices of the gircope are given by all permutations of the first three coordinates of: <span class="math display">\[
+\left(\pm\frac{1+2\sqrt{2}}{2}, \pm\frac{1+\sqrt{2}}{2}, 
+      \pm\frac{1}{2}, \pm\frac{1}{2}\right).
+\]</span></p>
+<p>I define these vertices in R as follows:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">library</span>(gyro)         <span class="co"># to use the `changesOfSign` function</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="kw">library</span>(arrangements) <span class="co"># to use the `permutations` function</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="kw">c</span>(</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>  (<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span><span class="kw">sqrt</span>(<span class="dv">2</span>)) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>  (<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="dv">2</span>)) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>  <span class="dv">1</span><span class="op">/</span><span class="dv">2</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>vertices &lt;-<span class="st"> </span><span class="kw">changesOfSign</span>(</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>  <span class="kw">cbind</span>(</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>    <span class="kw">t</span>(<span class="kw">apply</span>(<span class="kw">permutations</span>(3L), 1L, <span class="cf">function</span>(perm) x[perm])), </span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>    <span class="dv">1</span><span class="op">/</span><span class="dv">2</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>  )</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>)</span></code></pre></div>
+<p>Obviously, the vertices of the gircope lie on a sphere centered at the origin:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">apply</span>(vertices, 1L, crossprod)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="co">##  [1] 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="co">## [10] 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="co">## [19] 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="co">## [28] 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="co">## [37] 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a><span class="co">## [46] 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a><span class="co">## [55] 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a><span class="co">## [64] 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a><span class="co">## [73] 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a><span class="co">## [82] 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a><span class="co">## [91] 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132</span></span></code></pre></div>
+<p>We will need the value of the radius of this sphere later, for the stereographic projection:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>R &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(vertices[1L, ])))</span></code></pre></div>
+<p>The gircope is convex, hence it equals its convex hull. But we have only its vertices so far, and we need its edges, its cells, and its ridges (faces of the cells). This is why we use <strong>cxhull</strong> now:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">library</span>(cxhull)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>hull &lt;-<span class="st"> </span><span class="kw">cxhull</span>(vertices)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>edges &lt;-<span class="st"> </span>hull[[<span class="st">&quot;edges&quot;</span>]]</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>cells &lt;-<span class="st"> </span>hull[[<span class="st">&quot;facets&quot;</span>]]</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>ridges &lt;-<span class="st"> </span>hull[[<span class="st">&quot;ridges&quot;</span>]]</span></code></pre></div>
+<p>A cube has eight vertices, and among the cells of the gircope, only the cubic ones have eight vertices. So we get all the cubic cells like this:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>cubicCells &lt;-</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="st">  </span><span class="kw">Filter</span>(<span class="cf">function</span>(cell) <span class="kw">length</span>(cell[[<span class="st">&quot;vertices&quot;</span>]]) <span class="op">==</span><span class="st"> </span>8L, cells)</span></code></pre></div>
+<p>No we need the faces of the cubes (squares). We can easily get the indices of their vertices but we have to order them. That’s what the <code>polygonize</code> function below does:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>polygonize &lt;-<span class="st"> </span><span class="cf">function</span>(edges){</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>  nedges &lt;-<span class="st"> </span><span class="kw">nrow</span>(edges)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>  indices &lt;-<span class="st"> </span>edges[1L, ]</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>  i &lt;-<span class="st"> </span>indices[2L]</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>  edges &lt;-<span class="st"> </span>edges[<span class="op">-</span>1L, ]</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>  <span class="cf">for</span>(. <span class="cf">in</span> 1L<span class="op">:</span>(nedges<span class="op">-</span>2L)){</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a>    j &lt;-<span class="st"> </span><span class="kw">which</span>(<span class="kw">apply</span>(edges, 1L, <span class="cf">function</span>(e) i <span class="op">%in%</span><span class="st"> </span>e))</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a>    i &lt;-<span class="st"> </span>edges[j, ][<span class="kw">which</span>(edges[j, ] <span class="op">!=</span><span class="st"> </span>i)]</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a>    indices &lt;-<span class="st"> </span><span class="kw">c</span>(indices, i)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a>    edges &lt;-<span class="st"> </span>edges[<span class="op">-</span>j, ]</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a>  }</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a>  indices</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a>}</span></code></pre></div>
+<p>Now we can get the indices of the vertices of the squares:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>squares &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">vapply</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>  <span class="kw">do.call</span>(c, <span class="kw">lapply</span>(cubicCells, <span class="st">`</span><span class="dt">[[</span><span class="st">`</span>, <span class="st">&quot;ridges&quot;</span>)),</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>  <span class="cf">function</span>(r) <span class="kw">polygonize</span>(ridges[[r]][[<span class="st">&quot;edges&quot;</span>]]),</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>  <span class="kw">integer</span>(4L)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a>))</span></code></pre></div>
+<p>Now, let’s project the 4D vertices to the 3D space, with a stereographic projection:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>verts3D &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">apply</span>(vertices, 1L, <span class="cf">function</span>(v){</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a>  v[1L<span class="op">:</span>3L] <span class="op">/</span><span class="st"> </span>(R <span class="op">-</span><span class="st"> </span>v[4L])</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a>}))</span></code></pre></div>
+<p>We are ready for plotting. We can’t directly draw hyperbolic squares with the <strong>gyro</strong> package. It only allows to draw hyperbolic triangles, with the <code>gyrotriangle</code> function. So we draw an hyperbolic square by splitting it into two triangles, we merge these two triangles with <code>Morpho::mergeMeshes</code> and we remove the duplicated vertices of the resulting mesh with <code>Rvcg::vcgClean</code>.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="kw">library</span>(rgl)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="kw">library</span>(Morpho) <span class="co"># to use the `mergeMeshes` function</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="kw">library</span>(Rvcg)   <span class="co"># to use the `vcgClean` function</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a>s &lt;-<span class="st"> </span><span class="fl">0.5</span> <span class="co"># hyperbolic curvature</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>), <span class="dt">zoom =</span> <span class="fl">0.8</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a><span class="kw">bg3d</span>(<span class="kw">rgb</span>(<span class="dv">54</span>, <span class="dv">57</span>, <span class="dv">64</span>, <span class="dt">maxColorValue =</span> <span class="dv">255</span>))</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a><span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span><span class="kw">nrow</span>(squares)){</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true"></a>  square &lt;-<span class="st"> </span>squares[i, ]</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true"></a>  mesh1 &lt;-<span class="st"> </span><span class="kw">gyrotriangle</span>(</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true"></a>    verts3D[square[1L], ], verts3D[square[2L], ], verts3D[square[3L], ],</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true"></a>    <span class="dt">s =</span> s</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true"></a>  )</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true"></a>  mesh2 &lt;-<span class="st"> </span><span class="kw">gyrotriangle</span>(</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true"></a>    verts3D[square[1L], ], verts3D[square[3L], ], verts3D[square[4L], ],</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true"></a>    <span class="dt">s =</span> s</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true"></a>  )</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true"></a>  mesh &lt;-<span class="st"> </span><span class="kw">vcgClean</span>(<span class="kw">mergeMeshes</span>(mesh1, mesh2), <span class="dt">sel =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">7</span>), <span class="dt">silent =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true"></a>  <span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">&quot;violetred&quot;</span>)</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true"></a>}</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true"></a><span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span><span class="kw">nrow</span>(edges)){</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true"></a>  edge &lt;-<span class="st"> </span>edges[i, ]</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true"></a>  A &lt;-<span class="st"> </span>verts3D[edge[1L], ]; B &lt;-<span class="st"> </span>verts3D[edge[2L], ]</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true"></a>  tube &lt;-<span class="st"> </span><span class="kw">gyrotube</span>(A, B, <span class="dt">s =</span> s, <span class="dt">radius =</span> <span class="fl">0.025</span>)</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true"></a>  <span class="kw">shade3d</span>(tube, <span class="dt">color =</span> <span class="st">&quot;whitesmoke&quot;</span>)</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true"></a>}</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true"></a><span class="kw">spheres3d</span>(verts3D, <span class="dt">radius =</span> <span class="fl">0.03</span>, <span class="dt">color =</span> <span class="st">&quot;whitesmoke&quot;</span>)</span></code></pre></div>
+<p><img src="figures/hyperbolicGircope.gif" /></p>
+<p>To make the animation, I used the following code.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="kw">movie3d</span>(</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>  <span class="kw">spin3d</span>(<span class="dt">axis =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>), <span class="dt">rpm =</span> <span class="dv">10</span>),</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a>  <span class="dt">duration =</span> <span class="dv">6</span>, <span class="dt">fps =</span> <span class="dv">10</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a>  <span class="dt">movie =</span> <span class="st">&quot;pic&quot;</span>, <span class="dt">dir =</span> <span class="st">&quot;.&quot;</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a>  <span class="dt">convert =</span> <span class="ot">FALSE</span>,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a>  <span class="dt">startTime =</span> <span class="dv">1</span><span class="op">/</span><span class="dv">10</span>,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a>  <span class="dt">webshot =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
+<p>This code produces the files <strong>pic001.png</strong>, … <strong>pic060.png</strong>. Then I assembled them into a GIF with <a href="https://laustep.github.io/stlahblog/posts/gifskiBash.html">gifski</a> (you can use <strong>ImageMagick</strong> instead).</p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>

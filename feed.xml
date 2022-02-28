@@ -5,7 +5,220 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Sat, 26 Feb 2022 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Mon, 28 Feb 2022 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>Hyperbolic gircope - using 'cxhull' and 'gyro'</title>
+      <link>https://laustep.github.io/stlahblog/posts/HyperbolicGircope.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        This post is a demonstration of the <strong>cxhull</strong> and
+        <strong>gyro</strong> packages. I will use these packages (and others)
+        to draw an hyperbolic version of the stereographic projection of a
+        convex 4D polytope, the <em>gircope</em> or
+        <em>great rhombicuboctahedral prism</em>. The gircope has twenty-eight
+        cells, but I will only draw the twelve cubes among them.
+      </p>
+      <p>
+        As said in
+        <a
+          href="https://polytope.miraheze.org/wiki/Great_rhombicuboctahedral_prism"
+          >this wiki</a
+        >, the vertices of the gircope are given by all permutations of the
+        first three coordinates of:
+        <span class="math display"
+          >\[ \left(\pm\frac{1+2\sqrt{2}}{2}, \pm\frac{1+\sqrt{2}}{2},
+          \pm\frac{1}{2}, \pm\frac{1}{2}\right). \]</span
+        >
+      </p>
+      <p>I define these vertices in R as follows:</p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1"><span class="kw">library</span>(gyro)         <span class="co"># to use the `changesOfSign` function</span></span>
+<span id="cb1-2"><span class="kw">library</span>(arrangements) <span class="co"># to use the `permutations` function</span></span>
+<span id="cb1-3">x &lt;-<span class="st"> </span><span class="kw">c</span>(</span>
+<span id="cb1-4">  (<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span><span class="kw">sqrt</span>(<span class="dv">2</span>)) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>,</span>
+<span id="cb1-5">  (<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="dv">2</span>)) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>,</span>
+<span id="cb1-6">  <span class="dv">1</span><span class="op">/</span><span class="dv">2</span></span>
+<span id="cb1-7">)</span>
+<span id="cb1-8">vertices &lt;-<span class="st"> </span><span class="kw">changesOfSign</span>(</span>
+<span id="cb1-9">  <span class="kw">cbind</span>(</span>
+<span id="cb1-10">    <span class="kw">t</span>(<span class="kw">apply</span>(<span class="kw">permutations</span>(3L), 1L, <span class="cf">function</span>(perm) x[perm])), </span>
+<span id="cb1-11">    <span class="dv">1</span><span class="op">/</span><span class="dv">2</span></span>
+<span id="cb1-12">  )</span>
+<span id="cb1-13">)</span></code></pre>
+      </div>
+      <p>
+        Obviously, the vertices of the gircope lie on a sphere centered at the
+        origin:
+      </p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1"><span class="kw">apply</span>(vertices, 1L, crossprod)</span>
+<span id="cb2-2"><span class="co">##  [1] 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132</span></span>
+<span id="cb2-3"><span class="co">## [10] 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132</span></span>
+<span id="cb2-4"><span class="co">## [19] 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132</span></span>
+<span id="cb2-5"><span class="co">## [28] 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132</span></span>
+<span id="cb2-6"><span class="co">## [37] 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132</span></span>
+<span id="cb2-7"><span class="co">## [46] 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132</span></span>
+<span id="cb2-8"><span class="co">## [55] 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132</span></span>
+<span id="cb2-9"><span class="co">## [64] 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132</span></span>
+<span id="cb2-10"><span class="co">## [73] 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132</span></span>
+<span id="cb2-11"><span class="co">## [82] 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132</span></span>
+<span id="cb2-12"><span class="co">## [91] 5.62132 5.62132 5.62132 5.62132 5.62132 5.62132</span></span></code></pre>
+      </div>
+      <p>
+        We will need the value of the radius of this sphere later, for the
+        stereographic projection:
+      </p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb3-1">R &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(vertices[1L, ])))</span></code></pre>
+      </div>
+      <p>
+        The gircope is convex, hence it equals its convex hull. But we have only
+        its vertices so far, and we need its edges, its cells, and its ridges
+        (faces of the cells). This is why we use <strong>cxhull</strong> now:
+      </p>
+      <div class="sourceCode" id="cb4">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb4-1"><span class="kw">library</span>(cxhull)</span>
+<span id="cb4-2">hull &lt;-<span class="st"> </span><span class="kw">cxhull</span>(vertices)</span>
+<span id="cb4-3">edges &lt;-<span class="st"> </span>hull[[<span class="st">"edges"</span>]]</span>
+<span id="cb4-4">cells &lt;-<span class="st"> </span>hull[[<span class="st">"facets"</span>]]</span>
+<span id="cb4-5">ridges &lt;-<span class="st"> </span>hull[[<span class="st">"ridges"</span>]]</span></code></pre>
+      </div>
+      <p>
+        A cube has eight vertices, and among the cells of the gircope, only the
+        cubic ones have eight vertices. So we get all the cubic cells like this:
+      </p>
+      <div class="sourceCode" id="cb5">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb5-1">cubicCells &lt;-</span>
+<span id="cb5-2"><span class="st">  </span><span class="kw">Filter</span>(<span class="cf">function</span>(cell) <span class="kw">length</span>(cell[[<span class="st">"vertices"</span>]]) <span class="op">==</span><span class="st"> </span>8L, cells)</span></code></pre>
+      </div>
+      <p>
+        No we need the faces of the cubes (squares). We can easily get the
+        indices of their vertices but we have to order them. That’s what the
+        <code>polygonize</code> function below does:
+      </p>
+      <div class="sourceCode" id="cb6">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb6-1">polygonize &lt;-<span class="st"> </span><span class="cf">function</span>(edges){</span>
+<span id="cb6-2">  nedges &lt;-<span class="st"> </span><span class="kw">nrow</span>(edges)</span>
+<span id="cb6-3">  indices &lt;-<span class="st"> </span>edges[1L, ]</span>
+<span id="cb6-4">  i &lt;-<span class="st"> </span>indices[2L]</span>
+<span id="cb6-5">  edges &lt;-<span class="st"> </span>edges[<span class="op">-</span>1L, ]</span>
+<span id="cb6-6">  <span class="cf">for</span>(. <span class="cf">in</span> 1L<span class="op">:</span>(nedges<span class="op">-</span>2L)){</span>
+<span id="cb6-7">    j &lt;-<span class="st"> </span><span class="kw">which</span>(<span class="kw">apply</span>(edges, 1L, <span class="cf">function</span>(e) i <span class="op">%in%</span><span class="st"> </span>e))</span>
+<span id="cb6-8">    i &lt;-<span class="st"> </span>edges[j, ][<span class="kw">which</span>(edges[j, ] <span class="op">!=</span><span class="st"> </span>i)]</span>
+<span id="cb6-9">    indices &lt;-<span class="st"> </span><span class="kw">c</span>(indices, i)</span>
+<span id="cb6-10">    edges &lt;-<span class="st"> </span>edges[<span class="op">-</span>j, ]</span>
+<span id="cb6-11">  }</span>
+<span id="cb6-12">  indices</span>
+<span id="cb6-13">}</span></code></pre>
+      </div>
+      <p>Now we can get the indices of the vertices of the squares:</p>
+      <div class="sourceCode" id="cb7">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb7-1">squares &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">vapply</span>(</span>
+<span id="cb7-2">  <span class="kw">do.call</span>(c, <span class="kw">lapply</span>(cubicCells, <span class="st">`</span><span class="dt">[[</span><span class="st">`</span>, <span class="st">"ridges"</span>)),</span>
+<span id="cb7-3">  <span class="cf">function</span>(r) <span class="kw">polygonize</span>(ridges[[r]][[<span class="st">"edges"</span>]]),</span>
+<span id="cb7-4">  <span class="kw">integer</span>(4L)</span>
+<span id="cb7-5">))</span></code></pre>
+      </div>
+      <p>
+        Now, let’s project the 4D vertices to the 3D space, with a stereographic
+        projection:
+      </p>
+      <div class="sourceCode" id="cb8">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb8-1">verts3D &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">apply</span>(vertices, 1L, <span class="cf">function</span>(v){</span>
+<span id="cb8-2">  v[1L<span class="op">:</span>3L] <span class="op">/</span><span class="st"> </span>(R <span class="op">-</span><span class="st"> </span>v[4L])</span>
+<span id="cb8-3">}))</span></code></pre>
+      </div>
+      <p>
+        We are ready for plotting. We can’t directly draw hyperbolic squares
+        with the <strong>gyro</strong> package. It only allows to draw
+        hyperbolic triangles, with the <code>gyrotriangle</code> function. So we
+        draw an hyperbolic square by splitting it into two triangles, we merge
+        these two triangles with <code>Morpho::mergeMeshes</code> and we remove
+        the duplicated vertices of the resulting mesh with
+        <code>Rvcg::vcgClean</code>.
+      </p>
+      <div class="sourceCode" id="cb9">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb9-1"><span class="kw">library</span>(rgl)</span>
+<span id="cb9-2"><span class="kw">library</span>(Morpho) <span class="co"># to use the `mergeMeshes` function</span></span>
+<span id="cb9-3"><span class="kw">library</span>(Rvcg)   <span class="co"># to use the `vcgClean` function</span></span>
+<span id="cb9-4">s &lt;-<span class="st"> </span><span class="fl">0.5</span> <span class="co"># hyperbolic curvature</span></span>
+<span id="cb9-5"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>), <span class="dt">zoom =</span> <span class="fl">0.8</span>)</span>
+<span id="cb9-6"><span class="kw">bg3d</span>(<span class="kw">rgb</span>(<span class="dv">54</span>, <span class="dv">57</span>, <span class="dv">64</span>, <span class="dt">maxColorValue =</span> <span class="dv">255</span>))</span>
+<span id="cb9-7"><span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span><span class="kw">nrow</span>(squares)){</span>
+<span id="cb9-8">  square &lt;-<span class="st"> </span>squares[i, ]</span>
+<span id="cb9-9">  mesh1 &lt;-<span class="st"> </span><span class="kw">gyrotriangle</span>(</span>
+<span id="cb9-10">    verts3D[square[1L], ], verts3D[square[2L], ], verts3D[square[3L], ],</span>
+<span id="cb9-11">    <span class="dt">s =</span> s</span>
+<span id="cb9-12">  )</span>
+<span id="cb9-13">  mesh2 &lt;-<span class="st"> </span><span class="kw">gyrotriangle</span>(</span>
+<span id="cb9-14">    verts3D[square[1L], ], verts3D[square[3L], ], verts3D[square[4L], ],</span>
+<span id="cb9-15">    <span class="dt">s =</span> s</span>
+<span id="cb9-16">  )</span>
+<span id="cb9-17">  mesh &lt;-<span class="st"> </span><span class="kw">vcgClean</span>(<span class="kw">mergeMeshes</span>(mesh1, mesh2), <span class="dt">sel =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">7</span>), <span class="dt">silent =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb9-18">  <span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">"violetred"</span>)</span>
+<span id="cb9-19">}</span>
+<span id="cb9-20"><span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span><span class="kw">nrow</span>(edges)){</span>
+<span id="cb9-21">  edge &lt;-<span class="st"> </span>edges[i, ]</span>
+<span id="cb9-22">  A &lt;-<span class="st"> </span>verts3D[edge[1L], ]; B &lt;-<span class="st"> </span>verts3D[edge[2L], ]</span>
+<span id="cb9-23">  tube &lt;-<span class="st"> </span><span class="kw">gyrotube</span>(A, B, <span class="dt">s =</span> s, <span class="dt">radius =</span> <span class="fl">0.025</span>)</span>
+<span id="cb9-24">  <span class="kw">shade3d</span>(tube, <span class="dt">color =</span> <span class="st">"whitesmoke"</span>)</span>
+<span id="cb9-25">}</span>
+<span id="cb9-26"><span class="kw">spheres3d</span>(verts3D, <span class="dt">radius =</span> <span class="fl">0.03</span>, <span class="dt">color =</span> <span class="st">"whitesmoke"</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/hyperbolicGircope.gif"
+        />
+      </p>
+      <p>To make the animation, I used the following code.</p>
+      <div class="sourceCode" id="cb10">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb10-1"><span class="kw">movie3d</span>(</span>
+<span id="cb10-2">  <span class="kw">spin3d</span>(<span class="dt">axis =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>), <span class="dt">rpm =</span> <span class="dv">10</span>),</span>
+<span id="cb10-3">  <span class="dt">duration =</span> <span class="dv">6</span>, <span class="dt">fps =</span> <span class="dv">10</span>,</span>
+<span id="cb10-4">  <span class="dt">movie =</span> <span class="st">"pic"</span>, <span class="dt">dir =</span> <span class="st">"."</span>,</span>
+<span id="cb10-5">  <span class="dt">convert =</span> <span class="ot">FALSE</span>,</span>
+<span id="cb10-6">  <span class="dt">startTime =</span> <span class="dv">1</span><span class="op">/</span><span class="dv">10</span>,</span>
+<span id="cb10-7">  <span class="dt">webshot =</span> <span class="ot">FALSE</span>)</span></code></pre>
+      </div>
+      <p>
+        This code produces the files <strong>pic001.png</strong>, …
+        <strong>pic060.png</strong>. Then I assembled them into a GIF with
+        <a href="https://laustep.github.io/stlahblog/posts/gifskiBash.html"
+          >gifski</a
+        >
+        (you can use <strong>ImageMagick</strong> instead).
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Mon, 28 Feb 2022 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/HyperbolicGircope.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>Volume under surface from points</title>
       <link>https://laustep.github.io/stlahblog/posts/volumeUnderSurface.html</link>
@@ -92,7 +305,7 @@
       <p>
         If you ran the above code, you noticed that the
         <code>deldir</code> function as well as the
-        <code>triang.list</code> functions are a bit slow. My package
+        <code>triang.list</code> function are a bit slow. My package
         <a
           href="https://laustep.github.io/stlahblog/posts/SurfaceReconstruction.html"
           >RCGAL</a
