@@ -1,0 +1,477 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - The modified stereographic projection</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>The modified stereographic projection</h1> 
+          <div class="info">
+    Posted on March  1, 2022
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'rgl'." href="../tags/rgl.html">rgl</a>, <a title="All pages tagged 'misc3d'." href="../tags/misc3d.html">misc3d</a>, <a title="All pages tagged 'graphics'." href="../tags/graphics.html">graphics</a>, <a title="All pages tagged 'geometry'." href="../tags/geometry.html">geometry</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>
+    
+</div>
+
+<p>Some of my 3D animations start with a 4D object (such as a polytope) and I project it to the three-dimensional space with a stereographic projection. For example, the <a href="https://laustep.github.io/stlahblog/posts/HyperbolicGircope.html">hyperbolic gircope</a>. For this animation, I use the ordinary stereographic projection. But sometimes I don’t get a nice result with the ordinary stereographic projection, and then I use a “modified” stereographic projection, defined by <span class="math display">\[
+\text{Stereo}_\gamma(x) = 
+\frac{\arccos(x_4/r)}{{\bigl(r^\gamma - {|x_4|}^\gamma\bigr)}^{\frac{1}{\gamma}}}
+\times (x_1, x_2, x_3),
+\]</span> where <span class="math inline">\(r\)</span> is the radius of the centered sphere in <span class="math inline">\(\mathbb{R}^4\)</span> that we consider (for example <span class="math inline">\(r = \Vert x \Vert\)</span> for a polytope whose all vertices have the same norm, otherwise one can take the higher norm).</p>
+<p>In this post, I will show the result of this modified stereographic projection on some examples, with various values of <span class="math inline">\(\gamma\)</span>.</p>
+<h2 id="truncated-tesseract">Truncated tesseract</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(cxhull)</span>
+<span id="cb1-2"><a href="#cb1-2"></a></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="co"># Stereographic-like projection ####</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a>sproj &lt;-<span class="st"> </span><span class="cf">function</span>(v, r, gamma){</span>
+<span id="cb1-5"><a href="#cb1-5"></a>  <span class="kw">acos</span>(v[4L]<span class="op">/</span>r) <span class="op">/</span><span class="st"> </span>(r<span class="op">^</span>gamma <span class="op">-</span><span class="st"> </span><span class="kw">abs</span>(v[4L])<span class="op">^</span>gamma)<span class="op">^</span>(<span class="dv">1</span><span class="op">/</span>gamma) <span class="op">*</span><span class="st"> </span>v[1L<span class="op">:</span>3L]</span>
+<span id="cb1-6"><a href="#cb1-6"></a>}</span>
+<span id="cb1-7"><a href="#cb1-7"></a></span>
+<span id="cb1-8"><a href="#cb1-8"></a><span class="co"># vertices ####</span></span>
+<span id="cb1-9"><a href="#cb1-9"></a>sqr2p1 &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb1-10"><a href="#cb1-10"></a>vertices &lt;-<span class="st"> </span><span class="kw">rbind</span>(</span>
+<span id="cb1-11"><a href="#cb1-11"></a>  <span class="kw">c</span>(      <span class="dv">-1</span>, <span class="op">-</span>sqr2p1, <span class="op">-</span>sqr2p1, <span class="op">-</span>sqr2p1 ),</span>
+<span id="cb1-12"><a href="#cb1-12"></a>  <span class="kw">c</span>(      <span class="dv">-1</span>, <span class="op">-</span>sqr2p1, <span class="op">-</span>sqr2p1,  sqr2p1 ),</span>
+<span id="cb1-13"><a href="#cb1-13"></a>  <span class="kw">c</span>(      <span class="dv">-1</span>, <span class="op">-</span>sqr2p1,  sqr2p1, <span class="op">-</span>sqr2p1 ),</span>
+<span id="cb1-14"><a href="#cb1-14"></a>  <span class="kw">c</span>(      <span class="dv">-1</span>, <span class="op">-</span>sqr2p1,  sqr2p1,  sqr2p1 ),</span>
+<span id="cb1-15"><a href="#cb1-15"></a>  <span class="kw">c</span>(      <span class="dv">-1</span>,  sqr2p1, <span class="op">-</span>sqr2p1, <span class="op">-</span>sqr2p1 ),</span>
+<span id="cb1-16"><a href="#cb1-16"></a>  <span class="kw">c</span>(      <span class="dv">-1</span>,  sqr2p1, <span class="op">-</span>sqr2p1,  sqr2p1 ),</span>
+<span id="cb1-17"><a href="#cb1-17"></a>  <span class="kw">c</span>(      <span class="dv">-1</span>,  sqr2p1,  sqr2p1, <span class="op">-</span>sqr2p1 ),</span>
+<span id="cb1-18"><a href="#cb1-18"></a>  <span class="kw">c</span>(      <span class="dv">-1</span>,  sqr2p1,  sqr2p1,  sqr2p1 ),</span>
+<span id="cb1-19"><a href="#cb1-19"></a>  <span class="kw">c</span>(       <span class="dv">1</span>, <span class="op">-</span>sqr2p1, <span class="op">-</span>sqr2p1, <span class="op">-</span>sqr2p1 ),</span>
+<span id="cb1-20"><a href="#cb1-20"></a>  <span class="kw">c</span>(       <span class="dv">1</span>, <span class="op">-</span>sqr2p1, <span class="op">-</span>sqr2p1,  sqr2p1 ),</span>
+<span id="cb1-21"><a href="#cb1-21"></a>  <span class="kw">c</span>(       <span class="dv">1</span>, <span class="op">-</span>sqr2p1,  sqr2p1, <span class="op">-</span>sqr2p1 ),</span>
+<span id="cb1-22"><a href="#cb1-22"></a>  <span class="kw">c</span>(       <span class="dv">1</span>, <span class="op">-</span>sqr2p1,  sqr2p1,  sqr2p1 ),</span>
+<span id="cb1-23"><a href="#cb1-23"></a>  <span class="kw">c</span>(       <span class="dv">1</span>,  sqr2p1, <span class="op">-</span>sqr2p1, <span class="op">-</span>sqr2p1 ),</span>
+<span id="cb1-24"><a href="#cb1-24"></a>  <span class="kw">c</span>(       <span class="dv">1</span>,  sqr2p1, <span class="op">-</span>sqr2p1,  sqr2p1 ),</span>
+<span id="cb1-25"><a href="#cb1-25"></a>  <span class="kw">c</span>(       <span class="dv">1</span>,  sqr2p1,  sqr2p1, <span class="op">-</span>sqr2p1 ),</span>
+<span id="cb1-26"><a href="#cb1-26"></a>  <span class="kw">c</span>(       <span class="dv">1</span>,  sqr2p1,  sqr2p1,  sqr2p1 ),</span>
+<span id="cb1-27"><a href="#cb1-27"></a>  <span class="kw">c</span>( <span class="op">-</span>sqr2p1,      <span class="dv">-1</span>, <span class="op">-</span>sqr2p1, <span class="op">-</span>sqr2p1 ),</span>
+<span id="cb1-28"><a href="#cb1-28"></a>  <span class="kw">c</span>( <span class="op">-</span>sqr2p1,      <span class="dv">-1</span>, <span class="op">-</span>sqr2p1,  sqr2p1 ),</span>
+<span id="cb1-29"><a href="#cb1-29"></a>  <span class="kw">c</span>( <span class="op">-</span>sqr2p1,      <span class="dv">-1</span>,  sqr2p1, <span class="op">-</span>sqr2p1 ),</span>
+<span id="cb1-30"><a href="#cb1-30"></a>  <span class="kw">c</span>( <span class="op">-</span>sqr2p1,      <span class="dv">-1</span>,  sqr2p1,  sqr2p1 ),</span>
+<span id="cb1-31"><a href="#cb1-31"></a>  <span class="kw">c</span>( <span class="op">-</span>sqr2p1,       <span class="dv">1</span>, <span class="op">-</span>sqr2p1, <span class="op">-</span>sqr2p1 ),</span>
+<span id="cb1-32"><a href="#cb1-32"></a>  <span class="kw">c</span>( <span class="op">-</span>sqr2p1,       <span class="dv">1</span>, <span class="op">-</span>sqr2p1,  sqr2p1 ),</span>
+<span id="cb1-33"><a href="#cb1-33"></a>  <span class="kw">c</span>( <span class="op">-</span>sqr2p1,       <span class="dv">1</span>,  sqr2p1, <span class="op">-</span>sqr2p1 ),</span>
+<span id="cb1-34"><a href="#cb1-34"></a>  <span class="kw">c</span>( <span class="op">-</span>sqr2p1,       <span class="dv">1</span>,  sqr2p1,  sqr2p1 ),</span>
+<span id="cb1-35"><a href="#cb1-35"></a>  <span class="kw">c</span>(  sqr2p1,      <span class="dv">-1</span>, <span class="op">-</span>sqr2p1, <span class="op">-</span>sqr2p1 ),</span>
+<span id="cb1-36"><a href="#cb1-36"></a>  <span class="kw">c</span>(  sqr2p1,      <span class="dv">-1</span>, <span class="op">-</span>sqr2p1,  sqr2p1 ),</span>
+<span id="cb1-37"><a href="#cb1-37"></a>  <span class="kw">c</span>(  sqr2p1,      <span class="dv">-1</span>,  sqr2p1, <span class="op">-</span>sqr2p1 ),</span>
+<span id="cb1-38"><a href="#cb1-38"></a>  <span class="kw">c</span>(  sqr2p1,      <span class="dv">-1</span>,  sqr2p1,  sqr2p1 ),</span>
+<span id="cb1-39"><a href="#cb1-39"></a>  <span class="kw">c</span>(  sqr2p1,       <span class="dv">1</span>, <span class="op">-</span>sqr2p1, <span class="op">-</span>sqr2p1 ),</span>
+<span id="cb1-40"><a href="#cb1-40"></a>  <span class="kw">c</span>(  sqr2p1,       <span class="dv">1</span>, <span class="op">-</span>sqr2p1,  sqr2p1 ),</span>
+<span id="cb1-41"><a href="#cb1-41"></a>  <span class="kw">c</span>(  sqr2p1,       <span class="dv">1</span>,  sqr2p1, <span class="op">-</span>sqr2p1 ),</span>
+<span id="cb1-42"><a href="#cb1-42"></a>  <span class="kw">c</span>(  sqr2p1,       <span class="dv">1</span>,  sqr2p1,  sqr2p1 ),</span>
+<span id="cb1-43"><a href="#cb1-43"></a>  <span class="kw">c</span>( <span class="op">-</span>sqr2p1, <span class="op">-</span>sqr2p1,      <span class="dv">-1</span>, <span class="op">-</span>sqr2p1 ),</span>
+<span id="cb1-44"><a href="#cb1-44"></a>  <span class="kw">c</span>( <span class="op">-</span>sqr2p1, <span class="op">-</span>sqr2p1,      <span class="dv">-1</span>,  sqr2p1 ),</span>
+<span id="cb1-45"><a href="#cb1-45"></a>  <span class="kw">c</span>( <span class="op">-</span>sqr2p1, <span class="op">-</span>sqr2p1,       <span class="dv">1</span>, <span class="op">-</span>sqr2p1 ),</span>
+<span id="cb1-46"><a href="#cb1-46"></a>  <span class="kw">c</span>( <span class="op">-</span>sqr2p1, <span class="op">-</span>sqr2p1,       <span class="dv">1</span>,  sqr2p1 ),</span>
+<span id="cb1-47"><a href="#cb1-47"></a>  <span class="kw">c</span>( <span class="op">-</span>sqr2p1,  sqr2p1,      <span class="dv">-1</span>, <span class="op">-</span>sqr2p1 ),</span>
+<span id="cb1-48"><a href="#cb1-48"></a>  <span class="kw">c</span>( <span class="op">-</span>sqr2p1,  sqr2p1,      <span class="dv">-1</span>,  sqr2p1 ),</span>
+<span id="cb1-49"><a href="#cb1-49"></a>  <span class="kw">c</span>( <span class="op">-</span>sqr2p1,  sqr2p1,       <span class="dv">1</span>, <span class="op">-</span>sqr2p1 ),</span>
+<span id="cb1-50"><a href="#cb1-50"></a>  <span class="kw">c</span>( <span class="op">-</span>sqr2p1,  sqr2p1,       <span class="dv">1</span>,  sqr2p1 ),</span>
+<span id="cb1-51"><a href="#cb1-51"></a>  <span class="kw">c</span>(  sqr2p1, <span class="op">-</span>sqr2p1,      <span class="dv">-1</span>, <span class="op">-</span>sqr2p1 ),</span>
+<span id="cb1-52"><a href="#cb1-52"></a>  <span class="kw">c</span>(  sqr2p1, <span class="op">-</span>sqr2p1,      <span class="dv">-1</span>,  sqr2p1 ),</span>
+<span id="cb1-53"><a href="#cb1-53"></a>  <span class="kw">c</span>(  sqr2p1, <span class="op">-</span>sqr2p1,       <span class="dv">1</span>, <span class="op">-</span>sqr2p1 ),</span>
+<span id="cb1-54"><a href="#cb1-54"></a>  <span class="kw">c</span>(  sqr2p1, <span class="op">-</span>sqr2p1,       <span class="dv">1</span>,  sqr2p1 ),</span>
+<span id="cb1-55"><a href="#cb1-55"></a>  <span class="kw">c</span>(  sqr2p1,  sqr2p1,      <span class="dv">-1</span>, <span class="op">-</span>sqr2p1 ),</span>
+<span id="cb1-56"><a href="#cb1-56"></a>  <span class="kw">c</span>(  sqr2p1,  sqr2p1,      <span class="dv">-1</span>,  sqr2p1 ),</span>
+<span id="cb1-57"><a href="#cb1-57"></a>  <span class="kw">c</span>(  sqr2p1,  sqr2p1,       <span class="dv">1</span>, <span class="op">-</span>sqr2p1 ),</span>
+<span id="cb1-58"><a href="#cb1-58"></a>  <span class="kw">c</span>(  sqr2p1,  sqr2p1,       <span class="dv">1</span>,  sqr2p1 ),</span>
+<span id="cb1-59"><a href="#cb1-59"></a>  <span class="kw">c</span>( <span class="op">-</span>sqr2p1, <span class="op">-</span>sqr2p1, <span class="op">-</span>sqr2p1,      <span class="dv">-1</span> ),</span>
+<span id="cb1-60"><a href="#cb1-60"></a>  <span class="kw">c</span>( <span class="op">-</span>sqr2p1, <span class="op">-</span>sqr2p1, <span class="op">-</span>sqr2p1,       <span class="dv">1</span> ),</span>
+<span id="cb1-61"><a href="#cb1-61"></a>  <span class="kw">c</span>( <span class="op">-</span>sqr2p1, <span class="op">-</span>sqr2p1,  sqr2p1,      <span class="dv">-1</span> ),</span>
+<span id="cb1-62"><a href="#cb1-62"></a>  <span class="kw">c</span>( <span class="op">-</span>sqr2p1, <span class="op">-</span>sqr2p1,  sqr2p1,       <span class="dv">1</span> ),</span>
+<span id="cb1-63"><a href="#cb1-63"></a>  <span class="kw">c</span>( <span class="op">-</span>sqr2p1,  sqr2p1, <span class="op">-</span>sqr2p1,      <span class="dv">-1</span> ),</span>
+<span id="cb1-64"><a href="#cb1-64"></a>  <span class="kw">c</span>( <span class="op">-</span>sqr2p1,  sqr2p1, <span class="op">-</span>sqr2p1,       <span class="dv">1</span> ),</span>
+<span id="cb1-65"><a href="#cb1-65"></a>  <span class="kw">c</span>( <span class="op">-</span>sqr2p1,  sqr2p1,  sqr2p1,      <span class="dv">-1</span> ),</span>
+<span id="cb1-66"><a href="#cb1-66"></a>  <span class="kw">c</span>( <span class="op">-</span>sqr2p1,  sqr2p1,  sqr2p1,       <span class="dv">1</span> ),</span>
+<span id="cb1-67"><a href="#cb1-67"></a>  <span class="kw">c</span>(  sqr2p1, <span class="op">-</span>sqr2p1, <span class="op">-</span>sqr2p1,      <span class="dv">-1</span> ),</span>
+<span id="cb1-68"><a href="#cb1-68"></a>  <span class="kw">c</span>(  sqr2p1, <span class="op">-</span>sqr2p1, <span class="op">-</span>sqr2p1,       <span class="dv">1</span> ),</span>
+<span id="cb1-69"><a href="#cb1-69"></a>  <span class="kw">c</span>(  sqr2p1, <span class="op">-</span>sqr2p1,  sqr2p1,      <span class="dv">-1</span> ),</span>
+<span id="cb1-70"><a href="#cb1-70"></a>  <span class="kw">c</span>(  sqr2p1, <span class="op">-</span>sqr2p1,  sqr2p1,       <span class="dv">1</span> ),</span>
+<span id="cb1-71"><a href="#cb1-71"></a>  <span class="kw">c</span>(  sqr2p1,  sqr2p1, <span class="op">-</span>sqr2p1,      <span class="dv">-1</span> ),</span>
+<span id="cb1-72"><a href="#cb1-72"></a>  <span class="kw">c</span>(  sqr2p1,  sqr2p1, <span class="op">-</span>sqr2p1,       <span class="dv">1</span> ),</span>
+<span id="cb1-73"><a href="#cb1-73"></a>  <span class="kw">c</span>(  sqr2p1,  sqr2p1,  sqr2p1,      <span class="dv">-1</span> ),</span>
+<span id="cb1-74"><a href="#cb1-74"></a>  <span class="kw">c</span>(  sqr2p1,  sqr2p1,  sqr2p1,       <span class="dv">1</span> )</span>
+<span id="cb1-75"><a href="#cb1-75"></a>)</span>
+<span id="cb1-76"><a href="#cb1-76"></a></span>
+<span id="cb1-77"><a href="#cb1-77"></a><span class="co"># convex hull (= truncated tesseract, cause it is convex) ####</span></span>
+<span id="cb1-78"><a href="#cb1-78"></a>hull &lt;-<span class="st"> </span><span class="kw">cxhull</span>(vertices)</span>
+<span id="cb1-79"><a href="#cb1-79"></a>edges  &lt;-<span class="st"> </span>hull[[<span class="st">&quot;edges&quot;</span>]]</span>
+<span id="cb1-80"><a href="#cb1-80"></a>ridges &lt;-<span class="st"> </span>hull[[<span class="st">&quot;ridges&quot;</span>]]</span>
+<span id="cb1-81"><a href="#cb1-81"></a></span>
+<span id="cb1-82"><a href="#cb1-82"></a><span class="co"># triangles (of the tetrahedra in the corners) ####</span></span>
+<span id="cb1-83"><a href="#cb1-83"></a>ridgeSizes &lt;-<span class="st"> </span><span class="kw">vapply</span>(ridges, <span class="cf">function</span>(ridge){</span>
+<span id="cb1-84"><a href="#cb1-84"></a>  <span class="kw">length</span>(ridge[[<span class="st">&quot;vertices&quot;</span>]])</span>
+<span id="cb1-85"><a href="#cb1-85"></a>}, <span class="kw">integer</span>(1L))</span>
+<span id="cb1-86"><a href="#cb1-86"></a>triangles &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">vapply</span>(</span>
+<span id="cb1-87"><a href="#cb1-87"></a>  ridges[ridgeSizes <span class="op">==</span><span class="st"> </span>3L], </span>
+<span id="cb1-88"><a href="#cb1-88"></a>  <span class="cf">function</span>(ridge) ridge[[<span class="st">&quot;vertices&quot;</span>]],</span>
+<span id="cb1-89"><a href="#cb1-89"></a>  <span class="kw">integer</span>(3L)</span>
+<span id="cb1-90"><a href="#cb1-90"></a>))</span>
+<span id="cb1-91"><a href="#cb1-91"></a></span>
+<span id="cb1-92"><a href="#cb1-92"></a><span class="co"># projected vertices ####</span></span>
+<span id="cb1-93"><a href="#cb1-93"></a><span class="co">#   we also normalize them so that the higher norm is 1</span></span>
+<span id="cb1-94"><a href="#cb1-94"></a>r &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">3</span><span class="op">*</span>sqr2p1<span class="op">^</span><span class="dv">2</span>)</span>
+<span id="cb1-95"><a href="#cb1-95"></a>verts3D &lt;-<span class="st"> </span><span class="cf">function</span>(gamma){</span>
+<span id="cb1-96"><a href="#cb1-96"></a>  verts &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">apply</span>(vertices, 1L, <span class="cf">function</span>(v) <span class="kw">sproj</span>(v, r, gamma)))</span>
+<span id="cb1-97"><a href="#cb1-97"></a>  verts <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">max</span>(<span class="kw">apply</span>(verts, 1L, crossprod)))</span>
+<span id="cb1-98"><a href="#cb1-98"></a>}</span></code></pre></div>
+<p>Below is the code for the animation (<span class="math inline">\(\gamma\)</span> varies from <span class="math inline">\(1.5\)</span> to <span class="math inline">\(2.5\)</span>). I use <a href="https://laustep.github.io/stlahblog/posts/gifskiBash.html">my ‘gifski’ batch command</a> to make the GIF.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">library</span>(rgl)</span>
+<span id="cb2-2"><a href="#cb2-2"></a>gamma_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="fl">1.5</span>, <span class="fl">2.5</span>, <span class="dt">by =</span> <span class="fl">0.025</span>)</span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">100</span>, <span class="dv">100</span>, <span class="dv">612</span>, <span class="dv">612</span>))</span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="kw">bg3d</span>(<span class="st">&quot;#363940&quot;</span>)</span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="kw">view3d</span>(<span class="dv">15</span>, <span class="dv">25</span>, <span class="dt">zoom =</span> <span class="fl">0.9</span>)</span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="cf">for</span>(j <span class="cf">in</span> <span class="kw">seq_along</span>(gamma_)){</span>
+<span id="cb2-7"><a href="#cb2-7"></a>  points &lt;-<span class="st"> </span><span class="kw">verts3D</span>(gamma_[j])</span>
+<span id="cb2-8"><a href="#cb2-8"></a>  <span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span><span class="kw">nrow</span>(edges)){</span>
+<span id="cb2-9"><a href="#cb2-9"></a>    edge &lt;-<span class="st"> </span>edges[i, ]</span>
+<span id="cb2-10"><a href="#cb2-10"></a>    <span class="kw">shade3d</span>(<span class="kw">cylinder3d</span>(</span>
+<span id="cb2-11"><a href="#cb2-11"></a>      <span class="kw">rbind</span>(</span>
+<span id="cb2-12"><a href="#cb2-12"></a>        points[edge[1L], ], </span>
+<span id="cb2-13"><a href="#cb2-13"></a>        points[edge[2L], ]</span>
+<span id="cb2-14"><a href="#cb2-14"></a>      ), </span>
+<span id="cb2-15"><a href="#cb2-15"></a>      <span class="dt">radius =</span> <span class="fl">0.015</span>, <span class="dt">sides =</span> <span class="dv">90</span></span>
+<span id="cb2-16"><a href="#cb2-16"></a>    ), <span class="dt">color =</span> <span class="st">&quot;gold&quot;</span>)</span>
+<span id="cb2-17"><a href="#cb2-17"></a>  }</span>
+<span id="cb2-18"><a href="#cb2-18"></a>  <span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span><span class="kw">nrow</span>(triangles)){</span>
+<span id="cb2-19"><a href="#cb2-19"></a>    triangle &lt;-<span class="st"> </span>triangles[i, ]</span>
+<span id="cb2-20"><a href="#cb2-20"></a>    <span class="kw">triangles3d</span>(</span>
+<span id="cb2-21"><a href="#cb2-21"></a>      <span class="kw">rbind</span>(</span>
+<span id="cb2-22"><a href="#cb2-22"></a>        points[triangle[1L], ],</span>
+<span id="cb2-23"><a href="#cb2-23"></a>        points[triangle[2L], ],</span>
+<span id="cb2-24"><a href="#cb2-24"></a>        points[triangle[3L], ]</span>
+<span id="cb2-25"><a href="#cb2-25"></a>      ),</span>
+<span id="cb2-26"><a href="#cb2-26"></a>      <span class="dt">color =</span> <span class="st">&quot;red&quot;</span>, <span class="dt">alpha =</span> <span class="fl">0.4</span></span>
+<span id="cb2-27"><a href="#cb2-27"></a>    )</span>
+<span id="cb2-28"><a href="#cb2-28"></a>  }</span>
+<span id="cb2-29"><a href="#cb2-29"></a>  <span class="kw">spheres3d</span>(points, <span class="dt">radius =</span> <span class="fl">0.025</span>, <span class="dt">color =</span> <span class="st">&quot;orange&quot;</span>)</span>
+<span id="cb2-30"><a href="#cb2-30"></a>  <span class="kw">rgl.snapshot</span>(<span class="kw">sprintf</span>(<span class="st">&quot;pic%03d.png&quot;</span>, j))</span>
+<span id="cb2-31"><a href="#cb2-31"></a>  <span class="kw">clear3d</span>()</span>
+<span id="cb2-32"><a href="#cb2-32"></a>}</span>
+<span id="cb2-33"><a href="#cb2-33"></a></span>
+<span id="cb2-34"><a href="#cb2-34"></a>command &lt;-<span class="st"> </span></span>
+<span id="cb2-35"><a href="#cb2-35"></a><span class="st">  &quot;gifski --frames=pic*.png --fps=9 -b -o ModifStereoTruncTesseract.gif&quot;</span></span>
+<span id="cb2-36"><a href="#cb2-36"></a><span class="kw">system</span>(command)</span></code></pre></div>
+<p><img src="figures/ModifStereoTruncatedTesseract.gif" /></p>
+<p>The effect of <span class="math inline">\(\gamma\)</span> is interesting: the interior tetrahedra become bigger when it increases while the exterior tetrahedra become smaller.</p>
+<h2 id="hopf-torus">Hopf torus</h2>
+<p>Now, the <a href="https://laustep.github.io/stlahblog/posts/HopfTorus2.html">Hopf torus</a>. For more efficiency, I modify the <code>parametric3d</code> function of the <strong>misc3d</strong> package.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">library</span>(rgl)</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="kw">library</span>(misc3d)</span>
+<span id="cb3-3"><a href="#cb3-3"></a></span>
+<span id="cb3-4"><a href="#cb3-4"></a>Stereo &lt;-<span class="st"> </span><span class="cf">function</span>(q, gamma){</span>
+<span id="cb3-5"><a href="#cb3-5"></a>  <span class="kw">acos</span>(q[, 4L]) <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="kw">abs</span>(q[, 4L])<span class="op">^</span>gamma)<span class="op">^</span>(<span class="dv">1</span><span class="op">/</span>gamma) <span class="op">*</span><span class="st"> </span>q[, 1L<span class="op">:</span>3L]</span>
+<span id="cb3-6"><a href="#cb3-6"></a>}</span>
+<span id="cb3-7"><a href="#cb3-7"></a></span>
+<span id="cb3-8"><a href="#cb3-8"></a>parametricMesh3d &lt;-<span class="st"> </span><span class="cf">function</span>(gamma, r1, r2, r3){</span>
+<span id="cb3-9"><a href="#cb3-9"></a>  v1 &lt;-<span class="st"> </span><span class="kw">Stereo</span>(r1, gamma)</span>
+<span id="cb3-10"><a href="#cb3-10"></a>  v2 &lt;-<span class="st"> </span><span class="kw">Stereo</span>(r2, gamma)</span>
+<span id="cb3-11"><a href="#cb3-11"></a>  v3 &lt;-<span class="st"> </span><span class="kw">Stereo</span>(r3, gamma)</span>
+<span id="cb3-12"><a href="#cb3-12"></a>  tris &lt;-<span class="st"> </span><span class="kw">makeTriangles</span>(v1, v2, v3)</span>
+<span id="cb3-13"><a href="#cb3-13"></a>  mesh0 &lt;-<span class="st"> </span>misc3d<span class="op">:::</span><span class="kw">t2ve</span>(tris)</span>
+<span id="cb3-14"><a href="#cb3-14"></a>  <span class="kw">addNormals</span>(</span>
+<span id="cb3-15"><a href="#cb3-15"></a>    <span class="kw">tmesh3d</span>(</span>
+<span id="cb3-16"><a href="#cb3-16"></a>      <span class="dt">vertices =</span> mesh0<span class="op">$</span>vb,</span>
+<span id="cb3-17"><a href="#cb3-17"></a>      <span class="dt">indices  =</span> mesh0<span class="op">$</span>ib</span>
+<span id="cb3-18"><a href="#cb3-18"></a>    )</span>
+<span id="cb3-19"><a href="#cb3-19"></a>  )</span>
+<span id="cb3-20"><a href="#cb3-20"></a>}</span>
+<span id="cb3-21"><a href="#cb3-21"></a></span>
+<span id="cb3-22"><a href="#cb3-22"></a>A &lt;-<span class="st"> </span><span class="fl">0.44</span></span>
+<span id="cb3-23"><a href="#cb3-23"></a>n &lt;-<span class="st"> </span><span class="dv">3</span></span>
+<span id="cb3-24"><a href="#cb3-24"></a>Hopf4D &lt;-<span class="st"> </span><span class="cf">function</span>(t, phi){ </span>
+<span id="cb3-25"><a href="#cb3-25"></a>  alpha &lt;-<span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span>(pi<span class="op">/</span><span class="dv">2</span><span class="op">-</span>A)<span class="op">*</span><span class="kw">cos</span>(n<span class="op">*</span>t)</span>
+<span id="cb3-26"><a href="#cb3-26"></a>  beta &lt;-<span class="st"> </span>t <span class="op">+</span><span class="st"> </span>A<span class="op">*</span><span class="kw">sin</span>(<span class="dv">2</span><span class="op">*</span>n<span class="op">*</span>t)</span>
+<span id="cb3-27"><a href="#cb3-27"></a>  sin_alpha &lt;-<span class="st"> </span><span class="kw">sin</span>(alpha)</span>
+<span id="cb3-28"><a href="#cb3-28"></a>  p1 &lt;-<span class="st"> </span>sin_alpha <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(beta)</span>
+<span id="cb3-29"><a href="#cb3-29"></a>  p2 &lt;-<span class="st"> </span>sin_alpha <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(beta)</span>
+<span id="cb3-30"><a href="#cb3-30"></a>  p3 &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">cos</span>(alpha)</span>
+<span id="cb3-31"><a href="#cb3-31"></a>  cos_phi &lt;-<span class="st"> </span><span class="kw">cos</span>(phi)</span>
+<span id="cb3-32"><a href="#cb3-32"></a>  sin_phi &lt;-<span class="st"> </span><span class="kw">sin</span>(phi)</span>
+<span id="cb3-33"><a href="#cb3-33"></a>  <span class="kw">cbind</span>(</span>
+<span id="cb3-34"><a href="#cb3-34"></a>    cos_phi<span class="op">*</span>p3,</span>
+<span id="cb3-35"><a href="#cb3-35"></a>    sin_phi<span class="op">*</span>p1 <span class="op">-</span><span class="st"> </span>cos_phi<span class="op">*</span>p2, </span>
+<span id="cb3-36"><a href="#cb3-36"></a>    cos_phi<span class="op">*</span>p1 <span class="op">+</span><span class="st"> </span>sin_phi<span class="op">*</span>p2,</span>
+<span id="cb3-37"><a href="#cb3-37"></a>    sin_phi<span class="op">*</span>p3</span>
+<span id="cb3-38"><a href="#cb3-38"></a>  ) <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="dv">2</span><span class="op">*</span>p3)</span>
+<span id="cb3-39"><a href="#cb3-39"></a>}</span>
+<span id="cb3-40"><a href="#cb3-40"></a>u &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span>pi, pi, <span class="dt">length.out =</span> <span class="dv">300</span>)</span>
+<span id="cb3-41"><a href="#cb3-41"></a>v &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> <span class="dv">200</span>)</span>
+<span id="cb3-42"><a href="#cb3-42"></a>tg &lt;-<span class="st"> </span>misc3d<span class="op">:::</span><span class="kw">expandTriangleGrid</span>(u, v)</span>
+<span id="cb3-43"><a href="#cb3-43"></a>h &lt;-<span class="st"> </span><span class="cf">function</span>(uv) <span class="kw">Hopf4D</span>(uv[, 1L], uv[, 2L])</span>
+<span id="cb3-44"><a href="#cb3-44"></a>r1 &lt;-<span class="st"> </span><span class="kw">h</span>(tg<span class="op">$</span>v1); r2 &lt;-<span class="st"> </span><span class="kw">h</span>(tg<span class="op">$</span>v2); r3 &lt;-<span class="st"> </span><span class="kw">h</span>(tg<span class="op">$</span>v3)</span></code></pre></div>
+<p>Below is the animation when <span class="math inline">\(\gamma\)</span> varies from <span class="math inline">\(0.8\)</span> to <span class="math inline">\(2\)</span>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>gamma_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="fl">0.8</span>, <span class="dv">2</span>, <span class="dt">by =</span> <span class="fl">0.025</span>)</span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">100</span>, <span class="dv">100</span>, <span class="dv">612</span>, <span class="dv">612</span>))</span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="kw">bg3d</span>(<span class="st">&quot;#363940&quot;</span>)</span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="kw">view3d</span>(<span class="dv">90</span>, <span class="dv">0</span>, <span class="dt">zoom =</span> <span class="fl">0.7</span>)</span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_along</span>(gamma_)){</span>
+<span id="cb4-6"><a href="#cb4-6"></a>  mesh &lt;-<span class="st"> </span><span class="kw">parametricMesh3d</span>(<span class="dt">gamma =</span> gamma_[i], r1, r2, r3)</span>
+<span id="cb4-7"><a href="#cb4-7"></a>  <span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">&quot;green&quot;</span>)</span>
+<span id="cb4-8"><a href="#cb4-8"></a>  <span class="kw">rgl.snapshot</span>(<span class="kw">sprintf</span>(<span class="st">&quot;pic%03d.png&quot;</span>, i))</span>
+<span id="cb4-9"><a href="#cb4-9"></a>  <span class="kw">clear3d</span>()</span>
+<span id="cb4-10"><a href="#cb4-10"></a>}</span>
+<span id="cb4-11"><a href="#cb4-11"></a></span>
+<span id="cb4-12"><a href="#cb4-12"></a>command &lt;-<span class="st"> </span></span>
+<span id="cb4-13"><a href="#cb4-13"></a><span class="st">  &quot;gifski --frames=pic*.png --fps=9 -b -o ModifStereoHopfTorus.gif&quot;</span></span>
+<span id="cb4-14"><a href="#cb4-14"></a><span class="kw">system</span>(command)</span></code></pre></div>
+<p><img src="figures/ModifStereoHopfTorus.gif" /></p>
+<p>So the Hopf torus becomes more compact as <span class="math inline">\(\gamma\)</span> increases.</p>
+<h2 id="stereographic-duoprism">Stereographic duoprism</h2>
+<p>In the post devoted to the <a href="https://laustep.github.io/stlahblog/posts/DuoprismStereo.html">stereographic duoprism</a> I also use the ordinary stereographic projection. Let’s see what happens with the modified stereographic projection.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="kw">library</span>(rgl)</span>
+<span id="cb5-2"><a href="#cb5-2"></a></span>
+<span id="cb5-3"><a href="#cb5-3"></a>A &lt;-<span class="st"> </span>3L</span>
+<span id="cb5-4"><a href="#cb5-4"></a>B &lt;-<span class="st"> </span>24L</span>
+<span id="cb5-5"><a href="#cb5-5"></a></span>
+<span id="cb5-6"><a href="#cb5-6"></a><span class="co"># construction of the vertices ####</span></span>
+<span id="cb5-7"><a href="#cb5-7"></a>vertices &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="ot">NA_real_</span>, <span class="dt">dim =</span> <span class="kw">c</span>(A, B, 4L))</span>
+<span id="cb5-8"><a href="#cb5-8"></a><span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span>A){</span>
+<span id="cb5-9"><a href="#cb5-9"></a>  v1 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">cos</span>(i<span class="op">/</span>A<span class="op">*</span><span class="dv">2</span><span class="op">*</span>pi), <span class="kw">sin</span>(i<span class="op">/</span>A<span class="op">*</span><span class="dv">2</span><span class="op">*</span>pi))</span>
+<span id="cb5-10"><a href="#cb5-10"></a>  <span class="cf">for</span>(j <span class="cf">in</span> 1L<span class="op">:</span>B){</span>
+<span id="cb5-11"><a href="#cb5-11"></a>    v2 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">cos</span>(j<span class="op">/</span>B<span class="op">*</span><span class="dv">2</span><span class="op">*</span>pi), <span class="kw">sin</span>(j<span class="op">/</span>B<span class="op">*</span><span class="dv">2</span><span class="op">*</span>pi))</span>
+<span id="cb5-12"><a href="#cb5-12"></a>    vertices[i, j, ] &lt;-<span class="st"> </span><span class="kw">c</span>(v1, v2)</span>
+<span id="cb5-13"><a href="#cb5-13"></a>  }</span>
+<span id="cb5-14"><a href="#cb5-14"></a>}</span>
+<span id="cb5-15"><a href="#cb5-15"></a></span>
+<span id="cb5-16"><a href="#cb5-16"></a><span class="co"># construction of the edges ####</span></span>
+<span id="cb5-17"><a href="#cb5-17"></a>edges &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="ot">NA_integer_</span>, <span class="dt">dim =</span> <span class="kw">c</span>(2L, 2L, 2L<span class="op">*</span>A<span class="op">*</span>B))</span>
+<span id="cb5-18"><a href="#cb5-18"></a>dominates &lt;-<span class="st"> </span><span class="cf">function</span>(c1, c2){</span>
+<span id="cb5-19"><a href="#cb5-19"></a>  c2[1L] <span class="op">&gt;</span><span class="st"> </span>c1[1L] <span class="op">||</span><span class="st"> </span>(c2[1L] <span class="op">==</span><span class="st"> </span>c1[1L] <span class="op">&amp;&amp;</span><span class="st"> </span>c2[2L] <span class="op">&gt;</span><span class="st"> </span>c1[2L])</span>
+<span id="cb5-20"><a href="#cb5-20"></a>}</span>
+<span id="cb5-21"><a href="#cb5-21"></a>counter &lt;-<span class="st"> </span>1L</span>
+<span id="cb5-22"><a href="#cb5-22"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_len</span>(A)<span class="op">-</span>1L){</span>
+<span id="cb5-23"><a href="#cb5-23"></a>  <span class="cf">for</span>(j <span class="cf">in</span> <span class="kw">seq_len</span>(B)<span class="op">-</span>1L){</span>
+<span id="cb5-24"><a href="#cb5-24"></a>    c1 &lt;-<span class="st"> </span><span class="kw">c</span>(i, j)</span>
+<span id="cb5-25"><a href="#cb5-25"></a>    candidate &lt;-<span class="st"> </span><span class="kw">c</span>(i, (j<span class="op">-</span>1L) <span class="op">%%</span><span class="st"> </span>B)</span>
+<span id="cb5-26"><a href="#cb5-26"></a>    <span class="cf">if</span>(<span class="kw">dominates</span>(c1, candidate)){</span>
+<span id="cb5-27"><a href="#cb5-27"></a>      edges[, , counter] &lt;-<span class="st"> </span><span class="kw">cbind</span>(c1, candidate) <span class="op">+</span><span class="st"> </span>1L</span>
+<span id="cb5-28"><a href="#cb5-28"></a>      counter &lt;-<span class="st"> </span>counter <span class="op">+</span><span class="st"> </span>1L</span>
+<span id="cb5-29"><a href="#cb5-29"></a>    }</span>
+<span id="cb5-30"><a href="#cb5-30"></a>    candidate &lt;-<span class="st"> </span><span class="kw">c</span>(i, (j<span class="op">+</span>1L) <span class="op">%%</span><span class="st"> </span>B)</span>
+<span id="cb5-31"><a href="#cb5-31"></a>    <span class="cf">if</span>(<span class="kw">dominates</span>(c1, candidate)){</span>
+<span id="cb5-32"><a href="#cb5-32"></a>      edges[, , counter] &lt;-<span class="st"> </span><span class="kw">cbind</span>(c1, candidate) <span class="op">+</span><span class="st"> </span>1L</span>
+<span id="cb5-33"><a href="#cb5-33"></a>      counter &lt;-<span class="st"> </span>counter <span class="op">+</span><span class="st"> </span>1L</span>
+<span id="cb5-34"><a href="#cb5-34"></a>    }</span>
+<span id="cb5-35"><a href="#cb5-35"></a>    candidate &lt;-<span class="st"> </span><span class="kw">c</span>((i<span class="op">-</span>1L) <span class="op">%%</span><span class="st"> </span>A, j)</span>
+<span id="cb5-36"><a href="#cb5-36"></a>    <span class="cf">if</span>(<span class="kw">dominates</span>(c1, candidate)){</span>
+<span id="cb5-37"><a href="#cb5-37"></a>      edges[, , counter] &lt;-<span class="st"> </span><span class="kw">cbind</span>(c1, candidate) <span class="op">+</span><span class="st"> </span>1L</span>
+<span id="cb5-38"><a href="#cb5-38"></a>      counter &lt;-<span class="st"> </span>counter <span class="op">+</span><span class="st"> </span>1L</span>
+<span id="cb5-39"><a href="#cb5-39"></a>    }</span>
+<span id="cb5-40"><a href="#cb5-40"></a>    candidate &lt;-<span class="st"> </span><span class="kw">c</span>((i<span class="op">+</span>1L) <span class="op">%%</span><span class="st"> </span>A, j)</span>
+<span id="cb5-41"><a href="#cb5-41"></a>    <span class="cf">if</span>(<span class="kw">dominates</span>(c1, candidate)){</span>
+<span id="cb5-42"><a href="#cb5-42"></a>      edges[, , counter] &lt;-<span class="st"> </span><span class="kw">cbind</span>(c1, candidate) <span class="op">+</span><span class="st"> </span>1L</span>
+<span id="cb5-43"><a href="#cb5-43"></a>      counter &lt;-<span class="st"> </span>counter <span class="op">+</span><span class="st"> </span>1L</span>
+<span id="cb5-44"><a href="#cb5-44"></a>    }</span>
+<span id="cb5-45"><a href="#cb5-45"></a>  }</span>
+<span id="cb5-46"><a href="#cb5-46"></a>}</span>
+<span id="cb5-47"><a href="#cb5-47"></a></span>
+<span id="cb5-48"><a href="#cb5-48"></a><span class="co"># stereographic-like projection</span></span>
+<span id="cb5-49"><a href="#cb5-49"></a>stereog &lt;-<span class="st"> </span><span class="cf">function</span>(v, gamma){</span>
+<span id="cb5-50"><a href="#cb5-50"></a>  r &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="dv">2</span>)</span>
+<span id="cb5-51"><a href="#cb5-51"></a>  <span class="kw">acos</span>(v[4L]<span class="op">/</span>r) <span class="op">/</span><span class="st"> </span>(r<span class="op">^</span>gamma <span class="op">-</span><span class="st"> </span><span class="kw">abs</span>(v[4L])<span class="op">^</span>gamma)<span class="op">^</span>(<span class="dv">1</span><span class="op">/</span>gamma) <span class="op">*</span><span class="st"> </span>v[1L<span class="op">:</span>3L]</span>
+<span id="cb5-52"><a href="#cb5-52"></a>}</span>
+<span id="cb5-53"><a href="#cb5-53"></a></span>
+<span id="cb5-54"><a href="#cb5-54"></a><span class="co"># spherical segment</span></span>
+<span id="cb5-55"><a href="#cb5-55"></a>sphericalSegment &lt;-<span class="st"> </span><span class="cf">function</span>(P, Q, n){</span>
+<span id="cb5-56"><a href="#cb5-56"></a>  out &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="ot">NA_real_</span>, <span class="dt">nrow =</span> n <span class="op">+</span><span class="st"> </span>1L, <span class="dt">ncol =</span> 4L)</span>
+<span id="cb5-57"><a href="#cb5-57"></a>  <span class="cf">for</span>(i <span class="cf">in</span> 0L<span class="op">:</span>n){</span>
+<span id="cb5-58"><a href="#cb5-58"></a>    pt &lt;-<span class="st"> </span>P <span class="op">+</span><span class="st"> </span>(i<span class="op">/</span>n)<span class="op">*</span>(Q<span class="op">-</span>P)</span>
+<span id="cb5-59"><a href="#cb5-59"></a>    out[i<span class="op">+</span>1L, ] &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="dv">2</span><span class="op">/</span><span class="kw">c</span>(<span class="kw">crossprod</span>(pt))) <span class="op">*</span><span class="st"> </span>pt</span>
+<span id="cb5-60"><a href="#cb5-60"></a>  }</span>
+<span id="cb5-61"><a href="#cb5-61"></a>  out</span>
+<span id="cb5-62"><a href="#cb5-62"></a>}</span>
+<span id="cb5-63"><a href="#cb5-63"></a></span>
+<span id="cb5-64"><a href="#cb5-64"></a><span class="co"># stereographic edge</span></span>
+<span id="cb5-65"><a href="#cb5-65"></a>stereoEdge &lt;-<span class="st"> </span><span class="cf">function</span>(verts, v1, v2, gamma){</span>
+<span id="cb5-66"><a href="#cb5-66"></a>  P &lt;-<span class="st"> </span>verts[v1[1L], v1[2L], ]</span>
+<span id="cb5-67"><a href="#cb5-67"></a>  Q &lt;-<span class="st"> </span>verts[v2[1L], v2[2L], ]</span>
+<span id="cb5-68"><a href="#cb5-68"></a>  PQ &lt;-<span class="st"> </span><span class="kw">sphericalSegment</span>(P, Q, 100L)</span>
+<span id="cb5-69"><a href="#cb5-69"></a>  pq &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">apply</span>(PQ, 1L, stereog, <span class="dt">gamma =</span> gamma))</span>
+<span id="cb5-70"><a href="#cb5-70"></a>  dists &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">apply</span>(pq, 1L, crossprod))</span>
+<span id="cb5-71"><a href="#cb5-71"></a>  <span class="kw">cylinder3d</span>(pq, <span class="dt">radius =</span> dists<span class="op">/</span><span class="dv">15</span>, <span class="dt">sides =</span> <span class="dv">60</span>)</span>
+<span id="cb5-72"><a href="#cb5-72"></a>}</span>
+<span id="cb5-73"><a href="#cb5-73"></a></span>
+<span id="cb5-74"><a href="#cb5-74"></a><span class="co"># projected vertices</span></span>
+<span id="cb5-75"><a href="#cb5-75"></a>verts3D &lt;-<span class="st"> </span><span class="cf">function</span>(gamma){</span>
+<span id="cb5-76"><a href="#cb5-76"></a>  <span class="kw">apply</span>(vertices, <span class="kw">c</span>(1L, 2L), stereog, <span class="dt">gamma =</span> gamma)</span>
+<span id="cb5-77"><a href="#cb5-77"></a>}</span></code></pre></div>
+<p>The animation for <span class="math inline">\(\gamma\)</span> varying from <span class="math inline">\(0.8\)</span> to <span class="math inline">\(2\)</span>:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>gamma_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="fl">0.8</span>, <span class="dv">2</span>, <span class="dt">by =</span> <span class="fl">0.025</span>)</span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="kw">view3d</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dt">zoom =</span> <span class="fl">0.7</span>)</span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="kw">bg3d</span>(<span class="kw">rgb</span>(<span class="dv">54</span>, <span class="dv">57</span>, <span class="dv">64</span>, <span class="dt">maxColorValue =</span> <span class="dv">255</span>))</span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="cf">for</span>(frame <span class="cf">in</span> <span class="kw">seq_along</span>(gamma_)){</span>
+<span id="cb6-6"><a href="#cb6-6"></a>  gamma &lt;-<span class="st"> </span>gamma_[frame]</span>
+<span id="cb6-7"><a href="#cb6-7"></a>  <span class="co">## plot the edges</span></span>
+<span id="cb6-8"><a href="#cb6-8"></a>  <span class="cf">for</span>(k <span class="cf">in</span> 1L<span class="op">:</span>(2L<span class="op">*</span>A<span class="op">*</span>B)){</span>
+<span id="cb6-9"><a href="#cb6-9"></a>    v1 &lt;-<span class="st"> </span>edges[, 1L, k]</span>
+<span id="cb6-10"><a href="#cb6-10"></a>    v2 &lt;-<span class="st"> </span>edges[, 2L, k]</span>
+<span id="cb6-11"><a href="#cb6-11"></a>    edge &lt;-<span class="st"> </span><span class="kw">stereoEdge</span>(vertices, v1, v2, gamma)</span>
+<span id="cb6-12"><a href="#cb6-12"></a>    <span class="kw">shade3d</span>(edge, <span class="dt">color =</span> <span class="st">&quot;gold&quot;</span>)</span>
+<span id="cb6-13"><a href="#cb6-13"></a>  }</span>
+<span id="cb6-14"><a href="#cb6-14"></a>  <span class="co">## plot the vertices</span></span>
+<span id="cb6-15"><a href="#cb6-15"></a>  vs &lt;-<span class="st"> </span><span class="kw">verts3D</span>(gamma)</span>
+<span id="cb6-16"><a href="#cb6-16"></a>  <span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span>A){</span>
+<span id="cb6-17"><a href="#cb6-17"></a>    <span class="cf">for</span>(j <span class="cf">in</span> 1L<span class="op">:</span>B){</span>
+<span id="cb6-18"><a href="#cb6-18"></a>      v &lt;-<span class="st"> </span>vs[, i, j]</span>
+<span id="cb6-19"><a href="#cb6-19"></a>      <span class="kw">spheres3d</span>(v, <span class="dt">radius =</span> <span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(v)))<span class="op">/</span><span class="dv">10</span>, <span class="dt">color =</span> <span class="st">&quot;gold2&quot;</span>)</span>
+<span id="cb6-20"><a href="#cb6-20"></a>    }</span>
+<span id="cb6-21"><a href="#cb6-21"></a>  }</span>
+<span id="cb6-22"><a href="#cb6-22"></a>  <span class="kw">rgl.snapshot</span>(<span class="kw">sprintf</span>(<span class="st">&quot;pic%03d.png&quot;</span>, frame))</span>
+<span id="cb6-23"><a href="#cb6-23"></a>  <span class="kw">clear3d</span>()</span>
+<span id="cb6-24"><a href="#cb6-24"></a>}</span>
+<span id="cb6-25"><a href="#cb6-25"></a></span>
+<span id="cb6-26"><a href="#cb6-26"></a>command &lt;-<span class="st"> </span></span>
+<span id="cb6-27"><a href="#cb6-27"></a><span class="st">  &quot;gifski --frames=pic*.png --fps=9 -b -o ModifStereoDuoprism.gif&quot;</span></span>
+<span id="cb6-28"><a href="#cb6-28"></a><span class="kw">system</span>(command)</span></code></pre></div>
+<p><img src="figures/ModifStereoDuoprism.gif" /></p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
