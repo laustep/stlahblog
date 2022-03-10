@@ -156,20 +156,25 @@
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a>del &lt;-<span class="st"> </span>tessellation<span class="op">::</span><span class="kw">delaunay</span>(points, <span class="dt">elevation =</span> <span class="ot">TRUE</span>)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a>del[[<span class="st">&quot;volume&quot;</span>]]</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="co">## [1] 3.141593</span></span></code></pre></div>
+<h2 id="update-2022-03-10-using-rcdt">Update 2022-03-10: using ‘RCDT’</h2>
+<p>The elevated Delaunay triangulation is now available in my package <a href="https://github.com/stla/RCDT">RCDT</a>.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a>del &lt;-<span class="st"> </span>RCDT<span class="op">::</span><span class="kw">delaunay</span>(points, <span class="dt">elevation =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>del[[<span class="st">&quot;volume&quot;</span>]]</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a><span class="co">## [1] 3.141593</span></span></code></pre></div>
 <h2 id="interactive-plot-with-deldir">Interactive plot with ‘deldir’</h2>
 <p>The <strong>deldir</strong> also allows to get an interactive graphic from the elevated Delaunay tessellation. This requires the <strong>rgl</strong> package. I do it below with a less fine grid, otherwise the visualization is not nice (too dense):</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dt">length.out =</span> <span class="dv">20</span>)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>y &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dt">length.out =</span> <span class="dv">20</span>)</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a>grd &lt;-<span class="st"> </span><span class="kw">transform</span>(</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a>  <span class="kw">expand.grid</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y), <span class="dt">z =</span> <span class="kw">f</span>(x, y)</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a>) </span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a>del &lt;-<span class="st"> </span><span class="kw">deldir</span>(</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a>  <span class="dt">x =</span> grd[[<span class="st">&quot;x&quot;</span>]], <span class="dt">y =</span> grd[[<span class="st">&quot;y&quot;</span>]], <span class="dt">z =</span> grd[[<span class="st">&quot;z&quot;</span>]],</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a>  <span class="dt">rw =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">-3</span>, <span class="dv">3</span>), <span class="dt">round =</span> <span class="ot">FALSE</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true"></a>) </span></code></pre></div>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="kw">library</span>(rgl)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a><span class="kw">persp3d</span>(del, <span class="dt">front =</span> <span class="st">&quot;lines&quot;</span>, <span class="dt">back =</span> <span class="st">&quot;lines&quot;</span>, <span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>)</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true"></a><span class="kw">aspect3d</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dt">length.out =</span> <span class="dv">20</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a>y &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dt">length.out =</span> <span class="dv">20</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true"></a>grd &lt;-<span class="st"> </span><span class="kw">transform</span>(</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true"></a>  <span class="kw">expand.grid</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y), <span class="dt">z =</span> <span class="kw">f</span>(x, y)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true"></a>) </span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true"></a>del &lt;-<span class="st"> </span><span class="kw">deldir</span>(</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true"></a>  <span class="dt">x =</span> grd[[<span class="st">&quot;x&quot;</span>]], <span class="dt">y =</span> grd[[<span class="st">&quot;y&quot;</span>]], <span class="dt">z =</span> grd[[<span class="st">&quot;z&quot;</span>]],</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true"></a>  <span class="dt">rw =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">-3</span>, <span class="dv">3</span>), <span class="dt">round =</span> <span class="ot">FALSE</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true"></a>) </span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a><span class="kw">library</span>(rgl)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a><span class="kw">persp3d</span>(del, <span class="dt">front =</span> <span class="st">&quot;lines&quot;</span>, <span class="dt">back =</span> <span class="st">&quot;lines&quot;</span>, <span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true"></a><span class="kw">aspect3d</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">1</span>)</span></code></pre></div>
 <p><img src="figures/deldir_elevated_delaunay.gif" /></p>
 
         </div>
