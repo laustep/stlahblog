@@ -5,7 +5,434 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Tue, 01 Mar 2022 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Mon, 14 Mar 2022 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>The E8 root polytope</title>
+      <link>https://laustep.github.io/stlahblog/posts/E8rootPolytope.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <h2 id="the-e8-root-polytope-its-vertices-and-its-edges">
+        The E8 root polytope, its vertices and its edges
+      </h2>
+      <p>
+        The <em>E8 root polytope</em>, also known as the
+        <a href="https://en.wikipedia.org/wiki/4_21_polytope"
+          ><span class="math inline">\(4_{21}\)</span> polytope</a
+        >
+        is a 8-dimensional polytope. The Cartesian coordinates of its vertices
+        are described in the above linked Wikipedia page. It has 240 vertices,
+        that can be separated in two sets. The first set is obtained from
+        <span class="math inline">\((\pm 2, \pm 2, 0, 0, 0, 0, 0, 0)\)</span> by
+        taking an arbitrary combination of the signs and an arbitrary
+        permutation of the coordinates. This gives
+        <span class="math inline">\(2^2 \tbinom{8}{2} = 112\)</span> vertices,
+        that one can obtain as follows in R:
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1">combs &lt;-<span class="st"> </span>arrangements<span class="op">::</span><span class="kw">combinations</span>(8L, 2L)</span>
+<span id="cb1-2">vertices1 &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb1-3"><span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span><span class="kw">nrow</span>(combs)){</span>
+<span id="cb1-4">  comb &lt;-<span class="st"> </span>combs[i, ]</span>
+<span id="cb1-5">  <span class="cf">for</span>(x <span class="cf">in</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">2</span>, <span class="dv">2</span>)){</span>
+<span id="cb1-6">    <span class="cf">for</span>(y <span class="cf">in</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">2</span>, <span class="dv">2</span>)){</span>
+<span id="cb1-7">      zeros &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">0</span>, 8L)</span>
+<span id="cb1-8">      zeros[comb[1L]] &lt;-<span class="st"> </span>x</span>
+<span id="cb1-9">      zeros[comb[2L]] &lt;-<span class="st"> </span>y</span>
+<span id="cb1-10">      vertices1 &lt;-<span class="st"> </span><span class="kw">rbind</span>(vertices1, zeros)</span>
+<span id="cb1-11">    }</span>
+<span id="cb1-12">  }</span>
+<span id="cb1-13">}</span></code></pre>
+      </div>
+      <p>
+        Indeed we get <span class="math inline">\(112\)</span> vertices, in a
+        matrix with stupid row names:
+      </p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1"><span class="kw">str</span>(vertices1)</span>
+<span id="cb2-2"><span class="co">##  num [1:112, 1:8] -2 -2 2 2 -2 -2 2 2 -2 -2 ...</span></span>
+<span id="cb2-3"><span class="co">##  - attr(*, "dimnames")=List of 2</span></span>
+<span id="cb2-4"><span class="co">##   ..$ : chr [1:112] "zeros" "zeros" "zeros" "zeros" ...</span></span>
+<span id="cb2-5"><span class="co">##   ..$ : NULL</span></span>
+<span id="cb2-6"><span class="kw">head</span>(vertices1)</span>
+<span id="cb2-7"><span class="co">##       [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8]</span></span>
+<span id="cb2-8"><span class="co">## zeros   -2   -2    0    0    0    0    0    0</span></span>
+<span id="cb2-9"><span class="co">## zeros   -2    2    0    0    0    0    0    0</span></span>
+<span id="cb2-10"><span class="co">## zeros    2   -2    0    0    0    0    0    0</span></span>
+<span id="cb2-11"><span class="co">## zeros    2    2    0    0    0    0    0    0</span></span>
+<span id="cb2-12"><span class="co">## zeros   -2    0   -2    0    0    0    0    0</span></span>
+<span id="cb2-13"><span class="co">## zeros   -2    0    2    0    0    0    0    0</span></span></code></pre>
+      </div>
+      <p>
+        The second set of vertices is obtained from
+        <span class="math inline">\((\pm 1, \ldots, \pm 1)\)</span> by taking an
+        even number of minus signs. As noted in the Wikipedia article, this
+        amounts to say that the sum of the coordinates is a multiple of
+        <span class="math inline">\(4\)</span>.
+      </p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb3-1">vertices2 &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb3-2">grd &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(<span class="kw">expand.grid</span>(<span class="kw">rep</span>(<span class="kw">list</span>(<span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)), 8L)))</span>
+<span id="cb3-3"><span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span><span class="kw">nrow</span>(grd)){</span>
+<span id="cb3-4">  v &lt;-<span class="st"> </span>grd[i, ]</span>
+<span id="cb3-5">  <span class="cf">if</span>(<span class="kw">sum</span>(v) <span class="op">%%</span><span class="st"> </span><span class="dv">4</span> <span class="op">==</span><span class="st"> </span><span class="dv">0</span>){</span>
+<span id="cb3-6">    vertices2 &lt;-<span class="st"> </span><span class="kw">rbind</span>(vertices2, v)</span>
+<span id="cb3-7">  }</span>
+<span id="cb3-8">}</span></code></pre>
+      </div>
+      <p>
+        This gives <span class="math inline">\(128\)</span> vertices, again in a
+        matrix with stupid row names:
+      </p>
+      <div class="sourceCode" id="cb4">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb4-1"><span class="kw">str</span>(vertices2)</span>
+<span id="cb4-2"><span class="co">##  num [1:128, 1:8] -1 1 1 -1 1 -1 -1 1 1 -1 ...</span></span>
+<span id="cb4-3"><span class="co">##  - attr(*, "dimnames")=List of 2</span></span>
+<span id="cb4-4"><span class="co">##   ..$ : chr [1:128] "v" "v" "v" "v" ...</span></span>
+<span id="cb4-5"><span class="co">##   ..$ : chr [1:8] "Var1" "Var2" "Var3" "Var4" ...</span></span>
+<span id="cb4-6"><span class="kw">head</span>(vertices2)</span>
+<span id="cb4-7"><span class="co">##   Var1 Var2 Var3 Var4 Var5 Var6 Var7 Var8</span></span>
+<span id="cb4-8"><span class="co">## v   -1   -1   -1   -1   -1   -1   -1   -1</span></span>
+<span id="cb4-9"><span class="co">## v    1    1   -1   -1   -1   -1   -1   -1</span></span>
+<span id="cb4-10"><span class="co">## v    1   -1    1   -1   -1   -1   -1   -1</span></span>
+<span id="cb4-11"><span class="co">## v   -1    1    1   -1   -1   -1   -1   -1</span></span>
+<span id="cb4-12"><span class="co">## v    1   -1   -1    1   -1   -1   -1   -1</span></span>
+<span id="cb4-13"><span class="co">## v   -1    1   -1    1   -1   -1   -1   -1</span></span></code></pre>
+      </div>
+      <p>
+        So here is our matrix of
+        <span class="math inline">\(240\)</span> vertices:
+      </p>
+      <div class="sourceCode" id="cb5">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb5-1">vertices &lt;-<span class="st"> </span><span class="kw">rbind</span>(vertices1, vertices2)</span></code></pre>
+      </div>
+      <p>
+        Well. Now, how to get the <em>edges</em> of the polytope? An edge is a
+        pair of connected (adjacent) vertices, and it is better to store them as
+        pairs of vertex indices (the row indices of our
+        <code>vertices</code> matrix).
+      </p>
+      <p>
+        My first attempt was to resort to my package <strong>cxhull</strong>.
+        Indeed, the E8 root polytope is convex, therefore its convex hull is
+        itself, and the <code>cxhull</code> function of the
+        <strong>cxhull</strong> package provides the edges of the convex hull.
+        Therefore, I ran:
+      </p>
+      <div class="sourceCode" id="cb6">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb6-1"><span class="kw">library</span>(cxhull)</span>
+<span id="cb6-2">hull &lt;-<span class="st"> </span><span class="kw">cxhull</span>(vertices, <span class="dt">triangulate =</span> <span class="ot">FALSE</span>)</span></code></pre>
+      </div>
+      <p>
+        What a disaster! <strong><em>Do not run this code!</em></strong> It
+        totally crashed my laptop. Perhaps that can work with more RAM, I don’t
+        know (I have only 8 Gb). I searched and I searched on the web, with no
+        luck, I didn’t find these edges. So I decided to search another
+        computational geometry library, able to get these edges. I thought of
+        the C library
+        <a href="https://people.inf.ethz.ch/fukudak/cdd_home/">cddlib</a>. I’m
+        not a star in C but this library is wrapped in the Julia library
+        <a href="https://github.com/JuliaPolyhedra/CDDLib.jl">CDDLib.jl</a>. No
+        luck: this wrapper is incomplete and the vertex adjacency was not
+        available in this library. Then I opened an issue on the Github repo to
+        request this feature, and I looked at the documentation of the Python
+        wrapper of <strong>cddlib</strong>: the
+        <strong>pycddlib</strong> library. Very nice: it provides the vertex
+        adjacency feature. I didn’t have the courage to program the construction
+        of the vertices in Python, so I used
+        <a
+          href="https://laustep.github.io/stlahblog/posts/Rmatrix2HaskellList.html"
+          >my old blog post</a
+        >, <em>“A R matrix to a Haskell list”</em>, since it is also usable for
+        Python instead of Haskell. But now let’s show how to construct the
+        vertices in Python:
+      </p>
+      <div class="sourceCode" id="cb7">
+        <pre
+          class="sourceCode python"
+        ><code class="sourceCode python"><span id="cb7-1"><span class="im">from</span> itertools <span class="im">import</span> product, combinations</span>
+<span id="cb7-2"><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb7-3"></span>
+<span id="cb7-4">vertices <span class="op">=</span> []</span>
+<span id="cb7-5"></span>
+<span id="cb7-6"><span class="co"># our `vertices1` in R:</span></span>
+<span id="cb7-7"><span class="cf">for</span> i, j <span class="kw">in</span> combinations(<span class="bu">range</span>(<span class="dv">8</span>), <span class="dv">2</span>):</span>
+<span id="cb7-8">    <span class="cf">for</span> x, y <span class="kw">in</span> product([<span class="op">-</span><span class="dv">2</span>, <span class="dv">2</span>], repeat <span class="op">=</span> <span class="dv">2</span>):</span>
+<span id="cb7-9">        v <span class="op">=</span> np.zeros(<span class="dv">8</span>)</span>
+<span id="cb7-10">        v[i] <span class="op">=</span> x</span>
+<span id="cb7-11">        v[j] <span class="op">=</span> y</span>
+<span id="cb7-12">        vertices.append(v)</span>
+<span id="cb7-13"></span>
+<span id="cb7-14"><span class="co"># our `vertices2` in R:</span></span>
+<span id="cb7-15"><span class="cf">for</span> v <span class="kw">in</span> product([<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>], repeat <span class="op">=</span> <span class="dv">8</span>):</span>
+<span id="cb7-16">    <span class="cf">if</span> <span class="bu">sum</span>(v) <span class="op">%</span> <span class="dv">4</span> <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb7-17">        vertices.append(v)</span></code></pre>
+      </div>
+      <p>
+        Actually I’m not the author of this code (I will come back to this point
+        later). I have a long experience with R and a short experience with
+        Python, so for me the construction of the vertices is easier in R. But I
+        have to be honest: the Python code is more elegant.
+      </p>
+      <p>
+        Now, the edges. In fact <strong>pycddlib</strong> is simply called
+        <strong>cdd</strong> in Python:
+      </p>
+      <div class="sourceCode" id="cb8">
+        <pre
+          class="sourceCode python"
+        ><code class="sourceCode python"><span id="cb8-1"><span class="im">import</span> cdd <span class="im">as</span> pcdd</span></code></pre>
+      </div>
+      <p>
+        We want to do the so-called V-representation of the polytope
+        (representation by the vertices), and then (I refer you to the
+        documentation for this point), we have to prepend a
+        <span class="math inline">\(1\)</span> to each vertex coordinates:
+      </p>
+      <div class="sourceCode" id="cb9">
+        <pre
+          class="sourceCode python"
+        ><code class="sourceCode python"><span id="cb9-1">vertices <span class="op">=</span> np.hstack((np.ones((<span class="dv">240</span>, <span class="dv">1</span>)), vertices))</span></code></pre>
+      </div>
+      <p>
+        Now we’re ready for using <strong>pycddlib</strong>. Here is how I
+        proceeded. I used the <code>get_input_adjacency</code> method to get the
+        list of adjacent vertices for each vertex and from this list I
+        constructed a two-columns matrix <code>Edges</code> to store the edges
+        as pairs of vertex indices:
+      </p>
+      <div class="sourceCode" id="cb10">
+        <pre
+          class="sourceCode python"
+        ><code class="sourceCode python"><span id="cb10-1"><span class="co"># make the polytope</span></span>
+<span id="cb10-2">mat <span class="op">=</span> pcdd.Matrix(vertices, linear <span class="op">=</span> <span class="va">False</span>, number_type <span class="op">=</span> <span class="st">"fraction"</span>) </span>
+<span id="cb10-3">mat.rep_type <span class="op">=</span> pcdd.RepType.GENERATOR</span>
+<span id="cb10-4">poly <span class="op">=</span> pcdd.Polyhedron(mat)</span>
+<span id="cb10-5"><span class="co"># get the list of adjacencies</span></span>
+<span id="cb10-6">adjacencies <span class="op">=</span> [<span class="bu">list</span>(x) <span class="cf">for</span> x <span class="kw">in</span> poly.get_input_adjacency()]</span>
+<span id="cb10-7"><span class="co"># construct the matrix of edges</span></span>
+<span id="cb10-8">edges <span class="op">=</span> [<span class="va">None</span>]<span class="op">*</span><span class="dv">240</span></span>
+<span id="cb10-9"><span class="cf">for</span> i, indices <span class="kw">in</span> <span class="bu">enumerate</span>(adjacencies):</span>
+<span id="cb10-10">    indices <span class="op">=</span> <span class="bu">list</span>(<span class="bu">filter</span>(<span class="kw">lambda</span> x: x<span class="op">&gt;</span>i, indices))</span>
+<span id="cb10-11">    l <span class="op">=</span> <span class="bu">len</span>(indices)</span>
+<span id="cb10-12">    col1 <span class="op">=</span> np.full((l, <span class="dv">1</span>), i)</span>
+<span id="cb10-13">    indices <span class="op">=</span> np.reshape(indices, (l, <span class="dv">1</span>))</span>
+<span id="cb10-14">    edges[i] <span class="op">=</span> np.hstack((col1, indices))</span>
+<span id="cb10-15">Edges <span class="op">=</span> np.vstack(<span class="bu">tuple</span>(edges))</span>
+<span id="cb10-16">np.savetxt(<span class="st">"E8_edges.csv"</span>, Edges, fmt <span class="op">=</span> <span class="st">"</span><span class="sc">%d</span><span class="st">"</span>, delimiter <span class="op">=</span> <span class="st">","</span>)</span></code></pre>
+      </div>
+      <p>
+        I saved the edges matrix in a <strong>csv</strong> file to import it in
+        R (don’t forget to add <span class="math inline">\(1\)</span> to the
+        indices if you do that).
+      </p>
+      <p>
+        In the meantime, the author of the Julia library
+        <strong>CDDLib.jl</strong> kindly replied to my feature request, and now
+        the vertex adjacencies are available in this library.
+      </p>
+      <h2 id="projection-on-the-coxeter-plane">
+        Projection on the Coxeter plane
+      </h2>
+      <p>
+        That’s fine to have the vertices and the edges of a 8-dimensional
+        polytope but it remains to project it in 2D or 3D if we want to
+        visualize something. The most known figure of a projection of the E8
+        root polytope is the one of its projection to the so-called Coxeter
+        plane. No luck, I didn’t find on the web how to do this projection. I
+        found another one,
+        <a
+          href="https://theoryofeverything.org/theToE/2016/03/16/e8-in-e6-petrie-projection/"
+          >here</a
+        >. The author of this article provides an orthonormal basis of a plane
+        in the 8D space, and when one takes the two coordinates of the
+        projections of the vertices on this plane, one gets this figure:
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/E8_Petrie.png"
+        />
+      </p>
+      <p>Not bad. Of course I did a GIF:</p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/E8_Petrie.gif"
+        />
+      </p>
+      <p>
+        Finally, I found the orthonormal basis of the Coxeter plane in a
+        <a
+          href="https://github.com/SuperJason/python/blob/96989d1681085a87a0d7f488d926a1677cd7041f/famous_math_graphics/e8.py"
+          >Python script on Github</a
+        >.
+      </p>
+      <p>
+        Do you recognize the beginning of the code? The author of this script is
+        also the author of the Python code I provided earlier. I was astonished:
+        he doesn’t use any computational geometry library to get the edges! I
+        don’t know why, but two vertices are connected by an edge if and only if
+        the squared distance between these vertices is
+        <span class="math inline">\(8\)</span>. So you get the edges like this
+        in R:
+      </p>
+      <div class="sourceCode" id="cb11">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb11-1">edges &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb11-2"><span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span>(<span class="kw">nrow</span>(vertices)<span class="op">-</span>1L)){</span>
+<span id="cb11-3">  v1 &lt;-<span class="st"> </span>vertices[i, ]</span>
+<span id="cb11-4">  <span class="cf">for</span>(j <span class="cf">in</span> (i<span class="op">+</span>1L)<span class="op">:</span><span class="kw">nrow</span>(vertices)){</span>
+<span id="cb11-5">    v2 &lt;-<span class="st"> </span>vertices[j, ]</span>
+<span id="cb11-6">    <span class="cf">if</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(v1<span class="op">-</span>v2)) <span class="op">==</span><span class="st"> </span><span class="dv">8</span>){</span>
+<span id="cb11-7">      edges &lt;-<span class="st"> </span><span class="kw">rbind</span>(edges, <span class="kw">c</span>(i, j))</span>
+<span id="cb11-8">    }</span>
+<span id="cb11-9">  }</span>
+<span id="cb11-10">}</span></code></pre>
+      </div>
+      <p>
+        Also, I don’t understand the derivation of the basis of the Coxeter
+        plane that is provided by this Python script. But it is easy to
+        translate it in R. Here is the code, where I kept the comments of the
+        Python script:
+      </p>
+      <div class="sourceCode" id="cb12">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb12-1"><span class="co"># A set of simple roots, listed by the rows of 'delta'</span></span>
+<span id="cb12-2">delta &lt;-<span class="st"> </span><span class="kw">rbind</span>(</span>
+<span id="cb12-3">  <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">-1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>),</span>
+<span id="cb12-4">  <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">-1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>),</span>
+<span id="cb12-5">  <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">-1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>),</span>
+<span id="cb12-6">  <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">-1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>),</span>
+<span id="cb12-7">  <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">-1</span>, <span class="dv">0</span>, <span class="dv">0</span>),</span>
+<span id="cb12-8">  <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>),</span>
+<span id="cb12-9">  <span class="kw">c</span>(<span class="op">-</span>.<span class="dv">5</span>, <span class="fl">-.5</span>, <span class="fl">-.5</span>, <span class="fl">-.5</span>, <span class="fl">-.5</span>, <span class="fl">-.5</span>, <span class="fl">-.5</span>, <span class="fl">-.5</span>),</span>
+<span id="cb12-10">  <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">-1</span>, <span class="dv">0</span>)</span>
+<span id="cb12-11">)</span>
+<span id="cb12-12"></span>
+<span id="cb12-13"><span class="co"># Dynkin diagram of E8:</span></span>
+<span id="cb12-14"><span class="co"># 1---2---3---4---5---6---7</span></span>
+<span id="cb12-15"><span class="co">#                 |</span></span>
+<span id="cb12-16"><span class="co">#                 8</span></span>
+<span id="cb12-17"><span class="co"># where vertex i is the i-th simple root.</span></span>
+<span id="cb12-18"></span>
+<span id="cb12-19"><span class="co"># The Cartan matrix:</span></span>
+<span id="cb12-20">Cartan &lt;-<span class="st"> </span><span class="kw">tcrossprod</span>(delta)</span>
+<span id="cb12-21"></span>
+<span id="cb12-22"><span class="co"># Now we split the simple roots into two disjoint sets I and J</span></span>
+<span id="cb12-23"><span class="co"># such that the simple roots in each set are pairwise orthogonal.</span></span>
+<span id="cb12-24"><span class="co"># It's obvious to see how to find such a partition given the</span></span>
+<span id="cb12-25"><span class="co"># Dynkin graph above: I = [1, 3, 5, 7] and J = [2, 4, 6, 8],</span></span>
+<span id="cb12-26"><span class="co"># since roots are not connected by an edge if and only if they are orthogonal.</span></span>
+<span id="cb12-27"><span class="co"># Then a basis of the Coxeter plane is given by</span></span>
+<span id="cb12-28"><span class="co"># u1 = sum (c[i] * delta[i]) for i in I,</span></span>
+<span id="cb12-29"><span class="co"># u2 = sum (c[j] * delta[j]) for j in J,</span></span>
+<span id="cb12-30"><span class="co"># where c is an eigenvector for the minimal</span></span>
+<span id="cb12-31"><span class="co"># eigenvalue of the Cartan matrix.</span></span>
+<span id="cb12-32">eig &lt;-<span class="st"> </span><span class="kw">eigen</span>(Cartan)</span>
+<span id="cb12-33"></span>
+<span id="cb12-34"><span class="co"># The eigenvalues returned by eigen() are in descending order</span></span>
+<span id="cb12-35"><span class="co"># and the eigenvectors are listed by columns.</span></span>
+<span id="cb12-36">ev &lt;-<span class="st"> </span>eig<span class="op">$</span>vectors[, 8L]</span>
+<span id="cb12-37">u1 &lt;-<span class="st"> </span><span class="kw">rowSums</span>(<span class="kw">vapply</span>(<span class="kw">c</span>(1L, 3L, 5L, 7L), <span class="cf">function</span>(i){</span>
+<span id="cb12-38">  ev[i] <span class="op">*</span><span class="st"> </span>delta[i, ]</span>
+<span id="cb12-39">}, <span class="kw">numeric</span>(8L)))</span>
+<span id="cb12-40">u2 &lt;-<span class="st"> </span><span class="kw">rowSums</span>(<span class="kw">vapply</span>(<span class="kw">c</span>(2L, 4L, 6L, 8L), <span class="cf">function</span>(i){</span>
+<span id="cb12-41">  ev[i] <span class="op">*</span><span class="st"> </span>delta[i, ]</span>
+<span id="cb12-42">}, <span class="kw">numeric</span>(8L)))</span>
+<span id="cb12-43"></span>
+<span id="cb12-44"><span class="co"># Gram-Schmidt u1, u2 </span></span>
+<span id="cb12-45">u1 &lt;-<span class="st"> </span>u1 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(u1)))</span>
+<span id="cb12-46">u2 &lt;-<span class="st"> </span>u2 <span class="op">-</span><span class="st"> </span><span class="kw">c</span>(<span class="kw">crossprod</span>(u1, u2)) <span class="op">*</span><span class="st"> </span>u1</span>
+<span id="cb12-47">u2 &lt;-<span class="st"> </span>u2 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(u2)))</span></code></pre>
+      </div>
+      <p>I understand nothing, except the Gram-Schmidt step.</p>
+      <p>
+        But this works. Let’s project the vertices to the Coxeter plane,
+        i.e. the plane with the orthonormal basis
+        <span class="math inline">\((u_1, u_2)\)</span>:
+      </p>
+      <div class="sourceCode" id="cb13">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb13-1"><span class="co"># projections on the Coxeter plane</span></span>
+<span id="cb13-2">proj &lt;-<span class="st"> </span><span class="cf">function</span>(v){</span>
+<span id="cb13-3">  <span class="kw">c</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(v, u1)), <span class="kw">c</span>(<span class="kw">crossprod</span>(v, u2)))</span>
+<span id="cb13-4">}</span>
+<span id="cb13-5">points &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">apply</span>(vertices<span class="op">/</span><span class="dv">2</span>, 1L, proj))</span></code></pre>
+      </div>
+      <p>
+        Now you can represent these 2D points and connect them with the edges.
+        But if you do that with an ordinary base R plot, you will not get a
+        pretty figure, because there are too many edges. So I do a SVG plot:
+      </p>
+      <div class="sourceCode" id="cb14">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb14-1"><span class="co"># save plot as SVG</span></span>
+<span id="cb14-2"><span class="kw">svg</span>(<span class="dt">filename =</span> <span class="st">"E8_Coxeter.svg"</span>, <span class="dt">onefile =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb14-3">opar &lt;-<span class="st"> </span><span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>))</span>
+<span id="cb14-4"><span class="kw">plot</span>(</span>
+<span id="cb14-5">  points[<span class="op">!</span><span class="kw">duplicated</span>(points), ], <span class="dt">pch =</span> <span class="dv">19</span>, <span class="dt">cex =</span> <span class="fl">0.3</span>, <span class="dt">asp =</span> <span class="dv">1</span>, </span>
+<span id="cb14-6">  <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">xlab =</span> <span class="ot">NA</span>, <span class="dt">ylab =</span> <span class="ot">NA</span></span>
+<span id="cb14-7">)</span>
+<span id="cb14-8"><span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span><span class="kw">nrow</span>(edges)){</span>
+<span id="cb14-9">  <span class="kw">lines</span>(points[edges[i, ], ], <span class="dt">lwd =</span> <span class="fl">0.1</span>)</span>
+<span id="cb14-10">}</span>
+<span id="cb14-11"><span class="kw">par</span>(opar)</span>
+<span id="cb14-12"><span class="kw">dev.off</span>()</span></code></pre>
+      </div>
+      <p>
+        And then I convert it to a PNG image with the help of the
+        <strong>rsvg</strong> package:
+      </p>
+      <div class="sourceCode" id="cb15">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb15-1">rsvg<span class="op">::</span><span class="kw">rsvg_png</span>(<span class="st">"E8_Coxeter.svg"</span>, <span class="dt">file =</span> <span class="st">"E8_Coxeter.png"</span>)</span></code></pre>
+      </div>
+      <p>This gives this image:</p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/E8_Coxeter.png"
+        />
+      </p>
+      <p>
+        Rather pretty. But this lacks of colors. And of motion. Well, you see
+        what I mean: I did a GIF.
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/E8_Coxeter.gif"
+        />
+      </p>
+      <p>
+        If you want to know how I did this GIF, visit
+        <a href="https://gist.github.com/stla/19529d44a20bab4420bdd1a213ebcdbc"
+          >my gist</a
+        >.
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Mon, 14 Mar 2022 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/E8rootPolytope.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>The modified stereographic projection</title>
       <link>https://laustep.github.io/stlahblog/posts/ModifiedStereographicProjection.html</link>
@@ -774,6 +1201,34 @@
           src="https://laustep.github.io/stlahblog/posts/figures/rgl_elevated_delaunay.png"
         />
       </p>
+      <h2 id="update-2022-03-02-using-tessellation">
+        Update 2022-03-02: using ‘tessellation’
+      </h2>
+      <p>
+        The elevated Delaunay tessellation is now available in my package
+        <a href="https://github.com/stla/tessellation">tessellation</a>. The
+        command to get it is the same as the ‘RCGAL’ command and the output is
+        similar.
+      </p>
+      <div class="sourceCode" id="cb9">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb9-1">del &lt;-<span class="st"> </span>tessellation<span class="op">::</span><span class="kw">delaunay</span>(points, <span class="dt">elevation =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb9-2">del[[<span class="st">"volume"</span>]]</span>
+<span id="cb9-3"><span class="co">## [1] 3.141593</span></span></code></pre>
+      </div>
+      <h2 id="update-2022-03-10-using-rcdt">Update 2022-03-10: using ‘RCDT’</h2>
+      <p>
+        The elevated Delaunay triangulation is now available in my package
+        <a href="https://github.com/stla/RCDT">RCDT</a>.
+      </p>
+      <div class="sourceCode" id="cb10">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb10-1">del &lt;-<span class="st"> </span>RCDT<span class="op">::</span><span class="kw">delaunay</span>(points, <span class="dt">elevation =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb10-2">del[[<span class="st">"volume"</span>]]</span>
+<span id="cb10-3"><span class="co">## [1] 3.141593</span></span></code></pre>
+      </div>
       <h2 id="interactive-plot-with-deldir">Interactive plot with ‘deldir’</h2>
       <p>
         The <strong>deldir</strong> also allows to get an interactive graphic
@@ -781,25 +1236,25 @@
         <strong>rgl</strong> package. I do it below with a less fine grid,
         otherwise the visualization is not nice (too dense):
       </p>
-      <div class="sourceCode" id="cb9">
+      <div class="sourceCode" id="cb11">
         <pre
           class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb9-1">x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dt">length.out =</span> <span class="dv">20</span>)</span>
-<span id="cb9-2">y &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dt">length.out =</span> <span class="dv">20</span>)</span>
-<span id="cb9-3">grd &lt;-<span class="st"> </span><span class="kw">transform</span>(</span>
-<span id="cb9-4">  <span class="kw">expand.grid</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y), <span class="dt">z =</span> <span class="kw">f</span>(x, y)</span>
-<span id="cb9-5">) </span>
-<span id="cb9-6">del &lt;-<span class="st"> </span><span class="kw">deldir</span>(</span>
-<span id="cb9-7">  <span class="dt">x =</span> grd[[<span class="st">"x"</span>]], <span class="dt">y =</span> grd[[<span class="st">"y"</span>]], <span class="dt">z =</span> grd[[<span class="st">"z"</span>]],</span>
-<span id="cb9-8">  <span class="dt">rw =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">-3</span>, <span class="dv">3</span>), <span class="dt">round =</span> <span class="ot">FALSE</span></span>
-<span id="cb9-9">) </span></code></pre>
+        ><code class="sourceCode r"><span id="cb11-1">x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dt">length.out =</span> <span class="dv">20</span>)</span>
+<span id="cb11-2">y &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dt">length.out =</span> <span class="dv">20</span>)</span>
+<span id="cb11-3">grd &lt;-<span class="st"> </span><span class="kw">transform</span>(</span>
+<span id="cb11-4">  <span class="kw">expand.grid</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y), <span class="dt">z =</span> <span class="kw">f</span>(x, y)</span>
+<span id="cb11-5">) </span>
+<span id="cb11-6">del &lt;-<span class="st"> </span><span class="kw">deldir</span>(</span>
+<span id="cb11-7">  <span class="dt">x =</span> grd[[<span class="st">"x"</span>]], <span class="dt">y =</span> grd[[<span class="st">"y"</span>]], <span class="dt">z =</span> grd[[<span class="st">"z"</span>]],</span>
+<span id="cb11-8">  <span class="dt">rw =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">-3</span>, <span class="dv">3</span>), <span class="dt">round =</span> <span class="ot">FALSE</span></span>
+<span id="cb11-9">) </span></code></pre>
       </div>
-      <div class="sourceCode" id="cb10">
+      <div class="sourceCode" id="cb12">
         <pre
           class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb10-1"><span class="kw">library</span>(rgl)</span>
-<span id="cb10-2"><span class="kw">persp3d</span>(del, <span class="dt">front =</span> <span class="st">"lines"</span>, <span class="dt">back =</span> <span class="st">"lines"</span>, <span class="dt">col =</span> <span class="st">"blue"</span>)</span>
-<span id="cb10-3"><span class="kw">aspect3d</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">1</span>)</span></code></pre>
+        ><code class="sourceCode r"><span id="cb12-1"><span class="kw">library</span>(rgl)</span>
+<span id="cb12-2"><span class="kw">persp3d</span>(del, <span class="dt">front =</span> <span class="st">"lines"</span>, <span class="dt">back =</span> <span class="st">"lines"</span>, <span class="dt">col =</span> <span class="st">"blue"</span>)</span>
+<span id="cb12-3"><span class="kw">aspect3d</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">1</span>)</span></code></pre>
       </div>
       <p>
         <img
