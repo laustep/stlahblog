@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <title>Hopf torus</title>
+    <script src="../libraries/three_r136dev.min.js"></script>
+    <script src="../libraries/lil-gui.umd.js"></script>
+    <script src="../libraries/jquery-3.6.0.min.js"></script>
+    <style>
+        html,
+        body {
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        #gui {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+        }
+
+        .lil-gui {
+            --name-width: 30%;
+            --slider-input-min-width: 25px;
+            --slider-input-width: 10%;
+        }
+    </style>
+    <script>
+        function Hopf4D(u, v) {
+
+            const pi = Math.PI;
+
+            const t = 2 * pi * u;
+            const phi = 2 * pi * v;
+
+            const a = pi / 2 - (pi / 2 - 0.44) * Math.cos(3 * t);
+            const b = t + 0.44 * Math.sin(2 * 3 * t);
+
+            const p1 = Math.cos(a);
+            const sin_a = Math.sin(a);
+            const p2 = sin_a * Math.cos(b);
+            const p3 = sin_a * Math.sin(b);
+
+            const yden = Math.sqrt(2 * (1 + p1));
+            const y1 = (1 + p1) / yden;
+            const y2 = p2 / yden;
+            const y3 = p3 / yden;
+
+            const cos_phi = Math.cos(phi);
+            const sin_phi = Math.sin(phi);
+
+            return [
+                cos_phi * y3 + sin_phi * y2,
+                cos_phi * y2 - sin_phi * y3,
+                cos_phi * y1,
+                sin_phi * y1
+            ];
+
+        }
+
+        function StereoProj(v, gamma) {
+            const F = Math.acos(v[3]) / Math.pow(1 - Math.pow(Math.abs(v[3]), gamma), 1 / gamma);
+            return [F * v[0], F * v[1], F * v[2]];
+        }
+    </script>
+</head>
+
+<body>
+    <div id="container"></div>
+
+
+    <script>
+
+        let lgcontrols;
+        let camera, object, scene, renderer;
+        const n_u = 400, n_v = 300;
+        const vertices4D = [], indices = [];
+        let mesh;
+
+        prep(); // calculate vertices4D and indices
+        init(); // define lil-gui controls
+        three(); // define camera, scence, object, renderer, geometry, mesh
+        animate();
+
+        function prep() {
+
+            for (let i = 0; i < n_u; i++) {
+                const u = i / n_u;
+                const ip1 = (i == n_u - 1 ? 0 : i + 1);
+                for (let j = 0; j < n_v; j++) {
+                    vertices4D.push(Hopf4D(u, j / n_v));
+                    const jp1 = (j == n_v - 1 ? 0 : j + 1);
+                    indices.push(
+                        ip1 * n_v + j,
+                        i * n_v + j,
+                        i * n_v + jp1
+                    );
+                    indices.push(
+                        ip1 * n_v + j,
+                        i * n_v + jp1,
+                        ip1 * n_v + jp1
+                    );
+                }
+            }
+        }
+
+
+        function init() {
+            // lil-gui controls -------------------------------------------------
+            lgcontrols = {
+                rotationSpeed: 0.2,
+                zoom: 70,
+                gamma: 1.1
+            };
+            let gui = new GUI({ autoplace: false, width: 300 });
+            gui.domElement.id = "gui";
+            gui.add(lgcontrols, "rotationSpeed").min(0).max(1).step(0.05).name("rotation speed");
+            const controller_zoom = gui.add(lgcontrols, "zoom").min(1).max(100).step(1);
+            controller_zoom.onFinishChange(function (value) {
+                camera.position.z = 100 - value;
+            });
+            const controller_gamma = gui.add(lgcontrols, "gamma").min(0.8).max(2).step(0.02);
+            controller_gamma.onFinishChange(function (value) {
+                const vertices = [];
+                for (let k = 0; k < vertices4D.length; k++) {
+                    const v = StereoProj(vertices4D[k], value);
+                    vertices.push(...v);
+                }
+                mesh.geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
+                mesh.geometry.computeVertexNormals();
+                mesh.geometry.computeBoundingBox();
+                mesh.geometry.computeBoundingSphere();
+            });
+
+            window.addEventListener("resize", onWindowResize);
+        }
+
+        function onWindowResize() {
+            const windowX = window.innerWidth;
+            const windowY = window.innerHeight;
+            camera.aspect = windowX / windowY;
+            camera.updateProjectionMatrix();
+            renderer.setSize(windowX, windowY);
+        }
+
+        function three() {
+
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
+            camera.position.z = 100 - lgcontrols.zoom;
+            scene.add(camera);
+            object = new THREE.Object3D();
+            scene.add(object);
+
+            const vertices = [];
+            for (let k = 0; k < vertices4D.length; k++) {
+                const v = StereoProj(vertices4D[k], lgcontrols.gamma);
+                vertices.push(...v);
+            }
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setIndex(indices);
+            geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
+            geometry.computeVertexNormals();
+
+            const hopfMaterial = new THREE.MeshNormalMaterial({ wireframe: false });
+
+            mesh = new THREE.Mesh(geometry, hopfMaterial);
+            mesh.geometry.attributes.position.needsUpdate = true;
+            object.add(mesh);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById("container").appendChild(renderer.domElement);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            render();
+        }
+
+        function render() {
+            const speed = lgcontrols.rotationSpeed / 20;
+            object.rotation.x += speed;
+            object.rotation.y += speed;
+            renderer.render(scene, camera);
+        }
+
+        // DRAGGING
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+
+        $(renderer.domElement).on("mousedown", function (e) {
+            isDragging = true;
+        }).on("mousemove", function (e) {
+            const deltaMove = {
+                x: e.offsetX - previousMousePosition.x,
+                y: e.offsetY - previousMousePosition.y
+            };
+            if (isDragging) {
+                const deltaRotationQuaternion = new THREE.Quaternion()
+                    .setFromEuler(new THREE.Euler(
+                        Math.PI / 180 * (deltaMove.y * 0.5),
+                        Math.PI / 180 * (deltaMove.x * 0.5),
+                        0,
+                        "XYZ"
+                    ));
+                object.quaternion.multiplyQuaternions(deltaRotationQuaternion,
+                    object.quaternion);
+            }
+            previousMousePosition = {
+                x: e.offsetX,
+                y: e.offsetY
+            };
+        });
+
+        $(document).on("mouseup", function (e) {
+            isDragging = false;
+        });
+
+    </script>
+
+</body>
+
+</html>
