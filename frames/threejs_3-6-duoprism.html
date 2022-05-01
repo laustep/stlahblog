@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+    <title>3-6 Duoprism</title>
+    <script src="../libraries/three_r136dev.min.js"></script>
+    <script src="../libraries/lil-gui.umd.js"></script>
+    <script src="../libraries/jquery-3.6.0.min.js"></script>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+
+      canvas {
+        width: 100%;
+        height: 100%;
+      }
+
+      #gui {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+      }
+
+      .lil-gui {
+        --name-width: 30%;
+        --slider-input-min-width: 25px;
+        --slider-input-width: 10%;
+      }
+    </style>
+    <script>
+      const radius = 0.07;
+      let geomUnitCylinder = new THREE.CylinderGeometry(
+        radius,
+        radius,
+        1,
+        64,
+        1,
+        true
+      );
+      geomUnitCylinder.translate(0, 0.5, 0);
+
+      const J = new THREE.Vector3(0, 1, 0);
+
+      function geomTube(P, Q) {
+        let vec = Q.clone().sub(P);
+        const h = vec.length();
+        vec.normalize();
+        const quaternion = new THREE.Quaternion().setFromUnitVectors(J, vec);
+        let geometry = geomUnitCylinder.clone();
+        geometry.scale(1, h, 1);
+        geometry.applyQuaternion(quaternion);
+        geometry.translate(P.x, P.y, P.z);
+        return geometry;
+      }
+
+      const geomCenteredSphere = new THREE.SphereBufferGeometry(0.1, 32, 32);
+      function geomSphere(pt) {
+        let geometry = geomCenteredSphere.clone();
+        geometry.translate(pt[0], pt[1], pt[2]);
+        return geometry;
+      }
+
+      const twoPi = 2 * Math.PI;
+      const halfPi = Math.PI / 2;
+
+      // rotation in 4D space
+      function rightIsoclinic(alpha, x) {
+        const x0 = x[0],
+          x1 = x[1],
+          x2 = x[2],
+          x3 = x[3];
+        const q0 = Math.cos(alpha);
+        const sin_alpha = Math.sin(alpha);
+        const q1 = sin_alpha;
+        return [
+          q0 * x0 - q1 * x1,
+          q1 * x0 + q0 * x1,
+          q0 * x2 + q1 * x3,
+          -q1 * x2 + q0 * x3
+        ];
+      }
+
+      function StereoProj(v, r) {
+        const abs_v3 = Math.abs(v[3]);
+        const F = Math.acos(v[3] / r) / Math.sqrt(r * r - abs_v3 * abs_v3);
+        return [F * v[0], F * v[1], F * v[2]];
+      }
+
+      // modulo function (always returns a positive number) --------------------
+      function mod(n, m) {
+        return ((n % m) + m) % m;
+      }
+
+      // does e2 dominates e1 for the lexicographic order? ---------------------
+      function dominates(e1, e2) {
+        return e2[0] > e1[0] || (e2[0] == e1[0] && e2[1] > e1[1]);
+      }
+    </script>
+  </head>
+
+  <body>
+    <div id="container"></div>
+
+    <script>
+      let lgcontrols;
+      let camera, object, spheres, scene, renderer;
+      const A = 3,
+        B = 6;
+      const nvertices = A * B;
+      const nedges = 2 * nvertices;
+      let vertices4D, edges, r;
+      let theta = 0;
+      const meshMaterial = new THREE.MeshPhongMaterial({
+        color: 0x156289,
+        emissive: 0x072534,
+        flatShading: true
+      });
+      const sphMaterial = new THREE.MeshPhongMaterial({
+        color: 0x1562ff,
+        emissive: 0x0725ff,
+        flatShading: true
+      });
+
+      prep();  // calculate vertices4D and edges
+      init();  // define lil-gui controls
+      three(); // define camera, scene, object, renderer
+      animate();
+
+      function prep() {
+        let poly1 = new Array(A);
+        for (let i = 0; i < A; i++) {
+          const angle = (i * twoPi) / A;
+          poly1[i] = [Math.cos(angle), Math.sin(angle)];
+        }
+        let poly2 = new Array(B);
+        for (let i = 0; i < B; i++) {
+          const angle = (i * twoPi) / B;
+          poly2[i] = [Math.cos(angle), Math.sin(angle)];
+        }
+        vertices4D = new Array(A);
+        for (let i = 0; i < A; i++) {
+          vertices4D[i] = new Array(B);
+          for (let j = 0; j < B; j++) {
+            vertices4D[i][j] = poly1[i].concat(poly2[j]);
+          }
+        }
+
+        edges = new Array(0);
+        for (let i = 0; i < A; i++) {
+          for (let j = 0; j < B; j++) {
+            const e = [i, j];
+            let candidate = [i, mod(j - 1, B)];
+            if (dominates(e, candidate)) {
+              edges.push([e, candidate]);
+            }
+            candidate = [i, (j + 1) % B];
+            if (dominates(e, candidate)) {
+              edges.push([e, candidate]);
+            }
+            candidate = [mod(i - 1, A), j];
+            if (dominates(e, candidate)) {
+              edges.push([e, candidate]);
+            }
+            candidate = [(i + 1) % A, j];
+            if (dominates(e, candidate)) {
+              edges.push([e, candidate]);
+            }
+          }
+        }
+
+        // vertices norm
+        r = Math.sqrt(2);
+      }
+
+      function init() {
+        // lil-gui controls ----------------------------------------------------
+        lgcontrols = {
+          rotationSpeed: 0.2,
+          zoom: 55
+        };
+        let gui = new GUI({ autoplace: false, width: 300 });
+        gui.domElement.id = "gui";
+        gui
+          .add(lgcontrols, "rotationSpeed")
+          .min(0)
+          .max(1)
+          .step(0.05)
+          .name("rotation speed");
+        const controller_zoom = gui
+          .add(lgcontrols, "zoom")
+          .min(1)
+          .max(60)
+          .step(1);
+        controller_zoom.onFinishChange(function (value) {
+          camera.position.z = 60 - value;
+        });
+
+        window.addEventListener("resize", onWindowResize);
+      }
+
+      function onWindowResize() {
+        const windowX = window.innerWidth;
+        const windowY = window.innerHeight;
+        camera.aspect = windowX / windowY;
+        camera.updateProjectionMatrix();
+        renderer.setSize(windowX, windowY);
+      }
+
+      function three() {
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x444444);
+        camera = new THREE.PerspectiveCamera(
+          75,
+          window.innerWidth / window.innerHeight,
+          1,
+          10000
+        );
+        camera.position.z = 60 - lgcontrols.zoom;
+        scene.add(camera);
+        object = new THREE.Group();
+        scene.add(object);
+
+        // rotated vertices
+        let points = new Array(A);
+        for (let i = 0; i < A; i++) {
+          points[i] = new Array(B);
+          for (let j = 0; j < B; j++) {
+            const pt = StereoProj(rightIsoclinic(0, vertices4D[i][j]), r);
+            points[i][j] = pt;
+            const geometry = geomSphere(pt);
+            const mesh = new THREE.Mesh(geometry, sphMaterial);
+            object.add(mesh);
+          }
+        }
+
+        // edges
+        for (let k = 0; k < nedges; k++) {
+          const pt1 = points[edges[k][0][0]][edges[k][0][1]];
+          const pt2 = points[edges[k][1][0]][edges[k][1][1]];
+          const P = new THREE.Vector3().fromArray(pt1);
+          const Q = new THREE.Vector3().fromArray(pt2);
+          const geometry = geomTube(P, Q);
+          const mesh = new THREE.Mesh(geometry, meshMaterial);
+          object.add(mesh);
+        }
+
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById("container").appendChild(renderer.domElement);
+
+        const lights = [];
+        lights[0] = new THREE.PointLight(0xffffff, 1, 0);
+        lights[1] = new THREE.PointLight(0xffffff, 1, 0);
+        lights[2] = new THREE.PointLight(0xffffff, 1, 0);
+
+        lights[0].position.set(0, 20000, 0);
+        lights[1].position.set(10000, 20000, 10000);
+        lights[2].position.set(-10000, -20000, -10000);
+
+        scene.add(lights[0]);
+        scene.add(lights[1]);
+        scene.add(lights[2]);
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+        render();
+      }
+
+      function render() {
+        const speed = lgcontrols.rotationSpeed / 20;
+        object.rotation.x += speed;
+        object.rotation.y += speed;
+        const q = object.quaternion;
+        theta += speed;
+        let points = new Array(A);
+        let k = 0;
+        for (let i = 0; i < A; i++) {
+          points[i] = new Array(B);
+          for (let j = 0; j < B; j++) {
+            let pt = StereoProj(rightIsoclinic(theta, vertices4D[i][j]), r);
+            const O = new THREE.Vector3().fromArray(pt).applyQuaternion(q);
+            pt = O.toArray();
+            points[i][j] = pt;
+            const geometry = geomSphere(pt);
+            const mesh = new THREE.Mesh(geometry, sphMaterial);
+            object.children[k].geometry.dispose();
+            object.children[k] = mesh;
+            k++;
+          }
+        }
+        for (let k = 0; k < nedges; k++) {
+          const pt1 = points[edges[k][0][0]][edges[k][0][1]];
+          const pt2 = points[edges[k][1][0]][edges[k][1][1]];
+          const P = new THREE.Vector3().fromArray(pt1);
+          const Q = new THREE.Vector3().fromArray(pt2);
+          const geometry = geomTube(P, Q);
+          const mesh = new THREE.Mesh(geometry, meshMaterial);
+          object.children[k + nvertices].geometry.dispose();
+          object.children[k + nvertices] = mesh;
+        }
+
+        renderer.render(scene, camera);
+      }
+
+      // DRAGGING
+      let isDragging = false;
+      let previousMousePosition = { x: 0, y: 0 };
+
+      $("#container")
+        .on("mousedown", function (e) {
+          isDragging = true;
+        })
+        .on("mousemove", function (e) {
+          const deltaMove = {
+            x: e.offsetX - previousMousePosition.x,
+            y: e.offsetY - previousMousePosition.y
+          };
+          if (isDragging) {
+            console.log("drag");
+            const deltaRotationQuaternion = new THREE.Quaternion().setFromEuler(
+              new THREE.Euler(
+                (twoPi / 720) * deltaMove.y,
+                (twoPi / 720) * deltaMove.x,
+                0,
+                "XYZ"
+              )
+            );
+            object.quaternion.multiplyQuaternions(
+              deltaRotationQuaternion,
+              object.quaternion
+            );
+          }
+          previousMousePosition = {
+            x: e.offsetX,
+            y: e.offsetY
+          };
+        });
+
+      $(document).on("mouseup", function (e) {
+        isDragging = false;
+      });
+    </script>
+  </body>
+</html>
