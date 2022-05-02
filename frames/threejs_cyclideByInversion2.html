@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <title>Cyclide</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+    />
+
+    <script src="../libraries/three_r136dev.min.js"></script>
+    <script src="../libraries/lil-gui.umd.js"></script>
+    <script src="../libraries/jquery-3.6.0.min.js"></script>
+
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+
+      canvas {
+        width: 100%;
+        height: 100%;
+      }
+
+      #gui {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+      }
+
+      .lil-gui {
+        --name-width: 30%;
+        --slider-input-min-width: 35px;
+        --slider-input-width: 18%;
+      }
+    </style>
+
+    <script>
+      // grid ------------------------------------
+      const n_u = 200,
+        n_v = 200;
+      const cosines_u = [],
+        cosines_v = [],
+        sines_u = [],
+        sines_v = [],
+        indices = [],
+        tnormals = [];
+      const twoPi = 2 * Math.PI;
+      const twoPi_over_n_u = twoPi / n_u;
+      const twoPi_over_n_v = twoPi / n_v;
+      for (let i = 0; i < n_u; i++) {
+        const u = i * twoPi_over_n_u;
+        cosines_u.push(Math.cos(u));
+        sines_u.push(Math.sin(u));
+      }
+      for (let j = 0; j < n_v; j++) {
+        const v = j * twoPi_over_n_v;
+        cosines_v.push(Math.cos(v));
+        sines_v.push(Math.sin(v));
+      }
+      for (let i = 0; i < n_u; i++) {
+        const ip1 = i === n_u - 1 ? 0 : i + 1;
+        for (let j = 0; j < n_v; j++) {
+          const jp1 = j === n_v - 1 ? 0 : j + 1;
+          const a = ip1 * n_v + j,
+            b = i * n_v + j,
+            c = i * n_v + jp1,
+            d = ip1 * n_v + jp1;
+          indices.push(a, b, c);
+          indices.push(a, c, d);
+        }
+      }
+      for (let i = 0; i < n_u; i++) {
+        const cos_u = cosines_u[i];
+        const sin_u = sines_u[i];
+        for (let j = 0; j < n_v; j++) {
+          tnormals.push([
+            cos_u * cosines_v[j],
+            sin_u * cosines_v[j],
+            sines_v[j]
+          ]);
+        }
+      }
+      function TorusVertices(R, r) {
+        const vertices = [];
+        for (let i = 0; i < n_u; i++) {
+          const cos_u = cosines_u[i],
+            sin_u = sines_u[i];
+          const cx = R * cos_u,
+            cy = R * sin_u;
+          for (let j = 0; j < n_v; j++) {
+            const rcos_v = r * cosines_v[j],
+              rsin_v = r * sines_v[j];
+            vertices.push([cx + rcos_v * cos_u, cy + rcos_v * sin_u, rsin_v]);
+          }
+        }
+        return vertices;
+      }
+    </script>
+
+    <script>
+      // a cyclide mesh -------------------------------------------------
+      const material = new THREE.MeshNormalMaterial({ wireframe: false });
+      function CyclideMesh(a, c, mu) {
+        const b2 = a * a - c * c;
+        const b = Math.sqrt(b2);
+        const bb = b * Math.sqrt(mu * mu - c * c);
+        const omega = (a * mu + bb) / c;
+        const Omega0 = new THREE.Vector3(omega, 0, 0);
+        function inversion(M) {
+          const OmegaM = M.sub(Omega0);
+          const k = OmegaM.dot(OmegaM);
+          return OmegaM.multiplyScalar(1 / k).add(Omega0);
+        }
+        const h = (c * c) / ((a - c) * (mu - c) + bb);
+        const r = (h * (mu - c)) / ((a + c) * (mu - c) + bb);
+        const R = (h * (a - c)) / ((a - c) * (mu + c) + bb);
+        const omegaT =
+          omega -
+          (b2 * (omega - c)) /
+            ((a - c) * (mu + omega) - b2) /
+            ((a + c) * (omega - c) + b2);
+        const tvertices = TorusVertices(R, r);
+        const vertices = [],
+          normals = [];
+        const OmegaT = new THREE.Vector3(omegaT, 0, 0);
+        let counter = 0;
+        for (let i = 0; i < n_u; i++) {
+          for (let j = 0; j < n_v; j++) {
+            const rtnormal = new THREE.Vector3()
+              .fromArray(tnormals[counter])
+              .multiplyScalar(r);
+            const tvertex = new THREE.Vector3().fromArray(tvertices[counter]);
+            counter++;
+            const foo = inversion(rtnormal.add(tvertex).add(OmegaT));
+            const vertex = inversion(tvertex.add(OmegaT));
+            vertices.push(vertex.x, vertex.y, vertex.z);
+            const normal = vertex.sub(foo).normalize();
+            normals.push(normal.x, normal.y, normal.z);
+          }
+        }
+        return {
+          vertices: vertices,
+          normals: normals
+        };
+      }
+
+      const cyclideGeometry = new THREE.BufferGeometry();
+      cyclideGeometry.setIndex(indices);
+
+      let camera, scene, object, mesh;
+      let lgcontrols;
+      let renderer;
+    </script>
+  </head>
+
+  <body>
+    <div id="container"></div>
+
+    <script>
+      // three js scene --------------------------------------------------------
+      const aspect = window.innerWidth / window.innerHeight;
+      camera = new THREE.PerspectiveCamera(50, aspect, 1, 10000);
+
+      scene = new THREE.Scene();
+      object = new THREE.Object3D();
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.getElementById("container").appendChild(renderer.domElement);
+
+      const z0 = 93;
+      camera.position.z = 100 - z0;
+
+      scene.add(camera);
+
+      const light = new THREE.AmbientLight(0x404040);
+      scene.add(light);
+
+      function onWindowResize() {
+        const windowX = window.innerWidth;
+        const windowY = window.innerHeight;
+        camera.aspect = windowX / windowY;
+        camera.updateProjectionMatrix();
+        renderer.setSize(windowX, windowY);
+      }
+
+      window.addEventListener("resize", onWindowResize);
+
+      // lil.gui controls ------------------------------------------------------
+      lgcontrols = {
+        rotationSpeed: 0.002,
+        zoom: z0,
+        a: 0.97,
+        c: 0.32,
+        mu: 0.56
+      };
+
+      mesh = CyclideMesh(lgcontrols.a, lgcontrols.c, lgcontrols.mu);
+      cyclideGeometry.setAttribute(
+        "position",
+        new THREE.Float32BufferAttribute(mesh.vertices, 3)
+      );
+      cyclideGeometry.setAttribute(
+        "normal",
+        new THREE.Float32BufferAttribute(mesh.normals, 3)
+      );
+      let cyclideMesh = new THREE.Mesh(cyclideGeometry, material);
+      cyclideMesh.geometry.attributes.position.needsUpdate = true;
+      cyclideMesh.geometry.attributes.normal.needsUpdate = true;
+
+      object.add(cyclideMesh);
+      scene.add(object);
+
+      const gui = new GUI({ autoplace: false, width: 270 });
+      gui.domElement.id = "gui";
+      gui
+        .add(lgcontrols, "rotationSpeed")
+        .min(0)
+        .max(0.1)
+        .step(0.002)
+        .name("rotation speed");
+      const controller_zoom = gui
+        .add(lgcontrols, "zoom")
+        .min(1)
+        .max(100)
+        .step(1);
+      controller_zoom.onFinishChange(function (value) {
+        camera.position.z = 100 - value;
+      });
+      const controller_a = gui
+        .add(lgcontrols, "a")
+        .min(0.78)
+        .max(1.2)
+        .step(0.02)
+        .name("a (> mu)");
+      const controller_c = gui
+        .add(lgcontrols, "c")
+        .min(0.05)
+        .max(0.35)
+        .step(0.02);
+      const controller_mu = gui
+        .add(lgcontrols, "mu")
+        .min(0.36)
+        .max(0.76)
+        .step(0.02)
+        .name("mu (> c)");
+      const gui_state = gui.save((recursive = true));
+      function updateCyclide(mesh) {
+        cyclideMesh.geometry.setAttribute(
+          "position",
+          new THREE.Float32BufferAttribute(mesh.vertices, 3)
+        );
+        cyclideMesh.geometry.setAttribute(
+          "normal",
+          new THREE.Float32BufferAttribute(mesh.normals, 3)
+        );
+        cyclideMesh.geometry.computeBoundingBox();
+        cyclideMesh.geometry.computeBoundingSphere();
+      }
+
+      controller_a.onFinishChange(function (value) {
+        mesh = CyclideMesh(value, lgcontrols.c, lgcontrols.mu);
+        updateCyclide(mesh);
+      });
+      controller_c.onFinishChange(function (value) {
+        mesh = CyclideMesh(lgcontrols.a, value, lgcontrols.mu);
+        updateCyclide(mesh);
+      });
+      controller_mu.onFinishChange(function (value) {
+        mesh = CyclideMesh(lgcontrols.a, lgcontrols.c, value);
+        updateCyclide(mesh);
+      });
+
+      window.requestAnimFrame = (function () {
+        return (
+          window.requestAnimationFrame ||
+          window.webkitRequestAnimationFrame ||
+          window.mozRequestAnimationFrame ||
+          function (callback) {
+            window.setTimeout(callback, 1000 / 60);
+          }
+        );
+      })();
+
+      function animate() {
+        requestAnimFrame(animate);
+        render();
+      }
+
+      function render() {
+        const speed = lgcontrols.rotationSpeed;
+        object.rotation.x += speed;
+        object.rotation.y += speed;
+        renderer.render(scene, camera);
+      }
+
+      // run render
+      animate();
+
+      // DRAGGING
+      let isDragging = false;
+      let previousMousePosition = { x: 0, y: 0 };
+
+      $("#container")
+        .on("mousedown", function (e) {
+          isDragging = true;
+        })
+        .on("mousemove", function (e) {
+          const deltaMove = {
+            x: e.offsetX - previousMousePosition.x,
+            y: e.offsetY - previousMousePosition.y
+          };
+          if (isDragging) {
+            const deltaRotationQuaternion = new THREE.Quaternion().setFromEuler(
+              new THREE.Euler(
+                (twoPi / 360) * deltaMove.y,
+                (twoPi / 360) * deltaMove.x,
+                0,
+                "XYZ"
+              )
+            );
+            object.quaternion.multiplyQuaternions(
+              deltaRotationQuaternion,
+              object.quaternion
+            );
+          }
+          previousMousePosition = {
+            x: e.offsetX,
+            y: e.offsetY
+          };
+        });
+
+      $(document).on("mouseup", function (e) {
+        isDragging = false;
+      });
+    </script>
+  </body>
+</html>
