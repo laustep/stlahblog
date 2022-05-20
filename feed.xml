@@ -14,7 +14,7 @@
     <div class="content">
       <p>
         I really like the animated multibarchart of the JavaScript library
-        <a href="https://nvd3.org/">NVD3</a>. That?s why I did the ?Rnvd3?
+        <a href="https://nvd3.org/">NVD3</a>. That's why I did the ?Rnvd3?
         package.
       </p>
       <div class="sourceCode" id="cb1">
@@ -59,6 +59,81 @@
 ]]></description>
       <pubDate>Fri, 20 May 2022 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/Rnvd3.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
+    <item>
+      <title>Hierarchical data visualization with Shiny and D3</title>
+      <link>https://laustep.github.io/stlahblog/posts/HierarchicalDataViz.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        I refreshed my old package '<strong>dir2json</strong>' (5 years old). It
+        uses a Haskell DLL and can only work on Windows. You can install it from
+        Github:
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1">remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"stla/dir2json"</span>)</span></code></pre>
+      </div>
+      <p>
+        This package contains two Shiny apps. The first one allows to represent
+        a folder structure as a tree network diagram (called a
+        <em>Reingold-Tilford</em> tree), thanks to the amazing JavaScript
+        library '<strong>D3</strong>':
+      </p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1"><span class="fu">library</span>(dir2json)</span>
+<span id="cb2-2"><span class="co"># don't forget to limit the depth if the folder is deep!</span></span>
+<span id="cb2-3"><span class="fu">shinyDirTree</span>(<span class="at">dir =</span> <span class="st">"inst"</span>, <span class="at">depth =</span> <span class="dv">3</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/shinyDirTree.gif"
+        />
+      </p>
+      <p>
+        As you can see, it also allows to search a file in the tree. And it is
+        possible to zoom and to drag.
+      </p>
+      <p>
+        This Shiny app was already included in the original version of the
+        package. The second Shiny app is new. It is similar to the first one,
+        but instead of a folder, it allows to represent any dataset with a
+        hierarchical structure:
+      </p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb3-1"><span class="fu">library</span>(dir2json)</span>
+<span id="cb3-2">dat <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tribble</span>(</span>
+<span id="cb3-3">  <span class="sc">~</span>level1, <span class="sc">~</span>level2, <span class="sc">~</span>level3, <span class="sc">~</span>level4, </span>
+<span id="cb3-4">  <span class="st">"Beverages"</span>, <span class="st">"Water"</span>, <span class="st">""</span>, <span class="st">""</span>, </span>
+<span id="cb3-5">  <span class="st">"Beverages"</span>, <span class="st">"Coffee"</span>, <span class="st">""</span>, <span class="st">""</span>, </span>
+<span id="cb3-6">  <span class="st">"Beverages"</span>, <span class="st">"Tea"</span>, <span class="st">"Black tea"</span>, <span class="st">""</span>, </span>
+<span id="cb3-7">  <span class="st">"Beverages"</span>, <span class="st">"Tea"</span>, <span class="st">"White tea"</span>, <span class="st">""</span>, </span>
+<span id="cb3-8">  <span class="st">"Beverages"</span>, <span class="st">"Tea"</span>, <span class="st">"Green tea"</span>, <span class="st">"Sencha"</span>, </span>
+<span id="cb3-9">  <span class="st">"Beverages"</span>, <span class="st">"Tea"</span>, <span class="st">"Green tea"</span>, <span class="st">"Gyokuro"</span>, </span>
+<span id="cb3-10">  <span class="st">"Beverages"</span>, <span class="st">"Tea"</span>, <span class="st">"Green tea"</span>, <span class="st">"Matcha"</span>, </span>
+<span id="cb3-11">  <span class="st">"Beverages"</span>, <span class="st">"Tea"</span>, <span class="st">"Green tea"</span>, <span class="st">"Pi Lo Chun"</span></span>
+<span id="cb3-12">)</span>
+<span id="cb3-13"><span class="fu">shinyDataTree</span>(dat, <span class="at">root =</span> <span class="cn">FALSE</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/shinyDataTree.gif"
+        />
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Fri, 20 May 2022 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/HierarchicalDataViz.html</guid>
       <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
