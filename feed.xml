@@ -5,7 +5,63 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Sun, 15 May 2022 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Fri, 20 May 2022 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>Animated multibarchart with (R)nvd3</title>
+      <link>https://laustep.github.io/stlahblog/posts/Rnvd3.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        I really like the animated multibarchart of the JavaScript library
+        <a href="https://nvd3.org/">NVD3</a>. That’s why I did the ‘Rnvd3’
+        package.
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1"><span class="fu">library</span>(Rnvd3)</span>
+<span id="cb1-2"></span>
+<span id="cb1-3">dat <span class="ot">&lt;-</span> reshape2<span class="sc">::</span><span class="fu">melt</span>(</span>
+<span id="cb1-4">  <span class="fu">apply</span>(HairEyeColor, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), sum), <span class="at">value.name =</span> <span class="st">"Count"</span></span>
+<span id="cb1-5">)</span>
+<span id="cb1-6"></span>
+<span id="cb1-7"><span class="co"># style axis titles with CSS ####</span></span>
+<span id="cb1-8"><span class="fu">library</span>(htmltools)</span>
+<span id="cb1-9">CSS <span class="ot">&lt;-</span> <span class="fu">HTML</span>(</span>
+<span id="cb1-10">  <span class="st">".nvd3 .nv-axis.nv-x text.nv-axislabel,</span></span>
+<span id="cb1-11"><span class="st">   .nvd3 .nv-axis.nv-y text.nv-axislabel {</span></span>
+<span id="cb1-12"><span class="st">     font-size: 2rem;</span></span>
+<span id="cb1-13"><span class="st">     fill: red;</span></span>
+<span id="cb1-14"><span class="st">  }"</span></span>
+<span id="cb1-15">)</span>
+<span id="cb1-16"></span>
+<span id="cb1-17">widget <span class="ot">&lt;-</span> <span class="fu">multiBarChart</span>(</span>
+<span id="cb1-18">  dat, Count <span class="sc">~</span> Eye, <span class="st">"Hair"</span>, <span class="at">palette =</span> <span class="st">"turbo"</span></span>
+<span id="cb1-19">)</span>
+<span id="cb1-20"><span class="fu">prependContent</span>(</span>
+<span id="cb1-21">  widget,</span>
+<span id="cb1-22">  tags<span class="sc">$</span><span class="fu">style</span>(CSS)</span>
+<span id="cb1-23">)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/Rnvd3.gif"
+        />
+      </p>
+      <p>
+        This chart is also available in the ‘rCharts’ package, but this package
+        is not maintained.
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Fri, 20 May 2022 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/Rnvd3.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>The 'rAmCharts4' package</title>
       <link>https://laustep.github.io/stlahblog/posts/rAmCharts4.html</link>
@@ -29,7 +85,7 @@
 ]]></description>
       <pubDate>Sun, 15 May 2022 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/rAmCharts4.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -39,7 +95,7 @@
   <div class="main col-sm-12">
     <div class="content">
       <p>
-        I?m still working on my package <strong>RCGAL</strong>, that I already
+        I’m still working on my package <strong>RCGAL</strong>, that I already
         present in <a href="./SurfaceReconstruction.html">a previous post</a>.
       </p>
       <p>
@@ -76,7 +132,7 @@
         />
       </p>
       <p>The code generating these plots is given in the RCGAL examples.</p>
-      <p>Now let?s turn to a more interesting example.</p>
+      <p>Now let’s turn to a more interesting example.</p>
       <h2 id="the-compound-of-five-tetrahedra">
         The compound of five tetrahedra
       </h2>
@@ -110,7 +166,7 @@
       </p>
       <p>
         I wondered for a long time what is the intersection of these five
-        tetrahedra. But I didn?t have any tool to compute it. Now I have. Let?s
+        tetrahedra. But I didn’t have any tool to compute it. Now I have. Let’s
         see.
       </p>
       <div class="sourceCode" id="cb2">
@@ -157,7 +213,7 @@
 ]]></description>
       <pubDate>Sat, 14 May 2022 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/BooleanOpsOnMeshes.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -167,7 +223,7 @@
   <div class="main col-sm-12">
     <div class="content">
       <p>
-        The R code below shows how to get a <em>?Copy to clipboard?</em> button
+        The R code below shows how to get a <em>“Copy to clipboard”</em> button
         in the <code>plotly</code> toolbar.
       </p>
       <div class="sourceCode" id="cb1">
@@ -284,7 +340,7 @@
 ]]></description>
       <pubDate>Wed, 16 Mar 2022 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/plotly_copyToClipboard.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -418,12 +474,12 @@
       </div>
       <p>
         What a disaster! <strong><em>Do not run this code!</em></strong> It
-        totally crashed my laptop. Perhaps that can work with more RAM, I don?t
+        totally crashed my laptop. Perhaps that can work with more RAM, I don’t
         know (I have only 8 Gb). I searched and I searched on the web, with no
-        luck, I didn?t find these edges. So I decided to search another
+        luck, I didn’t find these edges. So I decided to search another
         computational geometry library, able to get these edges. I thought of
         the C library
-        <a href="https://people.inf.ethz.ch/fukudak/cdd_home/">cddlib</a>. I?m
+        <a href="https://people.inf.ethz.ch/fukudak/cdd_home/">cddlib</a>. I’m
         not a star in C but this library is wrapped in the Julia library
         <a href="https://github.com/JuliaPolyhedra/CDDLib.jl">CDDLib.jl</a>. No
         luck: this wrapper is incomplete and the vertex adjacency was not
@@ -431,13 +487,13 @@
         request this feature, and I looked at the documentation of the Python
         wrapper of <strong>cddlib</strong>: the
         <strong>pycddlib</strong> library. Very nice: it provides the vertex
-        adjacency feature. I didn?t have the courage to program the construction
+        adjacency feature. I didn’t have the courage to program the construction
         of the vertices in Python, so I used
         <a
           href="https://laustep.github.io/stlahblog/posts/Rmatrix2HaskellList.html"
           >my old blog post</a
-        >, <em>?A R matrix to a Haskell list?</em>, since it is also usable for
-        Python instead of Haskell. But now let?s show how to construct the
+        >, <em>“A R matrix to a Haskell list”</em>, since it is also usable for
+        Python instead of Haskell. But now let’s show how to construct the
         vertices in Python:
       </p>
       <div class="sourceCode" id="cb7">
@@ -462,7 +518,7 @@
 <span id="cb7-17">        vertices.append(v)</span></code></pre>
       </div>
       <p>
-        Actually I?m not the author of this code (I will come back to this point
+        Actually I’m not the author of this code (I will come back to this point
         later). I have a long experience with R and a short experience with
         Python, so for me the construction of the vertices is easier in R. But I
         have to be honest: the Python code is more elegant.
@@ -488,7 +544,7 @@
         ><code class="sourceCode python"><span id="cb9-1">vertices <span class="op">=</span> np.hstack((np.ones((<span class="dv">240</span>, <span class="dv">1</span>)), vertices))</span></code></pre>
       </div>
       <p>
-        Now we?re ready for using <strong>pycddlib</strong>. Here is how I
+        Now we’re ready for using <strong>pycddlib</strong>. Here is how I
         proceeded. I used the <code>get_input_adjacency</code> method to get the
         list of adjacent vertices for each vertex and from this list I
         constructed a two-columns matrix <code>Edges</code> to store the edges
@@ -516,7 +572,7 @@
       </div>
       <p>
         I saved the edges matrix in a <strong>csv</strong> file to import it in
-        R (don?t forget to add <span class="math inline">\(1\)</span> to the
+        R (don’t forget to add <span class="math inline">\(1\)</span> to the
         indices if you do that).
       </p>
       <p>
@@ -528,11 +584,11 @@
         Projection on the Coxeter plane
       </h2>
       <p>
-        That?s fine to have the vertices and the edges of a 8-dimensional
+        That’s fine to have the vertices and the edges of a 8-dimensional
         polytope but it remains to project it in 2D or 3D if we want to
         visualize something. The most known figure of a projection of the E8
         root polytope is the one of its projection to the so-called Coxeter
-        plane. No luck, I didn?t find on the web how to do this projection. I
+        plane. No luck, I didn’t find on the web how to do this projection. I
         found another one,
         <a
           href="https://theoryofeverything.org/theToE/2016/03/16/e8-in-e6-petrie-projection/"
@@ -562,8 +618,8 @@
       <p>
         Do you recognize the beginning of the code? The author of this script is
         also the author of the Python code I provided earlier. I was astonished:
-        he doesn?t use any computational geometry library to get the edges! I
-        don?t know why, but two vertices are connected by an edge if and only if
+        he doesn’t use any computational geometry library to get the edges! I
+        don’t know why, but two vertices are connected by an edge if and only if
         the squared distance between these vertices is
         <span class="math inline">\(8\)</span>. So you get the edges like this
         in R:
@@ -583,7 +639,7 @@
 <span id="cb11-10">}</span></code></pre>
       </div>
       <p>
-        Also, I don?t understand the derivation of the basis of the Coxeter
+        Also, I don’t understand the derivation of the basis of the Coxeter
         plane that is provided by this Python script. But it is easy to
         translate it in R. Here is the code, where I kept the comments of the
         Python script:
@@ -641,8 +697,8 @@
       </div>
       <p>I understand nothing, except the Gram-Schmidt step.</p>
       <p>
-        But this works. Let?s project the vertices to the Coxeter plane,
-        i.e.?the plane with the orthonormal basis
+        But this works. Let’s project the vertices to the Coxeter plane,
+        i.e. the plane with the orthonormal basis
         <span class="math inline">\((u_1, u_2)\)</span>:
       </p>
       <div class="sourceCode" id="cb13">
@@ -815,7 +871,7 @@
         <a href="https://gist.github.com/stla/2ed8d9f107ce3ae311ed365e83d66dbd"
           >this gist</a
         >, which deals with the projection to a Coxeter plane of the so-called
-        *600-cell? polytope. I even provide a hyperbolic version:
+        *600-cell° polytope. I even provide a hyperbolic version:
       </p>
       <p>
         <img
@@ -828,7 +884,7 @@
 ]]></description>
       <pubDate>Mon, 14 Mar 2022 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/E8rootPolytope.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -845,8 +901,8 @@
           href="https://laustep.github.io/stlahblog/posts/HyperbolicGircope.html"
           >hyperbolic gircope</a
         >. For this animation, I use the ordinary stereographic projection. But
-        sometimes I don?t get a nice result with the ordinary stereographic
-        projection, and then I use a ?modified? stereographic projection,
+        sometimes I don’t get a nice result with the ordinary stereographic
+        projection, and then I use a “modified” stereographic projection,
         defined by
         <span class="math display"
           >\[ \text{Stereo}_\gamma(x) = \frac{\arccos(x_4/r)}{{\bigl(r^\gamma -
@@ -975,7 +1031,7 @@
         varies from <span class="math inline">\(1.5\)</span> to
         <span class="math inline">\(2.5\)</span>). I use
         <a href="https://laustep.github.io/stlahblog/posts/gifskiBash.html"
-          >my ?gifski? batch command</a
+          >my ‘gifski’ batch command</a
         >
         to make the GIF.
       </p>
@@ -1124,7 +1180,7 @@
         <a href="https://laustep.github.io/stlahblog/posts/DuoprismStereo.html"
           >stereographic duoprism</a
         >
-        I also use the ordinary stereographic projection. Let?s see what happens
+        I also use the ordinary stereographic projection. Let’s see what happens
         with the modified stereographic projection.
       </p>
       <div class="sourceCode" id="cb5">
@@ -1256,7 +1312,7 @@
 ]]></description>
       <pubDate>Tue, 01 Mar 2022 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/ModifiedStereographicProjection.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -1358,7 +1414,7 @@
       </div>
       <p>
         No we need the faces of the cubes (squares). We can easily get the
-        indices of their vertices but we have to order them. That?s what the
+        indices of their vertices but we have to order them. That’s what the
         <code>polygonize</code> function below does:
       </p>
       <div class="sourceCode" id="cb6">
@@ -1389,7 +1445,7 @@
 <span id="cb7-5">))</span></code></pre>
       </div>
       <p>
-        Now, let?s project the 4D vertices to the 3D space, with a stereographic
+        Now, let’s project the 4D vertices to the 3D space, with a stereographic
         projection:
       </p>
       <div class="sourceCode" id="cb8">
@@ -1400,7 +1456,7 @@
 <span id="cb8-3">}))</span></code></pre>
       </div>
       <p>
-        We are ready for plotting. We can?t directly draw hyperbolic squares
+        We are ready for plotting. We can’t directly draw hyperbolic squares
         with the <strong>gyro</strong> package. It only allows to draw
         hyperbolic triangles, with the <code>gyrotriangle</code> function. So we
         draw an hyperbolic square by splitting it into two triangles, we merge
@@ -1456,7 +1512,7 @@
 <span id="cb10-7">  <span class="at">webshot =</span> <span class="cn">FALSE</span>)</span></code></pre>
       </div>
       <p>
-        This code produces the files <strong>pic001.png</strong>, ?
+        This code produces the files <strong>pic001.png</strong>, …
         <strong>pic060.png</strong>. Then I assembled them into a GIF with
         <a href="https://laustep.github.io/stlahblog/posts/gifskiBash.html"
           >gifski</a
@@ -1469,7 +1525,7 @@
 ]]></description>
       <pubDate>Mon, 28 Feb 2022 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/HyperbolicGircope.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -1485,7 +1541,7 @@
         surface defined by
         <span class="math inline">\(z = \exp\bigl(-(x^2 + y^2)\bigr)\)</span> on
         the square <span class="math inline">\([-5, 5] \times [-5, 5]\)</span>.
-        Then the volume we?re looking for is close to
+        Then the volume we’re looking for is close to
         <span class="math inline">\(\pi\)</span> (the integral on
         <span class="math inline"
           >\([-\infty, +\infty] \times [-\infty, +\infty]\)</span
@@ -1500,7 +1556,7 @@
 <span id="cb1-3">}</span></code></pre>
       </div>
       <p>
-        Now let?s define a grid on
+        Now let’s define a grid on
         <span class="math inline">\([-5, 5] \times [-5, 5]\)</span> and the
         value of <span class="math inline">\(z\)</span> for each point on this
         grid:
@@ -1515,7 +1571,7 @@
 <span id="cb2-5">) </span></code></pre>
       </div>
       <h2 id="elevated-delaunay-tessellation---using-deldir">
-        Elevated Delaunay tessellation - using ?deldir?
+        Elevated Delaunay tessellation - using ‘deldir’
       </h2>
       <p>
         A solution consists in constructing a Delaunay tessellation of the
@@ -1554,7 +1610,7 @@
 <span id="cb5-2"><span class="fu">sum</span>(volumes)</span>
 <span id="cb5-3"><span class="do">## [1] 3.141592</span></span></code></pre>
       </div>
-      <h2 id="using-rcgal">Using ?RCGAL?</h2>
+      <h2 id="using-rcgal">Using ‘RCGAL’</h2>
       <p>
         If you ran the above code, you noticed that the
         <code>deldir</code> function as well as the
@@ -1600,12 +1656,12 @@
         />
       </p>
       <h2 id="update-2022-03-02-using-tessellation">
-        Update 2022-03-02: using ?tessellation?
+        Update 2022-03-02: using ‘tessellation’
       </h2>
       <p>
         The elevated Delaunay tessellation is now available in my package
         <a href="https://github.com/stla/tessellation">tessellation</a>. The
-        command to get it is the same as the ?RCGAL? command and the output is
+        command to get it is the same as the ‘RCGAL’ command and the output is
         similar.
       </p>
       <div class="sourceCode" id="cb9">
@@ -1615,7 +1671,7 @@
 <span id="cb9-2">del[[<span class="st">"volume"</span>]]</span>
 <span id="cb9-3"><span class="do">## [1] 3.141593</span></span></code></pre>
       </div>
-      <h2 id="update-2022-03-10-using-rcdt">Update 2022-03-10: using ?RCDT?</h2>
+      <h2 id="update-2022-03-10-using-rcdt">Update 2022-03-10: using ‘RCDT’</h2>
       <p>
         The elevated Delaunay triangulation is now available in my package
         <a href="https://github.com/stla/RCDT">RCDT</a>.
@@ -1627,7 +1683,7 @@
 <span id="cb10-2">del[[<span class="st">"volume"</span>]]</span>
 <span id="cb10-3"><span class="do">## [1] 3.141593</span></span></code></pre>
       </div>
-      <h2 id="interactive-plot-with-deldir">Interactive plot with ?deldir?</h2>
+      <h2 id="interactive-plot-with-deldir">Interactive plot with ‘deldir’</h2>
       <p>
         The <strong>deldir</strong> also allows to get an interactive graphic
         from the elevated Delaunay tessellation. This requires the
@@ -1665,7 +1721,7 @@
 ]]></description>
       <pubDate>Sat, 26 Feb 2022 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/volumeUnderSurface.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -1770,7 +1826,7 @@
 ]]></description>
       <pubDate>Fri, 11 Feb 2022 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/DTselect2Filters.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -1851,7 +1907,7 @@
           >colorRamp</a
         >
         with the vector of colors passed to the <code>palette</code> argument.
-        This creates a function, let?s call it <code>fpalette</code>, that
+        This creates a function, let’s call it <code>fpalette</code>, that
         assigns a color to each number in the interval
         <span class="math inline">\([0, 1]\)</span>. Then,
         <code>gyrotriangle</code> calculates all the distances from the points
@@ -1911,7 +1967,7 @@
 ]]></description>
       <pubDate>Sat, 05 Feb 2022 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/gyrotriangle.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -1924,11 +1980,11 @@
         In this blog post I introduce three small
         <strong>RStudio</strong> addins I did.
       </p>
-      <h2 id="bracketify">?bracketify?</h2>
+      <h2 id="bracketify">‘bracketify’</h2>
       <p>
         I prefer subsetting with the double brackets than with the dollar in R,
         because this is more readable in <strong>RStudio</strong> thanks to the
-        syntax highlighting. That?s why I did
+        syntax highlighting. That’s why I did
         <a href="https://github.com/stla/bracketify">bracketify</a>. This addin
         replaces all occurrences of <code>foo$bar</code> with
         <code>foo[["bar"]]</code>, either in a whole file or only in the current
@@ -1941,10 +1997,10 @@
       </p>
       <p>
         To use carefully: if you have some dollar symbols in your code which are
-        not used for subsetting (e.g.?in a regular expression), they can be
+        not used for subsetting (e.g. in a regular expression), they can be
         transformed by <strong>bracketify</strong>.
       </p>
-      <h2 id="pasteascomment">?pasteAsComment?</h2>
+      <h2 id="pasteascomment">‘pasteAsComment’</h2>
       <p>
         Originally, I made
         <a href="https://github.com/stla/pasteAsComment">pasteAsComment</a> to
@@ -1967,7 +2023,7 @@
           style="width: 75%"
         />
       </p>
-      <h2 id="jsconsole">?JSconsole?</h2>
+      <h2 id="jsconsole">‘JSconsole’</h2>
       <p>
         <a href="https://github.com/stla/JSconsole">JSconsole</a> is available
         on CRAN. This addin allows to send some selected JavaScript code to the
@@ -1984,7 +2040,7 @@
 ]]></description>
       <pubDate>Thu, 03 Feb 2022 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/rstudioAddins.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -2057,7 +2113,7 @@
 <span id="cb2-14">  <span class="fu">cbind</span>(x1<span class="sc">/</span>xden, x2<span class="sc">/</span>xden, x3<span class="sc">/</span>xden)</span>
 <span id="cb2-15">}</span></code></pre>
       </div>
-      <p>Let?s make the Hopf torus mesh now.</p>
+      <p>Let’s make the Hopf torus mesh now.</p>
       <div class="sourceCode" id="cb3">
         <pre
           class="sourceCode r"
@@ -2079,7 +2135,7 @@
       </div>
       <p>
         Now we introduce a color palette function. The
-        <strong>trekcolors</strong> package has nice color palettes. I?m taking
+        <strong>trekcolors</strong> package has nice color palettes. I’m taking
         the <code>dominion</code> palette.
       </p>
       <div class="sourceCode" id="cb5">
@@ -2132,7 +2188,7 @@
       </div>
       <p>
         This code generates a series of <code>png</code> files
-        <code>pic001.png</code>, ?, <code>pic072.png</code>. Using
+        <code>pic001.png</code>, …, <code>pic072.png</code>. Using
         <strong>ImageMagick</strong> or <strong>gifski</strong>, we obtain this
         <code>gif</code> animation from these files:
       </p>
@@ -2158,7 +2214,7 @@
 ]]></description>
       <pubDate>Sat, 29 Jan 2022 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/HopfTorusDynamicColors.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -2170,8 +2226,8 @@
       <p>
         The <a href="https://gif.ski/">gifski</a> command-line utility is a
         great tool to make a GIF animation from a series of
-        <code>png</code> files. At my work I?m using a laptop with Windows 10
-        and I don?t have admin rights. I don?t know how to install
+        <code>png</code> files. At my work I’m using a laptop with Windows 10
+        and I don’t have admin rights. I don’t know how to install
         <strong>gifski</strong> on this laptop.
       </p>
       <p>
@@ -2285,7 +2341,7 @@
 <span id="cb2-3"><span class="ex">C:\path\to\Rscript.exe</span> C:<span class="dt">\p</span>ath<span class="dt">\t</span>o<span class="dt">\g</span>ifski.R %<span class="pp">*</span></span></code></pre>
       </div>
       <p>
-        That?s all. Put this <code>bat</code> file in a folder available in the
+        That’s all. Put this <code>bat</code> file in a folder available in the
         PATH environment variable and you can use the bash command
         <strong>gifski</strong>. Here is the help which is displayed by the
         command <code>gifski --help</code>:
@@ -2331,11 +2387,11 @@ Options:
 ]]></description>
       <pubDate>Fri, 28 Jan 2022 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/gifskiBash.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
-      <title>Funny 3D Vorono? diagrams</title>
+      <title>Funny 3D Voronoï diagrams</title>
       <link>https://laustep.github.io/stlahblog/posts/Voronoi_tessellation.html</link>
       <description><![CDATA[<div class="container-fluid">
   <div class="main col-sm-12">
@@ -2345,21 +2401,21 @@ Options:
         <a href="https://github.com/stla/qhull">Haskell package</a>. Thanks to
         <strong>Qhull</strong>, this package can do some convex hulls and some
         Delaunay tessellations. The <strong>Qhull</strong> library also allows
-        to do some Vorono? tessellations, but I never understood how that works.
-        So I programmed the Vorono? tessellation in Haskell, by deriving it from
+        to do some Voronoï tessellations, but I never understood how that works.
+        So I programmed the Voronoï tessellation in Haskell, by deriving it from
         the Delaunay tessellation.
       </p>
       <p>
         Recently, I released the R package <strong>tessellation</strong>. It
         uses the C code of my Haskell package to contruct Delaunay
-        tessellations, and I programmed the Vorono? tessellation in R.
+        tessellations, and I programmed the Voronoï tessellation in R.
       </p>
       <p>
         I discovered something interesting with my Haskell package: take a
-        classical polyhedron (e.g.?a tetrahedron, or a cube), enclose it with
+        classical polyhedron (e.g. a tetrahedron, or a cube), enclose it with
         two or three circles (I mean with some points on the circles), and do
-        the Vorono? diagram of all these points (the vertices of the polyhedron
-        and the points on the circles). Then you get a funny Vorono? diagram.
+        the Voronoï diagram of all these points (the vertices of the polyhedron
+        and the points on the circles). Then you get a funny Voronoï diagram.
         You can see some examples on
         <a href="https://stla.github.io/tessellation/"
           >the website I made for the <strong>tessellation</strong> package</a
@@ -2367,7 +2423,7 @@ Options:
         (thanks to the <strong>pkgdown</strong> package).
       </p>
       <p>
-        Let?s make another example here. This time, I take a cuboctahedron and I
+        Let’s make another example here. This time, I take a cuboctahedron and I
         enclose it with three circles:
       </p>
       <div class="sourceCode" id="cb1">
@@ -2399,7 +2455,7 @@ Options:
         />
       </p>
       <p>
-        Now let?s make the Vorono? diagram with the
+        Now let’s make the Voronoï diagram with the
         <strong>tessellation</strong> package:
       </p>
       <div class="sourceCode" id="cb3">
@@ -2408,12 +2464,12 @@ Options:
         ><code class="sourceCode r"><span id="cb3-1"><span class="fu">library</span>(tessellation)</span>
 <span id="cb3-2">del <span class="ot">&lt;-</span> <span class="fu">delaunay</span>(enclosedCuboctahedron, <span class="at">degenerate =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb3-3">v <span class="ot">&lt;-</span> <span class="fu">voronoi</span>(del)</span>
-<span id="cb3-4"><span class="do">## Vorono? diagram with twelve bounded cells.</span></span></code></pre>
+<span id="cb3-4"><span class="do">## Voronoï diagram with twelve bounded cells.</span></span></code></pre>
       </div>
       <p>
         I have not checked whether the option <code>degenerate = TRUE</code> is
-        necessary, but it is often necessary in order to get a correct Vorono?
-        diagram, and I never understood why. Now let?s plot the Vorono? diagram:
+        necessary, but it is often necessary in order to get a correct Voronoï
+        diagram, and I never understood why. Now let’s plot the Voronoï diagram:
       </p>
       <div class="sourceCode" id="cb4">
         <pre
@@ -2440,7 +2496,7 @@ Options:
 ]]></description>
       <pubDate>Wed, 19 Jan 2022 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/Voronoi_tessellation.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -2484,11 +2540,11 @@ Options:
         also resorts to pure R programming.
       </p>
       <p>Here we will have a look at the surface reconstruction methods.</p>
-      <h1 id="the-solid-m?bius-strip-construction-sampling-reconstruction">
-        The solid M?bius strip: construction, sampling, reconstruction
+      <h1 id="the-solid-möbius-strip-construction-sampling-reconstruction">
+        The solid Möbius strip: construction, sampling, reconstruction
       </h1>
       <p>
-        The <em>solid M?bius strip</em> is an isosurface I found in
+        The <em>solid Möbius strip</em> is an isosurface I found in
         <a
           href="http://data.imaginary-exhibition.com/IMAGINARY-Moebiusband-Stephan-Klaus.pdf"
           >this paper</a
@@ -2496,12 +2552,12 @@ Options:
       </p>
       <p>
         Here is the code I use to construct a <strong>rgl</strong> mesh of the
-        solid M?bius strip:
+        solid Möbius strip:
       </p>
       <div class="sourceCode" id="cb2">
         <pre
           class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb2-1"><span class="co"># solid M?bius strip: f(x,y,z)=0</span></span>
+        ><code class="sourceCode r"><span id="cb2-1"><span class="co"># solid Möbius strip: f(x,y,z)=0</span></span>
 <span id="cb2-2">f <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y, z, <span class="at">a =</span> <span class="fl">0.4</span>, <span class="at">b =</span> <span class="fl">0.1</span>){</span>
 <span id="cb2-3">  ((x<span class="sc">*</span>x<span class="sc">+</span>y<span class="sc">*</span>y<span class="sc">+</span><span class="dv">1</span>)<span class="sc">*</span>(a<span class="sc">*</span>x<span class="sc">*</span>x<span class="sc">+</span>b<span class="sc">*</span>y<span class="sc">*</span>y)<span class="sc">+</span>z<span class="sc">*</span>z<span class="sc">*</span>(b<span class="sc">*</span>x<span class="sc">*</span>x<span class="sc">+</span>a<span class="sc">*</span>y<span class="sc">*</span>y)<span class="sc">-</span><span class="dv">2</span><span class="sc">*</span>(a<span class="sc">-</span>b)<span class="sc">*</span>x<span class="sc">*</span>y<span class="sc">*</span>z<span class="sc">-</span>a<span class="sc">*</span>b<span class="sc">*</span>(x<span class="sc">*</span>x<span class="sc">+</span>y<span class="sc">*</span>y))<span class="sc">^</span><span class="dv">2</span> <span class="sc">-</span></span>
 <span id="cb2-4">    <span class="dv">4</span><span class="sc">*</span>(x<span class="sc">*</span>x<span class="sc">+</span>y<span class="sc">*</span>y)<span class="sc">*</span>(a<span class="sc">*</span>x<span class="sc">*</span>x<span class="sc">+</span>b<span class="sc">*</span>y<span class="sc">*</span>y<span class="sc">-</span>x<span class="sc">*</span>y<span class="sc">*</span>z<span class="sc">*</span>(a<span class="sc">-</span>b))<span class="sc">^</span><span class="dv">2</span></span>
@@ -2540,11 +2596,11 @@ Options:
         ><code class="sourceCode r"><span id="cb3-1">mesh</span>
 <span id="cb3-2"><span class="do">##  mesh3d object with 73544 vertices, 147088 triangles.</span></span></code></pre>
       </div>
-      <h2 id="sampling-the-solid-m?bius-strip">
-        Sampling the solid M?bius strip
+      <h2 id="sampling-the-solid-möbius-strip">
+        Sampling the solid Möbius strip
       </h2>
       <p>
-        Here we sample a subset of the vertices of the solid M?bius strip mesh,
+        Here we sample a subset of the vertices of the solid Möbius strip mesh,
         and later we will reconstruct the surface from this sample. I could
         select some vertices at random, but I prefer to use the uniform sampling
         performed by the <code>vcgUniformRemesh</code> function of the
@@ -2608,7 +2664,7 @@ Options:
 <span id="cb7-2">afs_mesh <span class="ot">&lt;-</span> <span class="fu">AFSreconstruction</span>(SolidMobiusStrip_cloud)</span></code></pre>
       </div>
       <p>
-        Let?s plot this mesh (this is a triangular <strong>rgl</strong> mesh, of
+        Let’s plot this mesh (this is a triangular <strong>rgl</strong> mesh, of
         class <code>mesh3d</code>):
       </p>
       <div class="sourceCode" id="cb8">
@@ -2626,7 +2682,7 @@ Options:
       <p>
         Well it is not very smooth, but not too bad. Note that the advanced
         front surface reconstruction algorithm does not alter the vertices of
-        the given points cloud, it doesn?t change them at all. So this mesh has
+        the given points cloud, it doesn’t change them at all. So this mesh has
         <span class="math inline">\(7948\)</span> vertices:
       </p>
       <div class="sourceCode" id="cb9">
@@ -2640,7 +2696,7 @@ Options:
         <span class="math inline">\(73544\)</span> vertices.
       </p>
       <p>
-        Let?s compare with the <em>ball-pivoting</em> algorithm provided by the
+        Let’s compare with the <em>ball-pivoting</em> algorithm provided by the
         <strong>Rvcg</strong> package:
       </p>
       <div class="sourceCode" id="cb10">
@@ -2702,11 +2758,11 @@ Options:
         Of course we could apply <code>vcgSmooth</code> to our
         <code>afs_mesh</code> as well.
       </p>
-      <h2 id="poisson-reconstruction-of-the-solid-m?bius-strip">
-        Poisson reconstruction of the solid M?bius strip
+      <h2 id="poisson-reconstruction-of-the-solid-möbius-strip">
+        Poisson reconstruction of the solid Möbius strip
       </h2>
       <p>
-        Now let?s try the <em>Poisson surface reconstruction</em>, available in
+        Now let’s try the <em>Poisson surface reconstruction</em>, available in
         <strong>RCGAL</strong>.
       </p>
       <div class="sourceCode" id="cb15">
@@ -2729,7 +2785,7 @@ Options:
         />
       </p>
       <p>
-        Clearly, that?s not smooth! But wait, there are only
+        Clearly, that’s not smooth! But wait, there are only
         <span class="math inline">\(604\)</span> vertices in this mesh:
       </p>
       <div class="sourceCode" id="cb17">
@@ -2764,7 +2820,7 @@ Options:
       <p>
         On one hand, the mesh is better, but on the other hand it has some small
         defaults (not highly visible on this view, try to reproduce the mesh and
-        rotate it, you?ll see). It has
+        rotate it, you’ll see). It has
         <span class="math inline">\(28726\)</span> vertices:
       </p>
       <div class="sourceCode" id="cb20">
@@ -2813,7 +2869,7 @@ Options:
       </div>
       <h1 id="the-stanford-bunny">The Stanford bunny</h1>
       <p>
-        Now let?s try these surface reconstruction techniques to another points
+        Now let’s try these surface reconstruction techniques to another points
         cloud, a famous one: the <em>Stanford bunny</em> points cloud. It has
         <span class="math inline">\(35947\)</span> points:
       </p>
@@ -2840,7 +2896,7 @@ Options:
           src="https://laustep.github.io/stlahblog/posts/figures/Bunny_cloud.png"
         />
       </p>
-      <p>Firstly, let?s try the advanced front surface reconstruction:</p>
+      <p>Firstly, let’s try the advanced front surface reconstruction:</p>
       <div class="sourceCode" id="cb26">
         <pre
           class="sourceCode r"
@@ -2892,7 +2948,7 @@ Options:
       </div>
       <h1 id="the-stanford-dragon">The Stanford dragon</h1>
       <p>
-        Finally, let?s play with the <em>Stanford dragon</em>. I found a points
+        Finally, let’s play with the <em>Stanford dragon</em>. I found a points
         cloud of it containing
         <span class="math inline">\(100250\)</span> points. It is so dense that
         its plot is a totally black shape:
@@ -2910,7 +2966,7 @@ Options:
         />
       </p>
       <p>
-        Let?s start with the advanced front surface reconstruction (the
+        Let’s start with the advanced front surface reconstruction (the
         <code>StanfordDragon</code> matrix is provided by
         <strong>RCGAL</strong>):
       </p>
@@ -2931,7 +2987,7 @@ Options:
           src="https://laustep.github.io/stlahblog/posts/figures/StanfordDragon_AFS.png"
         />
       </p>
-      <p>Very nice. And to finish, let?s try a Poisson reconstruction.</p>
+      <p>Very nice. And to finish, let’s try a Poisson reconstruction.</p>
       <div class="sourceCode" id="cb34">
         <pre
           class="sourceCode r"
@@ -2974,7 +3030,7 @@ Options:
 ]]></description>
       <pubDate>Sat, 15 Jan 2022 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/SurfaceReconstruction.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -3067,7 +3123,7 @@ Options:
         />
       </p>
       <p>
-        That?s not bad, but you see the problem: the borders are not smooth.
+        That’s not bad, but you see the problem: the borders are not smooth.
       </p>
       <h2 id="resorting-to-spherical-coordinates">
         Resorting to spherical coordinates
@@ -3256,7 +3312,7 @@ Options:
 ]]></description>
       <pubDate>Fri, 14 Jan 2022 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/MeshClipping.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -3273,11 +3329,11 @@ Options:
         <code>updateXXXinput</code> function.
       </p>
       <p>
-        Then I?m using my own way for bookmarking the state of a Shiny app and
-        restoring it. I?m saving the state of the app in a
+        Then I’m using my own way for bookmarking the state of a Shiny app and
+        restoring it. I’m saving the state of the app in a
         <strong>rds</strong> file and I restore the inputs delayed by a
         <code>renderUI</code> or an <code>updateXXXinput</code> function with
-        the help of the <code>delay</code> function of the ?shinyjs? package.
+        the help of the <code>delay</code> function of the ‘shinyjs’ package.
         Below is an example
       </p>
       <div class="sourceCode" id="cb1">
@@ -3459,7 +3515,7 @@ Options:
 ]]></description>
       <pubDate>Wed, 09 Dec 2020 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/shinyBookmarking.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -3469,7 +3525,7 @@ Options:
   <div class="main col-sm-12">
     <div class="content">
       <p>
-        My new package ?gfiExtremes? is on
+        My new package ‘gfiExtremes’ is on
         <a href="https://cran.r-project.org/web/packages/gfiExtremes/index.html"
           >CRAN</a
         >
@@ -3481,7 +3537,7 @@ Options:
         parametric model). The statistical inference is fiducial.
       </p>
       <p>
-        To give an illustration, I?m taking a sample of length 100 randomly
+        To give an illustration, I’m taking a sample of length 100 randomly
         generated from a Weibull distribution:
       </p>
       <div class="sourceCode" id="cb1">
@@ -3502,7 +3558,7 @@ Options:
         threshold, the function to use is <code>gfigpd2</code>. It runs a MCMC
         sampler, and one has to specify the length of the burnin phase, the
         desired length of the MCMC chains after the burnin, and the thin value
-        (e.g.?a thin of 2 means that one sampled value over two is dropped). One
+        (e.g. a thin of 2 means that one sampled value over two is dropped). One
         also has to specify the desired probability levels of the quantiles we
         are interested in.
       </p>
@@ -3523,7 +3579,7 @@ Options:
       </p>
       <p>
         The output of <code>gfigpd2</code> is a R object ready for analysis with
-        the ?coda? package, which is loaded by ?gfiExtremes?. In particular, it
+        the ‘coda’ package, which is loaded by ‘gfiExtremes’. In particular, it
         has a <code>summary</code> method:
       </p>
       <div class="sourceCode" id="cb3">
@@ -3552,7 +3608,7 @@ Options:
 <span id="cb3-21"><span class="do">## beta3 3.250 3.740 4.268 5.362 17.127</span></span></code></pre>
       </div>
       <p>
-        The ?coda? package provides the <code>HPDinterval</code> function which
+        The ‘coda’ package provides the <code>HPDinterval</code> function which
         gives the shortest confidence intervals:
       </p>
       <div class="sourceCode" id="cb4">
@@ -3588,7 +3644,7 @@ Options:
         ><code class="sourceCode r"><span id="cb6-1">logChains <span class="ot">&lt;-</span> <span class="fu">as.mcmc.list</span>(<span class="fu">lapply</span>(chains, log))</span></code></pre>
       </div>
       <p>
-        The ?ggmcmc? package is helpful here. Firstly, let?s have a look at the
+        The ‘ggmcmc’ package is helpful here. Firstly, let’s have a look at the
         traces:
       </p>
       <div class="sourceCode" id="cb7">
@@ -3605,7 +3661,7 @@ Options:
         />
       </p>
       <p>
-        Visually, nothing indicates a departure from the convergence. Let?s look
+        Visually, nothing indicates a departure from the convergence. Let’s look
         at the estimated densities now:
       </p>
       <div class="sourceCode" id="cb8">
@@ -3654,7 +3710,7 @@ Options:
           src="https://laustep.github.io/stlahblog/posts/figures/gfiExtremes-autocorrelations-1.png"
         />
       </p>
-      <p>Let?s also have a look at the Gelman-Rubin diagnostic:</p>
+      <p>Let’s also have a look at the Gelman-Rubin diagnostic:</p>
       <div class="sourceCode" id="cb12">
         <pre
           class="sourceCode r"
@@ -3674,7 +3730,7 @@ Options:
         The upper <code>Rhat</code> are close to 1, thereby indicating a
         successful diagnostic.
       </p>
-      <p>Finally, let?s look at the Heidelberger &amp; Welch diagnostic:</p>
+      <p>Finally, let’s look at the Heidelberger &amp; Welch diagnostic:</p>
       <div class="sourceCode" id="cb13">
         <pre
           class="sourceCode r"
@@ -3742,7 +3798,7 @@ Options:
 ]]></description>
       <pubDate>Fri, 27 Nov 2020 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/gfiExtremes.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -3770,16 +3826,16 @@ Options:
         >
       </p>
       <h2 id="using-rstanarm-with-the-default-priors">
-        Using ?rstanarm? with the default priors
+        Using ‘rstanarm’ with the default priors
       </h2>
       <p>
-        Below I fit the model with the ?rstanarm? package for fifteen simulated
+        Below I fit the model with the ‘rstanarm’ package for fifteen simulated
         datasets with <span class="math inline">\(I = 10\)</span>,
         <span class="math inline">\(J = 5\)</span>,
         <span class="math inline">\(\mu = 10000\)</span>,
         <span class="math inline">\(\sigma_{\mathrm{b}} = 50\)</span>,
         <span class="math inline">\(\sigma_{\mathrm{w}} = 1\)</span>. I assign a
-        ?vague? half-Cauchy prior distribution to
+        “vague” half-Cauchy prior distribution to
         <span class="math inline">\(\sigma_{\mathrm{w}}\)</span> and the other
         prior distributions are the default prior distributions of
         <code>stan_lmer</code>.
@@ -3839,7 +3895,7 @@ Options:
 <span id="cb1-50">  stanIntervals<span class="sc">$</span>between[i, ] <span class="ot">&lt;-</span> x[<span class="st">"sigma_group"</span>, ]</span>
 <span id="cb1-51">}</span></code></pre>
       </div>
-      <p>Let?s plot the intervals now.</p>
+      <p>Let’s plot the intervals now.</p>
       <div class="sourceCode" id="cb2">
         <pre
           class="sourceCode numberSource r numberLines"
@@ -3921,7 +3977,7 @@ Options:
           >\(\textrm{Gamma}(\textrm{shape}=2, \textrm{scale=30})\)</span
         >
         distribution because it has median
-        <span class="math inline">\(\approx 50\)</span> and is ?vague? enough:
+        <span class="math inline">\(\approx 50\)</span> and is “vague” enough:
         its equi-tailed <span class="math inline">\(95\%\)</span>-dispersion
         interval is <span class="math inline">\(\approx (7, 167)\)</span>.
       </p>
@@ -3939,7 +3995,7 @@ Options:
       <p>
         Below are the confidence intervals obtained with this Gamma prior
         distribution. I compare them with the frequentist intervals obtained
-        with the ?AOV1R? package.
+        with the ‘AOV1R’ package.
       </p>
       <p>
         <img
@@ -3965,7 +4021,7 @@ Options:
         Try the generalized fiducial inference.
       </h2>
       <p>
-        My new package ?gfilmm? allows to perform the
+        My new package ‘gfilmm’ allows to perform the
         <em>generalized fiducial inference</em> for any Gaussian linear mixed
         model with categorical random effects.
       </p>
@@ -3977,7 +4033,7 @@ Options:
       </p>
       <p>
         A notable difference between these two methods of inference is that
-        <em>there?s no prior distribution in fiducial statistics</em>.
+        <em>there’s no prior distribution in fiducial statistics</em>.
       </p>
       <p>Here is how to run the fiducial sampler:</p>
       <div class="sourceCode" id="cb5">
@@ -3991,7 +4047,7 @@ Options:
       </div>
       <p>
         Note the form of the response variable:
-        <code>~ cbind(y - 0.01, y + 0.01)</code>. That?s because the generalized
+        <code>~ cbind(y - 0.01, y + 0.01)</code>. That’s because the generalized
         fiducial inference applies to interval data.
       </p>
       <p>
@@ -4016,7 +4072,7 @@ Options:
         >. I implemented the algorithm (due to J. Cisewski and J. Hannig) in C++
         and it takes less than 1000 lines of code.
       </p>
-      <p>Let?s increase the between standard deviation now.</p>
+      <p>Let’s increase the between standard deviation now.</p>
       <div class="sourceCode" id="cb6">
         <pre
           class="sourceCode numberSource r numberLines"
@@ -4095,7 +4151,7 @@ Options:
 ]]></description>
       <pubDate>Sun, 08 Nov 2020 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/gfi_vs_rstanarm.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -4110,8 +4166,8 @@ Options:
         the end).
       </p>
       <p>
-        My R package ?HypergeoMat? provides a Rcpp implementation of Koev &amp;
-        Edelman?s algorithm for the evaluation of the hypergeometric function of
+        My R package ‘HypergeoMat’ provides a Rcpp implementation of Koev &amp;
+        Edelman’s algorithm for the evaluation of the hypergeometric function of
         a matrix argument.
       </p>
       <p>
@@ -4144,10 +4200,10 @@ Options:
       <p>
         My Haskell library generates a shared library (a DLL) which can be
         called from R. And one can call Julia from R with the help of the
-        ?XRJulia? package. So we will benchmark the three implementations from
+        ‘XRJulia’ package. So we will benchmark the three implementations from
         R.
       </p>
-      <p>Firstly, let?s check that they return the same value:</p>
+      <p>Firstly, let’s check that they return the same value:</p>
       <div class="sourceCode" id="cb1">
         <pre
           class="sourceCode r"
@@ -4174,7 +4230,7 @@ Options:
 <span id="cb1-21"><span class="co"># 2.116251</span></span></code></pre>
       </div>
       <p>
-        Well, the same results. Now, let?s run a first series of benchmarks, for
+        Well, the same results. Now, let’s run a first series of benchmarks, for
         <span class="math inline">\(m=5\)</span>.
       </p>
       <div class="sourceCode" id="cb2">
@@ -4198,7 +4254,7 @@ Options:
  Haskell  610.852  1136.963  1343.7442  1289.435  1504.323  2650.976    10  a </code></pre>
       <p>
         Should we conclude that Rcpp is the winner, and that Julia is slow?
-        That?s not sure. Observe that the unit of these durations is the
+        That’s not sure. Observe that the unit of these durations is the
         microsecond. Perhaps the call to Julia via <code>juliaEval</code> is
         time-consuming, as well as the call to the Haskell DLL via
         <code>.Call</code>.
@@ -4228,8 +4284,8 @@ Options:
         followed by Julia.
       </p>
       <p>
-        I?m using Julia 1.2.0, and I have been told that there is a great
-        improvement of performance in Julia 1.5.0, the latest version. I?ll try
+        I’m using Julia 1.2.0, and I have been told that there is a great
+        improvement of performance in Julia 1.5.0, the latest version. I’ll try
         with Julia 1.5.0 and then I will update this post to show whether there
         is a gain of speed.
       </p>
@@ -4239,7 +4295,7 @@ Options:
         This one intensively uses recursion, and perhaps Haskell is strong when
         dealing with recursion.
       </p>
-      <p>Don?t forget:</p>
+      <p>Don’t forget:</p>
       <div class="sourceCode" id="cb6">
         <pre
           class="sourceCode r"
@@ -4278,7 +4334,7 @@ Options:
 ]]></description>
       <pubDate>Thu, 22 Oct 2020 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/HaskellIsFast.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -4289,11 +4345,11 @@ Options:
     <div class="content">
       <p>
         It seems to me that the <code>kde1d</code> package (One-Dimensional
-        Kernel Density Estimation) is not very known. I?ve never heard of it on
+        Kernel Density Estimation) is not very known. I’ve never heard of it on
         Stack Overflow, except in an answer of mine.
       </p>
       <p>
-        However this is a great package, IMHO. I?m going to show why I like it.
+        However this is a great package, IMHO. I’m going to show why I like it.
       </p>
       <h3 id="the-dpqr-family">The <code>d/p/q/r</code> family</h3>
       <p>
@@ -4303,7 +4359,7 @@ Options:
         estimate, as well as a sampler from the estimated distribution.
       </p>
       <p>
-        Let?s fit a density with <code>kde1d</code> to a simulated Gaussian
+        Let’s fit a density with <code>kde1d</code> to a simulated Gaussian
         sample:
       </p>
       <div class="sourceCode" id="cb1">
@@ -4417,7 +4473,7 @@ Options:
 ]]></description>
       <pubDate>Thu, 15 Oct 2020 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/kde1d.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -4527,7 +4583,7 @@ Options:
 ]]></description>
       <pubDate>Thu, 08 Oct 2020 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/MyRGLartworks.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -4537,7 +4593,7 @@ Options:
   <div class="main col-sm-12">
     <div class="content">
       <p>
-        I?m going to show how to use the <code>DT</code> package to do a table
+        I’m going to show how to use the <code>DT</code> package to do a table
         with child tables, and how to edit and export such a table.
       </p>
       <p>
@@ -4938,7 +4994,7 @@ Options:
         ><code class="sourceCode javascript"><span id="cb9-1"><span class="kw">var</span> table <span class="op">=</span> <span class="fu">$</span>(<span class="st">'#mytable'</span>)<span class="op">.</span><span class="fu">find</span>(<span class="st">'table'</span>)<span class="op">.</span><span class="fu">DataTable</span>()<span class="op">;</span></span></code></pre>
       </div>
       <p>
-        If you don?t use Shiny, you have to set this id in the
+        If you don’t use Shiny, you have to set this id in the
         <code>elementId</code> argument of the <code>datatable</code> function.
         If you use Shiny, this id is the key of the element of the
         <code>output</code> object in which you assign a <code>renderDT</code>:
@@ -5050,7 +5106,7 @@ Options:
 <span id="cb11-91">  <span class="st">"}"</span></span>
 <span id="cb11-92">)</span></code></pre>
       </div>
-      <p>Let?s see an example.</p>
+      <p>Let’s see an example.</p>
       <div class="sourceCode" id="cb12">
         <pre
           class="sourceCode numberSource r numberLines"
@@ -5120,7 +5176,7 @@ Options:
 ]]></description>
       <pubDate>Fri, 08 May 2020 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/DT_childTables.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -5746,8 +5802,8 @@ Options:
         where <span class="math inline">\(A\)</span> is a symmetric
         <span class="math inline">\((3\times 3)\)</span>-matrix,
         <span class="math inline">\(J \in \mathbb{R}^3\)</span>, and
-        <span class="math inline">\(K \in \mathbb{R}\)</span>. Let?s treat an
-        example. We follow the strategy given at page 45 of Brannan &amp; al?s
+        <span class="math inline">\(K \in \mathbb{R}\)</span>. Let’s treat an
+        example. We follow the strategy given at page 45 of Brannan &amp; al’s
         book <em>Geometry</em> (<a
           href="http://math.haifa.ac.il/ROVENSKI/B2.pdf"
           >pdf</a
@@ -5847,7 +5903,7 @@ Options:
 ]]></description>
       <pubDate>Sun, 03 May 2020 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/focalQuadrics.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -5864,7 +5920,7 @@ Options:
         be a parameterization of a hypersurface
         <span class="math inline">\(\mathcal{S}\)</span>, where
         <span class="math inline">\(I,J,K \subset \mathbb{R}\)</span> are some
-        intervals. I?m going to show how to draw the cross-section of
+        intervals. I’m going to show how to draw the cross-section of
         <span class="math inline">\(\mathcal{S}\)</span> by a hyperplane with R.
       </p>
       <p>
@@ -6191,7 +6247,7 @@ Options:
       </p>
       <h2 id="toroidal-hyperboloid">Toroidal hyperboloid</h2>
       <p>
-        Let?s give another example, a <em>toroidal hyperboloid</em>. This is a
+        Let’s give another example, a <em>toroidal hyperboloid</em>. This is a
         quadric with implicit equation
         <span class="math display"
           >\[ \frac{x^2}{a^2} + \frac{y^2}{b^2} - \frac{z^2}{c^2} -
@@ -6217,7 +6273,7 @@ Options:
 ]]></description>
       <pubDate>Fri, 01 May 2020 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/slicedHypersurface.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -6303,7 +6359,7 @@ Options:
 <span id="cb1-25">}</span></code></pre>
       </div>
       <p>
-        Now we?re ready to plot the stereographic projection of the Hopf torus
+        Now we’re ready to plot the stereographic projection of the Hopf torus
         with <code>misc3d</code>:
       </p>
       <div class="sourceCode" id="cb2">
@@ -6386,7 +6442,7 @@ Options:
         <code>t</code> <span class="math inline">\(\in (0, 2\pi[\)</span>.
       </p>
       <p>
-        Let?s try. We enter three pairs of spherical coordinates and we apply
+        Let’s try. We enter three pairs of spherical coordinates and we apply
         the <code>circleOnUnitSphere</code> function:
       </p>
       <div class="sourceCode" id="cb4">
@@ -6491,7 +6547,7 @@ Options:
 <span id="cb7-53">  <span class="fu">c</span>(<span class="dv">2</span><span class="sc">*</span><span class="fu">atan</span>(<span class="fu">Mod</span>(z1)<span class="sc">/</span><span class="fu">Mod</span>(z0)), <span class="fu">Arg</span>(z1)<span class="sc">-</span><span class="fu">Arg</span>(z0))</span>
 <span id="cb7-54">}</span></code></pre>
       </div>
-      <p>Now, let?s rotate our spherical circle and plot:</p>
+      <p>Now, let’s rotate our spherical circle and plot:</p>
       <div class="sourceCode" id="cb8">
         <pre
           class="sourceCode numberSource r numberLines"
@@ -6519,7 +6575,7 @@ Options:
 ]]></description>
       <pubDate>Sun, 12 Apr 2020 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/HopfTorus2.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -6539,7 +6595,7 @@ Options:
       </p>
       <p>
         In particular, I was intrigued by the <em>generalized powers</em> of a
-        M?bius transformation (of a matrix, actually), and their actions on the
+        Möbius transformation (of a matrix, actually), and their actions on the
         modular tessellation.
       </p>
       <p>
@@ -6574,7 +6630,7 @@ Options:
         ><code class="sourceCode r"><span id="cb1-1"><span class="fu">library</span>(PlaneGeometry)</span>
 <span id="cb1-2"><span class="fu">library</span>(elliptic) <span class="co"># for the 'unimodular' function</span></span>
 <span id="cb1-3"></span>
-<span id="cb1-4"><span class="co"># M?bius transformations</span></span>
+<span id="cb1-4"><span class="co"># Möbius transformations</span></span>
 <span id="cb1-5">T <span class="ot">&lt;-</span> Mobius<span class="sc">$</span><span class="fu">new</span>(<span class="fu">rbind</span>(<span class="fu">c</span>(<span class="dv">0</span>,<span class="sc">-</span><span class="dv">1</span>), <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">0</span>)))</span>
 <span id="cb1-6">U <span class="ot">&lt;-</span> Mobius<span class="sc">$</span><span class="fu">new</span>(<span class="fu">rbind</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>), <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>)))</span>
 <span id="cb1-7">R <span class="ot">&lt;-</span> U<span class="sc">$</span><span class="fu">compose</span>(T)</span>
@@ -6700,7 +6756,7 @@ Options:
 ]]></description>
       <pubDate>Wed, 19 Feb 2020 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/ModularTessellationOrbit.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -7004,7 +7060,7 @@ Options:
 ]]></description>
       <pubDate>Sun, 16 Feb 2020 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/DTqTips.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -7014,7 +7070,7 @@ Options:
   <div class="main col-sm-12">
     <div class="content">
       <p>
-        In this post, I?ll show how to draw a stereographic
+        In this post, I’ll show how to draw a stereographic
         <a href="./Duoprism.html">duoprism</a> using R, Asymptote and POV-Ray.
       </p>
       <h1 id="with-r">With R</h1>
@@ -7969,7 +8025,7 @@ Options:
 ]]></description>
       <pubDate>Tue, 11 Feb 2020 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/DuoprismStereo.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -9137,7 +9193,7 @@ Options:
 ]]></description>
       <pubDate>Mon, 16 Dec 2019 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/StereoTruncatedTesseract.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -9297,7 +9353,7 @@ Options:
 ]]></description>
       <pubDate>Sat, 23 Nov 2019 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/shinytestthat.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -9451,7 +9507,7 @@ Options:
 <span id="cb4-9">}</span></code></pre>
       </div>
       <p>
-        I don?t know how to get a good starting value for
+        I don’t know how to get a good starting value for
         <span class="math inline">\(S\)</span>, so I always take
         <span class="math inline">\(1\)</span>.
       </p>
@@ -9525,7 +9581,7 @@ Options:
 <span id="cb7-20">  }</span>
 <span id="cb7-21">}</span></code></pre>
       </div>
-      <p>Let?s try it on a couple of simulated samples:</p>
+      <p>Let’s try it on a couple of simulated samples:</p>
       <div class="sourceCode" id="cb8">
         <pre
           class="sourceCode numberSource r numberLines"
@@ -9562,7 +9618,7 @@ Options:
         The estimate of <span class="math inline">\(x_{\text{mid}}\)</span> is
         excellent. As you can see, the estimate of
         <span class="math inline">\(S\)</span> is sometimes much larger than the
-        true value. Let?s have a look at the worst case:
+        true value. Let’s have a look at the worst case:
       </p>
       <div class="sourceCode" id="cb10">
         <pre
@@ -9645,7 +9701,7 @@ Options:
 ]]></description>
       <pubDate>Wed, 20 Nov 2019 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/5pl.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -9687,7 +9743,7 @@ Options:
         </li>
         <li>
           <a href="#application-to-the-bayesian-two-poisson-samples-model"
-            >Application to the Bayesian ?two Poisson samples? model</a
+            >Application to the Bayesian “two Poisson samples” model</a
           >
         </li>
       </ul>
@@ -9778,7 +9834,7 @@ Options:
         general, <span class="math inline">\(\tau\)</span> is not a scale
         parameter.
       </p>
-      <p>Let?s write a R function computing this density:</p>
+      <p>Let’s write a R function computing this density:</p>
       <div class="sourceCode" id="cb2">
         <pre
           class="sourceCode numberSource r numberLines"
@@ -9823,11 +9879,11 @@ Options:
         Update 2019-09-05: generalised Beta distribution
       </h1>
       <p>
-        I?ve just discovered that the
+        I’ve just discovered that the
         <span class="math inline">\(GB4\)</span> distribution appears in the
         paper
         <em
-          >On Kummer?s distributions of type two and generalized Beta
+          >On Kummer’s distributions of type two and generalized Beta
           distributions</em
         >
         written by Hamza &amp; Vallois. It is named
@@ -10013,7 +10069,7 @@ Options:
 <span id="cb4-44">  }</span>
 <span id="cb4-45">}</span></code></pre>
       </div>
-      <p>Let?s check. The density:</p>
+      <p>Let’s check. The density:</p>
       <div class="sourceCode" id="cb5">
         <pre
           class="sourceCode numberSource r numberLines"
@@ -10045,7 +10101,7 @@ Options:
         />
       </p>
       <p>
-        I?ve removed the sixth value of the vector <code>q</code> because there
+        I’ve removed the sixth value of the vector <code>q</code> because there
         is a crash of <code>appellf1</code> for this value:
       </p>
       <div class="sourceCode" id="cb7">
@@ -10103,7 +10159,7 @@ Options:
         >.
       </p>
       <h1 id="application-to-the-bayesian-two-poisson-samples-model">
-        Application to the Bayesian ?two Poisson samples? model
+        Application to the Bayesian “two Poisson samples” model
       </h1>
       <p>
         Consider the statistical model given by two independent observations
@@ -10112,7 +10168,7 @@ Options:
           \]</span
         >
         where <span class="math inline">\(S\)</span> and
-        <span class="math inline">\(T\)</span> are known ?sample sizes?. We
+        <span class="math inline">\(T\)</span> are known “sample sizes”. We
         parametrize the model by <span class="math inline">\(\mu\)</span> and
         <span class="math inline">\(\phi := \frac{\lambda}{\mu}\)</span>.
       </p>
@@ -10142,7 +10198,7 @@ Options:
         where <span class="math inline">\(\rho = \frac{S}{T+b}\)</span>.
       </p>
       <p>
-        Now, let?s assign a
+        Now, let’s assign a
         <span class="math inline">\(\mathcal{B}'(c,d,\tau)\)</span> prior
         distribution on <span class="math inline">\(\phi\)</span>. Then the
         posterior distribution on <span class="math inline">\(\phi\)</span> is
@@ -10177,7 +10233,7 @@ Options:
 ]]></description>
       <pubDate>Mon, 22 Jul 2019 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/Beta3.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -10748,7 +10804,7 @@ Options:
       <h1 id="with-three.js">With three.js</h1>
       <p>
         Here is a variant with <code>three.js</code>. I replaced the spheres
-        with ?Barth polyedra?.
+        with “Barth polyedra”.
       </p>
       <iframe
         src="../frames/threejs_BarthPolyhedronSteiner.html"
@@ -10764,7 +10820,7 @@ Options:
 ]]></description>
       <pubDate>Sat, 13 Jul 2019 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/SteinerChains.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -10899,7 +10955,7 @@ Options:
 ]]></description>
       <pubDate>Wed, 10 Jul 2019 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/PlotDatatableColumns.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -10947,15 +11003,15 @@ Options:
       </h1>
       <p>This callback allows a more friendly way to edit the cells:</p>
       <ul>
-        <li><p>navigate in the table, press ?Enter? to edit;</p></li>
+        <li><p>navigate in the table, press ‘Enter’ to edit;</p></li>
         <li>
           <p>
-            press ?Enter? to validate the edit and stay at the same position;
+            press ‘Enter’ to validate the edit and stay at the same position;
           </p>
         </li>
         <li>
           <p>
-            if you are editing a cell, then pressing ?Tab? or an arrow key will
+            if you are editing a cell, then pressing ‘Tab’ or an arrow key will
             trigger the edit of the new cell.
           </p>
         </li>
@@ -11220,7 +11276,7 @@ Options:
       <p>
         This callback uses the <code>jQuery contextMenu</code> library. It
         allows to edit a column header by right-clicking on it. When done, press
-        ?Escape? or move the mouse.
+        ‘Escape’ or move the mouse.
       </p>
       <div class="sourceCode" id="cb5">
         <pre
@@ -11757,7 +11813,7 @@ Options:
       </h1>
       <p>
         The default pagination is not convenient when there are many pages (the
-        user has to click multiple times on the ?Next? or ?Previous? button).
+        user has to click multiple times on the ‘Next’ or ‘Previous’ button).
         This callback allows to select a page with a numeric input.
       </p>
       <div class="sourceCode" id="cb10">
@@ -11842,7 +11898,7 @@ Options:
 ]]></description>
       <pubDate>Fri, 14 Jun 2019 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/DTcallbacks.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -11858,7 +11914,7 @@ Options:
       <p>
         Ungar deeply studied three examples of gyrovector spaces; they
         correspond to three models of hyperbolic geometry: the Beltrami model,
-        the Poincar? ball model, and the hyperboloid model.
+        the Poincaré ball model, and the hyperboloid model.
       </p>
       <p>
         In this blog post, I will consider the gyrovector approach to the
@@ -12008,7 +12064,7 @@ Options:
 <span id="cb3-11">  }))</span>
 <span id="cb3-12">}</span></code></pre>
       </div>
-      <p>Let?s plot a two-dimensional gyrosegment.</p>
+      <p>Let’s plot a two-dimensional gyrosegment.</p>
       <div class="sourceCode" id="cb4">
         <pre
           class="sourceCode numberSource r numberLines"
@@ -12141,7 +12197,7 @@ Options:
           src="https://laustep.github.io/stlahblog/posts/figures/hyperbolicPolyhedra-wire2-1.png"
         />
       </p>
-      <p>Now let?s plot the shaded triangle:</p>
+      <p>Now let’s plot the shaded triangle:</p>
       <div class="sourceCode" id="cb10">
         <pre
           class="sourceCode numberSource r numberLines"
@@ -12795,7 +12851,7 @@ Options:
       </p>
       <h2 id="update-2019-04-09">Update 2019-04-09</h2>
       <p>
-        I?ve realized that the <code>addNormals</code> function of the
+        I’ve realized that the <code>addNormals</code> function of the
         <code>rgl</code> package is not appropriate when there are duplicated
         vertices in the mesh (it adds different normals to the duplicated
         vertices). And there are (a lot of) duplicated vertices in the mesh
@@ -12873,7 +12929,7 @@ Options:
 ]]></description>
       <pubDate>Fri, 05 Apr 2019 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/hyperbolicPolyhedra.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -12938,7 +12994,7 @@ Options:
       </p>
       <p>
         The transformation <span class="math inline">\(f\)</span> is a
-        ?scaling-translation?. It is clear that it maps a generalized circle to
+        “scaling-translation”. It is clear that it maps a generalized circle to
         a generalized circle, and this also holds for
         <span class="math inline">\(f^{-1}\)</span>. Therefore,
         <span class="math inline">\(\iota\)</span> maps any generalized circle
@@ -13160,7 +13216,7 @@ Options:
 <span id="cb1-26">}</span></code></pre>
       </div>
       <p>
-        Let?s check the function <code>iotaCircle</code>. To do so, we use the
+        Let’s check the function <code>iotaCircle</code>. To do so, we use the
         <code>circumcircle</code> function below, which returns the center and
         the radius of the circle passing by <code>z1</code>, <code>z2</code>,
         <code>z3</code>.
@@ -13185,7 +13241,7 @@ Options:
 <span id="cb2-15">  <span class="fu">list</span>(<span class="at">center =</span> center[<span class="dv">1</span>] <span class="sc">+</span> 1i<span class="sc">*</span>center[<span class="dv">2</span>], <span class="at">radius =</span> r)</span>
 <span id="cb2-16">}</span></code></pre>
       </div>
-      <p>Now let?s check <code>iotaCircle</code>.</p>
+      <p>Now let’s check <code>iotaCircle</code>.</p>
       <div class="sourceCode" id="cb3">
         <pre
           class="sourceCode numberSource r numberLines"
@@ -13285,7 +13341,7 @@ Options:
 <span id="cb10-20">}</span></code></pre>
       </div>
       <p>
-        Let?s check <code>iotaLine</code>. Firstly, a case when the image is a
+        Let’s check <code>iotaLine</code>. Firstly, a case when the image is a
         circle.
       </p>
       <div class="sourceCode" id="cb11">
@@ -13373,7 +13429,7 @@ Options:
         ><code class="sourceCode r"><span id="cb17-1"><span class="fu">cos</span>(L<span class="sc">$</span>theta)<span class="sc">*</span><span class="fu">Re</span>(w3) <span class="sc">+</span> <span class="fu">sin</span>(L<span class="sc">$</span>theta)<span class="sc">*</span><span class="fu">Im</span>(w3) <span class="co"># = L$offset</span></span>
 <span id="cb17-2"><span class="do">## [1] -4.440892e-16</span></span></code></pre>
       </div>
-      <p>Finally, let?s put things together in a single function.</p>
+      <p>Finally, let’s put things together in a single function.</p>
       <div class="sourceCode" id="cb18">
         <pre
           class="sourceCode numberSource r numberLines"
@@ -13395,7 +13451,7 @@ Options:
         >.
       </p>
       <p>
-        Firstly, let?s write a function which draws a generalized circle. We use
+        Firstly, let’s write a function which draws a generalized circle. We use
         the <code>draw.circle</code> function of the
         <code>plotrix</code> package.
       </p>
@@ -13512,7 +13568,7 @@ Options:
 <span id="cb22-32">  }</span>
 <span id="cb22-33">}</span></code></pre>
       </div>
-      <p>Let?s put all the obtained generalized circles together:</p>
+      <p>Let’s put all the obtained generalized circles together:</p>
       <div class="sourceCode" id="cb23">
         <pre
           class="sourceCode numberSource r numberLines"
@@ -13570,7 +13626,7 @@ Options:
 <span id="cb26-7"><span class="do">## [1] "great"</span></span></code></pre>
       </div>
       <p>
-        So let?s define the function <code>f</code> which identifies two equal
+        So let’s define the function <code>f</code> which identifies two equal
         generalized circles.
       </p>
       <div class="sourceCode" id="cb27">
@@ -13591,7 +13647,7 @@ Options:
 <span id="cb27-13">  }</span>
 <span id="cb27-14">}</span></code></pre>
       </div>
-      <p>And now, let?s remove the duplicates:</p>
+      <p>And now, let’s remove the duplicates:</p>
       <div class="sourceCode" id="cb28">
         <pre
           class="sourceCode numberSource r numberLines"
@@ -13625,7 +13681,7 @@ Options:
 ]]></description>
       <pubDate>Wed, 13 Mar 2019 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/Inversions.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
     <item>
@@ -13740,7 +13796,7 @@ Options:
           </p>
         </li>
       </ul>
-      <p>Let?s go. We split the polyhedron:</p>
+      <p>Let’s go. We split the polyhedron:</p>
       <div class="sourceCode" id="cb4">
         <pre
           class="sourceCode numberSource r numberLines"
@@ -13780,7 +13836,7 @@ Options:
       </div>
       <p>
         Now we are ready to use the <code>SimplicialCubature</code> package.
-        Let?s define the function <span class="math inline">\(f\)</span> before,
+        Let’s define the function <span class="math inline">\(f\)</span> before,
         for example:
       </p>
       <div class="sourceCode" id="cb7">
@@ -13858,7 +13914,7 @@ Options:
 ]]></description>
       <pubDate>Wed, 27 Feb 2019 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/integralPolyhedron.html</guid>
-      <dc:creator>StÃ©phane Laurent</dc:creator>
+      <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
   </channel>
