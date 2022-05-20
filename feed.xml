@@ -14,7 +14,7 @@
     <div class="content">
       <p>
         I really like the animated multibarchart of the JavaScript library
-        <a href="https://nvd3.org/">NVD3</a>. That's why I did the ?Rnvd3?
+        <a href="https://nvd3.org/">NVD3</a>. That's why I did the 'Rnvd3'
         package.
       </p>
       <div class="sourceCode" id="cb1">
@@ -94,6 +94,7 @@
       <p>
         <img
           src="https://laustep.github.io/stlahblog/posts/figures/shinyDirTree.gif"
+          style="width: 95%"
         />
       </p>
       <p>
@@ -126,6 +127,7 @@
       <p>
         <img
           src="https://laustep.github.io/stlahblog/posts/figures/shinyDataTree.gif"
+          style="width: 95%"
         />
       </p>
     </div>
@@ -170,7 +172,7 @@
   <div class="main col-sm-12">
     <div class="content">
       <p>
-        I?m still working on my package <strong>RCGAL</strong>, that I already
+        I'm still working on my package <strong>RCGAL</strong>, that I already
         present in <a href="./SurfaceReconstruction.html">a previous post</a>.
       </p>
       <p>
@@ -207,7 +209,7 @@
         />
       </p>
       <p>The code generating these plots is given in the RCGAL examples.</p>
-      <p>Now let?s turn to a more interesting example.</p>
+      <p>Now let's turn to a more interesting example.</p>
       <h2 id="the-compound-of-five-tetrahedra">
         The compound of five tetrahedra
       </h2>
@@ -241,7 +243,7 @@
       </p>
       <p>
         I wondered for a long time what is the intersection of these five
-        tetrahedra. But I didn?t have any tool to compute it. Now I have. Let?s
+        tetrahedra. But I didn't have any tool to compute it. Now I have. Let's
         see.
       </p>
       <div class="sourceCode" id="cb2">
@@ -298,7 +300,7 @@
   <div class="main col-sm-12">
     <div class="content">
       <p>
-        The R code below shows how to get a <em>?Copy to clipboard?</em> button
+        The R code below shows how to get a <em>'Copy to clipboard'</em> button
         in the <code>plotly</code> toolbar.
       </p>
       <div class="sourceCode" id="cb1">
@@ -549,7 +551,7 @@
       </div>
       <p>
         What a disaster! <strong><em>Do not run this code!</em></strong> It
-        totally crashed my laptop. Perhaps that can work with more RAM, I don?t
+        totally crashed my laptop. Perhaps that can work with more RAM, I don't
         know (I have only 8 Gb). I searched and I searched on the web, with no
         luck, I didn?t find these edges. So I decided to search another
         computational geometry library, able to get these edges. I thought of
