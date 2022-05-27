@@ -1,0 +1,324 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Splitting RCGAL... and the connected components</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Splitting RCGAL... and the connected components</h1> 
+          <div class="info">
+    Posted on May 27, 2022
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'geometry'." href="../tags/geometry.html">geometry</a>, <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'rgl'." href="../tags/rgl.html">rgl</a>, <a title="All pages tagged 'graphics'." href="../tags/graphics.html">graphics</a>, <a title="All pages tagged 'C++'." href="../tags/C%2B%2B.html">C++</a>, <a title="All pages tagged 'Rcpp'." href="../tags/Rcpp.html">Rcpp</a>
+    
+</div>
+
+<p>I published two posts here about my package <strong>RCGAL</strong>, the <a href="https://laustep.github.io/stlahblog/posts/SurfaceReconstruction.html">first
+one</a>
+about surface reconstruction, and the <a href="https://laustep.github.io/stlahblog/posts/BooleanOpsOnMeshes.html">second
+one</a>
+about Boolean operations on 3D meshes.</p>
+<p>Now I decided to split this package into two packages:
+<a href="https://github.com/stla/SurfaceReconstruction">SurfaceReconstruction</a>,
+and <a href="https://github.com/stla/MeshesOperations">MeshesOperations</a>.</p>
+<p>I think <strong>MeshesOperations</strong> is almost ready for submission to CRAN. I
+have just started <strong>SurfaceReconstruction</strong> today, but it already works.</p>
+<h2 id="dealing-with-a-r-cmd-check-issue">Dealing with a ‘R CMD check’ issue</h2>
+<p>A technical note before playing with the <strong>MeshesOperations</strong> package.
+Feel free to skip this section.</p>
+<p>I faced a ‘R CMD check’ issue on ‘win-builder’ with
+<strong>MeshesOperations</strong>. Namely, this so-called significant warning:</p>
+<pre><code>C:/.../BH/include/boost/container/detail/copy_move_algo.hpp:184:19: warning: 
+'void* memmove(void*, const void*, size_t)' writing to an object of type 'value_type' 
+{aka 'struct std::pair, std::allocator &gt;, long long unsigned int&gt; &gt; &gt;, 
+std::allocator, std::allocator &gt;, long long unsigned int&gt; &gt; &gt; &gt; &gt;,
+CGAL::internal::In_place_list_iterator, std::allocator &gt;, 
+long long unsigned int&gt; &gt; &gt;, std::allocator, std::allocator &gt;, 
+long long unsigned int&gt; &gt; &gt; &gt; &gt; &gt;'} 
+with no trivial copy-assignment; use copy-assignment or copy-initialization 
+instead [-Wclass-memaccess]</code></pre>
+<p>This is a warning from the <strong>BH</strong> package (which allows to use the C++
+library <strong>Boost</strong> with <strong>Rcpp</strong>). On Linux, the ‘R CMD check’ report was
+clean.</p>
+<p>I found a solution to this issue. I describe it here, in case it could
+help someone.</p>
+<p>In order to use the <strong>BH</strong> package, I included it in the <strong>LinkingTo</strong>
+field of the <strong>DESCRIPTION</strong> file. Then I discovered that this was not
+necessary with R-4.2.0, and that’s because <strong>Rtools42</strong> contains the
+<strong>Boost</strong> library.</p>
+<p>So this solved the problem for Windows, but created a new problem for
+the other OSs. Then I solved this new problem by:</p>
+<ul>
+<li><p>putting <strong>BH</strong> in the <strong>Suggests</strong> field of <strong>DESCRIPTION</strong> (and
+only in this field)</p></li>
+<li><p>adding the following lines in the <strong>Makevars</strong> file in the <strong>src</strong>
+folder of the package (breaking the first line for display here):</p></li>
+</ul>
+<!-- -->
+<pre><code>BH_PATH = `echo 'cat(system.file(&quot;include&quot;, package = &quot;BH&quot;, mustWork=TRUE))' \ 
+| &quot;${R_HOME}/bin/R&quot; --vanilla --no-echo`
+PKG_CXXFLAGS = -I$(BH_PATH)</code></pre>
+<p>The first line allows to call R to get the path of the <strong>include</strong>
+folder of the <strong>BH</strong> package, and this path is set to the variable
+<strong>BH_PATH</strong>.</p>
+<p>Of course I didn’t change the <strong>Makevars.win</strong> file. This works, but I
+don’t know yet whether this is acceptable for CRAN. However I am
+optimistic, since such a technique can be found in <em>‘Writing R
+extensions’</em>.</p>
+<h2 id="connected-components">Connected components</h2>
+<p>There’s something new in <strong>MeshesOperations</strong> as compared to <strong>RCGAL</strong>:
+the computation of the connected components of a mesh. I’m going to show
+you an example. Note that the mesh in this example is triangle (i.e. it
+only has triangular faces), and then one could alternatively use my
+package <a href="https://github.com/stla/concomp">MeshesOperations</a> (not
+submitted to CRAN yet) to get the connected components of this mesh.</p>
+<p>So let’s try this feature. Our example is an isosurface called the <em>C8
+surface</em>. Unfortunately I do not remember where I found it. I’m using
+the <strong>rmarchingcubes</strong> to construct a mesh of this isosurface.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y, z){</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="dv">64</span><span class="sc">*</span>x<span class="sc">**</span><span class="dv">8</span> <span class="sc">-</span> <span class="dv">128</span><span class="sc">*</span>x<span class="sc">**</span><span class="dv">6</span> <span class="sc">+</span> <span class="dv">80</span><span class="sc">*</span>x<span class="sc">**</span><span class="dv">4</span> <span class="sc">-</span> <span class="dv">16</span><span class="sc">*</span>x<span class="sc">**</span><span class="dv">2</span> <span class="sc">+</span> <span class="dv">2</span> <span class="sc">+</span> <span class="dv">64</span><span class="sc">*</span>y<span class="sc">**</span><span class="dv">8</span> <span class="sc">-</span> <span class="dv">128</span><span class="sc">*</span>y<span class="sc">**</span><span class="dv">6</span> <span class="sc">+</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="dv">80</span><span class="sc">*</span>y<span class="sc">**</span><span class="dv">4</span> <span class="sc">-</span> <span class="dv">16</span><span class="sc">*</span>y<span class="sc">**</span><span class="dv">2</span> <span class="sc">+</span> <span class="dv">64</span><span class="sc">*</span>z<span class="sc">**</span><span class="dv">8</span> <span class="sc">-</span> <span class="dv">128</span><span class="sc">*</span>z<span class="sc">**</span><span class="dv">6</span> <span class="sc">+</span> <span class="dv">80</span><span class="sc">*</span>z<span class="sc">**</span><span class="dv">4</span> <span class="sc">-</span> <span class="dv">16</span><span class="sc">*</span>z<span class="sc">**</span><span class="dv">2</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>ngrid <span class="ot">&lt;-</span> 150L</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> y <span class="ot">&lt;-</span> z <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="fl">1.1</span>, <span class="fl">1.1</span>, <span class="at">len =</span> ngrid)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>Grid <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">X =</span> x, <span class="at">Y =</span> y, <span class="at">Z =</span> z)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>voxel <span class="ot">&lt;-</span> <span class="fu">array</span>(</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(Grid, <span class="fu">f</span>(X, Y, Z)), <span class="at">dim =</span> <span class="fu">c</span>(ngrid, ngrid, ngrid)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rmarchingcubes)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>contour_shape <span class="ot">&lt;-</span> <span class="fu">contour3d</span>(</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">griddata =</span> voxel, <span class="at">level =</span> <span class="sc">-</span><span class="fl">0.1</span>,</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">z =</span> z</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>Now let’s plot it with rgl:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rgl)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>tmesh <span class="ot">&lt;-</span> <span class="fu">tmesh3d</span>(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">vertices =</span> <span class="fu">t</span>(contour_shape[[<span class="st">&quot;vertices&quot;</span>]]),</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">indices =</span> <span class="fu">t</span>(contour_shape[[<span class="st">&quot;triangles&quot;</span>]]),</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">normals =</span> contour_shape[[<span class="st">&quot;normals&quot;</span>]],</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">homogeneous =</span> <span class="cn">FALSE</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">open3d</span>(<span class="at">windowRect =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="fu">shade3d</span>(tmesh, <span class="at">color =</span> <span class="st">&quot;darkred&quot;</span>)</span></code></pre></div>
+<p><img src="./figures/C8surface.gif" /></p>
+<p>As you can see, it has many isolated parts, the so-called <em>connected
+components</em>.</p>
+<p>Now we use the <strong>MeshesOperations</strong> package to extract these connected
+components, while requesting the vertex normals of each component:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MeshesOperations)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>meshes <span class="ot">&lt;-</span> <span class="fu">connectedComponents</span>(</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">vertices =</span> contour_shape[[<span class="st">&quot;vertices&quot;</span>]],</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">faces    =</span> contour_shape[[<span class="st">&quot;triangles&quot;</span>]],</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">normals  =</span> <span class="cn">TRUE</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Found 64 components.</span></span></code></pre></div>
+<p>Now let’s plot all theses meshes, one color per mesh:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ncc <span class="ot">&lt;-</span> <span class="fu">length</span>(meshes)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(randomcoloR)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>colors <span class="ot">&lt;-</span> <span class="fu">randomColor</span>(ncc, <span class="at">hue =</span> <span class="st">&quot;random&quot;</span>, <span class="at">luminosity =</span> <span class="st">&quot;dark&quot;</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">open3d</span>(<span class="at">windowRect =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="sc">:</span>ncc){</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  cc <span class="ot">&lt;-</span> meshes[[i]]</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  tmesh <span class="ot">&lt;-</span> <span class="fu">tmesh3d</span>(</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">vertices =</span> <span class="fu">t</span>(cc[[<span class="st">&quot;vertices&quot;</span>]]),</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">indices  =</span> <span class="fu">t</span>(cc[[<span class="st">&quot;faces&quot;</span>]]),</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">normals  =</span> cc[[<span class="st">&quot;normals&quot;</span>]],</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">homogeneous =</span> <span class="cn">FALSE</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">shade3d</span>(tmesh, <span class="at">color =</span> colors[i])</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p><img src="./figures/C8_components.gif" /></p>
+<p>Nice. However there is one problem: compare the smoothness of these
+meshes to the smoothness of our first plot. It is not as smooth.</p>
+<p>I think I know why. The smoothness depends on the vertex normals. Here
+we computed the normals with CGAL, then each vertex normal is obtained
+by averaging the normals of the surrounding faces of this vertex. We
+could have used <code>rgl::addNormals</code> instead, the result would be the same.
+But there is a convenient way to get the “true” vertex normals of an
+isosurface: the normal associated to a vertex is the gradient of the
+isosurface function evaluated at the coordinates of this vertex. So my
+guess is that <strong>rmarchingcubes</strong> uses the gradient. I am still thinking
+of having the possibility to preserve the original normals when
+computing the connected components, I didn’t have the time yet to find
+how to do that. This is not a problem, we will compute the true normals
+with R. In fact we will probably do better than <strong>rmarchingcubes</strong>:
+surely this package numerically computes the gradient, while we will use
+the <em>exact</em> gradient. How? Look at the isosurface function <code>f</code>: this is
+a multivariate polynomial. So it is easy to calculate its derivatives.
+This would be tedious to calculate them by hand however, so let’s use
+the <strong>spray</strong> package:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(spray)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># define the polynomial corresponding to f:</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>P <span class="ot">&lt;-</span> <span class="fu">f</span>(<span class="fu">lone</span>(<span class="dv">1</span>,<span class="dv">3</span>), <span class="fu">lone</span>(<span class="dv">2</span>,<span class="dv">3</span>), <span class="fu">lone</span>(<span class="dv">3</span>,<span class="dv">3</span>))</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># and its derivatives:</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>dfx <span class="ot">&lt;-</span> <span class="fu">as.function</span>(<span class="fu">deriv</span>(P, 1L))</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>dfy <span class="ot">&lt;-</span> <span class="fu">as.function</span>(<span class="fu">deriv</span>(P, 2L))</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>dfz <span class="ot">&lt;-</span> <span class="fu">as.function</span>(<span class="fu">deriv</span>(P, 3L))</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># the gradient is:</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>gradient <span class="ot">&lt;-</span> <span class="cf">function</span>(xyz){</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cbind</span>(<span class="fu">dfx</span>(xyz), <span class="fu">dfy</span>(xyz), <span class="fu">dfz</span>(xyz))</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Just a couple of lines of code… Now let’s do the plot with the true
+normals:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">open3d</span>(<span class="at">windowRect =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>ncc){</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  cc <span class="ot">&lt;-</span> meshes[[i]]</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  tmesh <span class="ot">&lt;-</span> <span class="fu">tmesh3d</span>(</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">vertices =</span> <span class="fu">t</span>(cc<span class="sc">$</span>vertices),</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">indices  =</span> <span class="fu">t</span>(cc<span class="sc">$</span>faces),</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">normals  =</span> <span class="fu">gradient</span>(cc<span class="sc">$</span>vertices),</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">homogeneous =</span> <span class="cn">FALSE</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">shade3d</span>(tmesh, <span class="at">color =</span> colors[i])</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p><img src="./figures/C8_components_trueNormals.gif" /></p>
+<p>A perfect smoothness!</p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
