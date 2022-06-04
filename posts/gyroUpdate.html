@@ -1,0 +1,220 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Update of 'gyro'</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Update of 'gyro'</h1> 
+          <div class="info">
+    Posted on June  4, 2022
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'geometry'." href="../tags/geometry.html">geometry</a>, <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'graphics'." href="../tags/graphics.html">graphics</a>
+    
+</div>
+
+<p>I updated the <strong>gyro</strong> package (soon on CRAN). Here are the new
+features.</p>
+<h2 id="hyperbolic-polyhedra-in-the-poincaré-model">Hyperbolic polyhedra in the Poincaré model</h2>
+<p>The previous version of the package only dealt with hyperbolic polyhedra
+in the Minkowski model. Now it is possible to get hyperbolic polyhedra
+in the Poincaré model. I don’t provide some example, because they look
+similar to the polyhedra in the Minkowski model (see <a href="https://laustep.github.io/stlahblog/posts/hyperbolicPolyhedra.html">this
+post</a>).
+I prefer the Minkowski model because one can change the hyperbolic
+curvature in this model.</p>
+<h2 id="hyperbolic-tilings-of-the-poincaré-disk">Hyperbolic tilings of the Poincaré disk</h2>
+<p>The package now provides the <code>tiling</code> function, which draws a hyperbolic
+tiling of the Poincaré disk.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gyro)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tiling</span>(<span class="dv">7</span>, <span class="dv">4</span>, <span class="at">depth =</span> <span class="dv">4</span>, <span class="at">border =</span> <span class="st">&quot;darkred&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span></code></pre></div>
+<p><img src="./figures/htiling_7-4.png" /></p>
+<h2 id="hyperbolic-delaunay-tessellations">Hyperbolic Delaunay tessellations</h2>
+<p>The package now provides the <code>hdelaunay</code> function, which constructs a
+hyperbolic Delaunay triangulation in the Poincaré disk thanks to the C++
+library <strong>CGAL</strong>, and the <code>plotHdelaunay</code> function, which plots such a
+triangulation.</p>
+<p>Unfortunately, this new feature will not be included in the CRAN
+version, because of a C++ issue spotted by Valgrind. If you want to use
+it, you have to install the <strong>hdelaunay</strong> branch of the Github repo:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;stla/gyro@hdelaunay&quot;</span>, <span class="at">build_vignettes =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p>Here is a first example:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gyro)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(uniformly)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">666</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>points <span class="ot">&lt;-</span> <span class="fu">runif_in_sphere</span>(50L, <span class="at">d =</span> <span class="dv">2</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>hdel <span class="ot">&lt;-</span> <span class="fu">hdelaunay</span>(points)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plotHdelaunay</span>(hdel, <span class="at">color=</span><span class="st">&quot;random&quot;</span>, <span class="at">luminosity=</span><span class="st">&quot;bright&quot;</span>)</span></code></pre></div>
+<p><img src="./figures/hdelaunay1.png" /></p>
+<p>Actually the faces of the hyperbolic Delaunay triangulation are the same
+as the ones of the Euclidean Delaunay triangulation, except that they
+are hyperbolic, up to this point: as you can see on the above plot,
+there are some edges without incident face; this occurs when the
+circumcircle of the missing Euclidean Delaunay face is not contained in
+the unit disk.</p>
+<p>Here is a second example, not random:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gyro)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(trekcolors)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>phi <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">sqrt</span>(<span class="dv">5</span>)) <span class="sc">/</span> <span class="dv">2</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>theta <span class="ot">&lt;-</span> <span class="fu">head</span>(<span class="fu">seq</span>(<span class="dv">0</span>, pi<span class="sc">/</span><span class="dv">2</span>, <span class="at">length.out =</span> 11L), <span class="sc">-</span>1L)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> phi<span class="sc">^</span>((<span class="dv">2</span><span class="sc">*</span>theta<span class="sc">/</span>pi)<span class="sc">^</span><span class="fl">0.8</span> <span class="sc">-</span> <span class="dv">1</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>u <span class="ot">&lt;-</span> a <span class="sc">*</span> <span class="fu">cos</span>(theta)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> a <span class="sc">*</span> <span class="fu">sin</span>(theta)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, u, <span class="sc">-</span>v, <span class="sc">-</span>u, v)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, v, u, <span class="sc">-</span>v, <span class="sc">-</span>u)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>pts <span class="ot">&lt;-</span> <span class="fu">cbind</span>(x, y) <span class="sc">/</span> <span class="fl">1.03</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>hdel <span class="ot">&lt;-</span> <span class="fu">hdelaunay</span>(pts, <span class="at">centroids =</span> <span class="cn">TRUE</span>, <span class="at">exact =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>fcolor <span class="ot">&lt;-</span> <span class="cf">function</span>(t){</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    RGB <span class="ot">&lt;-</span> <span class="fu">colorRamp</span>(<span class="fu">trek_pal</span>(<span class="st">&quot;klingon&quot;</span>))(t)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rgb</span>(RGB[, 1L], RGB[, 2L], RGB[, 3L], <span class="at">maxColorValue =</span> <span class="dv">255</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="fu">plotHdelaunay</span>(</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>        hdel, <span class="at">vertices =</span> <span class="cn">FALSE</span>, <span class="at">circle =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> fcolor</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p><img src="./figures/hdelaunay2.png" /></p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>

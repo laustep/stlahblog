@@ -5,7 +5,130 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Fri, 27 May 2022 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Sat, 04 Jun 2022 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>Update of 'gyro'</title>
+      <link>https://laustep.github.io/stlahblog/posts/gyroUpdate.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        I updated the <strong>gyro</strong> package (soon on CRAN). Here are the
+        new features.
+      </p>
+      <h2 id="hyperbolic-polyhedra-in-the-poincaré-model">
+        Hyperbolic polyhedra in the Poincaré model
+      </h2>
+      <p>
+        The previous version of the package only dealt with hyperbolic polyhedra
+        in the Minkowski model. Now it is possible to get hyperbolic polyhedra
+        in the Poincaré model. I don’t provide some example, because they look
+        similar to the polyhedra in the Minkowski model (see
+        <a
+          href="https://laustep.github.io/stlahblog/posts/hyperbolicPolyhedra.html"
+          >this post</a
+        >). I prefer the Minkowski model because one can change the hyperbolic
+        curvature in this model.
+      </p>
+      <h2 id="hyperbolic-tilings-of-the-poincaré-disk">
+        Hyperbolic tilings of the Poincaré disk
+      </h2>
+      <p>
+        The package now provides the <code>tiling</code> function, which draws a
+        hyperbolic tiling of the Poincaré disk.
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1"><span class="fu">library</span>(gyro)</span>
+<span id="cb1-2"><span class="fu">tiling</span>(<span class="dv">7</span>, <span class="dv">4</span>, <span class="at">depth =</span> <span class="dv">4</span>, <span class="at">border =</span> <span class="st">"darkred"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/htiling_7-4.png"
+        />
+      </p>
+      <h2 id="hyperbolic-delaunay-tessellations">
+        Hyperbolic Delaunay tessellations
+      </h2>
+      <p>
+        The package now provides the <code>hdelaunay</code> function, which
+        constructs a hyperbolic Delaunay triangulation in the Poincaré disk
+        thanks to the C++ library <strong>CGAL</strong>, and the
+        <code>plotHdelaunay</code> function, which plots such a triangulation.
+      </p>
+      <p>
+        Unfortunately, this new feature will not be included in the CRAN
+        version, because of a C++ issue spotted by Valgrind. If you want to use
+        it, you have to install the <strong>hdelaunay</strong> branch of the
+        Github repo:
+      </p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1">remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"stla/gyro@hdelaunay"</span>, <span class="at">build_vignettes =</span> <span class="cn">TRUE</span>)</span></code></pre>
+      </div>
+      <p>Here is a first example:</p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb3-1"><span class="fu">library</span>(gyro)</span>
+<span id="cb3-2"><span class="fu">library</span>(uniformly)</span>
+<span id="cb3-3"><span class="fu">set.seed</span>(<span class="dv">666</span>)</span>
+<span id="cb3-4">points <span class="ot">&lt;-</span> <span class="fu">runif_in_sphere</span>(50L, <span class="at">d =</span> <span class="dv">2</span>)</span>
+<span id="cb3-5">hdel <span class="ot">&lt;-</span> <span class="fu">hdelaunay</span>(points)</span>
+<span id="cb3-6"><span class="fu">plotHdelaunay</span>(hdel, <span class="at">color=</span><span class="st">"random"</span>, <span class="at">luminosity=</span><span class="st">"bright"</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/hdelaunay1.png"
+        />
+      </p>
+      <p>
+        Actually the faces of the hyperbolic Delaunay triangulation are the same
+        as the ones of the Euclidean Delaunay triangulation, except that they
+        are hyperbolic, up to this point: as you can see on the above plot,
+        there are some edges without incident face; this occurs when the
+        circumcircle of the missing Euclidean Delaunay face is not contained in
+        the unit disk.
+      </p>
+      <p>Here is a second example, not random:</p>
+      <div class="sourceCode" id="cb4">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb4-1"><span class="fu">library</span>(gyro)</span>
+<span id="cb4-2"><span class="fu">library</span>(trekcolors)</span>
+<span id="cb4-3">phi <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">sqrt</span>(<span class="dv">5</span>)) <span class="sc">/</span> <span class="dv">2</span></span>
+<span id="cb4-4">theta <span class="ot">&lt;-</span> <span class="fu">head</span>(<span class="fu">seq</span>(<span class="dv">0</span>, pi<span class="sc">/</span><span class="dv">2</span>, <span class="at">length.out =</span> 11L), <span class="sc">-</span>1L)</span>
+<span id="cb4-5">a <span class="ot">&lt;-</span> phi<span class="sc">^</span>((<span class="dv">2</span><span class="sc">*</span>theta<span class="sc">/</span>pi)<span class="sc">^</span><span class="fl">0.8</span> <span class="sc">-</span> <span class="dv">1</span>)</span>
+<span id="cb4-6">u <span class="ot">&lt;-</span> a <span class="sc">*</span> <span class="fu">cos</span>(theta)</span>
+<span id="cb4-7">v <span class="ot">&lt;-</span> a <span class="sc">*</span> <span class="fu">sin</span>(theta)</span>
+<span id="cb4-8">x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, u, <span class="sc">-</span>v, <span class="sc">-</span>u, v)</span>
+<span id="cb4-9">y <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, v, u, <span class="sc">-</span>v, <span class="sc">-</span>u)</span>
+<span id="cb4-10">pts <span class="ot">&lt;-</span> <span class="fu">cbind</span>(x, y) <span class="sc">/</span> <span class="fl">1.03</span></span>
+<span id="cb4-11">hdel <span class="ot">&lt;-</span> <span class="fu">hdelaunay</span>(pts, <span class="at">centroids =</span> <span class="cn">TRUE</span>, <span class="at">exact =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-12">fcolor <span class="ot">&lt;-</span> <span class="cf">function</span>(t){</span>
+<span id="cb4-13">    RGB <span class="ot">&lt;-</span> <span class="fu">colorRamp</span>(<span class="fu">trek_pal</span>(<span class="st">"klingon"</span>))(t)</span>
+<span id="cb4-14">    <span class="fu">rgb</span>(RGB[, 1L], RGB[, 2L], RGB[, 3L], <span class="at">maxColorValue =</span> <span class="dv">255</span>)</span>
+<span id="cb4-15">}</span>
+<span id="cb4-16"><span class="fu">plotHdelaunay</span>(</span>
+<span id="cb4-17">        hdel, <span class="at">vertices =</span> <span class="cn">FALSE</span>, <span class="at">circle =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> fcolor</span>
+<span id="cb4-18">)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/hdelaunay2.png"
+        />
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Sat, 04 Jun 2022 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/gyroUpdate.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>Splitting RCGAL... and the connected components</title>
       <link>https://laustep.github.io/stlahblog/posts/splittingRCGAL.html</link>
