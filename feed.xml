@@ -5,7 +5,132 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Sat, 04 Jun 2022 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Tue, 07 Jun 2022 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>Expanding a polynomial with 'caracas'</title>
+      <link>https://laustep.github.io/stlahblog/posts/caracas01.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        I wanted to plot an algebraic isosurface with
+        <strong>POV-Ray</strong> but the expression of the polynomial defining
+        the isosurface was very long (the polynomial had degree 12). Moreover
+        there was a square root in the coefficients (<span class="math inline"
+          >\(\sqrt{3}\)</span
+        >) as well as <span class="math inline">\(\cos t\)</span> and
+        <span class="math inline">\(\sin t\)</span>, where
+        <span class="math inline">\(t\)</span> is a parameter I wanted to vary
+        in order to make an animation. So I needed a tool able to expand a
+        polynomial with some literal values in the coefficients. This is not
+        possible with the <strong>Ryacas</strong> package.
+      </p>
+      <p>
+        I finally found this tool: the <strong>caracas</strong> package. It
+        allows to use the Python library <strong>SymPy</strong> in R. I didn’t
+        carefully read its documentation yet, I don’t know whether it has other
+        features. But this feature is a great one.
+      </p>
+      <p>Here is a small example:</p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1"><span class="fu">library</span>(caracas)</span>
+<span id="cb1-2"><span class="fu">def_sym</span>(x, y, z, a, b) <span class="co"># symbolic values</span></span>
+<span id="cb1-3">poly <span class="ot">&lt;-</span> <span class="fu">sympy_func</span>(</span>
+<span id="cb1-4">  x<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> a<span class="sc">*</span>x<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> <span class="dv">2</span><span class="sc">/</span><span class="dv">3</span><span class="sc">*</span>y <span class="sc">+</span> b<span class="sc">*</span>y <span class="sc">+</span> x<span class="sc">*</span>z <span class="sc">+</span> a<span class="sc">*</span>x<span class="sc">*</span>z, <span class="st">"Poly"</span>, <span class="at">domain =</span> <span class="st">"QQ[a,b]"</span></span>
+<span id="cb1-5">)</span>
+<span id="cb1-6"><span class="fu">as.character</span>(poly)</span></code></pre>
+      </div>
+      <p>This gives:</p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1"><span class="st">"Poly((a + 1)*x^2 + (a + 1)*x*z + (b + 2/3)*y, x, y, z, domain='QQ[a,b]')"</span></span></code></pre>
+      </div>
+      <p>
+        That is great. Here <code>QQ[a,b]</code> is the field
+        <span class="math inline">\(\mathbb{Q}[a,b]\)</span>. I lost a
+        significant part of my knowledge in mathematics but I think this is a
+        field. It doesn’t matter. Roughly speaking, this is the set of rational
+        numbers to which we add the two elements
+        <span class="math inline">\(a\)</span> and
+        <span class="math inline">\(b\)</span>. So there are treated as
+        constants, as if they were some numbers.
+      </p>
+      <p>
+        To get a coefficient, for example the one of
+        <span class="math inline">\(xz = x^1y^0z^1\)</span>:
+      </p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb3-1">sympy <span class="ot">&lt;-</span> <span class="fu">get_sympy</span>()</span>
+<span id="cb3-2">sympy<span class="sc">$</span>Poly<span class="sc">$</span><span class="fu">nth</span>(poly<span class="sc">$</span>pyobj, 1L, 0L, 1L)</span></code></pre>
+      </div>
+      <p>This gives:</p>
+      <div class="sourceCode" id="cb4">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb4-1">a <span class="sc">+</span> <span class="dv">1</span></span></code></pre>
+      </div>
+      <p>
+        Everything needed for writing the POV-Ray code was there. I wrote a
+        small script in addition to generate this code. I show it below with the
+        above small example:
+      </p>
+      <div class="sourceCode" id="cb5">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb5-1"><span class="fu">library</span>(caracas)</span>
+<span id="cb5-2"><span class="fu">library</span>(partitions) <span class="co"># to get the compositions of an integer, </span></span>
+<span id="cb5-3">                    <span class="co"># representing the degrees with a given total</span></span>
+<span id="cb5-4"><span class="fu">def_sym</span>(x, y, z, a, b) </span>
+<span id="cb5-5">poly <span class="ot">&lt;-</span> <span class="fu">sympy_func</span>(</span>
+<span id="cb5-6">  x<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> a<span class="sc">*</span>x<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> <span class="dv">2</span><span class="sc">/</span><span class="dv">3</span><span class="sc">*</span>y <span class="sc">+</span> b<span class="sc">*</span>y <span class="sc">+</span> x<span class="sc">*</span>z <span class="sc">+</span> a<span class="sc">*</span>x<span class="sc">*</span>z, <span class="st">"Poly"</span>, <span class="at">domain =</span> <span class="st">"QQ[a,b]"</span></span>
+<span id="cb5-7">)</span>
+<span id="cb5-8">sympy <span class="ot">&lt;-</span> <span class="fu">get_sympy</span>()</span>
+<span id="cb5-9">f <span class="ot">&lt;-</span> <span class="cf">function</span>(comp){</span>
+<span id="cb5-10">  xyz <span class="ot">&lt;-</span> <span class="fu">sprintf</span>(<span class="st">"xyz(%s): "</span>, <span class="fu">toString</span>(comp))</span>
+<span id="cb5-11">  coef <span class="ot">&lt;-</span> sympy<span class="sc">$</span>Poly<span class="sc">$</span><span class="fu">nth</span>(poly<span class="sc">$</span>pyobj, comp[1L], comp[2L], comp[3L])</span>
+<span id="cb5-12">  <span class="cf">if</span>(coef <span class="sc">==</span> <span class="dv">0</span>) <span class="fu">return</span>(<span class="cn">NULL</span>)</span>
+<span id="cb5-13">  <span class="fu">paste0</span>(xyz, coef, <span class="st">","</span>)</span>
+<span id="cb5-14">}</span>
+<span id="cb5-15"><span class="cf">for</span>(deg <span class="cf">in</span> 0L<span class="sc">:</span>2L){</span>
+<span id="cb5-16">  comps <span class="ot">&lt;-</span> <span class="fu">compositions</span>(deg, 3L)</span>
+<span id="cb5-17">  povray <span class="ot">&lt;-</span> <span class="fu">apply</span>(comps, 2L, f, <span class="at">simplify =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb5-18">  <span class="fu">cat</span>(</span>
+<span id="cb5-19">    <span class="fu">unlist</span>(povray), <span class="at">sep =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>, <span class="at">file =</span> <span class="st">"povray.txt"</span>, <span class="at">append =</span> deg <span class="sc">&gt;</span> 0L</span>
+<span id="cb5-20">  )</span>
+<span id="cb5-21">}</span></code></pre>
+      </div>
+      <p>
+        And here is the <strong>povray.txt</strong> file generated by this
+        script:
+      </p>
+      <pre><code>xyz(0, 1, 0): b + 2/3,
+xyz(2, 0, 0): a + 1,
+xyz(1, 0, 1): a + 1,</code></pre>
+      <p>
+        One just has to remove the trailing comma, and this the desired POV-Ray
+        code.
+      </p>
+      <p>I won’t leave you without showing the animation:</p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/ICN5D_01.gif"
+        />
+      </p>
+      <p>Credit to ‘<strong>ICN5D</strong>’ for the isosurface.</p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Tue, 07 Jun 2022 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/caracas01.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>Update of 'gyro'</title>
       <link>https://laustep.github.io/stlahblog/posts/gyroUpdate.html</link>
