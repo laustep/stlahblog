@@ -5,7 +5,121 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Sat, 11 Jun 2022 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Mon, 13 Jun 2022 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>Hopf torus, circle by circle</title>
+      <link>https://laustep.github.io/stlahblog/posts/HopfTorusCircleByCircle.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        Remember my
+        <a
+          href="https://laustep.github.io/stlahblog/posts/HopfTorus_3over3.html"
+          >first post</a
+        >
+        on the Hopf torus? I constructed it circle by circle. Below are some
+        animations of this construction. I save the image each time a circle is
+        added. The <strong>rgl</strong> package automatically centers the plot,
+        and this gives a nice effect.
+      </p>
+      <p>
+        First animation, three lobes, using a
+        <a
+          href="https://laustep.github.io/stlahblog/posts/ModifiedStereographicProjection.html"
+          >modified stereographic projection</a
+        >:
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/HopfTorusCircleByCircle_3lobes.gif"
+        />
+      </p>
+      <p>Here is the code producing this animation:</p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb1-1"><span class="co"># Hopf fiber</span></span>
+<span id="cb1-2">HopfFiber <span class="ot">&lt;-</span> <span class="cf">function</span>(q, t){ </span>
+<span id="cb1-3">  <span class="dv">1</span><span class="sc">/</span><span class="fu">sqrt</span>(<span class="dv">2</span><span class="sc">*</span>(<span class="dv">1</span><span class="sc">+</span>q[1L])) <span class="sc">*</span> <span class="fu">c</span>(q[3L]<span class="sc">*</span><span class="fu">cos</span>(t) <span class="sc">+</span> q[2L]<span class="sc">*</span><span class="fu">sin</span>(t),</span>
+<span id="cb1-4">                          q[2L]<span class="sc">*</span><span class="fu">cos</span>(t) <span class="sc">-</span> q[3L]<span class="sc">*</span><span class="fu">sin</span>(t),</span>
+<span id="cb1-5">                          <span class="fu">sin</span>(t)<span class="sc">*</span>(<span class="dv">1</span><span class="sc">+</span>q[1L]),</span>
+<span id="cb1-6">                          <span class="fu">cos</span>(t)<span class="sc">*</span>(<span class="dv">1</span><span class="sc">+</span>q[1L])) </span>
+<span id="cb1-7">}</span>
+<span id="cb1-8"><span class="co"># Modified stereographic projection</span></span>
+<span id="cb1-9">mstereog <span class="ot">&lt;-</span> <span class="cf">function</span>(x){</span>
+<span id="cb1-10">  <span class="fu">acos</span>(x[4L])<span class="sc">/</span><span class="fu">sqrt</span>(<span class="dv">1</span><span class="sc">-</span>x[4L]<span class="sc">^</span><span class="dv">2</span>) <span class="sc">*</span> x[1L<span class="sc">:</span>3L]</span>
+<span id="cb1-11">}</span>
+<span id="cb1-12"></span>
+<span id="cb1-13"><span class="co"># plot</span></span>
+<span id="cb1-14"><span class="fu">library</span>(rgl)</span>
+<span id="cb1-15"><span class="fu">open3d</span>(<span class="at">windowRect =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
+<span id="cb1-16"><span class="fu">bg3d</span>(<span class="st">"#666970"</span>)</span>
+<span id="cb1-17"><span class="fu">view3d</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="at">zoom =</span> <span class="fl">0.9</span>)</span>
+<span id="cb1-18">t_ <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="sc">*</span>pi, <span class="at">len =</span> 200L) <span class="co"># 200 subdivisions per circle</span></span>
+<span id="cb1-19">u_ <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="sc">*</span>pi, <span class="at">len =</span> 300L) <span class="co"># 300 circles</span></span>
+<span id="cb1-20">nlobes <span class="ot">&lt;-</span> 3L <span class="co"># number of lobes of the Hopf torus</span></span>
+<span id="cb1-21">colors <span class="ot">&lt;-</span> <span class="fu">colorRampPalette</span>( <span class="co"># colors</span></span>
+<span id="cb1-22">  <span class="fu">head</span>(trekcolors<span class="sc">::</span><span class="fu">trek_pal</span>(<span class="st">"klingon"</span>), <span class="sc">-</span>2L),</span>
+<span id="cb1-23">  <span class="at">interpolate =</span> <span class="st">"spline"</span>, <span class="at">bias =</span> <span class="fl">0.15</span></span>
+<span id="cb1-24">)(150L)</span>
+<span id="cb1-25">colors <span class="ot">&lt;-</span> <span class="fu">c</span>(colors, <span class="fu">rev</span>(colors))</span>
+<span id="cb1-26"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(u_)){</span>
+<span id="cb1-27">  u <span class="ot">&lt;-</span> u_[i]</span>
+<span id="cb1-28">  x <span class="ot">&lt;-</span>  <span class="fu">cos</span>(pi<span class="sc">/</span><span class="dv">2</span> <span class="sc">-</span> (pi<span class="sc">/</span><span class="dv">2</span><span class="fl">-0.44</span>)<span class="sc">*</span><span class="fu">cos</span>(nlobes<span class="sc">*</span>u))</span>
+<span id="cb1-29">  z <span class="ot">&lt;-</span>  <span class="fu">sin</span>(pi<span class="sc">/</span><span class="dv">2</span> <span class="sc">-</span> (pi<span class="sc">/</span><span class="dv">2</span><span class="fl">-0.44</span>)<span class="sc">*</span><span class="fu">cos</span>(nlobes<span class="sc">*</span>u)) <span class="sc">*</span> <span class="fu">cos</span>(u<span class="fl">+0.44</span><span class="sc">*</span><span class="fu">sin</span>(<span class="dv">2</span><span class="sc">*</span>nlobes))</span>
+<span id="cb1-30">  y <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">sin</span>(pi<span class="sc">/</span><span class="dv">2</span> <span class="sc">-</span> (pi<span class="sc">/</span><span class="dv">2</span><span class="fl">-0.44</span>)<span class="sc">*</span><span class="fu">cos</span>(nlobes<span class="sc">*</span>u)) <span class="sc">*</span> <span class="fu">sin</span>(u<span class="fl">+0.44</span><span class="sc">*</span><span class="fu">sin</span>(<span class="dv">2</span><span class="sc">*</span>nlobes))</span>
+<span id="cb1-31">  circle4d <span class="ot">&lt;-</span> <span class="fu">vapply</span>(t_, <span class="cf">function</span>(t){</span>
+<span id="cb1-32">    <span class="fu">HopfFiber</span>(<span class="fu">c</span>(x, y, z), t)  </span>
+<span id="cb1-33">  }, <span class="fu">numeric</span>(4L))</span>
+<span id="cb1-34">  circle3d <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">apply</span>(circle4d, 2L, mstereog))</span>
+<span id="cb1-35">  <span class="fu">shade3d</span>(</span>
+<span id="cb1-36">    <span class="fu">cylinder3d</span>(circle3d, <span class="at">radius =</span> <span class="fl">0.1</span>, <span class="at">sides =</span> <span class="dv">15</span>), </span>
+<span id="cb1-37">    <span class="at">color =</span> colors[i]</span>
+<span id="cb1-38">  )</span>
+<span id="cb1-39">  <span class="fu">rgl.snapshot</span>(<span class="fu">sprintf</span>(<span class="st">"pic%03d.png"</span>, i)) <span class="co"># save</span></span>
+<span id="cb1-40">}</span>
+<span id="cb1-41"></span>
+<span id="cb1-42"><span class="co"># duplicate last pic to make a pause at the end of the animation</span></span>
+<span id="cb1-43"><span class="cf">for</span>(i <span class="cf">in</span> 301L<span class="sc">:</span>350L){</span>
+<span id="cb1-44">  <span class="fu">file.copy</span>(<span class="st">"pic300.png"</span>, <span class="fu">sprintf</span>(<span class="st">"pic%03d.png"</span>, i))</span>
+<span id="cb1-45">}</span>
+<span id="cb1-46"><span class="co"># make animation</span></span>
+<span id="cb1-47">pngFiles <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="at">pattern =</span> <span class="st">"^pic?.*png$"</span>)</span>
+<span id="cb1-48"><span class="fu">library</span>(gifski)</span>
+<span id="cb1-49"><span class="fu">gifski</span>(</span>
+<span id="cb1-50">  pngFiles,</span>
+<span id="cb1-51">  <span class="at">gif_file =</span> <span class="st">"HopfTorusCircleByCircle_3lobes.gif"</span>,</span>
+<span id="cb1-52">  <span class="at">width    =</span> <span class="dv">512</span>, <span class="at">height   =</span> <span class="dv">512</span>,</span>
+<span id="cb1-53">  <span class="at">delay    =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">9</span> <span class="co"># 9 pics per second</span></span>
+<span id="cb1-54">)</span>
+<span id="cb1-55"><span class="co"># delete png files</span></span>
+<span id="cb1-56"><span class="fu">file.remove</span>(pngFiles)</span></code></pre>
+      </div>
+      <p>
+        Four lobes, modified stereographic projection, with the ‘rocket’ color
+        palette (in <strong>grDevices</strong> package):
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/HopfTorusCircleByCircle_4lobes.gif"
+        />
+      </p>
+      <p>Two lobes, classical stereographic projection:</p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/HopfTorusCircleByCircle_2lobes.gif"
+        />
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Mon, 13 Jun 2022 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/HopfTorusCircleByCircle.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>An example of the Minkowski addition</title>
       <link>https://laustep.github.io/stlahblog/posts/MinkowskiSumLeonardo.html</link>
