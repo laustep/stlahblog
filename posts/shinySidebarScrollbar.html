@@ -152,7 +152,7 @@ has to use the CSS <code>height: 90vh; overflow-y: auto;</code>:</p>
 <span id="cb1-45"><a href="#cb1-45"></a>}</span>
 <span id="cb1-46"><a href="#cb1-46"></a></span>
 <span id="cb1-47"><a href="#cb1-47"></a><span class="fu">shinyApp</span>(<span class="at">ui =</span> ui, <span class="at">server =</span> server)</span></code></pre></div>
-<p><img src="./figures/shiny_sidebar_scrollbar1.gif" /></p>
+<p><img src="./figures/shiny_sidebar_scrollbar1.gif" style="width:70.0%" /></p>
 <p>But, as you can see, there is an issue with the
 <code>shinyWidgets::dropdown</code>: when one opens it, the part outside the
 sidebar is hidden. Here is a JavaScript solution for this issue:</p>
@@ -178,7 +178,7 @@ sidebar is hidden. Here is a JavaScript solution for this issue:</p>
 <span id="cb2-20"><a href="#cb2-20"></a>      <span class="at">style =</span> <span class="st">&quot;height: 90vh; overflow-y: auto;&quot;</span>, </span>
 <span id="cb2-21"><a href="#cb2-21"></a>      <span class="fu">sliderInput</span>(<span class="st">&quot;bins&quot;</span>, <span class="st">&quot;Number of bins:&quot;</span>, <span class="at">min =</span> <span class="dv">1</span>, <span class="at">max =</span> <span class="dv">50</span>, <span class="at">value =</span> <span class="dv">30</span>),</span>
 <span id="cb2-22"><a href="#cb2-22"></a>      ......</span></code></pre></div>
-<p><img src="./figures/shiny_sidebar_scrollbar2.gif" /></p>
+<p><img src="./figures/shiny_sidebar_scrollbar2.gif" style="width:70.0%" /></p>
 <p>I find the native HTML scrollbars a bit ugly. It is possible to
 customize them: <a href="https://css-tricks.com/the-current-state-of-styling-scrollbars-in-css/">Styling scrollbars in
 CSS</a>.</p>
