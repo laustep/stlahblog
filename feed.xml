@@ -128,6 +128,89 @@
       <category>R</category>
     </item>
     <item>
+      <title>SVG to PNG</title>
+      <link>https://laustep.github.io/stlahblog/posts/SVG2PNG.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        Here is a way to get a high-quality PNG image with R: save it as SVG
+        first, then convert the SVG file to a PNG file, with the
+        <strong>rsvg</strong> package.
+      </p>
+      <p>
+        Let’s see. I construct a hyperbolic Delaunay triangulation with the
+        <strong>gyro</strong> package:
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1"><span class="fu">library</span>(gyro)</span>
+<span id="cb1-2"></span>
+<span id="cb1-3">phi <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">sqrt</span>(<span class="dv">5</span>)) <span class="sc">/</span> <span class="dv">2</span></span>
+<span id="cb1-4">theta <span class="ot">&lt;-</span> <span class="fu">head</span>(<span class="fu">seq</span>(<span class="dv">0</span>, pi<span class="sc">/</span><span class="dv">2</span>, <span class="at">length.out =</span> <span class="dv">11</span>), <span class="sc">-</span>1L)</span>
+<span id="cb1-5">a <span class="ot">&lt;-</span> phi<span class="sc">^</span>((<span class="dv">2</span><span class="sc">*</span>theta<span class="sc">/</span>pi)<span class="sc">^</span><span class="fl">0.8</span> <span class="sc">-</span> <span class="dv">1</span>)</span>
+<span id="cb1-6">u <span class="ot">&lt;-</span> a <span class="sc">*</span> <span class="fu">cos</span>(theta)</span>
+<span id="cb1-7">v <span class="ot">&lt;-</span> a <span class="sc">*</span> <span class="fu">sin</span>(theta)</span>
+<span id="cb1-8">x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, u, <span class="sc">-</span>v, <span class="sc">-</span>u, v)</span>
+<span id="cb1-9">y <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, v, u, <span class="sc">-</span>v, <span class="sc">-</span>u)</span>
+<span id="cb1-10">pts <span class="ot">&lt;-</span> <span class="fu">cbind</span>(x, y) <span class="sc">/</span> <span class="fl">1.07</span></span>
+<span id="cb1-11"></span>
+<span id="cb1-12">hdel <span class="ot">&lt;-</span> <span class="fu">hdelaunay</span>(pts, <span class="at">model =</span> <span class="st">"U"</span>)</span>
+<span id="cb1-13"></span>
+<span id="cb1-14">fcolor <span class="ot">&lt;-</span> <span class="cf">function</span>(t){</span>
+<span id="cb1-15">  RGB <span class="ot">&lt;-</span> <span class="fu">colorRamp</span>(<span class="fu">hcl.colors</span>(20L, <span class="st">"Berlin"</span>))(t)</span>
+<span id="cb1-16">  <span class="fu">rgb</span>(RGB[, 1L], RGB[, 2L], RGB[, 3L], <span class="at">maxColorValue =</span> <span class="dv">255</span>)</span>
+<span id="cb1-17">}</span></code></pre>
+      </div>
+      <p>Now let’s save the plot as a PNG, directly:</p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1"><span class="fu">png</span>(<span class="st">"hdelaunayU.png"</span>, <span class="at">width =</span> <span class="dv">512</span>, <span class="at">height =</span> <span class="dv">512</span>)</span>
+<span id="cb2-2"><span class="fu">plotHdelaunay</span>(</span>
+<span id="cb2-3">  hdel, <span class="at">vertices =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> fcolor</span>
+<span id="cb2-4">)</span>
+<span id="cb2-5"><span class="fu">dev.off</span>()</span></code></pre>
+      </div>
+      <p>And now let’s save it as SVG then convert it to PNG:</p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb3-1"><span class="fu">svg</span>(<span class="st">"hdelaunayU.svg"</span>)</span>
+<span id="cb3-2"><span class="fu">plotHdelaunay</span>(</span>
+<span id="cb3-3">  hdel, <span class="at">vertices =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> fcolor</span>
+<span id="cb3-4">)</span>
+<span id="cb3-5"><span class="fu">dev.off</span>()</span>
+<span id="cb3-6"></span>
+<span id="cb3-7">rsvg<span class="sc">::</span><span class="fu">rsvg_png</span>(</span>
+<span id="cb3-8">  <span class="st">"hdelaunayU.svg"</span>, <span class="st">"hdelaunayU_from_svg.png"</span>,</span>
+<span id="cb3-9">  <span class="at">width =</span> <span class="dv">512</span>, <span class="at">height =</span> <span class="dv">512</span></span>
+<span id="cb3-10">)</span></code></pre>
+      </div>
+      <p>Observe the difference:</p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/hdelaunayU.png"
+          style="width: 95%"
+        />
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/hdelaunayU_from_svg.png"
+          style="width: 95%"
+        />
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Fri, 17 Jun 2022 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/SVG2PNG.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
+    <item>
       <title>Hopf torus, circle by circle</title>
       <link>https://laustep.github.io/stlahblog/posts/HopfTorusCircleByCircle.html</link>
       <description><![CDATA[<div class="container-fluid">
