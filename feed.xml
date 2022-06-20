@@ -5,7 +5,123 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Fri, 17 Jun 2022 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Mon, 20 Jun 2022 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>Beautiful complex functions</title>
+      <link>https://laustep.github.io/stlahblog/posts/beautifulComplexFunctions.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        I’ve just submitted a new package to CRAN: <strong>jacobi</strong>. It
+        allows to evaluate the Jacobi theta functions as well as some related
+        functions. In particular, some Eisenstein series, that you will see
+        below.
+      </p>
+      <p>
+        To represent a complex function, a color map is needed, that is to say a
+        function which maps each complex number to a color. I’m using two
+        different color maps:
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb1-1">modulo <span class="ot">&lt;-</span> <span class="cf">function</span>(a, p) {</span>
+<span id="cb1-2">  a <span class="sc">-</span> p <span class="sc">*</span> <span class="fu">ifelse</span>(a <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="fu">floor</span>(a<span class="sc">/</span>p), <span class="fu">ceiling</span>(a<span class="sc">/</span>p))</span>
+<span id="cb1-3">}</span>
+<span id="cb1-4"></span>
+<span id="cb1-5">colormap1 <span class="ot">&lt;-</span> <span class="cf">function</span>(z){</span>
+<span id="cb1-6">  <span class="cf">if</span>(<span class="fu">is.infinite</span>(z) <span class="sc">||</span> <span class="fu">is.nan</span>(z)) <span class="fu">return</span>(<span class="st">"#000000"</span>)</span>
+<span id="cb1-7">  x <span class="ot">&lt;-</span> <span class="fu">Re</span>(z)</span>
+<span id="cb1-8">  y <span class="ot">&lt;-</span> <span class="fu">Im</span>(z)</span>
+<span id="cb1-9">  a <span class="ot">&lt;-</span> <span class="fu">atan2</span>(y, x)</span>
+<span id="cb1-10">  r <span class="ot">&lt;-</span> <span class="fu">modulo</span>(<span class="fu">Mod</span>(z), <span class="dv">1</span>)</span>
+<span id="cb1-11">  g <span class="ot">&lt;-</span> <span class="fu">abs</span>(<span class="fu">modulo</span>(a, <span class="fl">0.5</span>)) <span class="sc">*</span> <span class="dv">2</span></span>
+<span id="cb1-12">  b <span class="ot">&lt;-</span> <span class="fu">abs</span>(<span class="fu">modulo</span>(x<span class="sc">*</span>y, <span class="dv">1</span>))</span>
+<span id="cb1-13">  <span class="cf">if</span>(<span class="fu">is.nan</span>(b)){</span>
+<span id="cb1-14">    <span class="fu">return</span>(<span class="st">"#000000"</span>)</span>
+<span id="cb1-15">  }</span>
+<span id="cb1-16">  <span class="fu">rgb</span>(</span>
+<span id="cb1-17">    (<span class="fl">1.0</span> <span class="sc">-</span> <span class="fu">cos</span>(r<span class="fl">-0.5</span>))<span class="sc">*</span><span class="fl">8.0</span>, </span>
+<span id="cb1-18">    (<span class="fl">1.0</span> <span class="sc">-</span> <span class="fu">cos</span>(g<span class="fl">-0.5</span>))<span class="sc">*</span><span class="fl">8.0</span>, </span>
+<span id="cb1-19">    (<span class="fl">1.0</span> <span class="sc">-</span> <span class="fu">cos</span>(b<span class="fl">-0.5</span>))<span class="sc">*</span><span class="fl">8.0</span>,</span>
+<span id="cb1-20">    <span class="at">maxColorValue =</span> <span class="dv">1</span></span>
+<span id="cb1-21">  )</span>
+<span id="cb1-22">}</span>
+<span id="cb1-23"></span>
+<span id="cb1-24">colormap2 <span class="ot">&lt;-</span> <span class="cf">function</span>(z){</span>
+<span id="cb1-25">  <span class="cf">if</span>(<span class="fu">is.infinite</span>(z) <span class="sc">||</span> <span class="fu">is.nan</span>(z)) <span class="fu">return</span>(<span class="st">"#000000"</span>)</span>
+<span id="cb1-26">  arg <span class="ot">&lt;-</span> <span class="fu">Arg</span>(z)</span>
+<span id="cb1-27">  <span class="cf">if</span>(arg <span class="sc">&lt;</span> <span class="dv">0</span>) arg <span class="ot">&lt;-</span> <span class="dv">2</span><span class="sc">*</span>pi <span class="sc">+</span> arg</span>
+<span id="cb1-28">  h <span class="ot">&lt;-</span> arg <span class="sc">/</span> <span class="dv">2</span> <span class="sc">/</span> pi</span>
+<span id="cb1-29">  s <span class="ot">&lt;-</span> <span class="fu">sqrt</span>((<span class="dv">1</span> <span class="sc">+</span> <span class="fu">sin</span>(<span class="dv">2</span><span class="sc">*</span>pi<span class="sc">*</span><span class="fu">log</span>(<span class="dv">1</span><span class="sc">+</span><span class="fu">Mod</span>(z))))<span class="sc">/</span><span class="dv">2</span>)</span>
+<span id="cb1-30">  v <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">cos</span>(<span class="dv">2</span><span class="sc">*</span>pi<span class="sc">*</span><span class="fu">log</span>(<span class="dv">1</span><span class="sc">+</span><span class="fu">Mod</span>(z))))<span class="sc">/</span><span class="dv">2</span></span>
+<span id="cb1-31">  <span class="fu">hsv</span>(h, s, v)</span>
+<span id="cb1-32">}</span></code></pre>
+      </div>
+      <p>
+        Here is the <span class="math inline">\(E_4\)</span> Eisenstein series:
+      </p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb2-1"><span class="co"># background color</span></span>
+<span id="cb2-2">bkgcol <span class="ot">&lt;-</span> <span class="fu">rgb</span>(<span class="dv">21</span>, <span class="dv">25</span>, <span class="dv">30</span>, <span class="at">maxColorValue =</span> <span class="dv">255</span>)</span>
+<span id="cb2-3"></span>
+<span id="cb2-4">f <span class="ot">&lt;-</span> <span class="fu">Vectorize</span>(<span class="cf">function</span>(x, y){</span>
+<span id="cb2-5">  q <span class="ot">&lt;-</span> x <span class="sc">+</span> 1i<span class="sc">*</span>y</span>
+<span id="cb2-6">  <span class="cf">if</span>(<span class="fu">Mod</span>(q) <span class="sc">&gt;=</span> <span class="fl">0.99</span> <span class="sc">||</span> (<span class="fu">Im</span>(q) <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;&amp;</span> <span class="fu">Re</span>(q) <span class="sc">&lt;=</span> <span class="dv">0</span>)) <span class="fu">return</span>(bkgcol)</span>
+<span id="cb2-7">  z <span class="ot">&lt;-</span> <span class="fu">En</span>(<span class="dv">4</span>, q)</span>
+<span id="cb2-8">  <span class="fu">colormap1</span>(<span class="dv">1</span><span class="sc">/</span>z)</span>
+<span id="cb2-9">})</span>
+<span id="cb2-10"></span>
+<span id="cb2-11">x <span class="ot">&lt;-</span> y <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="at">len =</span> <span class="dv">2000</span>)</span>
+<span id="cb2-12">image <span class="ot">&lt;-</span> <span class="fu">outer</span>(x, y, f)</span>
+<span id="cb2-13"></span>
+<span id="cb2-14">opar <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>), <span class="at">bg =</span> bkgcol)</span>
+<span id="cb2-15"><span class="fu">plot</span>(</span>
+<span id="cb2-16">  <span class="fu">c</span>(<span class="sc">-</span><span class="dv">100</span>, <span class="dv">100</span>), <span class="fu">c</span>(<span class="sc">-</span><span class="dv">100</span>, <span class="dv">100</span>), <span class="at">type =</span> <span class="st">"n"</span>, </span>
+<span id="cb2-17">  <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">ylab =</span> <span class="st">""</span>, <span class="at">axes =</span> <span class="cn">FALSE</span>, <span class="at">asp =</span> <span class="dv">1</span></span>
+<span id="cb2-18">)</span>
+<span id="cb2-19"><span class="fu">rasterImage</span>(image, <span class="sc">-</span><span class="dv">100</span>, <span class="sc">-</span><span class="dv">100</span>, <span class="dv">100</span>, <span class="dv">100</span>)</span>
+<span id="cb2-20"><span class="fu">par</span>(opar)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/Eisenstein4.png"
+          style="width: 70%"
+        />
+      </p>
+      <p>It makes me think to a beetle.</p>
+      <p>
+        And here is the <span class="math inline">\(E_6\)</span> Eisenstein
+        series:
+      </p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb3-1">f <span class="ot">&lt;-</span> <span class="fu">Vectorize</span>(<span class="cf">function</span>(x, y){</span>
+<span id="cb3-2">  q <span class="ot">&lt;-</span> x <span class="sc">+</span> 1i<span class="sc">*</span>y</span>
+<span id="cb3-3">  <span class="cf">if</span>(<span class="fu">Mod</span>(q) <span class="sc">&gt;=</span> <span class="fl">0.99</span> <span class="sc">||</span> (<span class="fu">Im</span>(q) <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;&amp;</span> <span class="fu">Re</span>(q) <span class="sc">&lt;=</span> <span class="dv">0</span>)) <span class="fu">return</span>(bkgcol)</span>
+<span id="cb3-4">  z <span class="ot">&lt;-</span> <span class="fu">En</span>(<span class="dv">6</span>, q)</span>
+<span id="cb3-5">  <span class="fu">colormap2</span>(z)</span>
+<span id="cb3-6">})</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/Eisenstein6.png"
+          style="width: 70%"
+        />
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Mon, 20 Jun 2022 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/beautifulComplexFunctions.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>Scrollbar for the Shiny sidebar</title>
       <link>https://laustep.github.io/stlahblog/posts/shinySidebarScrollbar.html</link>
