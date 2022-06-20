@@ -1,0 +1,230 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Beautiful complex functions</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Beautiful complex functions</h1> 
+          <div class="info">
+    Posted on June 20, 2022
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>, <a title="All pages tagged 'graphics'." href="../tags/graphics.html">graphics</a>, <a title="All pages tagged 'special-functions'." href="../tags/special-functions.html">special-functions</a>
+    
+</div>
+
+<p>I’ve just submitted a new package to CRAN: <strong>jacobi</strong>. It allows to
+evaluate the Jacobi theta functions as well as some related functions.
+In particular, some Eisenstein series, that you will see below.</p>
+<p>To represent a complex function, a color map is needed, that is to say a
+function which maps each complex number to a color. I’m using two
+different color maps:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>modulo <span class="ot">&lt;-</span> <span class="cf">function</span>(a, p) {</span>
+<span id="cb1-2"><a href="#cb1-2"></a>  a <span class="sc">-</span> p <span class="sc">*</span> <span class="fu">ifelse</span>(a <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="fu">floor</span>(a<span class="sc">/</span>p), <span class="fu">ceiling</span>(a<span class="sc">/</span>p))</span>
+<span id="cb1-3"><a href="#cb1-3"></a>}</span>
+<span id="cb1-4"><a href="#cb1-4"></a></span>
+<span id="cb1-5"><a href="#cb1-5"></a>colormap1 <span class="ot">&lt;-</span> <span class="cf">function</span>(z){</span>
+<span id="cb1-6"><a href="#cb1-6"></a>  <span class="cf">if</span>(<span class="fu">is.infinite</span>(z) <span class="sc">||</span> <span class="fu">is.nan</span>(z)) <span class="fu">return</span>(<span class="st">&quot;#000000&quot;</span>)</span>
+<span id="cb1-7"><a href="#cb1-7"></a>  x <span class="ot">&lt;-</span> <span class="fu">Re</span>(z)</span>
+<span id="cb1-8"><a href="#cb1-8"></a>  y <span class="ot">&lt;-</span> <span class="fu">Im</span>(z)</span>
+<span id="cb1-9"><a href="#cb1-9"></a>  a <span class="ot">&lt;-</span> <span class="fu">atan2</span>(y, x)</span>
+<span id="cb1-10"><a href="#cb1-10"></a>  r <span class="ot">&lt;-</span> <span class="fu">modulo</span>(<span class="fu">Mod</span>(z), <span class="dv">1</span>)</span>
+<span id="cb1-11"><a href="#cb1-11"></a>  g <span class="ot">&lt;-</span> <span class="fu">abs</span>(<span class="fu">modulo</span>(a, <span class="fl">0.5</span>)) <span class="sc">*</span> <span class="dv">2</span></span>
+<span id="cb1-12"><a href="#cb1-12"></a>  b <span class="ot">&lt;-</span> <span class="fu">abs</span>(<span class="fu">modulo</span>(x<span class="sc">*</span>y, <span class="dv">1</span>))</span>
+<span id="cb1-13"><a href="#cb1-13"></a>  <span class="cf">if</span>(<span class="fu">is.nan</span>(b)){</span>
+<span id="cb1-14"><a href="#cb1-14"></a>    <span class="fu">return</span>(<span class="st">&quot;#000000&quot;</span>)</span>
+<span id="cb1-15"><a href="#cb1-15"></a>  }</span>
+<span id="cb1-16"><a href="#cb1-16"></a>  <span class="fu">rgb</span>(</span>
+<span id="cb1-17"><a href="#cb1-17"></a>    (<span class="fl">1.0</span> <span class="sc">-</span> <span class="fu">cos</span>(r<span class="fl">-0.5</span>))<span class="sc">*</span><span class="fl">8.0</span>, </span>
+<span id="cb1-18"><a href="#cb1-18"></a>    (<span class="fl">1.0</span> <span class="sc">-</span> <span class="fu">cos</span>(g<span class="fl">-0.5</span>))<span class="sc">*</span><span class="fl">8.0</span>, </span>
+<span id="cb1-19"><a href="#cb1-19"></a>    (<span class="fl">1.0</span> <span class="sc">-</span> <span class="fu">cos</span>(b<span class="fl">-0.5</span>))<span class="sc">*</span><span class="fl">8.0</span>,</span>
+<span id="cb1-20"><a href="#cb1-20"></a>    <span class="at">maxColorValue =</span> <span class="dv">1</span></span>
+<span id="cb1-21"><a href="#cb1-21"></a>  )</span>
+<span id="cb1-22"><a href="#cb1-22"></a>}</span>
+<span id="cb1-23"><a href="#cb1-23"></a></span>
+<span id="cb1-24"><a href="#cb1-24"></a>colormap2 <span class="ot">&lt;-</span> <span class="cf">function</span>(z){</span>
+<span id="cb1-25"><a href="#cb1-25"></a>  <span class="cf">if</span>(<span class="fu">is.infinite</span>(z) <span class="sc">||</span> <span class="fu">is.nan</span>(z)) <span class="fu">return</span>(<span class="st">&quot;#000000&quot;</span>)</span>
+<span id="cb1-26"><a href="#cb1-26"></a>  arg <span class="ot">&lt;-</span> <span class="fu">Arg</span>(z)</span>
+<span id="cb1-27"><a href="#cb1-27"></a>  <span class="cf">if</span>(arg <span class="sc">&lt;</span> <span class="dv">0</span>) arg <span class="ot">&lt;-</span> <span class="dv">2</span><span class="sc">*</span>pi <span class="sc">+</span> arg</span>
+<span id="cb1-28"><a href="#cb1-28"></a>  h <span class="ot">&lt;-</span> arg <span class="sc">/</span> <span class="dv">2</span> <span class="sc">/</span> pi</span>
+<span id="cb1-29"><a href="#cb1-29"></a>  s <span class="ot">&lt;-</span> <span class="fu">sqrt</span>((<span class="dv">1</span> <span class="sc">+</span> <span class="fu">sin</span>(<span class="dv">2</span><span class="sc">*</span>pi<span class="sc">*</span><span class="fu">log</span>(<span class="dv">1</span><span class="sc">+</span><span class="fu">Mod</span>(z))))<span class="sc">/</span><span class="dv">2</span>)</span>
+<span id="cb1-30"><a href="#cb1-30"></a>  v <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">cos</span>(<span class="dv">2</span><span class="sc">*</span>pi<span class="sc">*</span><span class="fu">log</span>(<span class="dv">1</span><span class="sc">+</span><span class="fu">Mod</span>(z))))<span class="sc">/</span><span class="dv">2</span></span>
+<span id="cb1-31"><a href="#cb1-31"></a>  <span class="fu">hsv</span>(h, s, v)</span>
+<span id="cb1-32"><a href="#cb1-32"></a>}</span></code></pre></div>
+<p>Here is the <span class="math inline">\(E_4\)</span> Eisenstein series:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># background color</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>bkgcol <span class="ot">&lt;-</span> <span class="fu">rgb</span>(<span class="dv">21</span>, <span class="dv">25</span>, <span class="dv">30</span>, <span class="at">maxColorValue =</span> <span class="dv">255</span>)</span>
+<span id="cb2-3"><a href="#cb2-3"></a></span>
+<span id="cb2-4"><a href="#cb2-4"></a>f <span class="ot">&lt;-</span> <span class="fu">Vectorize</span>(<span class="cf">function</span>(x, y){</span>
+<span id="cb2-5"><a href="#cb2-5"></a>  q <span class="ot">&lt;-</span> x <span class="sc">+</span> 1i<span class="sc">*</span>y</span>
+<span id="cb2-6"><a href="#cb2-6"></a>  <span class="cf">if</span>(<span class="fu">Mod</span>(q) <span class="sc">&gt;=</span> <span class="fl">0.99</span> <span class="sc">||</span> (<span class="fu">Im</span>(q) <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;&amp;</span> <span class="fu">Re</span>(q) <span class="sc">&lt;=</span> <span class="dv">0</span>)) <span class="fu">return</span>(bkgcol)</span>
+<span id="cb2-7"><a href="#cb2-7"></a>  z <span class="ot">&lt;-</span> <span class="fu">En</span>(<span class="dv">4</span>, q)</span>
+<span id="cb2-8"><a href="#cb2-8"></a>  <span class="fu">colormap1</span>(<span class="dv">1</span><span class="sc">/</span>z)</span>
+<span id="cb2-9"><a href="#cb2-9"></a>})</span>
+<span id="cb2-10"><a href="#cb2-10"></a></span>
+<span id="cb2-11"><a href="#cb2-11"></a>x <span class="ot">&lt;-</span> y <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="at">len =</span> <span class="dv">2000</span>)</span>
+<span id="cb2-12"><a href="#cb2-12"></a>image <span class="ot">&lt;-</span> <span class="fu">outer</span>(x, y, f)</span>
+<span id="cb2-13"><a href="#cb2-13"></a></span>
+<span id="cb2-14"><a href="#cb2-14"></a>opar <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>), <span class="at">bg =</span> bkgcol)</span>
+<span id="cb2-15"><a href="#cb2-15"></a><span class="fu">plot</span>(</span>
+<span id="cb2-16"><a href="#cb2-16"></a>  <span class="fu">c</span>(<span class="sc">-</span><span class="dv">100</span>, <span class="dv">100</span>), <span class="fu">c</span>(<span class="sc">-</span><span class="dv">100</span>, <span class="dv">100</span>), <span class="at">type =</span> <span class="st">&quot;n&quot;</span>, </span>
+<span id="cb2-17"><a href="#cb2-17"></a>  <span class="at">xlab =</span> <span class="st">&quot;&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;&quot;</span>, <span class="at">axes =</span> <span class="cn">FALSE</span>, <span class="at">asp =</span> <span class="dv">1</span></span>
+<span id="cb2-18"><a href="#cb2-18"></a>)</span>
+<span id="cb2-19"><a href="#cb2-19"></a><span class="fu">rasterImage</span>(image, <span class="sc">-</span><span class="dv">100</span>, <span class="sc">-</span><span class="dv">100</span>, <span class="dv">100</span>, <span class="dv">100</span>)</span>
+<span id="cb2-20"><a href="#cb2-20"></a><span class="fu">par</span>(opar)</span></code></pre></div>
+<p><img src="./figures/Eisenstein4.png" style="width:70.0%" /></p>
+<p>It makes me think to a beetle.</p>
+<p>And here is the <span class="math inline">\(E_6\)</span> Eisenstein series:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>f <span class="ot">&lt;-</span> <span class="fu">Vectorize</span>(<span class="cf">function</span>(x, y){</span>
+<span id="cb3-2"><a href="#cb3-2"></a>  q <span class="ot">&lt;-</span> x <span class="sc">+</span> 1i<span class="sc">*</span>y</span>
+<span id="cb3-3"><a href="#cb3-3"></a>  <span class="cf">if</span>(<span class="fu">Mod</span>(q) <span class="sc">&gt;=</span> <span class="fl">0.99</span> <span class="sc">||</span> (<span class="fu">Im</span>(q) <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;&amp;</span> <span class="fu">Re</span>(q) <span class="sc">&lt;=</span> <span class="dv">0</span>)) <span class="fu">return</span>(bkgcol)</span>
+<span id="cb3-4"><a href="#cb3-4"></a>  z <span class="ot">&lt;-</span> <span class="fu">En</span>(<span class="dv">6</span>, q)</span>
+<span id="cb3-5"><a href="#cb3-5"></a>  <span class="fu">colormap2</span>(z)</span>
+<span id="cb3-6"><a href="#cb3-6"></a>})</span></code></pre></div>
+<p><img src="./figures/Eisenstein6.png" style="width:70.0%" /></p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
