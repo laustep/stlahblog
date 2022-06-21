@@ -5,7 +5,245 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Mon, 20 Jun 2022 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Tue, 21 Jun 2022 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>On a Möbius transformation</title>
+      <link>https://laustep.github.io/stlahblog/posts/OnAMobiusTransformation.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        Consider a complex number
+        <span class="math inline">\(\gamma\)</span> such that
+        <span class="math inline">\(|\gamma| &lt; 1\)</span> and the following
+        matrix:
+        <span class="math display"
+          >\[ M = \begin{pmatrix} i &amp; \gamma \\ \bar\gamma &amp; -i
+          \end{pmatrix}. \]</span
+        >
+      </p>
+      <p>
+        Then the Möbius transformation associated to this matrix is nice. Why?
+        Because:
+      </p>
+      <ul>
+        <li><p>it maps the unit disk to itself;</p></li>
+        <li>
+          <p>it is of order <span class="math inline">\(2\)</span>;</p>
+        </li>
+        <li><p>its fractional powers have a closed form.</p></li>
+      </ul>
+      <p>
+        For these reasons, I often use this Möbius transformation in
+        <a href="https://laustep.github.io/stlahblog/frames/shaders_index.html"
+          >my shaders</a
+        >.
+      </p>
+      <p>
+        Let us derive the fractional powers of
+        <span class="math inline">\(M\)</span>. We set
+        <span class="math inline">\(h = \sqrt{1-|\gamma|^2}\)</span>.
+      </p>
+      <p>
+        The eigenvalues of <span class="math inline">\(M\)</span> are
+        <span class="math display"
+          >\[ \begin{align} \lambda_1 &amp; = -ih \\ \lambda_2 &amp; = ih =
+          \bar{\lambda_1} \end{align} \]</span
+        >
+        with corresponding eigen vectors
+        <span class="math display"
+          >\[ \begin{align} v_1 &amp; = \begin{pmatrix}
+          (1-h)\dfrac{i\gamma}{|\gamma|^2} \\ 1 \end{pmatrix} \\ v_2 &amp; =
+          \begin{pmatrix} (1+h)\dfrac{i\gamma}{|\gamma|^2} \\ 1 \end{pmatrix}.
+          \end{align} \]</span
+        >
+        Let
+        <span class="math inline"
+          >\(P = \begin{pmatrix} v_1 &amp; v_2 \end{pmatrix}\)</span
+        >. Then
+        <span class="math display"
+          >\[ \frac{1}{\det(P)} = \frac{i\bar\gamma}{2h} \]</span
+        >
+        and for any complex numbers <span class="math inline">\(d_1\)</span> and
+        <span class="math inline">\(d_2\)</span>,
+        <span class="math display"
+          >\[ P \begin{pmatrix} d_1 &amp; 0 \\ 0 &amp; d_2 \end{pmatrix} P^{-1}
+          = \frac{1}{2h} \begin{pmatrix} d_2(1+h)-d_1(1-h) &amp;
+          i(d_1-d_2)\gamma \\ i(d_1-d_2)\bar\gamma &amp; d_1(1+h)-d_2(1-h)
+          \end{pmatrix}. \]</span
+        >
+      </p>
+      <p>
+        In particular, <span class="math inline">\(M^t\)</span> is given by
+        <span class="math display"
+          >\[ \begin{pmatrix} a &amp; b \\ \bar b &amp; \bar a \end{pmatrix}
+          \]</span
+        >
+        where
+        <span class="math display"
+          >\[ \begin{align} a &amp; = \Re(d_1) - i \dfrac{\Im(d_1)}{h}, \\ b
+          &amp; = \gamma \dfrac{\Im(d_2)}{h}, \\ d_1 &amp; = \bar{d_2}, \\ d_2
+          &amp; = h^t \exp\left(i\dfrac{t\pi}{2}\right). \end{align} \]</span
+        >
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb1-1">M_power_t <span class="ot">&lt;-</span> <span class="cf">function</span>(gamma, t){</span>
+<span id="cb1-2">  h <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="dv">1</span><span class="sc">-</span><span class="fu">Mod</span>(gamma)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb1-3">  d2 <span class="ot">&lt;-</span> h<span class="sc">^</span>t <span class="sc">*</span> (<span class="fu">cos</span>(t<span class="sc">*</span>pi<span class="sc">/</span><span class="dv">2</span>) <span class="sc">+</span> 1i<span class="sc">*</span><span class="fu">sin</span>(t<span class="sc">*</span>pi<span class="sc">/</span><span class="dv">2</span>))</span>
+<span id="cb1-4">  d1 <span class="ot">&lt;-</span> <span class="fu">Conj</span>(d2)</span>
+<span id="cb1-5">  a <span class="ot">&lt;-</span> <span class="fu">Re</span>(d1) <span class="sc">-</span> 1i<span class="sc">*</span><span class="fu">Im</span>(d1)<span class="sc">/</span>h</span>
+<span id="cb1-6">  b <span class="ot">&lt;-</span> gamma <span class="sc">*</span> <span class="fu">Im</span>(d2)<span class="sc">/</span>h</span>
+<span id="cb1-7">  c <span class="ot">&lt;-</span> <span class="fu">Conj</span>(b)</span>
+<span id="cb1-8">  d <span class="ot">&lt;-</span> <span class="fu">Conj</span>(a)</span>
+<span id="cb1-9">  <span class="fu">c</span>(<span class="at">a =</span> a, <span class="at">b =</span> b, <span class="at">c =</span> c, <span class="at">d =</span> d)</span>
+<span id="cb1-10">}</span></code></pre>
+      </div>
+      <p>
+        Let’s apply this Möbius transformation now. Here is a visualization of
+        the <em>Dedekind eta function</em>, a complex function availale in the
+        <strong>jacobi</strong> package:
+      </p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb2-1"><span class="co"># background color</span></span>
+<span id="cb2-2">bkgcol <span class="ot">&lt;-</span> <span class="fu">rgb</span>(<span class="dv">21</span>, <span class="dv">25</span>, <span class="dv">30</span>, <span class="at">maxColorValue =</span> <span class="dv">255</span>)</span>
+<span id="cb2-3"></span>
+<span id="cb2-4">modulo <span class="ot">&lt;-</span> <span class="cf">function</span>(a, p) {</span>
+<span id="cb2-5">  a <span class="sc">-</span> p <span class="sc">*</span> <span class="fu">ifelse</span>(a <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="fu">floor</span>(a<span class="sc">/</span>p), <span class="fu">ceiling</span>(a<span class="sc">/</span>p))</span>
+<span id="cb2-6">}</span>
+<span id="cb2-7"></span>
+<span id="cb2-8">colormap <span class="ot">&lt;-</span> <span class="cf">function</span>(z){</span>
+<span id="cb2-9">  <span class="cf">if</span>(<span class="fu">is.na</span>(z)){</span>
+<span id="cb2-10">    <span class="fu">return</span>(bkgcol)</span>
+<span id="cb2-11">  }</span>
+<span id="cb2-12">  <span class="cf">if</span>(<span class="fu">is.infinite</span>(z) <span class="sc">||</span> <span class="fu">is.nan</span>(z)){</span>
+<span id="cb2-13">    <span class="fu">return</span>(<span class="st">"#000000"</span>)</span>
+<span id="cb2-14">  }</span>
+<span id="cb2-15">  x <span class="ot">&lt;-</span> <span class="fu">Re</span>(z)</span>
+<span id="cb2-16">  y <span class="ot">&lt;-</span> <span class="fu">Im</span>(z)</span>
+<span id="cb2-17">  r <span class="ot">&lt;-</span> <span class="fu">modulo</span>(<span class="fu">Mod</span>(z), <span class="dv">1</span>)</span>
+<span id="cb2-18">  g <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">abs</span>(<span class="fu">modulo</span>(<span class="fu">atan2</span>(y, x), <span class="fl">0.5</span>))</span>
+<span id="cb2-19">  b <span class="ot">&lt;-</span> <span class="fu">abs</span>(<span class="fu">modulo</span>(x<span class="sc">*</span>y, <span class="dv">1</span>))</span>
+<span id="cb2-20">  <span class="cf">if</span>(<span class="fu">is.nan</span>(b)){</span>
+<span id="cb2-21">    <span class="fu">return</span>(<span class="st">"#000000"</span>)</span>
+<span id="cb2-22">  }</span>
+<span id="cb2-23">  <span class="fu">rgb</span>(</span>
+<span id="cb2-24">    <span class="dv">8</span> <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="fu">cos</span>(r<span class="fl">-0.5</span>)), </span>
+<span id="cb2-25">    <span class="dv">8</span> <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="fu">cos</span>(g<span class="fl">-0.5</span>)), </span>
+<span id="cb2-26">    <span class="dv">8</span> <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="fu">cos</span>(b<span class="fl">-0.5</span>)),</span>
+<span id="cb2-27">    <span class="at">maxColorValue =</span> <span class="dv">1</span></span>
+<span id="cb2-28">  )</span>
+<span id="cb2-29">}</span>
+<span id="cb2-30"></span>
+<span id="cb2-31"><span class="fu">library</span>(jacobi)</span>
+<span id="cb2-32">f <span class="ot">&lt;-</span> <span class="fu">Vectorize</span>(<span class="cf">function</span>(x, y){</span>
+<span id="cb2-33">  q <span class="ot">&lt;-</span> x <span class="sc">+</span> 1i<span class="sc">*</span>y</span>
+<span id="cb2-34">  <span class="cf">if</span>(<span class="fu">Mod</span>(q) <span class="sc">&gt;</span> <span class="fl">0.9999</span> <span class="sc">||</span> (<span class="fu">Im</span>(q) <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;&amp;</span> <span class="fu">Re</span>(q) <span class="sc">&lt;=</span> <span class="dv">0</span>)){</span>
+<span id="cb2-35">    <span class="fu">return</span>(bkgcol)</span>
+<span id="cb2-36">  }</span>
+<span id="cb2-37">  tau <span class="ot">&lt;-</span> <span class="sc">-</span>1i <span class="sc">*</span> <span class="fu">log</span>(q) <span class="sc">/</span> pi</span>
+<span id="cb2-38">  z <span class="ot">&lt;-</span> <span class="fu">eta</span>(tau)</span>
+<span id="cb2-39">  <span class="fu">colormap</span>(z)</span>
+<span id="cb2-40">})</span>
+<span id="cb2-41"></span>
+<span id="cb2-42">x <span class="ot">&lt;-</span> y <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="at">len =</span> <span class="dv">2000</span>)</span>
+<span id="cb2-43">image <span class="ot">&lt;-</span> <span class="fu">outer</span>(x, y, f)</span>
+<span id="cb2-44"></span>
+<span id="cb2-45">opar <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>), <span class="at">bg =</span> bkgcol)</span>
+<span id="cb2-46"><span class="fu">plot</span>(</span>
+<span id="cb2-47">  <span class="fu">c</span>(<span class="sc">-</span><span class="dv">100</span>, <span class="dv">100</span>), <span class="fu">c</span>(<span class="sc">-</span><span class="dv">100</span>, <span class="dv">100</span>), <span class="at">type =</span> <span class="st">"n"</span>, </span>
+<span id="cb2-48">  <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">ylab =</span> <span class="st">""</span>, <span class="at">axes =</span> <span class="cn">FALSE</span>, <span class="at">asp =</span> <span class="dv">1</span></span>
+<span id="cb2-49">)</span>
+<span id="cb2-50"><span class="fu">rasterImage</span>(image, <span class="sc">-</span><span class="dv">100</span>, <span class="sc">-</span><span class="dv">100</span>, <span class="dv">100</span>, <span class="dv">100</span>)</span>
+<span id="cb2-51"><span class="fu">par</span>(opar)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/Dedekind.png"
+          style="width: 55%"
+        />
+      </p>
+      <p>
+        Here is how to apply the Möbius transformation for one value of the
+        power <span class="math inline">\(t\)</span>:
+      </p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb3-1">Mobius <span class="ot">&lt;-</span> <span class="fu">M_power_t</span>(<span class="at">gamma =</span> <span class="fl">0.7</span> <span class="sc">-</span> <span class="fl">0.3</span>i, <span class="at">t =</span> ...)</span>
+<span id="cb3-2">a <span class="ot">&lt;-</span> Mobius[<span class="st">"a"</span>]</span>
+<span id="cb3-3">b <span class="ot">&lt;-</span> Mobius[<span class="st">"b"</span>]</span>
+<span id="cb3-4">c <span class="ot">&lt;-</span> Mobius[<span class="st">"c"</span>]</span>
+<span id="cb3-5">d <span class="ot">&lt;-</span> Mobius[<span class="st">"d"</span>]; </span>
+<span id="cb3-6">f <span class="ot">&lt;-</span> <span class="fu">Vectorize</span>(<span class="cf">function</span>(x, y){</span>
+<span id="cb3-7">  q0 <span class="ot">&lt;-</span> x <span class="sc">+</span> 1i<span class="sc">*</span>y</span>
+<span id="cb3-8">  q <span class="ot">&lt;-</span> (a<span class="sc">*</span>q0 <span class="sc">+</span> b) <span class="sc">/</span> (c<span class="sc">*</span>q0 <span class="sc">+</span> d)</span>
+<span id="cb3-9">  <span class="cf">if</span>(<span class="fu">Mod</span>(q) <span class="sc">&gt;</span> <span class="fl">0.9999</span> <span class="sc">||</span> (<span class="fu">Im</span>(q) <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;&amp;</span> <span class="fu">Re</span>(q) <span class="sc">&lt;=</span> <span class="dv">0</span>)){</span>
+<span id="cb3-10">    <span class="fu">return</span>(bkgcol)</span>
+<span id="cb3-11">  }</span>
+<span id="cb3-12">  tau <span class="ot">&lt;-</span> <span class="sc">-</span>1i <span class="sc">*</span> <span class="fu">log</span>(q) <span class="sc">/</span> pi</span>
+<span id="cb3-13">  z <span class="ot">&lt;-</span> <span class="fu">eta</span>(tau)</span>
+<span id="cb3-14">  <span class="fu">colormap</span>(z)</span>
+<span id="cb3-15">})</span>
+<span id="cb3-16"></span>
+<span id="cb3-17">x <span class="ot">&lt;-</span> y <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="at">len =</span> <span class="dv">2000</span>)</span>
+<span id="cb3-18">image <span class="ot">&lt;-</span> <span class="fu">outer</span>(x, y, f)</span></code></pre>
+      </div>
+      <p>
+        Then it suffices to run this code for
+        <span class="math inline">\(t\)</span> varying from
+        <span class="math inline">\(0\)</span> to
+        <span class="math inline">\(2\)</span>, and to save the image for each
+        value of <span class="math inline">\(t\)</span>. But this would be very
+        slow. Actually I implemented the image generation with
+        <strong>Rcpp</strong>. Here is the result:
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/Dedekind.gif"
+          style="width: 55%"
+        />
+      </p>
+      <p>
+        My <strong>Rcpp</strong> code is available in the
+        <a href="https://github.com/stla/jacobi">Github version</a> of the
+        <strong>jacobi</strong> package. The R code which generates an image for
+        one value of <span class="math inline">\(t\)</span> is:
+      </p>
+      <div class="sourceCode" id="cb4">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb4-1">x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="at">len =</span> 2000L)</span>
+<span id="cb4-2">gamma <span class="ot">&lt;-</span> <span class="fl">0.7</span> <span class="sc">-</span> <span class="fl">0.3</span>i</span>
+<span id="cb4-3">t <span class="ot">&lt;-</span> ...</span>
+<span id="cb4-4">image <span class="ot">&lt;-</span> jacobi<span class="sc">:::</span><span class="fu">Image_eta</span>(x, gamma, t)</span>
+<span id="cb4-5">opar <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>), <span class="at">bg =</span> bkgcol)</span>
+<span id="cb4-6"><span class="fu">plot</span>(</span>
+<span id="cb4-7">  <span class="fu">c</span>(<span class="sc">-</span><span class="dv">100</span>, <span class="dv">100</span>), <span class="fu">c</span>(<span class="sc">-</span><span class="dv">100</span>, <span class="dv">100</span>), <span class="at">type =</span> <span class="st">"n"</span>, </span>
+<span id="cb4-8">  <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">ylab =</span> <span class="st">""</span>, <span class="at">axes =</span> <span class="cn">FALSE</span>, <span class="at">asp =</span> <span class="dv">1</span></span>
+<span id="cb4-9">)</span>
+<span id="cb4-10"><span class="fu">rasterImage</span>(image, <span class="sc">-</span><span class="dv">100</span>, <span class="sc">-</span><span class="dv">100</span>, <span class="dv">100</span>, <span class="dv">100</span>)</span>
+<span id="cb4-11"><span class="fu">par</span>(opar)</span></code></pre>
+      </div>
+      <p>
+        You can also play with <code>jacobi:::Image_E4</code> and
+        <code>jacobi:::Image_E6</code>, which respectively generate a
+        visualization of the Eisenstein series of weight
+        <span class="math inline">\(4\)</span> and a visualization of the
+        Eisenstein series of weight <span class="math inline">\(6\)</span>.
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Tue, 21 Jun 2022 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/OnAMobiusTransformation.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>Beautiful complex functions</title>
       <link>https://laustep.github.io/stlahblog/posts/beautifulComplexFunctions.html</link>
