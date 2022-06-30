@@ -1,0 +1,371 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Mapping a picture on a donut or a Hopf torus</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Mapping a picture on a donut or a Hopf torus</h1> 
+          <div class="info">
+    Posted on June 30, 2022
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>, <a title="All pages tagged 'geometry'." href="../tags/geometry.html">geometry</a>, <a title="All pages tagged 'graphics'." href="../tags/graphics.html">graphics</a>, <a title="All pages tagged 'rgl'." href="../tags/rgl.html">rgl</a>
+    
+</div>
+
+<h1 id="the-donut-torus">The donut torus</h1>
+<p>Given a number <span class="math inline">\(s \geqslant 1\)</span>, the following map: <span class="math display">\[
+(u, v) \mapsto (x, y, z) = 
+\frac{\Bigl(s\cos\frac{u}{s}, s\sin\frac{u}{s}, \sin v\Bigr)}{\sqrt{s^2+1}-\cos v}
+\]</span> is a <em>conformal parameterization</em> of the torus (the donut), where
+<span class="math inline">\(-s\pi \leqslant u &lt; s\pi\)</span> and <span class="math inline">\(\pi \leqslant v &lt; \pi\)</span>. I found it in
+<a href="https://static1.bridgesmathart.org/2011/cdrom/proceedings/134/paper_134.pdf">this paper by J.M.
+Sullivan</a>.
+The number <span class="math inline">\(s\)</span> is the ratio of the major radius over the minor radius.</p>
+<p>The conformality of the map has the following consequence: you can
+easily map a doubly periodic image on the torus in such a way that it
+will perfectly fit on the torus.</p>
+<h2 id="mapping-a-checkerboard">Mapping a checkerboard</h2>
+<p>Let me show what I mean. The code below generates a mesh of the torus
+with a checkerboard mapped on its surface:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">library</span>(rgl)</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(Rvcg) <span class="co"># to use vcgUpdateNormals()</span></span>
+<span id="cb1-3"><a href="#cb1-3"></a></span>
+<span id="cb1-4"><a href="#cb1-4"></a>torusMesh <span class="ot">&lt;-</span> <span class="cf">function</span>(s, nu, nv){</span>
+<span id="cb1-5"><a href="#cb1-5"></a>  nu <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(nu)</span>
+<span id="cb1-6"><a href="#cb1-6"></a>  nv <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(nv)</span>
+<span id="cb1-7"><a href="#cb1-7"></a>  nunv <span class="ot">&lt;-</span> nu <span class="sc">*</span> nv</span>
+<span id="cb1-8"><a href="#cb1-8"></a>  vs      <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA_real_</span>, <span class="at">nrow =</span> 3L, <span class="at">ncol =</span> nunv)</span>
+<span id="cb1-9"><a href="#cb1-9"></a>  tris1   <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA_integer_</span>, <span class="at">nrow =</span> 3L, <span class="at">ncol =</span> nunv)</span>
+<span id="cb1-10"><a href="#cb1-10"></a>  tris2   <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA_integer_</span>, <span class="at">nrow =</span> 3L, <span class="at">ncol =</span> nunv)</span>
+<span id="cb1-11"><a href="#cb1-11"></a>  u_ <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span>pi<span class="sc">*</span>s, pi<span class="sc">*</span>s, <span class="at">length.out =</span> nu <span class="sc">+</span> 1L)[<span class="sc">-</span>1L]</span>
+<span id="cb1-12"><a href="#cb1-12"></a>  v_ <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span>pi, pi, <span class="at">length.out =</span> nv <span class="sc">+</span> 1L)[<span class="sc">-</span>1L]</span>
+<span id="cb1-13"><a href="#cb1-13"></a>  scosu_ <span class="ot">&lt;-</span> s <span class="sc">*</span> <span class="fu">cos</span>(u_ <span class="sc">/</span> s)</span>
+<span id="cb1-14"><a href="#cb1-14"></a>  ssinu_ <span class="ot">&lt;-</span> s <span class="sc">*</span> <span class="fu">sin</span>(u_ <span class="sc">/</span> s)</span>
+<span id="cb1-15"><a href="#cb1-15"></a>  sinv_ <span class="ot">&lt;-</span> <span class="fu">sin</span>(v_)</span>
+<span id="cb1-16"><a href="#cb1-16"></a>  w     <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(s<span class="sc">*</span>s <span class="sc">+</span> <span class="dv">1</span>) <span class="sc">-</span> <span class="fu">cos</span>(v_)</span>
+<span id="cb1-17"><a href="#cb1-17"></a>  jp1_ <span class="ot">&lt;-</span> <span class="fu">c</span>(2L<span class="sc">:</span>nv, 1L)</span>
+<span id="cb1-18"><a href="#cb1-18"></a>  j_ <span class="ot">&lt;-</span> 1L<span class="sc">:</span>nv</span>
+<span id="cb1-19"><a href="#cb1-19"></a>  color <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb1-20"><a href="#cb1-20"></a>  <span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="sc">:</span>(nu<span class="sc">-</span>1L)){</span>
+<span id="cb1-21"><a href="#cb1-21"></a>    i_nv <span class="ot">&lt;-</span> i<span class="sc">*</span>nv</span>
+<span id="cb1-22"><a href="#cb1-22"></a>    rg <span class="ot">&lt;-</span> (i_nv <span class="sc">-</span> nv <span class="sc">+</span> 1L)<span class="sc">:</span>i_nv</span>
+<span id="cb1-23"><a href="#cb1-23"></a>    vs[, rg] <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
+<span id="cb1-24"><a href="#cb1-24"></a>      scosu_[i] <span class="sc">/</span> w,</span>
+<span id="cb1-25"><a href="#cb1-25"></a>      ssinu_[i] <span class="sc">/</span> w,</span>
+<span id="cb1-26"><a href="#cb1-26"></a>      sinv_     <span class="sc">/</span> w</span>
+<span id="cb1-27"><a href="#cb1-27"></a>    )</span>
+<span id="cb1-28"><a href="#cb1-28"></a>    color <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb1-29"><a href="#cb1-29"></a>      color,</span>
+<span id="cb1-30"><a href="#cb1-30"></a>      <span class="cf">if</span>(<span class="fu">mod</span>(<span class="fu">floor</span>(<span class="dv">5</span> <span class="sc">*</span> u_[i] <span class="sc">/</span> (pi<span class="sc">*</span>s)), <span class="dv">2</span>) <span class="sc">==</span> <span class="dv">0</span>){</span>
+<span id="cb1-31"><a href="#cb1-31"></a>        <span class="fu">ifelse</span>(</span>
+<span id="cb1-32"><a href="#cb1-32"></a>          <span class="fu">floor</span>(<span class="dv">5</span> <span class="sc">*</span> v_ <span class="sc">/</span> pi) <span class="sc">%%</span> <span class="dv">2</span> <span class="sc">==</span> <span class="dv">0</span>, <span class="st">&quot;yellow&quot;</span>, <span class="st">&quot;navy&quot;</span></span>
+<span id="cb1-33"><a href="#cb1-33"></a>        )</span>
+<span id="cb1-34"><a href="#cb1-34"></a>      }<span class="cf">else</span>{</span>
+<span id="cb1-35"><a href="#cb1-35"></a>        <span class="fu">ifelse</span>(</span>
+<span id="cb1-36"><a href="#cb1-36"></a>          <span class="fu">floor</span>(<span class="dv">5</span> <span class="sc">*</span> v_ <span class="sc">/</span> pi) <span class="sc">%%</span> <span class="dv">2</span> <span class="sc">==</span> <span class="dv">0</span>, <span class="st">&quot;navy&quot;</span>, <span class="st">&quot;yellow&quot;</span></span>
+<span id="cb1-37"><a href="#cb1-37"></a>        )</span>
+<span id="cb1-38"><a href="#cb1-38"></a>      }</span>
+<span id="cb1-39"><a href="#cb1-39"></a>    )</span>
+<span id="cb1-40"><a href="#cb1-40"></a>    k1 <span class="ot">&lt;-</span> i_nv <span class="sc">-</span> nv</span>
+<span id="cb1-41"><a href="#cb1-41"></a>    k_ <span class="ot">&lt;-</span> k1 <span class="sc">+</span> j_</span>
+<span id="cb1-42"><a href="#cb1-42"></a>    l_ <span class="ot">&lt;-</span> k1 <span class="sc">+</span> jp1_</span>
+<span id="cb1-43"><a href="#cb1-43"></a>    m_ <span class="ot">&lt;-</span> i_nv <span class="sc">+</span> j_</span>
+<span id="cb1-44"><a href="#cb1-44"></a>    tris1[, k_] <span class="ot">&lt;-</span> <span class="fu">rbind</span>(m_, l_, k_)</span>
+<span id="cb1-45"><a href="#cb1-45"></a>    tris2[, k_] <span class="ot">&lt;-</span> <span class="fu">rbind</span>(m_, i_nv <span class="sc">+</span> jp1_, l_)</span>
+<span id="cb1-46"><a href="#cb1-46"></a>  }</span>
+<span id="cb1-47"><a href="#cb1-47"></a>  i_nv <span class="ot">&lt;-</span> nunv</span>
+<span id="cb1-48"><a href="#cb1-48"></a>  rg <span class="ot">&lt;-</span> (i_nv <span class="sc">-</span> nv <span class="sc">+</span> 1L)<span class="sc">:</span>i_nv</span>
+<span id="cb1-49"><a href="#cb1-49"></a>  vs[, rg] <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
+<span id="cb1-50"><a href="#cb1-50"></a>    scosu_[nu] <span class="sc">/</span> w,</span>
+<span id="cb1-51"><a href="#cb1-51"></a>    ssinu_[nu] <span class="sc">/</span> w,</span>
+<span id="cb1-52"><a href="#cb1-52"></a>    sinv_      <span class="sc">/</span> w</span>
+<span id="cb1-53"><a href="#cb1-53"></a>  )</span>
+<span id="cb1-54"><a href="#cb1-54"></a>  color <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb1-55"><a href="#cb1-55"></a>    color,</span>
+<span id="cb1-56"><a href="#cb1-56"></a>    <span class="fu">ifelse</span>(</span>
+<span id="cb1-57"><a href="#cb1-57"></a>      <span class="fu">floor</span>(<span class="dv">5</span> <span class="sc">*</span> v_ <span class="sc">/</span> pi) <span class="sc">%%</span> <span class="dv">2</span> <span class="sc">==</span> <span class="dv">0</span>, <span class="st">&quot;yellow&quot;</span>, <span class="st">&quot;navy&quot;</span></span>
+<span id="cb1-58"><a href="#cb1-58"></a>    )</span>
+<span id="cb1-59"><a href="#cb1-59"></a>  )</span>
+<span id="cb1-60"><a href="#cb1-60"></a>  k1 <span class="ot">&lt;-</span> i_nv <span class="sc">-</span> nv</span>
+<span id="cb1-61"><a href="#cb1-61"></a>  l_ <span class="ot">&lt;-</span> k1 <span class="sc">+</span> jp1_</span>
+<span id="cb1-62"><a href="#cb1-62"></a>  k_ <span class="ot">&lt;-</span> k1 <span class="sc">+</span> j_</span>
+<span id="cb1-63"><a href="#cb1-63"></a>  tris1[, k_] <span class="ot">&lt;-</span> <span class="fu">rbind</span>(j_, l_, k_)</span>
+<span id="cb1-64"><a href="#cb1-64"></a>  tris2[, k_] <span class="ot">&lt;-</span> <span class="fu">rbind</span>(j_, jp1_, l_)</span>
+<span id="cb1-65"><a href="#cb1-65"></a>  tmesh <span class="ot">&lt;-</span> <span class="fu">tmesh3d</span>(</span>
+<span id="cb1-66"><a href="#cb1-66"></a>    <span class="at">vertices    =</span> vs,</span>
+<span id="cb1-67"><a href="#cb1-67"></a>    <span class="at">indices     =</span> <span class="fu">cbind</span>(tris1, tris2),</span>
+<span id="cb1-68"><a href="#cb1-68"></a>    <span class="at">homogeneous =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb1-69"><a href="#cb1-69"></a>    <span class="at">material    =</span> <span class="fu">list</span>(<span class="st">&quot;color&quot;</span> <span class="ot">=</span> color)</span>
+<span id="cb1-70"><a href="#cb1-70"></a>  )</span>
+<span id="cb1-71"><a href="#cb1-71"></a>  <span class="fu">vcgUpdateNormals</span>(tmesh)</span>
+<span id="cb1-72"><a href="#cb1-72"></a>}</span></code></pre></div>
+<p>Let’s see:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>mesh <span class="ot">&lt;-</span> <span class="fu">torusMesh</span>(<span class="at">s =</span> <span class="fu">sqrt</span>(<span class="dv">2</span>), <span class="at">nu =</span> <span class="dv">500</span>, <span class="at">nv =</span> <span class="dv">500</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">open3d</span>(<span class="at">windowRect =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>), <span class="at">zoom =</span> <span class="fl">0.85</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">bg3d</span>(<span class="st">&quot;gainsboro&quot;</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">shade3d</span>(mesh)</span></code></pre></div>
+<p><img src="./figures/ConformalTorusCheckerboard.gif" style="width:55.0%" /></p>
+<p>Now you surely see what I mean.</p>
+<h2 id="mapping-a-gray-scott-picture">Mapping a Gray-Scott picture</h2>
+<p>I am a fan of the <a href="https://fronkonstin.com/">Fronkonstin blog</a>. Maybe
+you already see <a href="https://fronkonstin.com/2019/12/28/reaction-diffusion/">this article about the Gray-Scott reaction-diffusion
+model</a> (it
+appeared on R-bloggers). It shows how to generate some beautiful
+pictures which are doubly periodic. So let’s map such a picture on the
+donut:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>......</span>
+<span id="cb3-2"><a href="#cb3-2"></a></span>
+<span id="cb3-3"><a href="#cb3-3"></a>fcolor <span class="ot">&lt;-</span> <span class="fu">colorRamp</span>(viridisLite<span class="sc">::</span><span class="fu">magma</span>(255L))</span>
+<span id="cb3-4"><a href="#cb3-4"></a>getColors <span class="ot">&lt;-</span> <span class="cf">function</span>(B){</span>
+<span id="cb3-5"><a href="#cb3-5"></a>  rgbs <span class="ot">&lt;-</span> <span class="fu">fcolor</span>(B)</span>
+<span id="cb3-6"><a href="#cb3-6"></a>  <span class="fu">rgb</span>(rgbs[, 1L], rgbs[, 2L], rgbs[, 3L], <span class="at">maxColorValue =</span> <span class="dv">255</span>)</span>
+<span id="cb3-7"><a href="#cb3-7"></a>}</span>
+<span id="cb3-8"><a href="#cb3-8"></a></span>
+<span id="cb3-9"><a href="#cb3-9"></a>X <span class="ot">&lt;-</span> <span class="fu">iterate_Gray_Scott</span>(X, L, DA, DB, <span class="dv">500</span>)</span>
+<span id="cb3-10"><a href="#cb3-10"></a>Colors <span class="ot">&lt;-</span> <span class="fu">getColors</span>(<span class="fu">c</span>(X[,,2L]))</span>
+<span id="cb3-11"><a href="#cb3-11"></a></span>
+<span id="cb3-12"><a href="#cb3-12"></a>mesh <span class="ot">&lt;-</span> <span class="fu">torusMesh</span>(<span class="at">s =</span> <span class="fu">sqrt</span>(<span class="dv">2</span>), <span class="at">nu =</span> <span class="dv">600</span>, <span class="at">nv =</span> <span class="dv">600</span>)</span>
+<span id="cb3-13"><a href="#cb3-13"></a>mesh[[<span class="st">&quot;material&quot;</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">&quot;color&quot;</span> <span class="ot">=</span> Colors)</span>
+<span id="cb3-14"><a href="#cb3-14"></a></span>
+<span id="cb3-15"><a href="#cb3-15"></a><span class="fu">open3d</span>(<span class="at">windowRect =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>), <span class="at">zoom =</span> <span class="fl">0.85</span>)</span>
+<span id="cb3-16"><a href="#cb3-16"></a><span class="fu">bg3d</span>(<span class="st">&quot;gainsboro&quot;</span>)</span>
+<span id="cb3-17"><a href="#cb3-17"></a><span class="fu">shade3d</span>(mesh)</span></code></pre></div>
+<p><img src="./figures/ConformalTorusGrayScott.gif" style="width:55.0%" /></p>
+<p>Beautiful!</p>
+<h1 id="the-hopf-torus">The Hopf torus</h1>
+<p>We can similarly map a picture on a Hopf torus, with this conformal
+parameterization:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>HT <span class="ot">&lt;-</span> <span class="cf">function</span>(h, nlobes, t, phi){</span>
+<span id="cb4-2"><a href="#cb4-2"></a>  <span class="co"># the spherical curve</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a>  p1 <span class="ot">&lt;-</span> <span class="fu">sin</span>(h <span class="sc">*</span> <span class="fu">cos</span>(nlobes<span class="sc">*</span>t))</span>
+<span id="cb4-4"><a href="#cb4-4"></a>  p2 <span class="ot">&lt;-</span> <span class="fu">cos</span>(t) <span class="sc">*</span> <span class="fu">cos</span>(h <span class="sc">*</span> <span class="fu">cos</span>(nlobes<span class="sc">*</span>t))</span>
+<span id="cb4-5"><a href="#cb4-5"></a>  p3 <span class="ot">&lt;-</span> <span class="fu">sin</span>(t) <span class="sc">*</span> <span class="fu">cos</span>(h <span class="sc">*</span> <span class="fu">cos</span>(nlobes<span class="sc">*</span>t))</span>
+<span id="cb4-6"><a href="#cb4-6"></a>  <span class="co"># parameterization</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a>  yden <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="dv">2</span><span class="sc">*</span>(<span class="dv">1</span><span class="sc">+</span>p1))</span>
+<span id="cb4-8"><a href="#cb4-8"></a>  y1 <span class="ot">&lt;-</span> (<span class="dv">1</span><span class="sc">+</span>p1)<span class="sc">/</span>yden</span>
+<span id="cb4-9"><a href="#cb4-9"></a>  y2 <span class="ot">&lt;-</span> p2<span class="sc">/</span>yden</span>
+<span id="cb4-10"><a href="#cb4-10"></a>  y3 <span class="ot">&lt;-</span> p3<span class="sc">/</span>yden</span>
+<span id="cb4-11"><a href="#cb4-11"></a>  cosphi <span class="ot">&lt;-</span> <span class="fu">cos</span>(phi)</span>
+<span id="cb4-12"><a href="#cb4-12"></a>  sinphi <span class="ot">&lt;-</span> <span class="fu">sin</span>(phi)</span>
+<span id="cb4-13"><a href="#cb4-13"></a>  x1 <span class="ot">&lt;-</span> cosphi<span class="sc">*</span>y1</span>
+<span id="cb4-14"><a href="#cb4-14"></a>  x2 <span class="ot">&lt;-</span> sinphi<span class="sc">*</span>y1</span>
+<span id="cb4-15"><a href="#cb4-15"></a>  x3 <span class="ot">&lt;-</span> cosphi<span class="sc">*</span>y2 <span class="sc">-</span> sinphi<span class="sc">*</span>y3</span>
+<span id="cb4-16"><a href="#cb4-16"></a>  x4 <span class="ot">&lt;-</span> cosphi<span class="sc">*</span>y3 <span class="sc">+</span> sinphi<span class="sc">*</span>y2  </span>
+<span id="cb4-17"><a href="#cb4-17"></a>  <span class="fu">return</span>(<span class="fu">rbind</span>(x1<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>x4), x2<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>x4), x3<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>x4)))</span>
+<span id="cb4-18"><a href="#cb4-18"></a>}</span></code></pre></div>
+<h2 id="checkerboard">Checkerboard</h2>
+<p>The code to construct the mesh with the checkerboard is similar to the
+one for the donut torus:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>HopfTorusMesh <span class="ot">&lt;-</span> <span class="cf">function</span>(h, nlobes, nu, nv){</span>
+<span id="cb5-2"><a href="#cb5-2"></a>  nu <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(nu)</span>
+<span id="cb5-3"><a href="#cb5-3"></a>  nv <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(nv)</span>
+<span id="cb5-4"><a href="#cb5-4"></a>  vs    <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA_real_</span>, <span class="at">nrow =</span> 3L, <span class="at">ncol =</span> nu<span class="sc">*</span>nv)</span>
+<span id="cb5-5"><a href="#cb5-5"></a>  tris1 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA_integer_</span>, <span class="at">nrow =</span> 3L, <span class="at">ncol =</span> nu<span class="sc">*</span>nv)</span>
+<span id="cb5-6"><a href="#cb5-6"></a>  tris2 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA_integer_</span>, <span class="at">nrow =</span> 3L, <span class="at">ncol =</span> nu<span class="sc">*</span>nv)</span>
+<span id="cb5-7"><a href="#cb5-7"></a>  u_ <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span>pi, pi, <span class="at">length.out =</span> nu <span class="sc">+</span> 1L)[<span class="sc">-</span>1L]</span>
+<span id="cb5-8"><a href="#cb5-8"></a>  v_ <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span>pi, pi, <span class="at">length.out =</span> nv <span class="sc">+</span> 1L)[<span class="sc">-</span>1L]</span>
+<span id="cb5-9"><a href="#cb5-9"></a>  jp1_ <span class="ot">&lt;-</span> <span class="fu">c</span>(2L<span class="sc">:</span>nv, 1L)</span>
+<span id="cb5-10"><a href="#cb5-10"></a>  j_ <span class="ot">&lt;-</span> 1L<span class="sc">:</span>nv</span>
+<span id="cb5-11"><a href="#cb5-11"></a>  color <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb5-12"><a href="#cb5-12"></a>  <span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="sc">:</span>(nu<span class="sc">-</span>1L)){</span>
+<span id="cb5-13"><a href="#cb5-13"></a>    i_nv <span class="ot">&lt;-</span> i<span class="sc">*</span>nv</span>
+<span id="cb5-14"><a href="#cb5-14"></a>    vs[, (i_nv <span class="sc">-</span> nv <span class="sc">+</span> 1L)<span class="sc">:</span>i_nv] <span class="ot">&lt;-</span> <span class="fu">HT</span>(h, nlobes, u_[i], v_)</span>
+<span id="cb5-15"><a href="#cb5-15"></a>    color <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb5-16"><a href="#cb5-16"></a>      color,</span>
+<span id="cb5-17"><a href="#cb5-17"></a>      <span class="cf">if</span>(<span class="fu">mod</span>(<span class="fu">floor</span>(<span class="dv">10</span> <span class="sc">*</span> u_[i] <span class="sc">/</span> pi), <span class="dv">2</span>) <span class="sc">==</span> <span class="dv">0</span>){</span>
+<span id="cb5-18"><a href="#cb5-18"></a>        <span class="fu">ifelse</span>(</span>
+<span id="cb5-19"><a href="#cb5-19"></a>          <span class="fu">floor</span>(<span class="dv">10</span> <span class="sc">*</span> v_ <span class="sc">/</span> pi) <span class="sc">%%</span> <span class="dv">2</span> <span class="sc">==</span> <span class="dv">0</span>, <span class="st">&quot;yellow&quot;</span>, <span class="st">&quot;navy&quot;</span></span>
+<span id="cb5-20"><a href="#cb5-20"></a>        )</span>
+<span id="cb5-21"><a href="#cb5-21"></a>      }<span class="cf">else</span>{</span>
+<span id="cb5-22"><a href="#cb5-22"></a>        <span class="fu">ifelse</span>(</span>
+<span id="cb5-23"><a href="#cb5-23"></a>          <span class="fu">floor</span>(<span class="dv">10</span> <span class="sc">*</span> v_ <span class="sc">/</span> pi) <span class="sc">%%</span> <span class="dv">2</span> <span class="sc">==</span> <span class="dv">0</span>, <span class="st">&quot;navy&quot;</span>, <span class="st">&quot;yellow&quot;</span></span>
+<span id="cb5-24"><a href="#cb5-24"></a>        )</span>
+<span id="cb5-25"><a href="#cb5-25"></a>      }</span>
+<span id="cb5-26"><a href="#cb5-26"></a>    )</span>
+<span id="cb5-27"><a href="#cb5-27"></a>    k1 <span class="ot">&lt;-</span> i_nv <span class="sc">-</span> nv</span>
+<span id="cb5-28"><a href="#cb5-28"></a>    k_ <span class="ot">&lt;-</span> k1 <span class="sc">+</span> j_</span>
+<span id="cb5-29"><a href="#cb5-29"></a>    l_ <span class="ot">&lt;-</span> k1 <span class="sc">+</span> jp1_</span>
+<span id="cb5-30"><a href="#cb5-30"></a>    m_ <span class="ot">&lt;-</span> i_nv <span class="sc">+</span> j_</span>
+<span id="cb5-31"><a href="#cb5-31"></a>    tris1[, k_] <span class="ot">&lt;-</span> <span class="fu">rbind</span>(k_, l_, m_)</span>
+<span id="cb5-32"><a href="#cb5-32"></a>    tris2[, k_] <span class="ot">&lt;-</span> <span class="fu">rbind</span>(l_, i_nv <span class="sc">+</span> jp1_, m_)</span>
+<span id="cb5-33"><a href="#cb5-33"></a>  }</span>
+<span id="cb5-34"><a href="#cb5-34"></a>  i_nv <span class="ot">&lt;-</span> nu<span class="sc">*</span>nv</span>
+<span id="cb5-35"><a href="#cb5-35"></a>  vs[, (i_nv <span class="sc">-</span> nv <span class="sc">+</span> 1L)<span class="sc">:</span>i_nv] <span class="ot">&lt;-</span> <span class="fu">HT</span>(h, nlobes, pi, v_)</span>
+<span id="cb5-36"><a href="#cb5-36"></a>  color <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb5-37"><a href="#cb5-37"></a>    color,</span>
+<span id="cb5-38"><a href="#cb5-38"></a>    <span class="fu">ifelse</span>(</span>
+<span id="cb5-39"><a href="#cb5-39"></a>      <span class="fu">floor</span>(<span class="dv">10</span> <span class="sc">*</span> v_ <span class="sc">/</span> pi) <span class="sc">%%</span> <span class="dv">2</span> <span class="sc">==</span> <span class="dv">0</span>, <span class="st">&quot;yellow&quot;</span>, <span class="st">&quot;navy&quot;</span></span>
+<span id="cb5-40"><a href="#cb5-40"></a>    )</span>
+<span id="cb5-41"><a href="#cb5-41"></a>  )</span>
+<span id="cb5-42"><a href="#cb5-42"></a>  k1 <span class="ot">&lt;-</span> i_nv <span class="sc">-</span> nv</span>
+<span id="cb5-43"><a href="#cb5-43"></a>  k_ <span class="ot">&lt;-</span> k1 <span class="sc">+</span> j_</span>
+<span id="cb5-44"><a href="#cb5-44"></a>  l_ <span class="ot">&lt;-</span> k1 <span class="sc">+</span> jp1_</span>
+<span id="cb5-45"><a href="#cb5-45"></a>  tris1[, k_] <span class="ot">&lt;-</span> <span class="fu">rbind</span>(k_, l_, j_)</span>
+<span id="cb5-46"><a href="#cb5-46"></a>  tris2[, k_] <span class="ot">&lt;-</span> <span class="fu">rbind</span>(l_, jp1_, j_)</span>
+<span id="cb5-47"><a href="#cb5-47"></a>  <span class="fu">vcgUpdateNormals</span>(<span class="fu">tmesh3d</span>(</span>
+<span id="cb5-48"><a href="#cb5-48"></a>    <span class="at">vertices    =</span> vs,</span>
+<span id="cb5-49"><a href="#cb5-49"></a>    <span class="at">indices     =</span> <span class="fu">cbind</span>(tris1, tris2),</span>
+<span id="cb5-50"><a href="#cb5-50"></a>    <span class="at">homogeneous =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb5-51"><a href="#cb5-51"></a>    <span class="at">material    =</span> <span class="fu">list</span>(<span class="st">&quot;color&quot;</span> <span class="ot">=</span> color) </span>
+<span id="cb5-52"><a href="#cb5-52"></a>  ))</span>
+<span id="cb5-53"><a href="#cb5-53"></a>}</span>
+<span id="cb5-54"><a href="#cb5-54"></a></span>
+<span id="cb5-55"><a href="#cb5-55"></a>mesh <span class="ot">&lt;-</span> <span class="fu">HopfTorusMesh</span>(<span class="at">h =</span> <span class="fl">0.4</span>, <span class="at">nlobes =</span> <span class="dv">4</span>, <span class="at">nu =</span> <span class="dv">500</span>, <span class="at">nv =</span> <span class="dv">500</span>)</span>
+<span id="cb5-56"><a href="#cb5-56"></a></span>
+<span id="cb5-57"><a href="#cb5-57"></a><span class="fu">open3d</span>(<span class="at">windowRect =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>), <span class="at">zoom =</span> <span class="fl">0.85</span>)</span>
+<span id="cb5-58"><a href="#cb5-58"></a><span class="fu">bg3d</span>(<span class="st">&quot;gainsboro&quot;</span>)</span>
+<span id="cb5-59"><a href="#cb5-59"></a><span class="fu">shade3d</span>(mesh)</span></code></pre></div>
+<p><img src="./figures/ConformalHopfTorusCheckerboard.gif" style="width:55.0%" /></p>
+<p>I really like it.</p>
+<h2 id="gray-scott-picture">Gray-Scott picture</h2>
+<p>To map the Gray-Scott picture, we proceed as for the donut torus. Here
+is the result:</p>
+<p><img src="./figures/ConformalHopfTorusGrayScott.gif" style="width:55.0%" /></p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
