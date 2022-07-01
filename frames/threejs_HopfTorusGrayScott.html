@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <title>Cyclide</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+
+  <script src="../libraries/three_r136dev.min.js"></script>
+  <script src="../libraries/lil-gui.umd.js"></script>
+  <script src="../libraries/jquery-3.6.0.min.js"></script>
+  <script src="../libraries/scale-color-perceptual/bundle.js"></script>
+  <script>
+    var scale = require("scale-color-perceptual");
+  </script>
+  <script>
+
+    function hex2rgb(hex) {
+      return {
+        // skip # at position 0
+        r: parseInt(hex.slice(1, 3), 16) / 255,
+        g: parseInt(hex.slice(3, 5), 16) / 255,
+        b: parseInt(hex.slice(5, 7), 16) / 255
+      }
+    }
+
+    function subm_index(M, x) {
+      if (x < 0)
+        return x + M;
+      if (x >= M)
+        return x - M;
+      return x;
+    }
+
+    function update_concentrations(X, L, DA, DB, f, k) {
+      var sum_a, sum_b, x1, y1, t;
+      var m = X.A.length, n = X.A[0].length;
+      var A = new Array(m), B = new Array(m);
+      for (var i = 0; i < m; i++) {
+        A[i] = new Array(n);
+        B[i] = new Array(n);
+      }
+      for (var x = 0; x < m; x++) {
+        for (var y = 0; y < n; y++) {
+          sum_a = 0.0; sum_b = 0.0;
+          for (var i = -1; i <= 1; i++) {
+            for (var j = -1; j <= 1; j++) {
+              x1 = subm_index(m, x - i);
+              y1 = subm_index(n, y - j);
+              sum_a = sum_a + L[i + 1][j + 1] * X.A[x1][y1];
+              sum_b = sum_b + L[i + 1][j + 1] * X.B[x1][y1];
+            }
+          }
+          t = X.A[x][y] * X.B[x][y] * X.B[x][y];
+          A[x][y] = X.A[x][y] + DA * sum_a - t + f * (1 - X.A[x][y]);
+          B[x][y] = X.B[x][y] + DB * sum_b + t - (k + f) * X.B[x][y];
+        }
+      }
+      return { A: A, B: B };
+    }
+
+    function iterate_Gray_Scott(X, L, DA, DB, f, k, niter) {
+      for (let i = 0; i < niter; i++) {
+        X = update_concentrations(X, L, DA, DB, f, k);
+      }
+      var m = X.A.length, n = X.A[0].length;
+      var Bflat = [].concat.apply([], X.B);
+      var Bmin = 0; //Math.min.apply(null, Bflat);
+      var Bmax = Math.max.apply(null, Bflat);
+      var Brange = Bmax - Bmin;
+      var fcolor = scale.viridis;
+      var hex, rgb;
+      const colors = [];
+      for (let y = 0; y < n; y++) {
+        for (let x = 0; x < m; x++) {
+          hex = fcolor((X.B[x][y] - Bmin) / Brange);
+          rgb = hex2rgb(hex);
+          colors.push(rgb.r, rgb.g, rgb.b);
+        }
+      }
+      return colors;
+    }
+
+    var L = [[0.05, 0.2, 0.05], [0.2, -1, 0.2], [0.05, 0.2, 0.05]];
+    var DA = 1;
+    var DB = 0.5;
+    var f = 0.0545;
+    var k = 0.062;
+
+    var pixels = 300;
+    // var gridSize = 2;
+    // var rectSize = 2;
+
+    var A = new Array(pixels);
+    var B = new Array(pixels);
+    var X;
+    var percentage = 1 / 100;
+    for (let i = 0; i < pixels; i++) {
+      A[i] = new Array(pixels);
+      B[i] = new Array(pixels);
+      for (let j = 0; j < pixels; j++) {
+        A[i][j] = 1;
+        B[i][j] = Math.random() > percentage ? 0 : 1;
+      }
+    }
+    X = { A: A, B: B };
+    var Colors = iterate_Gray_Scott(X, L, DA, DB, f, k, 600);
+  </script>
+
+  <style>
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    #gui {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+    }
+
+    .lil-gui {
+      --name-width: 30%;
+      --slider-input-min-width: 35px;
+      --slider-input-width: 18%;
+    }
+  </style>
+
+  <script>
+    // grid ------------------------------------
+    const n_u = pixels,
+      n_v = pixels;
+    const twoPi = 2 * Math.PI;
+    const twoPi_over_n_u = twoPi / n_u;
+    const twoPi_over_n_v = twoPi / n_v;
+    ////
+    function f_p1p2p3(h, nlobes) {
+      const p1_ = [],
+        p2_ = [],
+        p3_ = [];
+      for (let i = 0; i < n_u; i++) {
+        const u = i * twoPi_over_n_u;
+        const hcosnu = h * Math.cos(nlobes * u);
+        const coshcosnu = Math.cos(hcosnu);
+        p1_.push(Math.sin(hcosnu));
+        p2_.push(Math.cos(u) * coshcosnu);
+        p3_.push(Math.sin(u) * coshcosnu);
+      }
+      return [p1_, p2_, p3_];
+    }
+    ////
+    const cosines_v = [],
+      sines_v = [];
+    for (let j = 0; j < n_v; j++) {
+      const v = j * twoPi_over_n_v;
+      cosines_v.push(Math.cos(v));
+      sines_v.push(Math.sin(v));
+    }
+    ////
+    function HT(p1, p2, p3, cosv, sinv) {
+      const yden = Math.sqrt(2 * (1 + p1));
+      const y1 = (1 + p1) / yden;
+      const y3 = p2 / yden;
+      const y2 = p3 / yden;
+      const x1 = cosv * y1;
+      const x2 = sinv * y1;
+      const x3 = cosv * y2 - sinv * y3;
+      const x4 = cosv * y3 + sinv * y2;
+      return [x1 / (1 - x4), x2 / (1 - x4), x3 / (1 - x4)];
+    }
+    ////
+    const indices = [];
+    for (let i = 0; i < n_u - 1; i++) {
+      const ip1 = i + 1;
+      for (let j = 0; j < n_v - 1; j++) {
+        const jp1 = j + 1;
+        const a = ip1 * n_v + j,
+          b = i * n_v + j,
+          c = i * n_v + jp1,
+          d = ip1 * n_v + jp1;
+        indices.push(a, b, c);
+        indices.push(a, c, d);
+      }
+      const a = ip1 * n_v + n_v - 1,
+        b = i * n_v + n_v - 1,
+        c = i * n_v,
+        d = ip1 * n_v;
+      indices.push(a, b, c);
+      indices.push(a, c, d);
+    }
+    for (let j = 0; j < n_v - 1; j++) {
+      const jp1 = j + 1;
+      const a = j,
+        b = (n_u - 1) * n_v + j,
+        c = (n_u - 1) * n_v + jp1,
+        d = jp1;
+      indices.push(a, b, c);
+      indices.push(a, c, d);
+    }
+    const a = n_v - 1,
+      b = (n_u - 1) * n_v + n_v - 1,
+      c = (n_u - 1) * n_v,
+      d = 0;
+    indices.push(a, b, c);
+    indices.push(a, c, d);
+    ////      
+    function HopfVertices(h, nlobes) {
+      const vertices = [];
+      const p1p2p3 = f_p1p2p3(h, nlobes);
+      const p1_ = p1p2p3[0], p2_ = p1p2p3[1], p3_ = p1p2p3[2];
+      for (let i = 0; i < n_u; i++) {
+        for (let j = 0; j < n_v; j++) {
+          vertices.push(...HT(p1_[i], p2_[i], p3_[i], cosines_v[j], sines_v[j]));
+        }
+      }
+      return vertices;
+    }
+  </script>
+
+  <script>
+    const material = new THREE.MeshLambertMaterial({ vertexColors: THREE.VertexColors });
+    //    const material = new THREE.MeshNormalMaterial({ wireframe: false, vertexColors: true });
+    const HopfGeometry = new THREE.BufferGeometry();
+    HopfGeometry.setIndex(indices);
+    let camera, scene, object, vertices;
+    let lgcontrols;
+    let renderer;
+  </script>
+</head>
+
+<body>
+  <div id="container"></div>
+
+  <script>
+    // three js scene --------------------------------------------------------
+    const aspect = window.innerWidth / window.innerHeight;
+    camera = new THREE.PerspectiveCamera(50, aspect, 1, 10000);
+
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x111111);
+    object = new THREE.Object3D();
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.getElementById("container").appendChild(renderer.domElement);
+
+    const z0 = 90;
+    camera.position.z = 100 - z0;
+
+    scene.add(camera);
+
+    const light = new THREE.AmbientLight(0x404040);
+    const lights = [];
+    lights[0] = new THREE.PointLight(0xffffff, 1, 0);
+    lights[1] = new THREE.PointLight(0xffffff, 1, 0);
+    lights[2] = new THREE.PointLight(0xffffff, 1, 0);
+    lights[0].position.set(0, 200, 0);
+    lights[1].position.set(100, 200, 100);
+    lights[2].position.set(-100, -200, -100);
+    scene.add(light);
+    scene.add(lights[0]);
+    scene.add(lights[1]);
+    scene.add(lights[2]);
+
+
+    function onWindowResize() {
+      const windowX = window.innerWidth;
+      const windowY = window.innerHeight;
+      camera.aspect = windowX / windowY;
+      camera.updateProjectionMatrix();
+      renderer.setSize(windowX, windowY);
+    }
+    window.addEventListener("resize", onWindowResize);
+
+    // lil.gui controls ------------------------------------------------------
+    lgcontrols = {
+      rotationSpeed: 0.002,
+      zoom: z0,
+      h: 0.4,
+      nlobes: 4
+    };
+
+    vertices = HopfVertices(lgcontrols.h, lgcontrols.nlobes);
+    HopfGeometry.setAttribute(
+      "position",
+      new THREE.Float32BufferAttribute(vertices, 3)
+    );
+    HopfGeometry.setAttribute(
+      "color",
+      new THREE.Float32BufferAttribute(Colors, 3)
+    );
+    HopfGeometry.computeVertexNormals();
+    let HopfMesh = new THREE.Mesh(HopfGeometry, material);
+    HopfMesh.geometry.attributes.position.needsUpdate = true;
+    HopfMesh.geometry.attributes.color.needsUpdate = true;
+    HopfMesh.geometry.attributes.normal.needsUpdate = true;
+
+    object.add(HopfMesh);
+    scene.add(object);
+
+    const gui = new GUI({ autoplace: false, width: 270 });
+    gui.domElement.id = "gui";
+    gui
+      .add(lgcontrols, "rotationSpeed")
+      .min(0)
+      .max(0.1)
+      .step(0.002)
+      .name("rotation speed");
+    const controller_zoom = gui
+      .add(lgcontrols, "zoom")
+      .min(1)
+      .max(100)
+      .step(1);
+    controller_zoom.onFinishChange(function (value) {
+      camera.position.z = 100 - value;
+    });
+    const controller_h = gui
+      .add(lgcontrols, "h")
+      .min(0.2)
+      .max(0.8)
+      .step(0.05);
+    const controller_nlobes = gui
+      .add(lgcontrols, "nlobes")
+      .min(2)
+      .max(7)
+      .step(1);
+    const gui_state = gui.save((recursive = true));
+
+    function updateHopf(vertices) {
+      HopfMesh.geometry.setAttribute(
+        "position",
+        new THREE.Float32BufferAttribute(vertices, 3)
+      );
+      // normals ? nnedsupdate=true ?..
+      HopfMesh.geometry.computeBoundingBox();
+      HopfMesh.geometry.computeBoundingSphere();
+    }
+
+    controller_h.onFinishChange(function (value) {
+      vertices = HopfVertices(value, lgcontrols.nlobes);
+      updateHopf(vertices);
+    });
+    controller_nlobes.onFinishChange(function (value) {
+      vertices = HopfVertices(lgcontrols.h, value);
+      updateHopf(vertices);
+    });
+
+    window.requestAnimFrame = (function () {
+      return (
+        window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        function (callback) {
+          window.setTimeout(callback, 1000 / 60);
+        }
+      );
+    })();
+
+    function animate() {
+      requestAnimFrame(animate);
+      render();
+    }
+
+    function render() {
+      const speed = lgcontrols.rotationSpeed;
+      object.rotation.x += speed;
+      object.rotation.y += speed;
+      renderer.render(scene, camera);
+    }
+
+    // run render
+    animate();
+
+    // DRAGGING
+    let isDragging = false;
+    let previousMousePosition = { x: 0, y: 0 };
+
+    $("#container")
+      .on("mousedown", function (e) {
+        isDragging = true;
+      })
+      .on("mousemove", function (e) {
+        const deltaMove = {
+          x: e.offsetX - previousMousePosition.x,
+          y: e.offsetY - previousMousePosition.y
+        };
+        if (isDragging) {
+          const deltaRotationQuaternion = new THREE.Quaternion().setFromEuler(
+            new THREE.Euler(
+              (twoPi / 360) * deltaMove.y,
+              (twoPi / 360) * deltaMove.x,
+              0,
+              "XYZ"
+            )
+          );
+          object.quaternion.multiplyQuaternions(
+            deltaRotationQuaternion,
+            object.quaternion
+          );
+        }
+        previousMousePosition = {
+          x: e.offsetX,
+          y: e.offsetY
+        };
+      });
+
+    $(document).on("mouseup", function (e) {
+      isDragging = false;
+    });
+  </script>
+</body>
+
+</html>
