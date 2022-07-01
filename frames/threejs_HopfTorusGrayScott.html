@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-  <title>Cyclide</title>
+  <title>Hopf torus</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
 
@@ -269,6 +269,23 @@
     scene.add(lights[0]);
     scene.add(lights[1]);
     scene.add(lights[2]);
+
+    //This will add a starfield to the background
+    var starsGeometry = new THREE.BufferGeometry();
+    var stars = [];
+    for (var i = 0; i < 20000; i++) {
+      var x = THREE.Math.randFloatSpread(2000);
+      var y = THREE.Math.randFloatSpread(2000);
+      var z = THREE.Math.randFloatSpread(2000);
+      stars.push(x, y, z);
+    }
+    starsGeometry.setAttribute(
+      "position",
+      new THREE.Float32BufferAttribute(stars, 3)
+    );
+    var starsMaterial = new THREE.PointsMaterial({ color: 0x888888 });
+    var starField = new THREE.Points(starsGeometry, starsMaterial);
+    scene.add(starField);
 
 
     function onWindowResize() {
