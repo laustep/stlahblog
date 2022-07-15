@@ -1,0 +1,274 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Slices of an implicit hypersurface with R</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Slices of an implicit hypersurface with R</h1> 
+          <div class="info">
+    Posted on July 15, 2022
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'graphics'." href="../tags/graphics.html">graphics</a>, <a title="All pages tagged 'rgl'." href="../tags/rgl.html">rgl</a>, <a title="All pages tagged 'geometry'." href="../tags/geometry.html">geometry</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>
+    
+</div>
+
+<p>In a <a href="https://laustep.github.io/stlahblog/posts/slicedHypersurface.html">previous
+post</a>,
+I showed how to draw a 3D slice of a 4D hypersurface when a
+parameterization of this hypersurface is available. Here we deal with
+the case when an implicit equation of the hypersurface is available. For
+the illustration, we again consider the
+<a href="http://hi.gher.space/wiki/Tiger"><em>tiger</em></a>. It is given by the implicit
+equation <span class="math display">\[
+{\bigl(x^2 + y^2 - R_1\bigr)}^2 + 
+{\bigl(z^2 + w^2 - R_2\bigr)}^2 = r^2.
+\]</span> We will fix a value of the fourth coordinate <span class="math inline">\(w\)</span>, say <span class="math inline">\(w_0\)</span>. That is
+to say we deal with the cross-section with the hyperplane <span class="math inline">\(\{w = w_0\}\)</span>.
+And we will rotate the hypersurface in the 4D space. We use a
+<a href="https://en.wikipedia.org/wiki/Rotations_in_4-dimensional_Euclidean_space"><em>right-isoclinic</em></a>
+rotation. The function below performs such a rotation, allowing to pass
+several input vectors as a matrix.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># right-isoclinic rotation in 4D space </span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="co"># xi is the angle of rotation</span></span>
+<span id="cb1-3"><a href="#cb1-3"></a>rotate4d <span class="ot">&lt;-</span> <span class="cf">function</span>(alpha, beta, xi, vec){</span>
+<span id="cb1-4"><a href="#cb1-4"></a>  a <span class="ot">&lt;-</span> <span class="fu">cos</span>(xi)</span>
+<span id="cb1-5"><a href="#cb1-5"></a>  b <span class="ot">&lt;-</span> <span class="fu">sin</span>(alpha) <span class="sc">*</span> <span class="fu">cos</span>(beta) <span class="sc">*</span> <span class="fu">sin</span>(xi)</span>
+<span id="cb1-6"><a href="#cb1-6"></a>  c <span class="ot">&lt;-</span> <span class="fu">sin</span>(alpha) <span class="sc">*</span> <span class="fu">sin</span>(beta) <span class="sc">*</span> <span class="fu">sin</span>(xi)</span>
+<span id="cb1-7"><a href="#cb1-7"></a>  d <span class="ot">&lt;-</span> <span class="fu">cos</span>(alpha) <span class="sc">*</span> <span class="fu">sin</span>(xi)</span>
+<span id="cb1-8"><a href="#cb1-8"></a>  x <span class="ot">&lt;-</span> vec[, 1L]; y <span class="ot">&lt;-</span> vec[, 2L]; z <span class="ot">&lt;-</span> vec[, 3L]; w <span class="ot">&lt;-</span> vec[, 4L]</span>
+<span id="cb1-9"><a href="#cb1-9"></a>  <span class="fu">cbind</span>(</span>
+<span id="cb1-10"><a href="#cb1-10"></a>    a<span class="sc">*</span>x <span class="sc">-</span> b<span class="sc">*</span>y <span class="sc">-</span> c<span class="sc">*</span>z <span class="sc">-</span> d<span class="sc">*</span>w,</span>
+<span id="cb1-11"><a href="#cb1-11"></a>    a<span class="sc">*</span>y <span class="sc">+</span> b<span class="sc">*</span>x <span class="sc">+</span> c<span class="sc">*</span>w <span class="sc">-</span> d<span class="sc">*</span>z,</span>
+<span id="cb1-12"><a href="#cb1-12"></a>    a<span class="sc">*</span>z <span class="sc">-</span> b<span class="sc">*</span>w <span class="sc">+</span> c<span class="sc">*</span>x <span class="sc">+</span> d<span class="sc">*</span>y,</span>
+<span id="cb1-13"><a href="#cb1-13"></a>    a<span class="sc">*</span>w <span class="sc">+</span> b<span class="sc">*</span>z <span class="sc">-</span> c<span class="sc">*</span>y <span class="sc">+</span> d<span class="sc">*</span>x</span>
+<span id="cb1-14"><a href="#cb1-14"></a>  )</span>
+<span id="cb1-15"><a href="#cb1-15"></a>}</span></code></pre></div>
+<p>So, in the implicit equation we fix <span class="math inline">\(w=w_0\)</span> and we perform the rotation,
+taking arbitrary values for <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>f <span class="ot">&lt;-</span> <span class="cf">function</span>(xyz, w0, xi, <span class="at">R1 =</span> <span class="dv">3</span>, <span class="at">R2 =</span> <span class="dv">2</span>, <span class="at">r =</span> <span class="dv">1</span>){</span>
+<span id="cb2-2"><a href="#cb2-2"></a>  rxyzw <span class="ot">&lt;-</span> <span class="fu">rotate4d</span>(pi<span class="sc">/</span><span class="dv">4</span>, pi<span class="sc">/</span><span class="dv">4</span>, xi, <span class="fu">cbind</span>(xyz, w0))</span>
+<span id="cb2-3"><a href="#cb2-3"></a>  x <span class="ot">&lt;-</span> rxyzw[, 1L]</span>
+<span id="cb2-4"><a href="#cb2-4"></a>  y <span class="ot">&lt;-</span> rxyzw[, 2L]</span>
+<span id="cb2-5"><a href="#cb2-5"></a>  z <span class="ot">&lt;-</span> rxyzw[, 3L]</span>
+<span id="cb2-6"><a href="#cb2-6"></a>  w <span class="ot">&lt;-</span> rxyzw[, 4L]</span>
+<span id="cb2-7"><a href="#cb2-7"></a>  (<span class="fu">sqrt</span>(x<span class="sc">^</span><span class="dv">2</span><span class="sc">+</span>y<span class="sc">^</span><span class="dv">2</span>) <span class="sc">-</span> R1)<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> (<span class="fu">sqrt</span>(z<span class="sc">^</span><span class="dv">2</span><span class="sc">+</span>w<span class="sc">^</span><span class="dv">2</span>) <span class="sc">-</span> R2)<span class="sc">^</span><span class="dv">2</span> <span class="sc">-</span> r<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a>}</span></code></pre></div>
+<p>To plot the isosurface, we will use the <strong>rmarchingcubes</strong> package, not
+only for its speed, but also because it computes an excellent
+approximation of the per-vertex normals (it approximates the gradient of
+<span class="math inline">\(f\)</span>). So taking a <span class="math inline">\(150 \times 150 \times 150\)</span> grid is enough to get a
+smooth surface:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># make grid ####</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a>n <span class="ot">&lt;-</span> 150L</span>
+<span id="cb3-3"><a href="#cb3-3"></a>x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">5</span>, <span class="at">len =</span> n)</span>
+<span id="cb3-4"><a href="#cb3-4"></a>y <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">5</span>, <span class="at">len =</span> n)</span>
+<span id="cb3-5"><a href="#cb3-5"></a>z <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">5</span>, <span class="at">len =</span> n)</span>
+<span id="cb3-6"><a href="#cb3-6"></a>Grid <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">X =</span> x, <span class="at">Y =</span> y, <span class="at">Z =</span> z)</span>
+<span id="cb3-7"><a href="#cb3-7"></a></span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="co"># run the marching cubes #### </span></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="fu">library</span>(rmarchingcubes)</span>
+<span id="cb3-10"><a href="#cb3-10"></a>voxel <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="fu">f</span>(Grid, <span class="at">w_0 =</span> <span class="fl">0.3</span>, <span class="at">xi =</span> pi<span class="sc">/</span><span class="dv">3</span>), <span class="at">dim =</span> <span class="fu">c</span>(n, n, n))</span>
+<span id="cb3-11"><a href="#cb3-11"></a>cont <span class="ot">&lt;-</span> <span class="fu">contour3d</span>(voxel, <span class="at">level =</span> <span class="dv">0</span>, <span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">z =</span> z)</span>
+<span id="cb3-12"><a href="#cb3-12"></a></span>
+<span id="cb3-13"><a href="#cb3-13"></a><span class="co"># plot #### </span></span>
+<span id="cb3-14"><a href="#cb3-14"></a><span class="fu">library</span>(rgl)</span>
+<span id="cb3-15"><a href="#cb3-15"></a>mesh <span class="ot">&lt;-</span> <span class="fu">tmesh3d</span>(</span>
+<span id="cb3-16"><a href="#cb3-16"></a>  <span class="at">vertices =</span> <span class="fu">t</span>(cont[[<span class="st">&quot;vertices&quot;</span>]]),</span>
+<span id="cb3-17"><a href="#cb3-17"></a>  <span class="at">indices  =</span> <span class="fu">t</span>(cont[[<span class="st">&quot;triangles&quot;</span>]]),</span>
+<span id="cb3-18"><a href="#cb3-18"></a>  <span class="at">normals  =</span> cont[[<span class="st">&quot;normals&quot;</span>]],</span>
+<span id="cb3-19"><a href="#cb3-19"></a>  <span class="at">homogeneous =</span> <span class="cn">FALSE</span></span>
+<span id="cb3-20"><a href="#cb3-20"></a>)</span>
+<span id="cb3-21"><a href="#cb3-21"></a><span class="fu">open3d</span>(<span class="at">windowRect =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>), <span class="at">zoom =</span> <span class="fl">0.8</span>)</span>
+<span id="cb3-22"><a href="#cb3-22"></a><span class="fu">bg3d</span>(</span>
+<span id="cb3-23"><a href="#cb3-23"></a>  <span class="at">sphere =</span> <span class="cn">FALSE</span>, <span class="at">texture =</span> <span class="st">&quot;SpaceBackground.png&quot;</span>, <span class="at">col =</span> <span class="st">&quot;white&quot;</span></span>
+<span id="cb3-24"><a href="#cb3-24"></a>)</span>
+<span id="cb3-25"><a href="#cb3-25"></a><span class="fu">shade3d</span>(mesh, <span class="at">color =</span> <span class="st">&quot;maroon&quot;</span>)</span></code></pre></div>
+<p><img src="./figures/tiger01(implicit).png" style="width:55.0%" /></p>
+<p>Now let’s make an animation by varying the angle of rotation <span class="math inline">\(\xi\)</span> from
+<span class="math inline">\(0\)</span> to <span class="math inline">\(\pi\)</span>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># vector of angles #### </span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>nframes <span class="ot">&lt;-</span> 60L</span>
+<span id="cb4-3"><a href="#cb4-3"></a>xi_ <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, pi, <span class="at">length.out =</span> nframes)</span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="co"># open the 3D engine #### </span></span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="fu">open3d</span>(</span>
+<span id="cb4-6"><a href="#cb4-6"></a>  <span class="at">windowRect =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>),</span>
+<span id="cb4-7"><a href="#cb4-7"></a>  <span class="at">zoom       =</span> <span class="fl">0.85</span>,</span>
+<span id="cb4-8"><a href="#cb4-8"></a>  <span class="at">userMatrix =</span> <span class="fu">rbind</span>(</span>
+<span id="cb4-9"><a href="#cb4-9"></a>    <span class="fu">c</span>(<span class="fl">0.93</span>, <span class="sc">-</span><span class="fl">0.16</span>, <span class="sc">-</span><span class="fl">0.33</span>, <span class="dv">0</span>),</span>
+<span id="cb4-10"><a href="#cb4-10"></a>    <span class="fu">c</span>(<span class="fl">0.35</span>,  <span class="fl">0.66</span>,  <span class="fl">0.67</span>, <span class="dv">0</span>),</span>
+<span id="cb4-11"><a href="#cb4-11"></a>    <span class="fu">c</span>(<span class="fl">0.11</span>, <span class="sc">-</span><span class="fl">0.74</span>,  <span class="fl">0.67</span>, <span class="dv">0</span>),</span>
+<span id="cb4-12"><a href="#cb4-12"></a>    <span class="fu">c</span>(   <span class="dv">0</span>,     <span class="dv">0</span>,     <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb4-13"><a href="#cb4-13"></a>  )</span>
+<span id="cb4-14"><a href="#cb4-14"></a>)</span>
+<span id="cb4-15"><a href="#cb4-15"></a><span class="fu">bg3d</span>(</span>
+<span id="cb4-16"><a href="#cb4-16"></a>  <span class="at">sphere =</span> <span class="cn">FALSE</span>, <span class="at">texture =</span> <span class="st">&quot;SpaceBackground.png&quot;</span>, <span class="at">col =</span> <span class="st">&quot;white&quot;</span></span>
+<span id="cb4-17"><a href="#cb4-17"></a>)</span>
+<span id="cb4-18"><a href="#cb4-18"></a><span class="co"># save the frames in png files #### </span></span>
+<span id="cb4-19"><a href="#cb4-19"></a><span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="sc">:</span>nframes){</span>
+<span id="cb4-20"><a href="#cb4-20"></a>  v <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="fu">f</span>(Grid, <span class="at">w0 =</span> <span class="fl">0.3</span>, <span class="at">xi =</span> xi_[i]), <span class="at">dim =</span> <span class="fu">c</span>(n, n, n))</span>
+<span id="cb4-21"><a href="#cb4-21"></a>  cont <span class="ot">&lt;-</span> <span class="fu">contour3d</span>(v, <span class="at">level =</span> <span class="dv">0</span>, <span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">z =</span> z)</span>
+<span id="cb4-22"><a href="#cb4-22"></a>  mesh <span class="ot">&lt;-</span> <span class="fu">tmesh3d</span>(</span>
+<span id="cb4-23"><a href="#cb4-23"></a>    <span class="at">vertices =</span> <span class="fu">t</span>(cont[[<span class="st">&quot;vertices&quot;</span>]]),</span>
+<span id="cb4-24"><a href="#cb4-24"></a>    <span class="at">indices  =</span> <span class="fu">t</span>(cont[[<span class="st">&quot;triangles&quot;</span>]]),</span>
+<span id="cb4-25"><a href="#cb4-25"></a>    <span class="at">normals  =</span> cont[[<span class="st">&quot;normals&quot;</span>]],</span>
+<span id="cb4-26"><a href="#cb4-26"></a>    <span class="at">homogeneous =</span> <span class="cn">FALSE</span></span>
+<span id="cb4-27"><a href="#cb4-27"></a>  )</span>
+<span id="cb4-28"><a href="#cb4-28"></a>  <span class="fu">shade3d</span>(mesh, <span class="at">color =</span> <span class="st">&quot;maroon&quot;</span>)</span>
+<span id="cb4-29"><a href="#cb4-29"></a>  <span class="fu">snapshot3d</span>(<span class="fu">sprintf</span>(<span class="st">&quot;zzpic%03d.png&quot;</span>, i), <span class="at">webshot =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb4-30"><a href="#cb4-30"></a>  <span class="fu">clear3d</span>()</span>
+<span id="cb4-31"><a href="#cb4-31"></a>}</span>
+<span id="cb4-32"><a href="#cb4-32"></a><span class="co"># make the animation with ImageMagick #### </span></span>
+<span id="cb4-33"><a href="#cb4-33"></a><span class="co"># option '-duplicate 1,-2-1' to get a forward-backward animation</span></span>
+<span id="cb4-34"><a href="#cb4-34"></a>command <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
+<span id="cb4-35"><a href="#cb4-35"></a>  <span class="st">&quot;magick convert -dispose previous -delay 10 &quot;</span>,</span>
+<span id="cb4-36"><a href="#cb4-36"></a>  <span class="st">&quot;-duplicate 1,-2-1 zzpic*.png tiger.gif&quot;</span></span>
+<span id="cb4-37"><a href="#cb4-37"></a>)</span>
+<span id="cb4-38"><a href="#cb4-38"></a><span class="fu">system</span>(command)</span></code></pre></div>
+<p><img src="./figures/tiger01(implicit).gif" style="width:55.0%" /></p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
