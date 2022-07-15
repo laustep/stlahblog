@@ -111,8 +111,8 @@ the case when an implicit equation of the hypersurface is available. For
 the illustration, we again consider the
 <a href="http://hi.gher.space/wiki/Tiger"><em>tiger</em></a>. It is given by the implicit
 equation <span class="math display">\[
-{\bigl(x^2 + y^2 - R_1\bigr)}^2 + 
-{\bigl(z^2 + w^2 - R_2\bigr)}^2 = r^2.
+{\bigl(\sqrt{x^2 + y^2} - R_1\bigr)}^2 + 
+{\bigl(\sqrt{z^2 + w^2} - R_2\bigr)}^2 = r^2.
 \]</span> We will fix a value of the fourth coordinate <span class="math inline">\(w\)</span>, say <span class="math inline">\(w_0\)</span>. That is
 to say we deal with the cross-section with the hyperplane <span class="math inline">\(\{w = w_0\}\)</span>.
 And we will rotate the hypersurface in the 4D space. We use a
@@ -174,7 +174,7 @@ smooth surface:</p>
 <span id="cb3-23"><a href="#cb3-23"></a>  <span class="at">sphere =</span> <span class="cn">FALSE</span>, <span class="at">texture =</span> <span class="st">&quot;SpaceBackground.png&quot;</span>, <span class="at">col =</span> <span class="st">&quot;white&quot;</span></span>
 <span id="cb3-24"><a href="#cb3-24"></a>)</span>
 <span id="cb3-25"><a href="#cb3-25"></a><span class="fu">shade3d</span>(mesh, <span class="at">color =</span> <span class="st">&quot;maroon&quot;</span>)</span></code></pre></div>
-<p><img src="./figures/tiger01(implicit).png" style="width:55.0%" /></p>
+<p><img src="./figures/tiger01(implicit).png" style="width:50.0%" /></p>
 <p>Now let’s make an animation by varying the angle of rotation <span class="math inline">\(\xi\)</span> from
 <span class="math inline">\(0\)</span> to <span class="math inline">\(\pi\)</span>.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># vector of angles #### </span></span>
@@ -215,7 +215,10 @@ smooth surface:</p>
 <span id="cb4-36"><a href="#cb4-36"></a>  <span class="st">&quot;-duplicate 1,-2-1 zzpic*.png tiger.gif&quot;</span></span>
 <span id="cb4-37"><a href="#cb4-37"></a>)</span>
 <span id="cb4-38"><a href="#cb4-38"></a><span class="fu">system</span>(command)</span></code></pre></div>
-<p><img src="./figures/tiger01(implicit).gif" style="width:55.0%" /></p>
+<p><img src="./figures/tiger01(implicit).gif" style="width:50.0%" /></p>
+<p>A similar animation with a more complex surface can be found on <a href="https://www.youtube.com/channel/UCQ2hC8ETS9FFm2pzzyZCVUw/videos">my
+youtube
+channel</a>.</p>
 
         </div>
 
