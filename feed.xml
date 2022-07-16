@@ -5,7 +5,136 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Fri, 15 Jul 2022 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Sat, 16 Jul 2022 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>Expanding a polynomial with 'caracas', part 2</title>
+      <link>https://laustep.github.io/stlahblog/posts/caracas02.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        Last month, I posted an
+        <a href="https://laustep.github.io/stlahblog/posts/caracas01.html"
+          >article</a
+        >
+        showing a way to expand a polynomial in R when the coefficients of the
+        polynomial contain some literal values, with the help of the
+        <strong>caracas</strong> package. Today I wanted to apply it with a
+        polynomial expression having about 500 characters, and highly
+        factorized. The method took more than 30 minutes, so I looked for a more
+        efficient one.
+      </p>
+      <p>
+        Thanks to some help on StackOverflow, I came to the following method
+        which is more efficient. It consists in splitting the expression
+        according to its additive terms and to work on each term, instead of
+        expanding the whole polynomial. In the example below I take the
+        polynomial expression defining the isosurface equation of a Solid Möbius
+        strip.
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb1-1"><span class="fu">library</span>(caracas)</span>
+<span id="cb1-2">sympy <span class="ot">&lt;-</span> <span class="fu">get_sympy</span>()</span>
+<span id="cb1-3"><span class="co"># define the variables x,y,z and the constants a,b</span></span>
+<span id="cb1-4"><span class="fu">def_sym</span>(x, y, z, a, b)</span>
+<span id="cb1-5"><span class="co"># define expression </span></span>
+<span id="cb1-6">expr <span class="ot">&lt;-</span> sympy<span class="sc">$</span><span class="fu">parse_expr</span>(</span>
+<span id="cb1-7">  <span class="st">"((x*x+y*y+1)*(a*x*x+b*y*y)+z*z*(b*x*x+a*y*y)-2*(a-b)*x*y*z-a*b*(x*x+y*y))**2-4*(x*x+y*y)*(a*x*x+b*y*y-x*y*z*(a-b))**2"</span></span>
+<span id="cb1-8">) </span>
+<span id="cb1-9"><span class="co"># extraction of monomials in the 'povray' list</span></span>
+<span id="cb1-10">povray <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb1-11">terms <span class="ot">&lt;-</span> sympy<span class="sc">$</span>Add<span class="sc">$</span><span class="fu">make_args</span>(expr)</span>
+<span id="cb1-12"><span class="cf">for</span>(term <span class="cf">in</span> terms){</span>
+<span id="cb1-13">  f <span class="ot">&lt;-</span> term<span class="sc">$</span><span class="fu">expand</span>()</span>
+<span id="cb1-14">  fterms <span class="ot">&lt;-</span> sympy<span class="sc">$</span>Add<span class="sc">$</span><span class="fu">make_args</span>(f)</span>
+<span id="cb1-15">  <span class="cf">for</span>(fterm <span class="cf">in</span> fterms){</span>
+<span id="cb1-16">    decomp  <span class="ot">&lt;-</span> fterm<span class="sc">$</span><span class="fu">as_coeff_mul</span>(x<span class="sc">$</span>pyobj, y<span class="sc">$</span>pyobj, z<span class="sc">$</span>pyobj)</span>
+<span id="cb1-17">    coef    <span class="ot">&lt;-</span> decomp[[<span class="dv">1</span>]]</span>
+<span id="cb1-18">    mono    <span class="ot">&lt;-</span> decomp[[<span class="dv">2</span>]]</span>
+<span id="cb1-19">    polexpr <span class="ot">&lt;-</span> sympy<span class="sc">$</span>Mul<span class="sc">$</span><span class="fu">fromiter</span>(mono)</span>
+<span id="cb1-20">    poly    <span class="ot">&lt;-</span> polexpr<span class="sc">$</span><span class="fu">as_poly</span>(x<span class="sc">$</span>pyobj, y<span class="sc">$</span>pyobj, z<span class="sc">$</span>pyobj)</span>
+<span id="cb1-21">    degree  <span class="ot">&lt;-</span> <span class="fu">toString</span>(poly<span class="sc">$</span><span class="fu">monoms</span>()[[<span class="dv">1</span>]])</span>
+<span id="cb1-22">    <span class="cf">if</span>(degree <span class="sc">%in%</span> <span class="fu">names</span>(povray)){</span>
+<span id="cb1-23">      povray[[degree]] <span class="ot">&lt;-</span> sympy<span class="sc">$</span><span class="fu">Add</span>(povray[[degree]], coef)</span>
+<span id="cb1-24">    }<span class="cf">else</span>{</span>
+<span id="cb1-25">      povray[[degree]] <span class="ot">&lt;-</span> coef</span>
+<span id="cb1-26">    }</span>
+<span id="cb1-27">  }</span>
+<span id="cb1-28">}</span>
+<span id="cb1-29">polynomial <span class="ot">&lt;-</span> <span class="fu">vapply</span>(<span class="fu">names</span>(povray), <span class="cf">function</span>(degree){</span>
+<span id="cb1-30">  coeff <span class="ot">&lt;-</span> povray[[degree]] <span class="sc">|&gt;</span></span>
+<span id="cb1-31">    <span class="fu">gsub</span>(<span class="st">"([ab])</span><span class="sc">\\</span><span class="st">*</span><span class="sc">\\</span><span class="st">*(</span><span class="sc">\\</span><span class="st">d+)"</span>, <span class="st">"pow(</span><span class="sc">\\</span><span class="st">1,</span><span class="sc">\\</span><span class="st">2)"</span>, <span class="at">x =</span> _)</span>
+<span id="cb1-32">  <span class="fu">sprintf</span>(<span class="st">"xyz(%s): %s,"</span>, degree, coeff)</span>
+<span id="cb1-33">}, <span class="fu">character</span>(1L))</span>
+<span id="cb1-34"><span class="fu">cat</span>(polynomial, <span class="at">sep =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>, <span class="at">file =</span> <span class="st">"SolidMobiusStrip.txt"</span>)</span></code></pre>
+      </div>
+      <p>
+        At the last step I use <code>gsub</code> to replace the powers like
+        <code>a**2</code> to their POV-Ray syntax <code>pow(a,2)</code>. The
+        above code writes this POV-Ray code:
+      </p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode povray"
+        ><code class="sourceCode povray"><span id="cb2-1">xyz<span class="op">(</span><span class="fl">4</span><span class="op">,</span> <span class="fl">0</span><span class="op">,</span> <span class="fl">0</span><span class="op">):</span> <span class="fu">pow</span><span class="op">(</span>a<span class="op">,</span><span class="fl">2</span><span class="op">)*</span><span class="fu">pow</span><span class="op">(</span>b<span class="op">,</span><span class="fl">2</span><span class="op">)</span> <span class="op">-</span> <span class="fl">2</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>a<span class="op">,</span><span class="fl">2</span><span class="op">)*</span>b <span class="op">+</span> <span class="fu">pow</span><span class="op">(</span>a<span class="op">,</span><span class="fl">2</span><span class="op">),</span></span>
+<span id="cb2-2">xyz<span class="op">(</span><span class="fl">8</span><span class="op">,</span> <span class="fl">0</span><span class="op">,</span> <span class="fl">0</span><span class="op">):</span> <span class="fu">pow</span><span class="op">(</span>a<span class="op">,</span><span class="fl">2</span><span class="op">),</span></span>
+<span id="cb2-3">xyz<span class="op">(</span><span class="fl">0</span><span class="op">,</span> <span class="fl">4</span><span class="op">,</span> <span class="fl">0</span><span class="op">):</span> <span class="fu">pow</span><span class="op">(</span>a<span class="op">,</span><span class="fl">2</span><span class="op">)*</span><span class="fu">pow</span><span class="op">(</span>b<span class="op">,</span><span class="fl">2</span><span class="op">)</span> <span class="op">-</span> <span class="fl">2</span><span class="op">*</span>a<span class="op">*</span><span class="fu">pow</span><span class="op">(</span>b<span class="op">,</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">pow</span><span class="op">(</span>b<span class="op">,</span><span class="fl">2</span><span class="op">),</span></span>
+<span id="cb2-4">xyz<span class="op">(</span><span class="fl">0</span><span class="op">,</span> <span class="fl">8</span><span class="op">,</span> <span class="fl">0</span><span class="op">):</span> <span class="fu">pow</span><span class="op">(</span>b<span class="op">,</span><span class="fl">2</span><span class="op">),</span></span>
+<span id="cb2-5">xyz<span class="op">(</span><span class="fl">6</span><span class="op">,</span> <span class="fl">0</span><span class="op">,</span> <span class="fl">0</span><span class="op">):</span> <span class="op">-</span><span class="fl">2</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>a<span class="op">,</span><span class="fl">2</span><span class="op">)*</span>b <span class="op">-</span> <span class="fl">2</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>a<span class="op">,</span><span class="fl">2</span><span class="op">),</span></span>
+<span id="cb2-6">xyz<span class="op">(</span><span class="fl">0</span><span class="op">,</span> <span class="fl">6</span><span class="op">,</span> <span class="fl">0</span><span class="op">):</span> <span class="op">-</span><span class="fl">2</span><span class="op">*</span>a<span class="op">*</span><span class="fu">pow</span><span class="op">(</span>b<span class="op">,</span><span class="fl">2</span><span class="op">)</span> <span class="op">-</span> <span class="fl">2</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>b<span class="op">,</span><span class="fl">2</span><span class="op">),</span></span>
+<span id="cb2-7">xyz<span class="op">(</span><span class="fl">4</span><span class="op">,</span> <span class="fl">4</span><span class="op">,</span> <span class="fl">0</span><span class="op">):</span> <span class="fu">pow</span><span class="op">(</span>a<span class="op">,</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="fl">4</span><span class="op">*</span>a<span class="op">*</span>b <span class="op">+</span> <span class="fu">pow</span><span class="op">(</span>b<span class="op">,</span><span class="fl">2</span><span class="op">),</span></span>
+<span id="cb2-8">xyz<span class="op">(</span><span class="fl">0</span><span class="op">,</span> <span class="fl">4</span><span class="op">,</span> <span class="fl">4</span><span class="op">):</span> <span class="fu">pow</span><span class="op">(</span>a<span class="op">,</span><span class="fl">2</span><span class="op">),</span></span>
+<span id="cb2-9">xyz<span class="op">(</span><span class="fl">4</span><span class="op">,</span> <span class="fl">0</span><span class="op">,</span> <span class="fl">4</span><span class="op">):</span> <span class="fu">pow</span><span class="op">(</span>b<span class="op">,</span><span class="fl">2</span><span class="op">),</span></span>
+<span id="cb2-10">xyz<span class="op">(</span><span class="fl">4</span><span class="op">,</span> <span class="fl">2</span><span class="op">,</span> <span class="fl">0</span><span class="op">):</span> <span class="op">-</span><span class="fl">4</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>a<span class="op">,</span><span class="fl">2</span><span class="op">)*</span>b <span class="op">-</span> <span class="fl">2</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>a<span class="op">,</span><span class="fl">2</span><span class="op">)</span> <span class="op">-</span> <span class="fl">2</span><span class="op">*</span>a<span class="op">*</span><span class="fu">pow</span><span class="op">(</span>b<span class="op">,</span><span class="fl">2</span><span class="op">)</span> <span class="op">-</span> <span class="fl">4</span><span class="op">*</span>a<span class="op">*</span>b<span class="op">,</span></span>
+<span id="cb2-11">xyz<span class="op">(</span><span class="fl">6</span><span class="op">,</span> <span class="fl">2</span><span class="op">,</span> <span class="fl">0</span><span class="op">):</span> <span class="fl">2</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>a<span class="op">,</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="fl">2</span><span class="op">*</span>a<span class="op">*</span>b<span class="op">,</span></span>
+<span id="cb2-12">xyz<span class="op">(</span><span class="fl">2</span><span class="op">,</span> <span class="fl">4</span><span class="op">,</span> <span class="fl">0</span><span class="op">):</span> <span class="op">-</span><span class="fl">2</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>a<span class="op">,</span><span class="fl">2</span><span class="op">)*</span>b <span class="op">-</span> <span class="fl">4</span><span class="op">*</span>a<span class="op">*</span><span class="fu">pow</span><span class="op">(</span>b<span class="op">,</span><span class="fl">2</span><span class="op">)</span> <span class="op">-</span> <span class="fl">4</span><span class="op">*</span>a<span class="op">*</span>b <span class="op">-</span> <span class="fl">2</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>b<span class="op">,</span><span class="fl">2</span><span class="op">),</span></span>
+<span id="cb2-13">xyz<span class="op">(</span><span class="fl">2</span><span class="op">,</span> <span class="fl">6</span><span class="op">,</span> <span class="fl">0</span><span class="op">):</span> <span class="fl">2</span><span class="op">*</span>a<span class="op">*</span>b <span class="op">+</span> <span class="fl">2</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>b<span class="op">,</span><span class="fl">2</span><span class="op">),</span></span>
+<span id="cb2-14">xyz<span class="op">(</span><span class="fl">1</span><span class="op">,</span> <span class="fl">3</span><span class="op">,</span> <span class="fl">3</span><span class="op">):</span> <span class="op">-</span><span class="fl">4</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>a<span class="op">,</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="fl">4</span><span class="op">*</span>a<span class="op">*</span>b<span class="op">,</span></span>
+<span id="cb2-15">xyz<span class="op">(</span><span class="fl">3</span><span class="op">,</span> <span class="fl">1</span><span class="op">,</span> <span class="fl">1</span><span class="op">):</span> <span class="fl">4</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>a<span class="op">,</span><span class="fl">2</span><span class="op">)*</span>b <span class="op">-</span> <span class="fl">4</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>a<span class="op">,</span><span class="fl">2</span><span class="op">)</span> <span class="op">-</span> <span class="fl">4</span><span class="op">*</span>a<span class="op">*</span><span class="fu">pow</span><span class="op">(</span>b<span class="op">,</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="fl">4</span><span class="op">*</span>a<span class="op">*</span>b<span class="op">,</span></span>
+<span id="cb2-16">xyz<span class="op">(</span><span class="fl">5</span><span class="op">,</span> <span class="fl">1</span><span class="op">,</span> <span class="fl">1</span><span class="op">):</span> <span class="fl">4</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>a<span class="op">,</span><span class="fl">2</span><span class="op">)</span> <span class="op">-</span> <span class="fl">4</span><span class="op">*</span>a<span class="op">*</span>b<span class="op">,</span></span>
+<span id="cb2-17">xyz<span class="op">(</span><span class="fl">3</span><span class="op">,</span> <span class="fl">3</span><span class="op">,</span> <span class="fl">1</span><span class="op">):</span> <span class="fl">4</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>a<span class="op">,</span><span class="fl">2</span><span class="op">)</span> <span class="op">-</span> <span class="fl">4</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>b<span class="op">,</span><span class="fl">2</span><span class="op">),</span></span>
+<span id="cb2-18">xyz<span class="op">(</span><span class="fl">2</span><span class="op">,</span> <span class="fl">2</span><span class="op">,</span> <span class="fl">0</span><span class="op">):</span> <span class="fl">2</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>a<span class="op">,</span><span class="fl">2</span><span class="op">)*</span><span class="fu">pow</span><span class="op">(</span>b<span class="op">,</span><span class="fl">2</span><span class="op">)</span> <span class="op">-</span> <span class="fl">2</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>a<span class="op">,</span><span class="fl">2</span><span class="op">)*</span>b <span class="op">-</span> <span class="fl">2</span><span class="op">*</span>a<span class="op">*</span><span class="fu">pow</span><span class="op">(</span>b<span class="op">,</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="fl">2</span><span class="op">*</span>a<span class="op">*</span>b<span class="op">,</span></span>
+<span id="cb2-19">xyz<span class="op">(</span><span class="fl">4</span><span class="op">,</span> <span class="fl">0</span><span class="op">,</span> <span class="fl">2</span><span class="op">):</span> <span class="op">-</span><span class="fl">2</span><span class="op">*</span>a<span class="op">*</span><span class="fu">pow</span><span class="op">(</span>b<span class="op">,</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="fl">2</span><span class="op">*</span>a<span class="op">*</span>b<span class="op">,</span></span>
+<span id="cb2-20">xyz<span class="op">(</span><span class="fl">0</span><span class="op">,</span> <span class="fl">4</span><span class="op">,</span> <span class="fl">2</span><span class="op">):</span> <span class="op">-</span><span class="fl">2</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>a<span class="op">,</span><span class="fl">2</span><span class="op">)*</span>b <span class="op">+</span> <span class="fl">2</span><span class="op">*</span>a<span class="op">*</span>b<span class="op">,</span></span>
+<span id="cb2-21">xyz<span class="op">(</span><span class="fl">6</span><span class="op">,</span> <span class="fl">0</span><span class="op">,</span> <span class="fl">2</span><span class="op">):</span> <span class="fl">2</span><span class="op">*</span>a<span class="op">*</span>b<span class="op">,</span></span>
+<span id="cb2-22">xyz<span class="op">(</span><span class="fl">0</span><span class="op">,</span> <span class="fl">6</span><span class="op">,</span> <span class="fl">2</span><span class="op">):</span> <span class="fl">2</span><span class="op">*</span>a<span class="op">*</span>b<span class="op">,</span></span>
+<span id="cb2-23">xyz<span class="op">(</span><span class="fl">2</span><span class="op">,</span> <span class="fl">4</span><span class="op">,</span> <span class="fl">2</span><span class="op">):</span> <span class="op">-</span><span class="fl">2</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>a<span class="op">,</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="fl">10</span><span class="op">*</span>a<span class="op">*</span>b <span class="op">-</span> <span class="fl">2</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>b<span class="op">,</span><span class="fl">2</span><span class="op">),</span></span>
+<span id="cb2-24">xyz<span class="op">(</span><span class="fl">4</span><span class="op">,</span> <span class="fl">2</span><span class="op">,</span> <span class="fl">2</span><span class="op">):</span> <span class="op">-</span><span class="fl">2</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>a<span class="op">,</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="fl">10</span><span class="op">*</span>a<span class="op">*</span>b <span class="op">-</span> <span class="fl">2</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>b<span class="op">,</span><span class="fl">2</span><span class="op">),</span></span>
+<span id="cb2-25">xyz<span class="op">(</span><span class="fl">1</span><span class="op">,</span> <span class="fl">3</span><span class="op">,</span> <span class="fl">1</span><span class="op">):</span> <span class="fl">4</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>a<span class="op">,</span><span class="fl">2</span><span class="op">)*</span>b <span class="op">-</span> <span class="fl">4</span><span class="op">*</span>a<span class="op">*</span><span class="fu">pow</span><span class="op">(</span>b<span class="op">,</span><span class="fl">2</span><span class="op">)</span> <span class="op">-</span> <span class="fl">4</span><span class="op">*</span>a<span class="op">*</span>b <span class="op">+</span> <span class="fl">4</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>b<span class="op">,</span><span class="fl">2</span><span class="op">),</span></span>
+<span id="cb2-26">xyz<span class="op">(</span><span class="fl">1</span><span class="op">,</span> <span class="fl">5</span><span class="op">,</span> <span class="fl">1</span><span class="op">):</span> <span class="fl">4</span><span class="op">*</span>a<span class="op">*</span>b <span class="op">-</span> <span class="fl">4</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>b<span class="op">,</span><span class="fl">2</span><span class="op">),</span></span>
+<span id="cb2-27">xyz<span class="op">(</span><span class="fl">3</span><span class="op">,</span> <span class="fl">1</span><span class="op">,</span> <span class="fl">3</span><span class="op">):</span> <span class="op">-</span><span class="fl">4</span><span class="op">*</span>a<span class="op">*</span>b <span class="op">+</span> <span class="fl">4</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>b<span class="op">,</span><span class="fl">2</span><span class="op">),</span></span>
+<span id="cb2-28">xyz<span class="op">(</span><span class="fl">2</span><span class="op">,</span> <span class="fl">2</span><span class="op">,</span> <span class="fl">2</span><span class="op">):</span> <span class="op">-</span><span class="fl">2</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>a<span class="op">,</span><span class="fl">2</span><span class="op">)*</span>b <span class="op">+</span> <span class="fl">6</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>a<span class="op">,</span><span class="fl">2</span><span class="op">)</span> <span class="op">-</span> <span class="fl">2</span><span class="op">*</span>a<span class="op">*</span><span class="fu">pow</span><span class="op">(</span>b<span class="op">,</span><span class="fl">2</span><span class="op">)</span> <span class="op">-</span> <span class="fl">8</span><span class="op">*</span>a<span class="op">*</span>b <span class="op">+</span> <span class="fl">6</span><span class="op">*</span><span class="fu">pow</span><span class="op">(</span>b<span class="op">,</span><span class="fl">2</span><span class="op">),</span></span>
+<span id="cb2-29">xyz<span class="op">(</span><span class="fl">2</span><span class="op">,</span> <span class="fl">2</span><span class="op">,</span> <span class="fl">4</span><span class="op">):</span> <span class="fl">2</span><span class="op">*</span>a<span class="op">*</span>b<span class="op">,</span></span></code></pre>
+      </div>
+      <p>
+        This is very fast for this example, but it still took 20 minutes with my
+        case, which is a slight modification of an animation by ‘ICN5D’; here it
+        is:
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/ICN5D_02.gif"
+        />
+      </p>
+      <p>
+        The difference with the original animation is that this one uses an
+        <a
+          href="https://laustep.github.io/stlahblog/posts/slicedImplicitHypersurface.html"
+          >isoclinic rotation</a
+        >
+        for the animation.
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Sat, 16 Jul 2022 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/caracas02.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>Slices of an implicit hypersurface with R</title>
       <link>https://laustep.github.io/stlahblog/posts/slicedImplicitHypersurface.html</link>
