@@ -1,0 +1,383 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - The compound of five tetrahedra</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>The compound of five tetrahedra</h1> 
+          <div class="info">
+    Posted on September 10, 2022
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'python'." href="../tags/python.html">python</a>, <a title="All pages tagged 'geometry'." href="../tags/geometry.html">geometry</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>
+    
+</div>
+
+<p>In <a href="https://laustep.github.io/stlahblog/posts/BooleanOpsOnMeshes.html">this previous post</a> I was wrong when I said I didn’t have a tool to compute the intersection of the compound of five tetrahedra:</p>
+<p><img src="./figures/tetrahedraCompoundIntersection.gif" style="width:60.0%" /></p>
+<p>This can be achieved with the help of the <strong>rcdd</strong> package in R.</p>
+<p>This package is a wrapper of the C library <strong>cddlib</strong>. It implements the <em>double description</em> of convex polyhedra:</p>
+<ul>
+<li><p>the <em>V-description</em> is the description by the vertices of the polyhedron;</p></li>
+<li><p>the <em>H-description</em> is the description by a set of linear inequalities.</p></li>
+</ul>
+<p>Once we get the H-description of two or more polyhedra, it is straightforward to get the H-description of their intersection: it suffices to join all the linear inequalities. Then, <strong>cddlib</strong> will give us the corresponding V-representation. That’s it.</p>
+<p>The <strong>cddlib</strong> library is also usable in Python, with the <strong>pycddlib</strong> library. I’m going to show how to compute the intersection of the five tetrahedra forming the compound with R and with Python.</p>
+<h2 id="the-r-way">The R way</h2>
+<p>Here are the vertices of the five tetrahedra:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># the twenty vertices ####</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a>phi &lt;-<span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="dv">5</span>)) <span class="op">/</span><span class="st"> </span><span class="dv">2</span></span>
+<span id="cb1-3"><a href="#cb1-3"></a>a &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="dv">3</span>)</span>
+<span id="cb1-4"><a href="#cb1-4"></a>b &lt;-<span class="st"> </span>a <span class="op">/</span><span class="st"> </span>phi</span>
+<span id="cb1-5"><a href="#cb1-5"></a>c &lt;-<span class="st"> </span>a <span class="op">*</span><span class="st"> </span>phi</span>
+<span id="cb1-6"><a href="#cb1-6"></a>vertices &lt;-<span class="st"> </span><span class="kw">rbind</span>(</span>
+<span id="cb1-7"><a href="#cb1-7"></a>  <span class="kw">c</span>( a,  a,  a),</span>
+<span id="cb1-8"><a href="#cb1-8"></a>  <span class="kw">c</span>( a,  a, <span class="op">-</span>a),</span>
+<span id="cb1-9"><a href="#cb1-9"></a>  <span class="kw">c</span>( a, <span class="op">-</span>a,  a),</span>
+<span id="cb1-10"><a href="#cb1-10"></a>  <span class="kw">c</span>(<span class="op">-</span>a, <span class="op">-</span>a,  a),</span>
+<span id="cb1-11"><a href="#cb1-11"></a>  <span class="kw">c</span>(<span class="op">-</span>a,  a, <span class="op">-</span>a),</span>
+<span id="cb1-12"><a href="#cb1-12"></a>  <span class="kw">c</span>(<span class="op">-</span>a,  a,  a),</span>
+<span id="cb1-13"><a href="#cb1-13"></a>  <span class="kw">c</span>( <span class="dv">0</span>,  b, <span class="op">-</span>c),</span>
+<span id="cb1-14"><a href="#cb1-14"></a>  <span class="kw">c</span>( <span class="dv">0</span>, <span class="op">-</span>b, <span class="op">-</span>c),</span>
+<span id="cb1-15"><a href="#cb1-15"></a>  <span class="kw">c</span>( <span class="dv">0</span>, <span class="op">-</span>b,  c),</span>
+<span id="cb1-16"><a href="#cb1-16"></a>  <span class="kw">c</span>( c,  <span class="dv">0</span>, <span class="op">-</span>b),</span>
+<span id="cb1-17"><a href="#cb1-17"></a>  <span class="kw">c</span>(<span class="op">-</span>c,  <span class="dv">0</span>, <span class="op">-</span>b),</span>
+<span id="cb1-18"><a href="#cb1-18"></a>  <span class="kw">c</span>(<span class="op">-</span>c,  <span class="dv">0</span>,  b),</span>
+<span id="cb1-19"><a href="#cb1-19"></a>  <span class="kw">c</span>( b,  c,  <span class="dv">0</span>),</span>
+<span id="cb1-20"><a href="#cb1-20"></a>  <span class="kw">c</span>( b, <span class="op">-</span>c,  <span class="dv">0</span>),</span>
+<span id="cb1-21"><a href="#cb1-21"></a>  <span class="kw">c</span>(<span class="op">-</span>b, <span class="op">-</span>c,  <span class="dv">0</span>),</span>
+<span id="cb1-22"><a href="#cb1-22"></a>  <span class="kw">c</span>(<span class="op">-</span>b,  c,  <span class="dv">0</span>),</span>
+<span id="cb1-23"><a href="#cb1-23"></a>  <span class="kw">c</span>( <span class="dv">0</span>,  b,  c),</span>
+<span id="cb1-24"><a href="#cb1-24"></a>  <span class="kw">c</span>( a, <span class="op">-</span>a, <span class="op">-</span>a),</span>
+<span id="cb1-25"><a href="#cb1-25"></a>  <span class="kw">c</span>( c,  <span class="dv">0</span>,  b),</span>
+<span id="cb1-26"><a href="#cb1-26"></a>  <span class="kw">c</span>(<span class="op">-</span>a, <span class="op">-</span>a, <span class="op">-</span>a)</span>
+<span id="cb1-27"><a href="#cb1-27"></a>)</span>
+<span id="cb1-28"><a href="#cb1-28"></a></span>
+<span id="cb1-29"><a href="#cb1-29"></a><span class="co"># the five tetrahedra ####</span></span>
+<span id="cb1-30"><a href="#cb1-30"></a>th1 &lt;-<span class="st"> </span>vertices[<span class="kw">c</span>(17L, 14L,  2L, 11L), ]</span>
+<span id="cb1-31"><a href="#cb1-31"></a>th2 &lt;-<span class="st"> </span>vertices[<span class="kw">c</span>(18L,  1L,  4L,  5L), ]</span>
+<span id="cb1-32"><a href="#cb1-32"></a>th3 &lt;-<span class="st"> </span>vertices[<span class="kw">c</span>(19L,  6L, 15L,  7L), ]</span>
+<span id="cb1-33"><a href="#cb1-33"></a>th4 &lt;-<span class="st"> </span>vertices[<span class="kw">c</span>( 3L, 13L, 12L,  8L), ]</span>
+<span id="cb1-34"><a href="#cb1-34"></a>th5 &lt;-<span class="st"> </span>vertices[<span class="kw">c</span>(20L, 16L, 10L,  9L), ]</span></code></pre></div>
+<p>To make a V-description with <strong>rcdd</strong>, one uses the function <code>makeV</code>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">library</span>(rcdd)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>V1 &lt;-<span class="st"> </span><span class="kw">makeV</span>(th1)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>V2 &lt;-<span class="st"> </span><span class="kw">makeV</span>(th2)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>V3 &lt;-<span class="st"> </span><span class="kw">makeV</span>(th3)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>V4 &lt;-<span class="st"> </span><span class="kw">makeV</span>(th4)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>V5 &lt;-<span class="st"> </span><span class="kw">makeV</span>(th5)</span></code></pre></div>
+<p>Let’s look at a V-description in R:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>V1</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="co">##      [,1] [,2]       [,3]       [,4]       [,5]</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="co">## [1,]    0    1  0.0000000  0.3568221  0.9341724</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="co">## [2,]    0    1  0.3568221 -0.9341724  0.0000000</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a><span class="co">## [3,]    0    1  0.5773503  0.5773503 -0.5773503</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a><span class="co">## [4,]    0    1 -0.9341724  0.0000000 -0.3568221</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a><span class="co">## attr(,&quot;representation&quot;)</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a><span class="co">## [1] &quot;V&quot;</span></span></code></pre></div>
+<p>Each row starts with a zero and a one, followed by the coordinates of the vertex. I don’t remember what the zero means. The one means that the subsequent numbers represent a vertex (it is also possible to encode rays and lines in a V-description).</p>
+<p>Now we get the H-representations with the help of the <code>scdd</code> function:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>H1 &lt;-<span class="st"> </span><span class="kw">scdd</span>(V1)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>H2 &lt;-<span class="st"> </span><span class="kw">scdd</span>(V2)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>H3 &lt;-<span class="st"> </span><span class="kw">scdd</span>(V3)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>H4 &lt;-<span class="st"> </span><span class="kw">scdd</span>(V4)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>H5 &lt;-<span class="st"> </span><span class="kw">scdd</span>(V5)</span></code></pre></div>
+<p>Let’s look at a H-description:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>H1</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="co">## $output</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="co">##      [,1] [,2]          [,3]          [,4]          [,5]</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="co">## [1,]    0    1 -2.802517e+00 -2.220446e-16 -1.070466e+00</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="co">## [2,]    0    1 -8.881784e-16  1.070466e+00  2.802517e+00</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a><span class="co">## [3,]    0    1  1.070466e+00 -2.802517e+00  9.614813e-17</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a><span class="co">## [4,]    0    1  1.732051e+00  1.732051e+00 -1.732051e+00</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a><span class="co">## attr(,&quot;representation&quot;)</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a><span class="co">## [1] &quot;H&quot;</span></span></code></pre></div>
+<p>In the first column, a zero indicates that the corresponding rows represents an inequality. The number in the second column is the right hand side of the inequality, and the subsequent three numbers are the coefficients of the linear inequality.</p>
+<p>Now, let’s join all the linear inequalities. That is, we stack the five matrices:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>H &lt;-<span class="st"> </span><span class="kw">rbind</span>(H1<span class="op">$</span>output, H2<span class="op">$</span>output, H3<span class="op">$</span>output, H4<span class="op">$</span>output, H5<span class="op">$</span>output)</span></code></pre></div>
+<p>The <code>scdd</code> function converts from the V-representation to the H-representation and vice-versa. Hence we get the vertices of the intersection by applying this function to the above H-representation:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>(V &lt;-<span class="st"> </span><span class="kw">scdd</span>(H) )</span></code></pre></div>
+<pre><code>## $output
+##       [,1] [,2]          [,3]          [,4]          [,5]
+##  [1,]    0    1 -2.205282e-01 -8.212094e-16  3.568221e-01
+##  [2,]    0    1  4.240675e-16 -3.568221e-01  2.205282e-01
+##  [3,]    0    1  5.654233e-16  3.568221e-01  2.205282e-01
+##  [4,]    0    1  2.205282e-01  0.000000e+00  3.568221e-01
+##  [5,]    0    1  3.568221e-01 -2.205282e-01  4.574370e-17
+##  [6,]    0    1  3.568221e-01  2.205282e-01 -4.574370e-17
+##  [7,]    0    1  2.205282e-01  3.202059e-16 -3.568221e-01
+##  [8,]    0    1  1.017762e-15  3.568221e-01 -2.205282e-01
+##  [9,]    0    1  6.785079e-16 -3.568221e-01 -2.205282e-01
+## [10,]    0    1 -2.205282e-01 -5.010035e-16 -3.568221e-01
+## [11,]    0    1 -3.568221e-01  2.205282e-01  2.795606e-16
+## [12,]    0    1 -3.568221e-01 -2.205282e-01 -9.718761e-17
+## attr(,&quot;representation&quot;)
+## [1] &quot;V&quot;</code></pre>
+<p>The vertices are given in the last three columns. Let’s extract them:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a>vertices &lt;-<span class="st"> </span>V<span class="op">$</span>output[, <span class="kw">c</span>(3L, 4L, 5L)]</span></code></pre></div>
+<p>There are twelve vertices. The intersection is a regular icosahedron. Now we will plot it. First, we compute the convex hull of these vertices with the <strong>cxhull</strong> package. The icosahedron is convex, so its convex hull is itself. But <strong>cxhull</strong> also provides the faces and the edges that are used for plotting.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="kw">library</span>(cxhull)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>icosahedron &lt;-<span class="st"> </span><span class="kw">cxhull</span>(vertices, <span class="dt">triangulate =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<p>There’s a convenient function in <strong>cxhull</strong> to plot a convec hull with <strong>rgl</strong>, namely <code>plotConvexHull3d</code>:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="kw">library</span>(rgl)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true"></a><span class="kw">view3d</span>(<span class="dv">10</span>, <span class="dv">80</span>, <span class="dt">zoom =</span> <span class="fl">0.7</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true"></a><span class="kw">plotConvexHull3d</span>(</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true"></a>  icosahedron, <span class="dt">palette =</span> <span class="kw">hcl.colors</span>(<span class="dv">256</span>, <span class="st">&quot;BuPu&quot;</span>), <span class="dt">bias =</span> <span class="fl">0.25</span>, </span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true"></a>  <span class="dt">edgesColor =</span> <span class="st">&quot;yellow&quot;</span>, <span class="dt">tubesRadius =</span> <span class="fl">0.06</span>, <span class="dt">spheresRadius =</span> <span class="fl">0.08</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true"></a>)</span></code></pre></div>
+<p><img src="./figures/icosahedron2.png" style="width:60.0%" /></p>
+<h2 id="the-python-way">The Python way</h2>
+<p>Here is the Python code computing the intersection of the five tetrahedra:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode numberSource python numberLines"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb12-2"><a href="#cb12-2"></a><span class="im">import</span> cdd <span class="im">as</span> cdd</span>
+<span id="cb12-3"><a href="#cb12-3"></a></span>
+<span id="cb12-4"><a href="#cb12-4"></a><span class="co"># the twenty vertices </span></span>
+<span id="cb12-5"><a href="#cb12-5"></a>phi <span class="op">=</span> (<span class="dv">1</span> <span class="op">+</span> np.sqrt(<span class="dv">5</span>)) <span class="op">/</span> <span class="dv">2</span></span>
+<span id="cb12-6"><a href="#cb12-6"></a>a <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> np.sqrt(<span class="dv">3</span>)</span>
+<span id="cb12-7"><a href="#cb12-7"></a>b <span class="op">=</span> a <span class="op">/</span> phi</span>
+<span id="cb12-8"><a href="#cb12-8"></a>c <span class="op">=</span> a <span class="op">*</span> phi</span>
+<span id="cb12-9"><a href="#cb12-9"></a></span>
+<span id="cb12-10"><a href="#cb12-10"></a>vertices <span class="op">=</span> np.vstack(</span>
+<span id="cb12-11"><a href="#cb12-11"></a>    (</span>
+<span id="cb12-12"><a href="#cb12-12"></a>        np.array([a, a, a]),</span>
+<span id="cb12-13"><a href="#cb12-13"></a>        np.array([a, a, <span class="op">-</span>a]),</span>
+<span id="cb12-14"><a href="#cb12-14"></a>        np.array([a, <span class="op">-</span>a, a]),</span>
+<span id="cb12-15"><a href="#cb12-15"></a>        np.array([<span class="op">-</span>a, <span class="op">-</span>a, a]),</span>
+<span id="cb12-16"><a href="#cb12-16"></a>        np.array([<span class="op">-</span>a, a, <span class="op">-</span>a]),</span>
+<span id="cb12-17"><a href="#cb12-17"></a>        np.array([<span class="op">-</span>a, a, a]),</span>
+<span id="cb12-18"><a href="#cb12-18"></a>        np.array([<span class="dv">0</span>, b, <span class="op">-</span>c]),</span>
+<span id="cb12-19"><a href="#cb12-19"></a>        np.array([<span class="dv">0</span>, <span class="op">-</span>b, <span class="op">-</span>c]),</span>
+<span id="cb12-20"><a href="#cb12-20"></a>        np.array([<span class="dv">0</span>, <span class="op">-</span>b, c]),</span>
+<span id="cb12-21"><a href="#cb12-21"></a>        np.array([c, <span class="dv">0</span>, <span class="op">-</span>b]),</span>
+<span id="cb12-22"><a href="#cb12-22"></a>        np.array([<span class="op">-</span>c, <span class="dv">0</span>, <span class="op">-</span>b]),</span>
+<span id="cb12-23"><a href="#cb12-23"></a>        np.array([<span class="op">-</span>c, <span class="dv">0</span>, b]),</span>
+<span id="cb12-24"><a href="#cb12-24"></a>        np.array([b, c, <span class="dv">0</span>]),</span>
+<span id="cb12-25"><a href="#cb12-25"></a>        np.array([b, <span class="op">-</span>c, <span class="dv">0</span>]),</span>
+<span id="cb12-26"><a href="#cb12-26"></a>        np.array([<span class="op">-</span>b, <span class="op">-</span>c, <span class="dv">0</span>]),</span>
+<span id="cb12-27"><a href="#cb12-27"></a>        np.array([<span class="op">-</span>b, c, <span class="dv">0</span>]),</span>
+<span id="cb12-28"><a href="#cb12-28"></a>        np.array([<span class="dv">0</span>, b, c]),</span>
+<span id="cb12-29"><a href="#cb12-29"></a>        np.array([a, <span class="op">-</span>a, <span class="op">-</span>a]),</span>
+<span id="cb12-30"><a href="#cb12-30"></a>        np.array([c, <span class="dv">0</span>, b]),</span>
+<span id="cb12-31"><a href="#cb12-31"></a>        np.array([<span class="op">-</span>a, <span class="op">-</span>a, <span class="op">-</span>a]),</span>
+<span id="cb12-32"><a href="#cb12-32"></a>    )</span>
+<span id="cb12-33"><a href="#cb12-33"></a>)</span>
+<span id="cb12-34"><a href="#cb12-34"></a></span>
+<span id="cb12-35"><a href="#cb12-35"></a><span class="co"># tetrahedra vertices </span></span>
+<span id="cb12-36"><a href="#cb12-36"></a>tetra1Idxs <span class="op">=</span> [<span class="dv">16</span>, <span class="dv">13</span>, <span class="dv">1</span>, <span class="dv">10</span>]</span>
+<span id="cb12-37"><a href="#cb12-37"></a>tetra2Idxs <span class="op">=</span> [<span class="dv">17</span>, <span class="dv">0</span>, <span class="dv">3</span>, <span class="dv">4</span>]</span>
+<span id="cb12-38"><a href="#cb12-38"></a>tetra3Idxs <span class="op">=</span> [<span class="dv">18</span>, <span class="dv">5</span>, <span class="dv">14</span>, <span class="dv">6</span>]</span>
+<span id="cb12-39"><a href="#cb12-39"></a>tetra4Idxs <span class="op">=</span> [<span class="dv">2</span>, <span class="dv">12</span>, <span class="dv">11</span>, <span class="dv">7</span>]</span>
+<span id="cb12-40"><a href="#cb12-40"></a>tetra5Idxs <span class="op">=</span> [<span class="dv">19</span>, <span class="dv">15</span>, <span class="dv">9</span>, <span class="dv">8</span>]</span>
+<span id="cb12-41"><a href="#cb12-41"></a>th1 <span class="op">=</span> vertices[tetra1Idxs, :]</span>
+<span id="cb12-42"><a href="#cb12-42"></a>th2 <span class="op">=</span> vertices[tetra2Idxs, :]</span>
+<span id="cb12-43"><a href="#cb12-43"></a>th3 <span class="op">=</span> vertices[tetra3Idxs, :]</span>
+<span id="cb12-44"><a href="#cb12-44"></a>th4 <span class="op">=</span> vertices[tetra4Idxs, :]</span>
+<span id="cb12-45"><a href="#cb12-45"></a>th5 <span class="op">=</span> vertices[tetra5Idxs, :]</span>
+<span id="cb12-46"><a href="#cb12-46"></a></span>
+<span id="cb12-47"><a href="#cb12-47"></a><span class="co"># make the V-representation of each tetrahedron; you have to prepend the </span></span>
+<span id="cb12-48"><a href="#cb12-48"></a><span class="co"># vertices array with a column of ones</span></span>
+<span id="cb12-49"><a href="#cb12-49"></a>v <span class="op">=</span> np.column_stack((np.ones(<span class="dv">4</span>), th1))</span>
+<span id="cb12-50"><a href="#cb12-50"></a>mat <span class="op">=</span> cdd.Matrix(v, number_type<span class="op">=</span><span class="st">'float'</span>) </span>
+<span id="cb12-51"><a href="#cb12-51"></a>mat.rep_type <span class="op">=</span> cdd.RepType.GENERATOR</span>
+<span id="cb12-52"><a href="#cb12-52"></a>poly1 <span class="op">=</span> cdd.Polyhedron(mat)</span>
+<span id="cb12-53"><a href="#cb12-53"></a>v <span class="op">=</span> np.column_stack((np.ones(<span class="dv">4</span>), th2))</span>
+<span id="cb12-54"><a href="#cb12-54"></a>mat <span class="op">=</span> cdd.Matrix(v, number_type<span class="op">=</span><span class="st">'float'</span>) </span>
+<span id="cb12-55"><a href="#cb12-55"></a>mat.rep_type <span class="op">=</span> cdd.RepType.GENERATOR</span>
+<span id="cb12-56"><a href="#cb12-56"></a>poly2 <span class="op">=</span> cdd.Polyhedron(mat)</span>
+<span id="cb12-57"><a href="#cb12-57"></a>v <span class="op">=</span> np.column_stack((np.ones(<span class="dv">4</span>), th3))</span>
+<span id="cb12-58"><a href="#cb12-58"></a>mat <span class="op">=</span> cdd.Matrix(v, number_type<span class="op">=</span><span class="st">'float'</span>) </span>
+<span id="cb12-59"><a href="#cb12-59"></a>mat.rep_type <span class="op">=</span> cdd.RepType.GENERATOR</span>
+<span id="cb12-60"><a href="#cb12-60"></a>poly3 <span class="op">=</span> cdd.Polyhedron(mat)</span>
+<span id="cb12-61"><a href="#cb12-61"></a>v <span class="op">=</span> np.column_stack((np.ones(<span class="dv">4</span>), th4))</span>
+<span id="cb12-62"><a href="#cb12-62"></a>mat <span class="op">=</span> cdd.Matrix(v, number_type<span class="op">=</span><span class="st">'float'</span>) </span>
+<span id="cb12-63"><a href="#cb12-63"></a>mat.rep_type <span class="op">=</span> cdd.RepType.GENERATOR</span>
+<span id="cb12-64"><a href="#cb12-64"></a>poly4 <span class="op">=</span> cdd.Polyhedron(mat)</span>
+<span id="cb12-65"><a href="#cb12-65"></a>v <span class="op">=</span> np.column_stack((np.ones(<span class="dv">4</span>), th5))</span>
+<span id="cb12-66"><a href="#cb12-66"></a>mat <span class="op">=</span> cdd.Matrix(v, number_type<span class="op">=</span><span class="st">'float'</span>) </span>
+<span id="cb12-67"><a href="#cb12-67"></a>mat.rep_type <span class="op">=</span> cdd.RepType.GENERATOR</span>
+<span id="cb12-68"><a href="#cb12-68"></a>poly5 <span class="op">=</span> cdd.Polyhedron(mat)</span>
+<span id="cb12-69"><a href="#cb12-69"></a></span>
+<span id="cb12-70"><a href="#cb12-70"></a><span class="co"># H-representations of the tetrahedra</span></span>
+<span id="cb12-71"><a href="#cb12-71"></a>h1 <span class="op">=</span> poly1.get_inequalities()</span>
+<span id="cb12-72"><a href="#cb12-72"></a>h2 <span class="op">=</span> poly2.get_inequalities()</span>
+<span id="cb12-73"><a href="#cb12-73"></a>h3 <span class="op">=</span> poly3.get_inequalities()</span>
+<span id="cb12-74"><a href="#cb12-74"></a>h4 <span class="op">=</span> poly4.get_inequalities()</span>
+<span id="cb12-75"><a href="#cb12-75"></a>h5 <span class="op">=</span> poly5.get_inequalities()</span>
+<span id="cb12-76"><a href="#cb12-76"></a></span>
+<span id="cb12-77"><a href="#cb12-77"></a><span class="co"># join the five sets of linear inequalities; this will give the intersection</span></span>
+<span id="cb12-78"><a href="#cb12-78"></a>hintersection <span class="op">=</span> np.vstack((h1, h2, h3, h4, h5))</span>
+<span id="cb12-79"><a href="#cb12-79"></a></span>
+<span id="cb12-80"><a href="#cb12-80"></a><span class="co"># make the V-representation of the intersection</span></span>
+<span id="cb12-81"><a href="#cb12-81"></a>mat <span class="op">=</span> cdd.Matrix(hintersection, number_type<span class="op">=</span><span class="st">'float'</span>)</span>
+<span id="cb12-82"><a href="#cb12-82"></a>mat.rep_type <span class="op">=</span> cdd.RepType.INEQUALITY</span>
+<span id="cb12-83"><a href="#cb12-83"></a>polyintersection <span class="op">=</span> cdd.Polyhedron(mat)</span>
+<span id="cb12-84"><a href="#cb12-84"></a></span>
+<span id="cb12-85"><a href="#cb12-85"></a><span class="co"># get the vertices; they are given in a matrix prepended by a column of ones</span></span>
+<span id="cb12-86"><a href="#cb12-86"></a>vintersection <span class="op">=</span> polyintersection.get_generators()</span>
+<span id="cb12-87"><a href="#cb12-87"></a></span>
+<span id="cb12-88"><a href="#cb12-88"></a><span class="co"># get rid of the column of ones</span></span>
+<span id="cb12-89"><a href="#cb12-89"></a>n_inequalities <span class="op">=</span> vintersection.row_size</span>
+<span id="cb12-90"><a href="#cb12-90"></a>intersection <span class="op">=</span> np.array([</span>
+<span id="cb12-91"><a href="#cb12-91"></a>    vintersection[i][<span class="dv">1</span>:<span class="dv">4</span>] <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_inequalities)    </span>
+<span id="cb12-92"><a href="#cb12-92"></a>])</span></code></pre></div>
+<p>Results are the same as the ones we got with R:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a>array([[<span class="op">-</span><span class="fl">2.20528179e-01</span>, <span class="op">-</span><span class="fl">8.21209393e-16</span>,  <span class="fl">3.56822090e-01</span>],</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true"></a>       [ <span class="fl">4.24067460e-16</span>, <span class="op">-</span><span class="fl">3.56822090e-01</span>,  <span class="fl">2.20528179e-01</span>],</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true"></a>       [ <span class="fl">5.65423280e-16</span>,  <span class="fl">3.56822090e-01</span>,  <span class="fl">2.20528179e-01</span>],</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true"></a>       [ <span class="fl">2.20528179e-01</span>,  <span class="fl">0.00000000e+00</span>,  <span class="fl">3.56822090e-01</span>],</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true"></a>       [ <span class="fl">3.56822090e-01</span>, <span class="op">-</span><span class="fl">2.20528179e-01</span>,  <span class="fl">4.57437043e-17</span>],</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true"></a>       [ <span class="fl">3.56822090e-01</span>,  <span class="fl">2.20528179e-01</span>, <span class="op">-</span><span class="fl">4.57437043e-17</span>],</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true"></a>       [ <span class="fl">2.20528179e-01</span>,  <span class="fl">3.20205930e-16</span>, <span class="op">-</span><span class="fl">3.56822090e-01</span>],</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true"></a>       [ <span class="fl">1.01776190e-15</span>,  <span class="fl">3.56822090e-01</span>, <span class="op">-</span><span class="fl">2.20528179e-01</span>],</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true"></a>       [ <span class="fl">6.78507937e-16</span>, <span class="op">-</span><span class="fl">3.56822090e-01</span>, <span class="op">-</span><span class="fl">2.20528179e-01</span>],</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true"></a>       [<span class="op">-</span><span class="fl">2.20528179e-01</span>, <span class="op">-</span><span class="fl">5.01003463e-16</span>, <span class="op">-</span><span class="fl">3.56822090e-01</span>],</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true"></a>       [<span class="op">-</span><span class="fl">3.56822090e-01</span>,  <span class="fl">2.20528179e-01</span>,  <span class="fl">2.79560644e-16</span>],</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true"></a>       [<span class="op">-</span><span class="fl">3.56822090e-01</span>, <span class="op">-</span><span class="fl">2.20528179e-01</span>, <span class="op">-</span><span class="fl">9.71876138e-17</span>]])</span></code></pre></div>
+<p>It is possible to get the edges of the polyhedron with <strong>pycddlib</strong>; see how I did in <a href="https://laustep.github.io/stlahblog/posts/E8rootPolytope.html">this post</a>. And to get the convex hull with its faces, one can use <code>scipy.spatial.ConvexHull(intersection)</code>.</p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
