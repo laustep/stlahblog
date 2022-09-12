@@ -104,7 +104,7 @@
 </div>
 
 <p>In <a href="https://laustep.github.io/stlahblog/posts/BooleanOpsOnMeshes.html">this previous post</a> I was wrong when I said I didn’t have a tool to compute the intersection of the compound of five tetrahedra:</p>
-<p><img src="./figures/tetrahedraCompoundIntersection.gif" style="width:60.0%" /></p>
+<p><img src="./figures/tetrahedraCompoundIntersection.gif" style="width:50.0%" /></p>
 <p>This can be achieved with the help of the <strong>rcdd</strong> package in R.</p>
 <p>This package is a wrapper of the C library <strong>cddlib</strong>. It implements the <em>double description</em> of convex polyhedra:</p>
 <ul>
@@ -208,15 +208,15 @@
 <p>There are twelve vertices. The intersection is a regular icosahedron. Now we will plot it. First, we compute the convex hull of these vertices with the <strong>cxhull</strong> package. The icosahedron is convex, so its convex hull is itself. But <strong>cxhull</strong> also provides the faces and the edges that are used for plotting.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="kw">library</span>(cxhull)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>icosahedron &lt;-<span class="st"> </span><span class="kw">cxhull</span>(vertices, <span class="dt">triangulate =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
-<p>There’s a convenient function in <strong>cxhull</strong> to plot a convec hull with <strong>rgl</strong>, namely <code>plotConvexHull3d</code>:</p>
+<p>There’s a convenient function in <strong>cxhull</strong> to plot a convex hull with <strong>rgl</strong>, namely <code>plotConvexHull3d</code>:</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="kw">library</span>(rgl)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true"></a><span class="kw">view3d</span>(<span class="dv">10</span>, <span class="dv">80</span>, <span class="dt">zoom =</span> <span class="fl">0.7</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true"></a><span class="kw">view3d</span>(<span class="dv">30</span>, <span class="dv">80</span>, <span class="dt">zoom =</span> <span class="fl">0.7</span>)</span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true"></a><span class="kw">plotConvexHull3d</span>(</span>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true"></a>  icosahedron, <span class="dt">palette =</span> <span class="kw">hcl.colors</span>(<span class="dv">256</span>, <span class="st">&quot;BuPu&quot;</span>), <span class="dt">bias =</span> <span class="fl">0.25</span>, </span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true"></a>  <span class="dt">edgesColor =</span> <span class="st">&quot;yellow&quot;</span>, <span class="dt">tubesRadius =</span> <span class="fl">0.06</span>, <span class="dt">spheresRadius =</span> <span class="fl">0.08</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true"></a>  <span class="dt">edgesColor =</span> <span class="st">&quot;yellow&quot;</span>, <span class="dt">tubesRadius =</span> <span class="fl">0.015</span>, <span class="dt">spheresRadius =</span> <span class="fl">0.02</span></span>
 <span id="cb11-7"><a href="#cb11-7" aria-hidden="true"></a>)</span></code></pre></div>
-<p><img src="./figures/icosahedron2.png" style="width:60.0%" /></p>
+<p><img src="./figures/icosahedron2.png" style="width:50.0%" /></p>
 <h2 id="the-python-way">The Python way</h2>
 <p>Here is the Python code computing the intersection of the five tetrahedra:</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode numberSource python numberLines"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>

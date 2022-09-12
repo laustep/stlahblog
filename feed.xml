@@ -5,7 +5,145 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Sat, 10 Sep 2022 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Mon, 12 Sep 2022 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>Kantorovich distance with the 'ompr' package</title>
+      <link>https://laustep.github.io/stlahblog/posts/kantorovichWithOMPR.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        Do you know
+        <a href="http://stla.github.io/stlapblog/index.html">my former blog</a>?
+        It contains four posts about the computation of the Kantorovich
+        distance:
+      </p>
+      <ul>
+        <li>
+          <p>
+            <a
+              href="https://stla.github.io/stlapblog/posts/KantorovichWithJulia.html"
+              >Using Julia to compute the Kantorovich distance</a
+            >
+          </p>
+        </li>
+        <li>
+          <p>
+            <a
+              href="http://stla.github.io/stlapblog/posts/KantorovichWithR.html"
+              >Using R to compute the Kantorovich distance</a
+            >
+          </p>
+        </li>
+        <li>
+          <p>
+            <a
+              href="http://stla.github.io/stlapblog/posts/KantorovichWithScala.html"
+              >Using Scala to compute the Kantorovich distance</a
+            >
+          </p>
+        </li>
+        <li>
+          <p>
+            <a
+              href="http://stla.github.io/stlapblog/posts/kantorovich-package.html"
+              >The ‘kantorovich’ package for R</a
+            >
+          </p>
+        </li>
+      </ul>
+      <p>
+        The Julia way using the <strong>JumP</strong> library has the most
+        convenient syntax:
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode julia"
+        ><code class="sourceCode julia"><span id="cb1-1"><span class="kw">using</span> JuMP </span>
+<span id="cb1-2">mu <span class="op">=</span> [<span class="fl">1</span><span class="op">/</span><span class="fl">7</span><span class="op">,</span> <span class="fl">2</span><span class="op">/</span><span class="fl">7</span><span class="op">,</span> <span class="fl">4</span><span class="op">/</span><span class="fl">7</span>]</span>
+<span id="cb1-3">nu <span class="op">=</span> [<span class="fl">1</span><span class="op">/</span><span class="fl">4</span><span class="op">,</span> <span class="fl">1</span><span class="op">/</span><span class="fl">4</span><span class="op">,</span> <span class="fl">1</span><span class="op">/</span><span class="fl">2</span>]</span>
+<span id="cb1-4">n <span class="op">=</span> length(mu)</span>
+<span id="cb1-5">m <span class="op">=</span> Model()</span>
+<span id="cb1-6"><span class="pp">@defVar</span>(m<span class="op">,</span> p[<span class="fl">1</span><span class="op">:</span>n<span class="op">,</span> <span class="fl">1</span><span class="op">:</span>n] <span class="op">&gt;=</span> <span class="fl">0</span>)</span>
+<span id="cb1-7"><span class="pp">@setObjective</span>(m<span class="op">,</span> Min<span class="op">,</span> sum{p[i<span class="op">,</span> j]<span class="op">,</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>n<span class="op">,</span> j <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>n<span class="op">;</span> i <span class="op">!=</span> j})</span>
+<span id="cb1-8"><span class="kw">for</span> k <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>n</span>
+<span id="cb1-9">  <span class="pp">@addConstraint</span>(m<span class="op">,</span> sum(p[k<span class="op">,</span> <span class="op">:</span>]) <span class="op">==</span> mu[k])</span>
+<span id="cb1-10">  <span class="pp">@addConstraint</span>(m<span class="op">,</span> sum(p[<span class="op">:,</span> k]) <span class="op">==</span> nu[k])</span>
+<span id="cb1-11"><span class="kw">end</span></span>
+<span id="cb1-12">solve(m)</span></code></pre>
+      </div>
+      <p>
+        This allows to get the Kantorovich distance between the two
+        probabilities <code>mu</code> and <code>nu</code> corresponding to the
+        0-1 distance (assuming <code>mu</code> and <code>nu</code> have the same
+        support). This is totally useless because one can straightforwardly get
+        this distance: it is one minus the total weight of the infimum measure
+        of the two probability measures (<code>1 - sum(pmin(mu, nu))</code> in
+        R). But this is just for a simple illustration purpose. This problem is
+        not trivial for another distance on the support of <code>mu</code> and
+        <code>nu</code>. Encoding this distance as a matrix <code>D</code>, the
+        linear programming model allowing to get the corresponding Kantorovich
+        distance is obtained by replacing
+      </p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode julia"
+        ><code class="sourceCode julia"><span id="cb2-1">sum{p[i<span class="op">,</span> j]<span class="op">,</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>n<span class="op">,</span> j <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>n<span class="op">;</span> i <span class="op">!=</span> j}</span></code></pre>
+      </div>
+      <p>with</p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode julia"
+        ><code class="sourceCode julia"><span id="cb3-1">sum{p[i<span class="op">,</span> j] <span class="op">*</span> D[i<span class="op">,</span> j]<span class="op">,</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>n<span class="op">,</span> j <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>n<span class="op">;</span> i <span class="op">!=</span> j}</span></code></pre>
+      </div>
+      <p>
+        Now I want to show again how to compute the Kantorovich distance with R,
+        but using another package I discovered yesterday: the
+        <strong>ompr</strong> package. It allows to write the model with a
+        convenient syntax, close to the mathematical language, similar to the
+        one above with <strong>JumP</strong>. Here is the model:
+      </p>
+      <div class="sourceCode" id="cb4">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb4-1"><span class="kw">library</span>(ompr)</span>
+<span id="cb4-2"><span class="kw">library</span>(ompr.roi)</span>
+<span id="cb4-3"><span class="kw">library</span>(ROI.plugin.glpk)</span>
+<span id="cb4-4"></span>
+<span id="cb4-5">mu &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span><span class="op">/</span><span class="dv">7</span>, <span class="dv">2</span><span class="op">/</span><span class="dv">7</span>, <span class="dv">4</span><span class="op">/</span><span class="dv">7</span>)</span>
+<span id="cb4-6">nu &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span><span class="op">/</span><span class="dv">4</span>, <span class="dv">1</span><span class="op">/</span><span class="dv">4</span>, <span class="dv">1</span><span class="op">/</span><span class="dv">2</span>)</span>
+<span id="cb4-7">n &lt;-<span class="st"> </span><span class="kw">length</span>(mu)</span>
+<span id="cb4-8"></span>
+<span id="cb4-9">model &lt;-<span class="st"> </span><span class="kw">MIPModel</span>() <span class="op">|</span><span class="er">&gt;</span></span>
+<span id="cb4-10"><span class="st">  </span><span class="kw">add_variable</span>(p[i, j], <span class="dt">i =</span> <span class="dv">1</span><span class="op">:</span>n, <span class="dt">j =</span> <span class="dv">1</span><span class="op">:</span>n, <span class="dt">type =</span> <span class="st">"continuous"</span>) <span class="op">|</span><span class="er">&gt;</span></span>
+<span id="cb4-11"><span class="st">  </span><span class="kw">add_constraint</span>(p[i, j] <span class="op">&gt;=</span><span class="st"> </span><span class="dv">0</span>, <span class="dt">i =</span> <span class="dv">1</span><span class="op">:</span>n, <span class="dt">j =</span> <span class="dv">1</span><span class="op">:</span>n) <span class="op">|</span><span class="er">&gt;</span></span>
+<span id="cb4-12"><span class="st">  </span><span class="kw">add_constraint</span>(<span class="kw">sum_over</span>(p[i, j], <span class="dt">j =</span> <span class="dv">1</span><span class="op">:</span>n) <span class="op">==</span><span class="st"> </span>mu[i], <span class="dt">i =</span> <span class="dv">1</span><span class="op">:</span>n) <span class="op">|</span><span class="er">&gt;</span></span>
+<span id="cb4-13"><span class="st">  </span><span class="kw">add_constraint</span>(<span class="kw">sum_over</span>(p[i, j], <span class="dt">i =</span> <span class="dv">1</span><span class="op">:</span>n) <span class="op">==</span><span class="st"> </span>nu[j], <span class="dt">j =</span> <span class="dv">1</span><span class="op">:</span>n) <span class="op">|</span><span class="er">&gt;</span></span>
+<span id="cb4-14"><span class="st">  </span><span class="kw">set_objective</span>(<span class="kw">sum_over</span>(p[i, j], <span class="dt">i =</span> <span class="dv">1</span><span class="op">:</span>n, <span class="dt">j =</span> <span class="dv">1</span><span class="op">:</span>n, i <span class="op">!=</span><span class="st"> </span>j), <span class="st">"min"</span>) </span></code></pre>
+      </div>
+      <p>This is nicely readable. Now we solve the problem:</p>
+      <div class="sourceCode" id="cb5">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb5-1">optimization &lt;-<span class="st"> </span>model <span class="op">|</span><span class="er">&gt;</span></span>
+<span id="cb5-2"><span class="st">  </span><span class="kw">solve_model</span>(<span class="kw">with_ROI</span>(<span class="dt">solver =</span> <span class="st">"glpk"</span>))</span></code></pre>
+      </div>
+      <p>And we get the Kantorovich distance:</p>
+      <div class="sourceCode" id="cb6">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb6-1"><span class="kw">objective_value</span>(optimization)</span>
+<span id="cb6-2"><span class="co">## [1] 0.1071429</span></span></code></pre>
+      </div>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Mon, 12 Sep 2022 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/kantorovichWithOMPR.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>The compound of five tetrahedra</title>
       <link>https://laustep.github.io/stlahblog/posts/tetrahedraCompound.html</link>
@@ -24,7 +162,7 @@
       <p>
         <img
           src="https://laustep.github.io/stlahblog/posts/figures/tetrahedraCompoundIntersection.gif"
-          style="width: 60%"
+          style="width: 50%"
         />
       </p>
       <p>
@@ -226,7 +364,7 @@
       </div>
       <p>
         There’s a convenient function in <strong>cxhull</strong> to plot a
-        convec hull with <strong>rgl</strong>, namely
+        convex hull with <strong>rgl</strong>, namely
         <code>plotConvexHull3d</code>:
       </p>
       <div class="sourceCode" id="cb11">
@@ -234,16 +372,16 @@
           class="sourceCode r"
         ><code class="sourceCode r"><span id="cb11-1"><span class="kw">library</span>(rgl)</span>
 <span id="cb11-2"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
-<span id="cb11-3"><span class="kw">view3d</span>(<span class="dv">10</span>, <span class="dv">80</span>, <span class="dt">zoom =</span> <span class="fl">0.7</span>)</span>
+<span id="cb11-3"><span class="kw">view3d</span>(<span class="dv">30</span>, <span class="dv">80</span>, <span class="dt">zoom =</span> <span class="fl">0.7</span>)</span>
 <span id="cb11-4"><span class="kw">plotConvexHull3d</span>(</span>
 <span id="cb11-5">  icosahedron, <span class="dt">palette =</span> <span class="kw">hcl.colors</span>(<span class="dv">256</span>, <span class="st">"BuPu"</span>), <span class="dt">bias =</span> <span class="fl">0.25</span>, </span>
-<span id="cb11-6">  <span class="dt">edgesColor =</span> <span class="st">"yellow"</span>, <span class="dt">tubesRadius =</span> <span class="fl">0.06</span>, <span class="dt">spheresRadius =</span> <span class="fl">0.08</span></span>
+<span id="cb11-6">  <span class="dt">edgesColor =</span> <span class="st">"yellow"</span>, <span class="dt">tubesRadius =</span> <span class="fl">0.015</span>, <span class="dt">spheresRadius =</span> <span class="fl">0.02</span></span>
 <span id="cb11-7">)</span></code></pre>
       </div>
       <p>
         <img
           src="https://laustep.github.io/stlahblog/posts/figures/icosahedron2.png"
-          style="width: 60%"
+          style="width: 50%"
         />
       </p>
       <h2 id="the-python-way">The Python way</h2>
