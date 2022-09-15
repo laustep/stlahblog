@@ -1,0 +1,347 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - The 'Reorient' transformation</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>The 'Reorient' transformation</h1> 
+          <div class="info">
+    Posted on September 15, 2022
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>, <a title="All pages tagged 'geometry'." href="../tags/geometry.html">geometry</a>, <a title="All pages tagged 'python'." href="../tags/python.html">python</a>, <a title="All pages tagged 'asymptote'." href="../tags/asymptote.html">asymptote</a>, <a title="All pages tagged 'haskell'." href="../tags/haskell.html">haskell</a>, <a title="All pages tagged 'javascript'." href="../tags/javascript.html">javascript</a>, <a title="All pages tagged 'povray'." href="../tags/povray.html">povray</a>, <a title="All pages tagged 'graphics'." href="../tags/graphics.html">graphics</a>
+    
+</div>
+
+<p>If you follow <a href="https://www.youtube.com/channel/UCQ2hC8ETS9FFm2pzzyZCVUw/videos">my youtube channel</a> then you have certainly seen the “ball” of twenty Hopf tori. Sometimes I call it the “Hopf flower”. How is it done?</p>
+<p>Well, firstly, I take twenty points on a ball: the twenty vertices of the <a href="https://laustep.github.io/stlahblog/posts/tetrahedraCompound.html">compound of five tetrahedra</a>. Then, I construct one Hopf torus, and for each of the twenty points I reorient it towards this point and I translate it to this point. This post is about the transformation used to reorient.</p>
+<h2 id="pov-ray">POV-Ray</h2>
+<p><img src="./figures/Reorient_povray.gif" style="width:50.0%" /></p>
+<p>I discovered this transformation in the file <strong>transforms.inc</strong> of the POV-Ray distribution. You can find it <a href="https://github.com/POV-Ray/povray/blob/master/distribution/include/transforms.inc">here</a>. Below is the POV-Ray macro which runs the transformation.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode povray"><code class="sourceCode povray"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">#macro Reorient_Trans</span>(Axis1, Axis2)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>   <span class="kw">#local vX1 </span>= <span class="kw">vnormalize</span>(Axis1);</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>   <span class="kw">#local vX2 </span>= <span class="kw">vnormalize</span>(Axis2);</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>   <span class="kw">#local Y </span>= <span class="kw">vcross</span>(vX1, vX2);</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>   <span class="ot">#if</span>(<span class="kw">vlength</span>(Y) &gt; <span class="fl">0</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>      <span class="kw">#local vY </span>= <span class="kw">vnormalize</span>(Y);</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>      <span class="kw">#local vZ1 </span>= <span class="kw">vnormalize</span>(<span class="kw">vcross</span>(vX1, vY));</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>      <span class="kw">#local vZ2 </span>= <span class="kw">vnormalize</span>(<span class="kw">vcross</span>(vX2, vY));</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>      <span class="kw">transform</span> {</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>         <span class="kw">matrix</span> &lt; vX1.<span class="kw">x</span>, vY.<span class="kw">x</span>, vZ1.<span class="kw">x</span>, </span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>                  vX1.<span class="kw">y</span>, vY.<span class="kw">y</span>, vZ1.<span class="kw">y</span>, </span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>                  vX1.<span class="kw">z</span>, vY.<span class="kw">z</span>, vZ1.<span class="kw">z</span>, </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>                  <span class="fl">0</span>,     <span class="fl">0</span>,    <span class="fl">0</span> &gt;</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>         <span class="kw">matrix</span> &lt; vX2.<span class="kw">x</span>, vX2.<span class="kw">y</span>, vX2.<span class="kw">z</span>,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a>                  vY.<span class="kw">x</span>,  vY.<span class="kw">y</span>,  vY.<span class="kw">z</span>, </span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>                  vZ2.<span class="kw">x</span>, vZ2.<span class="kw">y</span>, vZ2.<span class="kw">z</span>, </span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a>                  <span class="fl">0</span>,     <span class="fl">0</span>,     <span class="fl">0</span> &gt;</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a>      }</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a>   <span class="ot">#else</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a>      <span class="ot">#if</span> (<span class="kw">vlength</span>(vX1-vX2)=<span class="fl">0</span>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a>         <span class="kw">transform</span> {}</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a>      <span class="ot">#else</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a>         <span class="kw">#local vZ </span>= VPerp_To_Vector(vX2);</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a>         <span class="kw">transform</span> { Axis_Rotate_Trans(vZ,<span class="fl">180</span>) }</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true"></a>      <span class="ot">#end</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true"></a>   <span class="ot">#end</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true"></a><span class="ot">#end</span></span></code></pre></div>
+<p><code>Axis1</code> is the vector to be rotated and <code>Axis2</code> is the vector to be rotated towards. Usually, <code>Axis1</code> is the <span class="math inline">\(x\)</span>, <span class="math inline">\(y\)</span>, or <span class="math inline">\(z\)</span> direction, that depends on the software used.</p>
+<h2 id="haskell">Haskell</h2>
+<p><img src="./figures/Reorient_haskell.gif" style="width:50.0%" /></p>
+<p>I also did the ball of twenty Hopf tori in Haskell, with the <strong>OpenGL</strong> library. The full code is available in <a href="https://github.com/stla/opengl-HopfTorus">this Github repository</a>. Below are the relevant parts of the code.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">import</span> <span class="dt">Data.Foldable</span> (toList)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="kw">import</span> <span class="dt">Linear</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="ot">translateAndReorient ::</span> (<span class="dt">Real</span> a, <span class="dt">Floating</span> a) <span class="ot">=&gt;</span> <span class="dt">V3</span> a <span class="ot">-&gt;</span> <span class="dt">V3</span> a <span class="ot">-&gt;</span> [a]</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>translateAndReorient axis vector <span class="ot">=</span> </span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>  <span class="fu">concatMap</span> toList (toList (mkTransformationMat m vector))</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>  <span class="kw">where</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>    vx1 <span class="ot">=</span> axis <span class="op">^/</span> (norm axis)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>    vx2 <span class="ot">=</span> vector <span class="op">^/</span> (norm vector)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>    y' <span class="ot">=</span> cross vx1 vx2</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>    y <span class="ot">=</span> y' <span class="op">^/</span> norm y'</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>    z1' <span class="ot">=</span> cross vx1 y</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a>    z1 <span class="ot">=</span> z1' <span class="op">^/</span> norm z1'</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a>    z2' <span class="ot">=</span> cross vx2 y</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a>    z2 <span class="ot">=</span> z2' <span class="op">^/</span> norm z2'</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a>    m1 <span class="ot">=</span> transpose <span class="op">$</span> <span class="dt">V3</span> vx1 y z1</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a>    m2 <span class="ot">=</span> <span class="dt">V3</span> vx2 y z2</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true"></a>    m <span class="ot">=</span> transpose <span class="op">$</span> m1 <span class="op">!*!</span> m2</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">import</span> <span class="dt">Graphics.Rendering.OpenGL.GL</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="op">......</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a><span class="ot">tmatrices ::</span> [[<span class="dt">GLfloat</span>]]</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>tmatrices <span class="ot">=</span> </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>    <span class="fu">map</span> (translateAndReorient (<span class="dt">V3</span> <span class="dv">0</span> <span class="dv">0</span> <span class="dv">1</span>)) points</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>    </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a><span class="op">......</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a>forM_ tmatrices <span class="op">$</span> \tmatrix <span class="ot">-&gt;</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a>  preservingMatrix <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a>    m <span class="ot">&lt;-</span> newMatrix <span class="dt">RowMajor</span><span class="ot"> tmatrix ::</span> <span class="dt">IO</span> (<span class="dt">GLmatrix</span> <span class="dt">GLfloat</span>)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a>    multMatrix m</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a>    </span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a><span class="op">......</span></span></code></pre></div>
+<h2 id="r">R</h2>
+<p><img src="./figures/Reorient_R.gif" style="width:50.0%" /></p>
+<p>Of course I also did it in R, with the <strong>rgl</strong> package. The code is available in <a href="https://gist.github.com/stla/9c036c2ae9c678745b784ed8d895a518">this gist</a>, and below are the relevant parts of the code.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>Reorient_Trans &lt;-<span class="st"> </span><span class="cf">function</span>(Axis1, Axis2){</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>  vX1 &lt;-<span class="st"> </span>Axis1 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(Axis1)))</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>  vX2 &lt;-<span class="st"> </span>Axis2 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(Axis2)))</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>  Y &lt;-<span class="st"> </span>rgl<span class="op">:::</span><span class="kw">xprod</span>(vX1, vX2)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>  vY &lt;-<span class="st"> </span>Y <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(Y)))</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>  Z1 &lt;-<span class="st"> </span>rgl<span class="op">:::</span><span class="kw">xprod</span>(vX1, vY)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>  vZ1 &lt;-<span class="st"> </span>Z1 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(Z1)))</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>  Z2 &lt;-<span class="st"> </span>rgl<span class="op">:::</span><span class="kw">xprod</span>(vX2, vY)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>  vZ2 &lt;-<span class="st"> </span>Z2 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(Z2)))</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a>  M1 &lt;-<span class="st"> </span><span class="kw">cbind</span>(vX1, vY, vZ1)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a>  M2 &lt;-<span class="st"> </span><span class="kw">rbind</span>(vX2, vY, vZ2)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a>  M &lt;-<span class="st"> </span>M1 <span class="op">%*%</span><span class="st"> </span>M2</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a>  <span class="kw">rbind</span>(<span class="kw">cbind</span>(M, <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>)), <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a>}</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true"></a><span class="kw">library</span>(rgl)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true"></a></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true"></a>......</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true"></a></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">20</span>){</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true"></a>    v &lt;-<span class="st"> </span>vertices[i,]</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true"></a>    M &lt;-<span class="st"> </span><span class="kw">Reorient_Trans</span>(<span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>), v)</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true"></a>    obj &lt;-<span class="st"> </span><span class="kw">transform3d</span>(HTmesh, M)</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true"></a>    obj &lt;-<span class="st"> </span><span class="kw">translate3d</span>(obj, v[<span class="dv">1</span>], v[<span class="dv">2</span>], v[<span class="dv">3</span>])</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true"></a>    <span class="kw">shade3d</span>(obj, <span class="dt">color=</span>colors[i])</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true"></a>    <span class="kw">shade3d</span>(<span class="kw">Cmesh</span>(<span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="dv">0</span>, v, <span class="fl">0.05</span>, <span class="dv">6</span>, <span class="dv">40</span>, <span class="dt">color =</span> <span class="st">&quot;brown&quot;</span>))</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true"></a>}</span></code></pre></div>
+<h2 id="python">Python</h2>
+<p><img src="./figures/Reorient_python.gif" style="width:50.0%" /></p>
+<p>I dit it in Python as well, with the <strong>PyVista</strong> library. You can find the code in <a href="https://github.com/stla/PyVistaMiscellanous">this Github repository</a>.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="kw">def</span> Reorient_Trans(Axis1, Axis2):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>  vX1 <span class="op">=</span> Axis1 <span class="co">#/ must be normalized</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>  vX2 <span class="op">=</span> Axis2 <span class="co">#/ must be normalized</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>  Y <span class="op">=</span> np.cross(vX1, vX2)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>  vY <span class="op">=</span> Y <span class="op">/</span> np.linalg.norm(Y)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>  Z1 <span class="op">=</span> np.cross(vX1, vY)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a>  vZ1 <span class="op">=</span> Z1 <span class="op">/</span> np.linalg.norm(Z1)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a>  Z2 <span class="op">=</span> np.cross(vX2, vY)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a>  vZ2 <span class="op">=</span> Z2 <span class="op">/</span> np.linalg.norm(Z2)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a>  M1 <span class="op">=</span> np.transpose(np.array([vX1, vY, vZ1]))</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true"></a>  M2 <span class="op">=</span> np.array([vX2, vY, vZ2])</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true"></a>  M <span class="op">=</span> np.matmul(M1, M2)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true"></a>  <span class="cf">return</span> np.transpose(</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true"></a>      np.column_stack(</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true"></a>          (np.vstack((M, np.zeros((<span class="dv">1</span>,<span class="dv">3</span>)))), np.transpose(np.array([<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>])))</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true"></a>      )</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true"></a>  )</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true"></a>......</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true"></a>M <span class="op">=</span> Reorient_Trans(np.array([<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>]), v)</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true"></a>m <span class="op">=</span> mesh.copy()</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true"></a>m.transform(M)</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true"></a>m.translate((v[<span class="dv">0</span>], v[<span class="dv">1</span>], v[<span class="dv">2</span>]), inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true"></a></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true"></a>......</span></code></pre></div>
+<h2 id="asymptote">Asymptote</h2>
+<p><img src="./figures/Reorient_asymptote.gif" style="width:50.0%" /></p>
+<p>And I did it in Asymptote too. The full code is available in <a href="https://gist.github.com/stla/6892a261bc2c45509cd1482fbeff2f93">this gist</a>.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="co">// transformation which reorients and translates -----</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>transform3 transReorient(triple axis, triple vector){</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>  triple vX1 = unit(vector);</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>  triple vX2 = unit(axis);</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>  triple vY = unit(cross(vX1,vX2));</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>  triple vZ1 = unit(cross(vX1,vY));</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a>  triple vZ2 = unit(cross(vX2,vY));</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a>  real[][] M1 = </span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a>    {{vX1.x, vX1.y, vX1.z}, </span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a>     {vY.x, vY.y, vY.z}, </span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a>     {vZ1.x, vZ1.y, vZ1.z}};</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a>  real[][] M2 = </span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a>    {{vX2.x, vY.x, vZ2.x}, </span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a>     {vX2.y, vY.y, vZ2.y}, </span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true"></a>     {vX2.z, vY.z, vZ2.z}};</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true"></a>  real[][] M = transpose(M2*M1);</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true"></a>  transform3 T = copy(identity4);</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true"></a>  T[<span class="dv">0</span>][<span class="dv">0</span>] = M[<span class="dv">0</span>][<span class="dv">0</span>];</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true"></a>  T[<span class="dv">1</span>][<span class="dv">0</span>] = M[<span class="dv">1</span>][<span class="dv">0</span>];</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true"></a>  T[<span class="dv">2</span>][<span class="dv">0</span>] = M[<span class="dv">2</span>][<span class="dv">0</span>];</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true"></a>  T[<span class="dv">0</span>][<span class="dv">1</span>] = M[<span class="dv">0</span>][<span class="dv">1</span>];</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true"></a>  T[<span class="dv">1</span>][<span class="dv">1</span>] = M[<span class="dv">1</span>][<span class="dv">1</span>];</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true"></a>  T[<span class="dv">2</span>][<span class="dv">1</span>] = M[<span class="dv">2</span>][<span class="dv">1</span>];</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true"></a>  T[<span class="dv">0</span>][<span class="dv">2</span>] = M[<span class="dv">0</span>][<span class="dv">2</span>];</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true"></a>  T[<span class="dv">1</span>][<span class="dv">2</span>] = M[<span class="dv">1</span>][<span class="dv">2</span>];</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true"></a>  T[<span class="dv">2</span>][<span class="dv">2</span>] = M[<span class="dv">2</span>][<span class="dv">2</span>];</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true"></a>  T[<span class="dv">0</span>][<span class="dv">3</span>] = vector.x;</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true"></a>  T[<span class="dv">1</span>][<span class="dv">3</span>] = vector.y;</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true"></a>  T[<span class="dv">2</span>][<span class="dv">3</span>] = vector.z;</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true"></a>  <span class="cf">return</span> T;</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true"></a>}</span></code></pre></div>
+<h2 id="three.js">three.js</h2>
+<iframe src="../frames/threejs_TwentyHopfTori2.html" width="100%" height="500px" scrolling="no" frameborder="0">
+</iframe>
+<p>And finally in JavaScript, with <strong>three.js</strong>. Go <a href="https://github.com/laustep/stlahblog/blob/gh-pages/frames/threejs_TwentyHopfTori2.html">here</a> for the code. And click <a href="https://laustep.github.io/stlahblog/frames/threejs_TwentyHopfTori2.html">here</a> to play with it in full screen.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="kw">function</span> <span class="fu">reorient</span>(axis1<span class="op">,</span> axis2) {</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>  <span class="kw">var</span> vX1 <span class="op">=</span> axis1<span class="op">.</span><span class="fu">normalize</span>()<span class="op">;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>  <span class="kw">var</span> vX2 <span class="op">=</span> axis2<span class="op">.</span><span class="fu">normalize</span>()<span class="op">;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>  <span class="kw">var</span> vY <span class="op">=</span> vX1<span class="op">.</span><span class="fu">clone</span>()<span class="op">.</span><span class="fu">cross</span>(vX2)<span class="op">.</span><span class="fu">normalize</span>()<span class="op">;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a>  <span class="kw">var</span> vZ1 <span class="op">=</span> vX1<span class="op">.</span><span class="fu">clone</span>()<span class="op">.</span><span class="fu">cross</span>(vY)<span class="op">.</span><span class="fu">normalize</span>()<span class="op">;</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a>  <span class="kw">var</span> vZ2 <span class="op">=</span> vX2<span class="op">.</span><span class="fu">clone</span>()<span class="op">.</span><span class="fu">cross</span>(vY)<span class="op">.</span><span class="fu">normalize</span>()<span class="op">;</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a>  <span class="kw">var</span> M1 <span class="op">=</span> <span class="kw">new</span> THREE<span class="op">.</span><span class="fu">Matrix3</span>()</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a>    <span class="op">.</span><span class="fu">fromArray</span>([vX1<span class="op">.</span><span class="at">x</span><span class="op">,</span> vX1<span class="op">.</span><span class="at">y</span><span class="op">,</span> vX1<span class="op">.</span><span class="at">z</span><span class="op">,</span> vY<span class="op">.</span><span class="at">x</span><span class="op">,</span> vY<span class="op">.</span><span class="at">y</span><span class="op">,</span> vY<span class="op">.</span><span class="at">z</span><span class="op">,</span> vZ1<span class="op">.</span><span class="at">x</span><span class="op">,</span> vZ1<span class="op">.</span><span class="at">y</span><span class="op">,</span> vZ1<span class="op">.</span><span class="at">z</span>])<span class="op">;</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true"></a>  <span class="kw">var</span> M2 <span class="op">=</span> <span class="kw">new</span> THREE<span class="op">.</span><span class="fu">Matrix3</span>()</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true"></a>    <span class="op">.</span><span class="fu">fromArray</span>([vX2<span class="op">.</span><span class="at">x</span><span class="op">,</span> vY<span class="op">.</span><span class="at">x</span><span class="op">,</span> vZ2<span class="op">.</span><span class="at">x</span><span class="op">,</span> vX2<span class="op">.</span><span class="at">y</span><span class="op">,</span> vY<span class="op">.</span><span class="at">y</span><span class="op">,</span> vZ2<span class="op">.</span><span class="at">y</span><span class="op">,</span> vX2<span class="op">.</span><span class="at">z</span><span class="op">,</span> vY<span class="op">.</span><span class="at">z</span><span class="op">,</span> vZ2<span class="op">.</span><span class="at">z</span>])<span class="op">;</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true"></a>  <span class="kw">var</span> M <span class="op">=</span> M1<span class="op">.</span><span class="fu">clone</span>()<span class="op">.</span><span class="fu">multiply</span>(M2)<span class="op">;</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true"></a>  <span class="kw">var</span> elems <span class="op">=</span> M<span class="op">.</span><span class="at">elements</span><span class="op">;</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true"></a>  <span class="kw">var</span> A <span class="op">=</span> <span class="kw">new</span> THREE<span class="op">.</span><span class="fu">Matrix4</span>()<span class="op">;</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true"></a>  A<span class="op">.</span><span class="fu">set</span>(elems[<span class="dv">0</span>]<span class="op">,</span> elems[<span class="dv">1</span>]<span class="op">,</span> elems[<span class="dv">2</span>]<span class="op">,</span> axis2<span class="op">.</span><span class="at">x</span><span class="op">,</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true"></a>        elems[<span class="dv">3</span>]<span class="op">,</span> elems[<span class="dv">4</span>]<span class="op">,</span> elems[<span class="dv">5</span>]<span class="op">,</span> axis2<span class="op">.</span><span class="at">y</span><span class="op">,</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true"></a>        elems[<span class="dv">6</span>]<span class="op">,</span> elems[<span class="dv">7</span>]<span class="op">,</span> elems[<span class="dv">8</span>]<span class="op">,</span> axis2<span class="op">.</span><span class="at">z</span><span class="op">,</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true"></a>        <span class="dv">0</span><span class="op">,</span>        <span class="dv">0</span><span class="op">,</span>        <span class="dv">0</span><span class="op">,</span>        <span class="dv">1</span>)<span class="op">;</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true"></a>  <span class="cf">return</span> A<span class="op">;</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true"></a>}</span></code></pre></div>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
