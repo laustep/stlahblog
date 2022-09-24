@@ -1,0 +1,208 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - A note on Shiny reactivity</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>A note on Shiny reactivity</h1> 
+          <div class="info">
+    Posted on September 24, 2022
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'shiny'." href="../tags/shiny.html">shiny</a>
+    
+</div>
+
+<p>In the ‘shiny’ package, the <code>reactiveConsole</code> function allows to enable reactivity at the console, for the purposes of experimentation and learning (that doesn’t work in a R Markdown document).</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="kw">reactiveConsole</span>(<span class="ot">TRUE</span>)</span></code></pre></div>
+<p>So let’s play with the Shiny reactivity, without a Shiny app.</p>
+<p>The code below creates an observer which observes a <em>reactive value</em>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="kw">reactiveVal</span>(<span class="ot">NULL</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="kw">observeEvent</span>(<span class="kw">x</span>(), {</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>  <span class="kw">print</span>(<span class="st">&quot;An event has occured.&quot;</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>})</span></code></pre></div>
+<p>Recall that <code>x</code> is a function; when calling it with an argument, this sets the value, and when calling it without argument, this read the value.</p>
+<p>Let’s try it:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">x</span>(<span class="dv">2</span>)  <span class="co"># observer triggered</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>[<span class="dv">1</span>] <span class="st">&quot;An event has occured.&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>[<span class="dv">1</span>] <span class="st">&quot;The value of x is 2&quot;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">x</span>(<span class="dv">2</span>)  <span class="co"># observer not triggered, because same value</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">x</span>(<span class="op">-</span><span class="dv">2</span>) <span class="co"># observer triggered</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>[<span class="dv">1</span>] <span class="st">&quot;An event has occured.&quot;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>[<span class="dv">1</span>] <span class="st">&quot;The value of x is -2&quot;</span></span></code></pre></div>
+<p>Nothing surprising. Everybody knows that.</p>
+<p>Now, let’s define a <code>reactive conductor</code> which calculates the square of our reactive value, and let’s observe its value:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="kw">reactiveVal</span>(<span class="ot">NULL</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>xsquared &lt;-<span class="st"> </span><span class="kw">reactive</span>({</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>  <span class="kw">x</span>()<span class="op">^</span><span class="dv">2</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>})</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a><span class="kw">observeEvent</span>(<span class="kw">xsquared</span>(), {</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>  <span class="kw">print</span>(<span class="st">&quot;An event has occured.&quot;</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>  <span class="kw">print</span>(<span class="kw">paste</span>(<span class="st">&quot;The value of x² is&quot;</span>, <span class="kw">xsquared</span>()))</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>})</span></code></pre></div>
+<p>What happens if we execute the same code as before? The same output as before? The answer is <em>no</em>:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">x</span>(<span class="dv">2</span>)  <span class="co"># observer triggered</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>[<span class="dv">1</span>] <span class="st">&quot;An event has occured.&quot;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>[<span class="dv">1</span>] <span class="st">&quot;The value of x² is 4&quot;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">x</span>(<span class="dv">2</span>)  <span class="co"># observer not triggered, because nothing has changed</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">x</span>(<span class="op">-</span><span class="dv">2</span>) <span class="co"># observer triggered, while x² has not changed!</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>[<span class="dv">1</span>] <span class="st">&quot;An event has occured.&quot;</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a>[<span class="dv">1</span>] <span class="st">&quot;The value of x² is 4&quot;</span></span></code></pre></div>
+<p>This is an important difference between a reactive value and a reactive conductor. The reactive conductor is also an observer, and here it observes the reactive value <code>x()</code>. Then it reacts when <code>x()</code> changes and even though its output does not change, it triggers an event.</p>
+<p>Note that an observer observing <code>x()^2</code> is also triggered when <code>x()</code> takes the value <code>2</code> then <code>-2</code>:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="kw">reactiveVal</span>(<span class="ot">NULL</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="kw">observeEvent</span>(<span class="kw">x</span>()<span class="op">^</span><span class="dv">2</span>, {</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>  <span class="kw">print</span>(<span class="st">&quot;An event has occured.&quot;</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>}, <span class="dt">ignoreInit =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">x</span>(<span class="dv">2</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a>[<span class="dv">1</span>] <span class="st">&quot;An event has occured.&quot;</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">x</span>(<span class="op">-</span><span class="dv">2</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a>[<span class="dv">1</span>] <span class="st">&quot;An event has occured.&quot;</span></span></code></pre></div>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
