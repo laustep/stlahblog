@@ -1,0 +1,208 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - 'CGAL' meets 'R6': the 'cgalMeshes' package</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>'CGAL' meets 'R6': the 'cgalMeshes' package</h1> 
+          <div class="info">
+    Posted on November  3, 2022
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'geometry'." href="../tags/geometry.html">geometry</a>, <a title="All pages tagged 'C++'." href="../tags/C%2B%2B.html">C++</a>, <a title="All pages tagged 'Rcpp'." href="../tags/Rcpp.html">Rcpp</a>, <a title="All pages tagged 'rgl'." href="../tags/rgl.html">rgl</a>
+    
+</div>
+
+<p>My new package <a href="https://github.com/stla/cgalMeshes">cgalMeshes</a> (not on CRAN yet) deals with 3D meshes. All algorithms implemented in this package are performed by the C++ library <a href="https://www.cgal.org/">CGAL</a>.</p>
+<p>I already wrapped some <strong>CGAL</strong> stuff in some other packages. But these packages have been archived by CRAN because there were some warnings from the <strong>CGAL</strong> library, and I can’t fix them. So I didn’t implement the algorithms which throw some CRAN-unacceptable warnings in <strong>cgalMeshes</strong>, and hopefully this package will remain on CRAN.</p>
+<p>Moreover this package is different: the meshes are represented by a <strong>R6</strong> class, called <code>cgalMesh</code>. This is more convenient for the user, and once a mesh is instantiated, it stays in memory, whereas the mesh was reprocessed at each operation with the other packages.</p>
+<p>Let’s have a quick look at <strong>cgalMeshes</strong>. Recall that the <strong>R6</strong> class representing a mesh is called <code>cgalMesh</code>. So to create a <strong>R6</strong> object from this class, one has to use the <code>new</code> method. This method allows to instantiate a mesh from a file, a <strong>rgl</strong> mesh, or from a matrix of vertices and a list of faces.</p>
+<p>I have the Stanford dragon in a mesh file. Let’s create a new <code>cgalMesh</code> object from this file:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">library</span>(cgalMeshes)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>dragon &lt;-<span class="st"> </span>cgalMesh<span class="op">$</span><span class="kw">new</span>(<span class="st">&quot;StanfordDragon.off&quot;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>dragon</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="co">## Mesh with 100239 vertices and 200379 faces.</span></span></code></pre></div>
+<p>Let’s plot it. We first do a <strong>rgl</strong> mesh from <code>dragon</code> with the <code>getMesh</code> method:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>rglDragon &lt;-<span class="st"> </span>dragon<span class="op">$</span><span class="kw">getMesh</span>()</span></code></pre></div>
+<p>And now we plot the Stanford dragon:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">library</span>(rgl)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>))</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="kw">view3d</span>(<span class="op">-</span><span class="dv">30</span>, <span class="dv">0</span>, <span class="dt">zoom =</span> <span class="fl">0.7</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="kw">shade3d</span>(rglDragon, <span class="dt">color =</span> <span class="st">&quot;darkgreen&quot;</span>)</span></code></pre></div>
+<p><img src="./figures/StanfordDragon.png" style="width:75.0%" /></p>
+<p>We can check whether the mesh is triangle and closed:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>dragon<span class="op">$</span><span class="kw">isTriangle</span>()</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="co">## [1] TRUE</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>dragon<span class="op">$</span><span class="kw">isClosed</span>()</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a><span class="co">## [1] FALSE</span></span></code></pre></div>
+<p>I don’t know why this mesh is not closed. If it were closed, we could get its volume by running <code>dragon$volume</code>:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>dragon<span class="op">$</span><span class="kw">volume</span>()</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="co">## Error in .CppObject$volume(...): The mesh is not closed.</span></span></code></pre></div>
+<p>Let’s do something more funny now. We will compute the geodesic distances between a source vertex on the mesh and all other vertices, and we will plot the dragon after assigning to each vertex a color corresponding to its geodesic distance from the source vertex. The geodesic distance between two vertices is the length of the shortest path between these two vertices which lies on the surface of the mesh.</p>
+<p>We will take the rightmost vertex for the source vertex:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>vertices &lt;-<span class="st"> </span>dragon<span class="op">$</span><span class="kw">vertices</span>()</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>index &lt;-<span class="st"> </span><span class="kw">which.max</span>(vertices[, 1L])</span></code></pre></div>
+<p>And we call the <code>geoDists</code> method to get the estimated geodesic distances:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>geoDists &lt;-<span class="st"> </span>dragon<span class="op">$</span><span class="kw">geoDists</span>(index)</span></code></pre></div>
+<p>Now we define a coloring function, which associates a color of the <code>viridisLite::plasma</code> palette to each number in <span class="math inline">\((0, 1)\)</span>:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>fcolor &lt;-<span class="st"> </span><span class="kw">colorRamp</span>(viridisLite<span class="op">::</span><span class="kw">plasma</span>(200L))</span></code></pre></div>
+<p>Then we associate a color to each vertex:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a>colors &lt;-<span class="st"> </span><span class="kw">fcolor</span>(geoDists <span class="op">/</span><span class="st"> </span><span class="kw">max</span>(geoDists))</span></code></pre></div>
+<p>The <code>colors</code> object is a matrix, one row for each vertex, and the columns provide the RGB coding of the color. We use the <code>rgb</code> function to get hexadecimal colors:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a>colors &lt;-<span class="st"> </span><span class="kw">rgb</span>(</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>  colors[, 1L], colors[, 2L], colors[, 3L], <span class="dt">maxColorValue =</span> <span class="dv">255</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a>)</span></code></pre></div>
+<p>Now we can add these colors to the <strong>rgl</strong> mesh:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a>rglDragon[[<span class="st">&quot;material&quot;</span>]] &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="st">&quot;color&quot;</span> =<span class="st"> </span>colors)</span></code></pre></div>
+<p>And here is the result:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>))</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a><span class="kw">view3d</span>(<span class="op">-</span><span class="dv">30</span>, <span class="dv">0</span>, <span class="dt">zoom =</span> <span class="fl">0.7</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true"></a><span class="kw">shade3d</span>(rglDragon)</span></code></pre></div>
+<p><img src="./figures/StanfordDragon_colors.png" style="width:75.0%" /></p>
+<p>More images on <a href="https://github.com/stla/cgalMeshes">the Github repo</a>.</p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
