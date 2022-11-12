@@ -11,10 +11,8 @@
   <link rel="stylesheet" href="../css/post.css" />
   <link rel="stylesheet" href="../css/misc.css" /> 
   
-    <link rel="stylesheet" href="../css/kate.css" /> 
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
    
-  
-    <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
@@ -78,7 +76,7 @@
 
       <div class="main col-sm-10">
         <div id="header">
-          <div id="logo" style="position:absolute;">
+          <div id="logo">
             <a href="../">
               <img src="../images/stla.jpg" alt="stla" width="100px" />
             </a>
@@ -101,50 +99,50 @@
 </div>
 <div class="info">
     
-    Tags: <a href="../tags/R.html">R</a>, <a href="../tags/graphics.html">graphics</a>
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'graphics'." href="../tags/graphics.html">graphics</a>, <a title="All pages tagged 'rgl'." href="../tags/rgl.html">rgl</a>
     
 </div>
 
-<p>This post provides some code to draw a sphere wedge with the R library <code>rgl</code>.</p>
-<p>As an helper function, I use <code>spherical2cartesian</code> to convert from spherical coordinates to Cartesian coordinates:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">spherical2cartesian &lt;-<span class="st"> </span><span class="cf">function</span>(rthetaphi){</a>
-<a class="sourceLine" id="cb1-2" title="2">  r &lt;-<span class="st"> </span>rthetaphi[<span class="dv">1</span>]</a>
-<a class="sourceLine" id="cb1-3" title="3">  theta &lt;-<span class="st"> </span>rthetaphi[<span class="dv">2</span>]</a>
-<a class="sourceLine" id="cb1-4" title="4">  phi &lt;-<span class="st"> </span>rthetaphi[<span class="dv">3</span>]</a>
-<a class="sourceLine" id="cb1-5" title="5">  <span class="kw">c</span>(<span class="dt">x=</span>r<span class="op">*</span><span class="kw">cos</span>(theta)<span class="op">*</span><span class="kw">sin</span>(phi), <span class="dt">y=</span>r<span class="op">*</span><span class="kw">sin</span>(theta)<span class="op">*</span><span class="kw">sin</span>(phi), <span class="dt">z=</span>r<span class="op">*</span><span class="kw">cos</span>(phi))</a>
-<a class="sourceLine" id="cb1-6" title="6">}</a></code></pre></div>
+<p>This post provides some code to draw a spherical wedge with the R library <code>rgl</code>.</p>
+<p>As a helper function, I use <code>spherical2cartesian</code> to convert from spherical coordinates to Cartesian coordinates:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>spherical2cartesian &lt;-<span class="st"> </span><span class="cf">function</span>(rthetaphi){</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>  r &lt;-<span class="st"> </span>rthetaphi[<span class="dv">1</span>]</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>  theta &lt;-<span class="st"> </span>rthetaphi[<span class="dv">2</span>]</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>  phi &lt;-<span class="st"> </span>rthetaphi[<span class="dv">3</span>]</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>  <span class="kw">c</span>(<span class="dt">x=</span>r<span class="op">*</span><span class="kw">cos</span>(theta)<span class="op">*</span><span class="kw">sin</span>(phi), <span class="dt">y=</span>r<span class="op">*</span><span class="kw">sin</span>(theta)<span class="op">*</span><span class="kw">sin</span>(phi), <span class="dt">z=</span>r<span class="op">*</span><span class="kw">cos</span>(phi))</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>}</span></code></pre></div>
 <p>Now, here is the main function:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">sphereWedge &lt;-<span class="st"> </span><span class="cf">function</span>(theta1, theta2, <span class="dt">radius=</span><span class="dv">1</span>, <span class="dt">nm=</span><span class="dv">30</span>, <span class="dt">np=</span><span class="dv">30</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>){</a>
-<a class="sourceLine" id="cb2-2" title="2">  thetas &lt;-<span class="st"> </span><span class="kw">seq</span>(theta1, theta2, <span class="dt">length.out=</span>nm)</a>
-<a class="sourceLine" id="cb2-3" title="3">  phis &lt;-<span class="st"> </span>pi <span class="op">*</span><span class="st"> </span><span class="dv">1</span><span class="op">:</span>(np<span class="dv">-1</span>)<span class="op">/</span>np</a>
-<a class="sourceLine" id="cb2-4" title="4">  meridians &lt;-<span class="st"> </span><span class="kw">sapply</span>(phis, </a>
-<a class="sourceLine" id="cb2-5" title="5">                      <span class="cf">function</span>(phi) <span class="kw">sapply</span>(thetas, </a>
-<a class="sourceLine" id="cb2-6" title="6">                                           <span class="cf">function</span>(theta) <span class="kw">c</span>(radius,theta,phi)), </a>
-<a class="sourceLine" id="cb2-7" title="7">                      <span class="dt">simplify=</span><span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb2-8" title="8">  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>(np<span class="dv">-2</span>)){</a>
-<a class="sourceLine" id="cb2-9" title="9">    x1 &lt;-<span class="st"> </span>plyr<span class="op">::</span><span class="kw">aaply</span>(meridians[[i]], <span class="dv">2</span>, spherical2cartesian)</a>
-<a class="sourceLine" id="cb2-10" title="10">    x2 &lt;-<span class="st"> </span>plyr<span class="op">::</span><span class="kw">aaply</span>(meridians[[i<span class="op">+</span><span class="dv">1</span>]], <span class="dv">2</span>, spherical2cartesian)</a>
-<a class="sourceLine" id="cb2-11" title="11">    <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>(nm<span class="dv">-1</span>)){</a>
-<a class="sourceLine" id="cb2-12" title="12">      <span class="kw">quads3d</span>(<span class="kw">rbind</span>(x1[j<span class="op">:</span>(j<span class="op">+</span><span class="dv">1</span>),],x2[(j<span class="op">+</span><span class="dv">1</span>)<span class="op">:</span>j,]), <span class="dt">color=</span>col)</a>
-<a class="sourceLine" id="cb2-13" title="13">      <span class="kw">triangles3d</span>(<span class="kw">rbind</span>(<span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,radius), <span class="kw">spherical2cartesian</span>(meridians[[<span class="dv">1</span>]][,j]), </a>
-<a class="sourceLine" id="cb2-14" title="14">                        <span class="kw">spherical2cartesian</span>(meridians[[<span class="dv">1</span>]][,j<span class="op">+</span><span class="dv">1</span>])), <span class="dt">color=</span>col)</a>
-<a class="sourceLine" id="cb2-15" title="15">      <span class="kw">triangles3d</span>(<span class="kw">rbind</span>(<span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="op">-</span>radius), <span class="kw">spherical2cartesian</span>(meridians[[np<span class="dv">-1</span>]][,j]), </a>
-<a class="sourceLine" id="cb2-16" title="16">                        <span class="kw">spherical2cartesian</span>(meridians[[np<span class="dv">-1</span>]][,j<span class="op">+</span><span class="dv">1</span>])), <span class="dt">color=</span>col)</a>
-<a class="sourceLine" id="cb2-17" title="17">    }</a>
-<a class="sourceLine" id="cb2-18" title="18">  }</a>
-<a class="sourceLine" id="cb2-19" title="19">}</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>sphereWedge &lt;-<span class="st"> </span><span class="cf">function</span>(theta1, theta2, <span class="dt">radius=</span><span class="dv">1</span>, <span class="dt">nm=</span><span class="dv">30</span>, <span class="dt">np=</span><span class="dv">30</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>){</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>  thetas &lt;-<span class="st"> </span><span class="kw">seq</span>(theta1, theta2, <span class="dt">length.out=</span>nm)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>  phis &lt;-<span class="st"> </span>pi <span class="op">*</span><span class="st"> </span><span class="dv">1</span><span class="op">:</span>(np<span class="dv">-1</span>)<span class="op">/</span>np</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>  meridians &lt;-<span class="st"> </span><span class="kw">sapply</span>(phis, </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>                      <span class="cf">function</span>(phi) <span class="kw">sapply</span>(thetas, </span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>                                           <span class="cf">function</span>(theta) <span class="kw">c</span>(radius,theta,phi)), </span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>                      <span class="dt">simplify=</span><span class="ot">FALSE</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>(np<span class="dv">-2</span>)){</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>    x1 &lt;-<span class="st"> </span>plyr<span class="op">::</span><span class="kw">aaply</span>(meridians[[i]], <span class="dv">2</span>, spherical2cartesian)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>    x2 &lt;-<span class="st"> </span>plyr<span class="op">::</span><span class="kw">aaply</span>(meridians[[i<span class="op">+</span><span class="dv">1</span>]], <span class="dv">2</span>, spherical2cartesian)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>    <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>(nm<span class="dv">-1</span>)){</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>      <span class="kw">quads3d</span>(<span class="kw">rbind</span>(x1[j<span class="op">:</span>(j<span class="op">+</span><span class="dv">1</span>),],x2[(j<span class="op">+</span><span class="dv">1</span>)<span class="op">:</span>j,]), <span class="dt">color=</span>col)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a>      <span class="kw">triangles3d</span>(<span class="kw">rbind</span>(<span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,radius), <span class="kw">spherical2cartesian</span>(meridians[[<span class="dv">1</span>]][,j]), </span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a>                        <span class="kw">spherical2cartesian</span>(meridians[[<span class="dv">1</span>]][,j<span class="op">+</span><span class="dv">1</span>])), <span class="dt">color=</span>col)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a>      <span class="kw">triangles3d</span>(<span class="kw">rbind</span>(<span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="op">-</span>radius), <span class="kw">spherical2cartesian</span>(meridians[[np<span class="dv">-1</span>]][,j]), </span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a>                        <span class="kw">spherical2cartesian</span>(meridians[[np<span class="dv">-1</span>]][,j<span class="op">+</span><span class="dv">1</span>])), <span class="dt">color=</span>col)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a>    }</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true"></a>  }</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true"></a>}</span></code></pre></div>
 <p>A simple example:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw">sphereWedge</span>(<span class="dv">0</span>, pi<span class="op">/</span><span class="dv">3</span>, <span class="dt">col=</span><span class="st">&quot;purple&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">sphereWedge</span>(<span class="dv">0</span>, pi<span class="op">/</span><span class="dv">3</span>, <span class="dt">col=</span><span class="st">&quot;purple&quot;</span>)</span></code></pre></div>
 <p><img src="figures/wedge1.png" /></p>
 <p>Now let’s draw a tricolor sphere:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="kw">sphereWedge</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>)</a>
-<a class="sourceLine" id="cb4-2" title="2"><span class="kw">sphereWedge</span>(<span class="dv">2</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>, <span class="dv">4</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>, <span class="dt">col=</span><span class="st">&quot;green&quot;</span>)</a>
-<a class="sourceLine" id="cb4-3" title="3"><span class="kw">sphereWedge</span>(<span class="dv">4</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">sphereWedge</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="kw">sphereWedge</span>(<span class="dv">2</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>, <span class="dv">4</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>, <span class="dt">col=</span><span class="st">&quot;green&quot;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="kw">sphereWedge</span>(<span class="dv">4</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>)</span></code></pre></div>
 <p><img src="figures/wedge2.png" /></p>
 <p>As you can see, I use <code>2*pi</code> and not <code>0</code> for the blue wedge. That should be equivalent. However, and I don’t know why, using <code>0</code> instead of <code>2*pi</code> colors the interior of the two other wedges:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">sphereWedge</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>)</a>
-<a class="sourceLine" id="cb5-2" title="2"><span class="kw">sphereWedge</span>(<span class="dv">2</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>, <span class="dv">4</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>, <span class="dt">col=</span><span class="st">&quot;green&quot;</span>)</a>
-<a class="sourceLine" id="cb5-3" title="3"><span class="kw">sphereWedge</span>(<span class="dv">4</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>, <span class="dv">0</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="kw">sphereWedge</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="kw">sphereWedge</span>(<span class="dv">2</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>, <span class="dv">4</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>, <span class="dt">col=</span><span class="st">&quot;green&quot;</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="kw">sphereWedge</span>(<span class="dv">4</span><span class="op">*</span>pi<span class="op">/</span><span class="dv">3</span>, <span class="dv">0</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>)</span></code></pre></div>
 <p><img src="figures/wedge3.png" /></p>
 <h2 id="spherical-triangles-with-rgl">Spherical triangles with rgl</h2>
 <p>I also did a code which draws spherical triangles for rgl. I won’t reproduce it here. If you are interested, it is available in <a href="https://gist.github.com/stla/1cd2c0b3c4db4898f7132003e2ed2766">this gist</a>.</p>
@@ -202,20 +200,6 @@
 <!-- <script>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
-
-  <!-- Google Prettify -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-  <script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
-  <script>
-    var pres = document.getElementsByTagName("pre");
-    for (var i = 0; i < pres.length; ++i) {
-      
-        pres[i].className = pres[i].className + " prettyprint";
-      
-    }
-    prettyPrint();
-  </script> 
 
 
 </html>
