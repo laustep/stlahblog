@@ -1,0 +1,227 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - The lazy numbers in R</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>The lazy numbers in R</h1> 
+          <div class="info">
+    Posted on November 12, 2022
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'C++'." href="../tags/C%2B%2B.html">C++</a>, <a title="All pages tagged 'Rcpp'." href="../tags/Rcpp.html">Rcpp</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>
+    
+</div>
+
+<p>My new package <a href="https://github.com/stla/lazyNumbers"><strong>lazyNumbers</strong></a> is a port of the lazy numbers implemented in the C++ library <strong>CGAL</strong>. The lazy numbers represent the real numbers and arithmetic on these numbers is exact.</p>
+<p>The ordinary floating-point arithmetic is not exact. Consider for example the simple operation <span class="math inline">\(1 - 7 \times 0.1\)</span>. In double precision, it is not equal to <span class="math inline">\(0.3\)</span>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="dv">7</span> <span class="op">*</span><span class="st"> </span><span class="fl">0.1</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>x <span class="op">==</span><span class="st"> </span><span class="fl">0.3</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="co">## [1] FALSE</span></span></code></pre></div>
+<p>With the lazy numbers, it is equal to <span class="math inline">\(0.3\)</span>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">library</span>(lazyNumbers)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="kw">lazynb</span>(<span class="dv">1</span>) <span class="op">-</span><span class="st"> </span><span class="kw">lazynb</span>(<span class="dv">7</span>) <span class="op">*</span><span class="st"> </span><span class="kw">lazynb</span>(<span class="fl">0.1</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="kw">as.double</span>(x) <span class="op">==</span><span class="st"> </span><span class="fl">0.3</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="co">## [1] TRUE</span></span></code></pre></div>
+<p>In fact, when a binary operation involves a lazy number, the other number is automatically converted to a lazy number, so you can shortly enter this operation as follows:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="kw">lazynb</span>(<span class="dv">7</span>) <span class="op">*</span><span class="st"> </span><span class="fl">0.1</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="kw">as.double</span>(x) <span class="op">==</span><span class="st"> </span><span class="fl">0.3</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="co">## [1] TRUE</span></span></code></pre></div>
+<p>Let’s see a more dramatic example now. Consider the sequence <span class="math inline">\((u_n)\)</span> recursively defined by <span class="math inline">\(u_1 = 1/7\)</span> and <span class="math inline">\(u_{n+1} = 8 u_n - 1\)</span>. You can easily check that <span class="math inline">\(u_2 = 1/7\)</span>, therefore <span class="math inline">\(u_n = 1/7\)</span> for every <span class="math inline">\(n \geqslant 1\)</span>. However, when implemented in double precision, this sequence quickly goes crazy (<span class="math inline">\(1/7 \approx 0.1428571\)</span>):</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>u &lt;-<span class="st"> </span><span class="cf">function</span>(n) {</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>  <span class="cf">if</span>(n <span class="op">==</span><span class="st"> </span><span class="dv">1</span>) {</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>    <span class="kw">return</span>(<span class="dv">1</span> <span class="op">/</span><span class="st"> </span><span class="dv">7</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>  }</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>  <span class="dv">8</span> <span class="op">*</span><span class="st"> </span><span class="kw">u</span>(n<span class="dv">-1</span>) <span class="op">-</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>}</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a><span class="kw">u</span>(<span class="dv">15</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a><span class="co">## [1] 0.1428223</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a><span class="kw">u</span>(<span class="dv">18</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a><span class="co">## [1] 0.125</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a><span class="kw">u</span>(<span class="dv">20</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a><span class="co">## [1] -1</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a><span class="kw">u</span>(<span class="dv">30</span>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a><span class="co">## [1] -1227133513</span></span></code></pre></div>
+<p>With the lazy numbers, this sequence never moves from <span class="math inline">\(1/7\)</span>:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>u_lazy &lt;-<span class="st"> </span><span class="cf">function</span>(n) {</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>  <span class="cf">if</span>(n <span class="op">==</span><span class="st"> </span><span class="dv">1</span>) {</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>    <span class="kw">return</span>(<span class="dv">1</span> <span class="op">/</span><span class="st"> </span><span class="kw">lazynb</span>(<span class="dv">7</span>))</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>  }</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>  <span class="dv">8</span> <span class="op">*</span><span class="st"> </span><span class="kw">u_lazy</span>(n<span class="dv">-1</span>) <span class="op">-</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>}</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a><span class="kw">as.double</span>(<span class="kw">u_lazy</span>(<span class="dv">100</span>))</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a><span class="co">## [1] 0.1428571</span></span></code></pre></div>
+<p>Let’s compare with the multiple precision numbers provided by the <strong>Rmpfr</strong> package. One has to set the precision of these numbers. Let’s try with <span class="math inline">\(256\)</span> bits (the double precision corresponds to <span class="math inline">\(53\)</span> bits):</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">library</span>(Rmpfr)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>u_mpfr &lt;-<span class="st"> </span><span class="cf">function</span>(n) {</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>  <span class="cf">if</span>(n <span class="op">==</span><span class="st"> </span><span class="dv">1</span>) {</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>    <span class="kw">return</span>(<span class="dv">1</span> <span class="op">/</span><span class="st"> </span><span class="kw">mpfr</span>(<span class="dv">7</span>, <span class="dt">prec =</span> 256L))</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>  }</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>  <span class="dv">8</span> <span class="op">*</span><span class="st"> </span><span class="kw">u_mpfr</span>(n<span class="dv">-1</span>) <span class="op">-</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a>}</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a><span class="kw">asNumeric</span>(<span class="kw">u_mpfr</span>(<span class="dv">30</span>))</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a><span class="co">## [1] 0.1428571</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a><span class="kw">asNumeric</span>(<span class="kw">u_mpfr</span>(<span class="dv">85</span>))</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a><span class="co">## [1] 0.140625</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a><span class="kw">asNumeric</span>(<span class="kw">u_mpfr</span>(<span class="dv">100</span>))</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a><span class="co">## [1] -78536544841</span></span></code></pre></div>
+<p>The sequence goes crazy before the <span class="math inline">\(100^{\textrm{th}}\)</span> term. Of course we could increase the precision. With the lazy numbers, there’s no precision to set. Moreover they are faster (at least for this example):</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="kw">library</span>(microbenchmark)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="kw">options</span>(<span class="dt">digits =</span> 4L)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a><span class="kw">microbenchmark</span>(</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>  <span class="dt">lazy =</span> <span class="kw">u_lazy</span>(<span class="dv">200</span>),</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a>  <span class="dt">mpfr =</span> <span class="kw">u_mpfr</span>(<span class="dv">200</span>),</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a>  <span class="dt">times =</span> 20L</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a><span class="co">## Unit: milliseconds</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true"></a><span class="co">##  expr   min    lq  mean median    uq   max neval cld</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true"></a><span class="co">##  lazy 39.74 40.30 40.82  40.77 41.31 42.75    20  a </span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true"></a><span class="co">##  mpfr 58.89 60.78 61.69  61.25 62.67 64.95    20   b</span></span></code></pre></div>
+<p>Vectors of lazy numbers and matrices of lazy numbers are available in the <strong>lazyNumbers</strong> package. One can get the inverse and the determinant of a square lazy matrix.</p>
+<p>A thing to note is that the usual mathematical functions such as <span class="math inline">\(\exp\)</span>, <span class="math inline">\(\cos\)</span> or <span class="math inline">\(\sqrt{}\)</span>, are not implemented for lazy numbers. Only the addition, the subtraction, the multiplication, the division and the absolute value are implemented.</p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
