@@ -113,6 +113,7 @@
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="kw">lazynb</span>(<span class="dv">1</span>) <span class="op">-</span><span class="st"> </span><span class="kw">lazynb</span>(<span class="dv">7</span>) <span class="op">*</span><span class="st"> </span><span class="kw">lazynb</span>(<span class="fl">0.1</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="kw">as.double</span>(x) <span class="op">==</span><span class="st"> </span><span class="fl">0.3</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="co">## [1] TRUE</span></span></code></pre></div>
+<p><strong><em>Correction:</em></strong> <em>this is</em> <a href="https://laustep.github.io/stlahblog/posts/lazyNumbers2.html"><em>wrong</em></a><em>!</em></p>
 <p>In fact, when a binary operation involves a lazy number, the other number is automatically converted to a lazy number, so you can shortly enter this operation as follows:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="kw">lazynb</span>(<span class="dv">7</span>) <span class="op">*</span><span class="st"> </span><span class="fl">0.1</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="kw">as.double</span>(x) <span class="op">==</span><span class="st"> </span><span class="fl">0.3</span></span>
@@ -165,8 +166,8 @@
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a>)</span>
 <span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a><span class="co">## Unit: milliseconds</span></span>
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true"></a><span class="co">##  expr   min    lq  mean median    uq   max neval cld</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true"></a><span class="co">##  lazy 39.74 40.30 40.82  40.77 41.31 42.75    20  a </span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true"></a><span class="co">##  mpfr 58.89 60.78 61.69  61.25 62.67 64.95    20   b</span></span></code></pre></div>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true"></a><span class="co">##  lazy 38.42 39.57 40.30  40.04 40.68 43.47    20  a </span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true"></a><span class="co">##  mpfr 59.22 60.09 61.01  60.60 61.94 64.89    20   b</span></span></code></pre></div>
 <p>Vectors of lazy numbers and matrices of lazy numbers are available in the <strong>lazyNumbers</strong> package. One can get the inverse and the determinant of a square lazy matrix.</p>
 <p>A thing to note is that the usual mathematical functions such as <span class="math inline">\(\exp\)</span>, <span class="math inline">\(\cos\)</span> or <span class="math inline">\(\sqrt{}\)</span>, are not implemented for lazy numbers. Only the addition, the subtraction, the multiplication, the division and the absolute value are implemented.</p>
 

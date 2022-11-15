@@ -5,7 +5,74 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Sat, 12 Nov 2022 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Tue, 15 Nov 2022 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>The lazy numbers in R: correction</title>
+      <link>https://laustep.github.io/stlahblog/posts/lazyNumbers2.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        Because of a change I did in the <strong>lazyNumbers</strong> package, I
+        have to post a correction to
+        <a href="https://laustep.github.io/stlahblog/posts/lazyNumbers.html"
+          >my previous post</a
+        >.
+      </p>
+      <p>
+        The <code>as.double</code> function, called on a lazy number, was not
+        stable. Now it is. In the previous post, the following equality was
+        true:
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1"><span class="kw">library</span>(lazyNumbers)</span>
+<span id="cb1-2">x &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="kw">lazynb</span>(<span class="dv">7</span>) <span class="op">*</span><span class="st"> </span><span class="fl">0.1</span></span>
+<span id="cb1-3"><span class="kw">as.double</span>(x) <span class="op">==</span><span class="st"> </span><span class="fl">0.3</span></span>
+<span id="cb1-4"><span class="co">## [1] FALSE</span></span></code></pre>
+      </div>
+      <p>
+        It is not true anymore. This is expected actually. Indeed, the double
+        numbers <code>0.1</code> and <code>0.3</code> do not exactly represent
+        the numbers <span class="math inline">\(0.1\)</span> and
+        <span class="math inline">\(0.3\)</span>:
+      </p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1"><span class="kw">print</span>(<span class="fl">0.1</span>, <span class="dt">digits =</span> 17L)</span>
+<span id="cb2-2"><span class="co">## [1] 0.10000000000000001</span></span>
+<span id="cb2-3"><span class="kw">print</span>(<span class="fl">0.3</span>, <span class="dt">digits =</span> 17L)</span>
+<span id="cb2-4"><span class="co">## [1] 0.29999999999999999</span></span></code></pre>
+      </div>
+      <p>
+        The double representation of whole numbers is exact. The following
+        equality is true:
+      </p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb3-1"><span class="kw">library</span>(lazyNumbers)</span>
+<span id="cb3-2">x &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="kw">lazynb</span>(<span class="dv">7</span>) <span class="op">/</span><span class="st"> </span><span class="dv">10</span></span>
+<span id="cb3-3"><span class="kw">as.double</span>(x) <span class="op">==</span><span class="st"> </span><span class="fl">0.3</span></span>
+<span id="cb3-4"><span class="co">## [1] TRUE</span></span></code></pre>
+      </div>
+      <p>
+        No other change, and nothing else to correct. It is time to submit the
+        package to CRAN. See the
+        <a href="https://github.com/stla/lazyNumbers">Github repository</a> for
+        another short presentation of this package.
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Tue, 15 Nov 2022 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/lazyNumbers2.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>The lazy numbers in R</title>
       <link>https://laustep.github.io/stlahblog/posts/lazyNumbers.html</link>
@@ -46,6 +113,12 @@
 <span id="cb2-3"><span class="kw">as.double</span>(x) <span class="op">==</span><span class="st"> </span><span class="fl">0.3</span></span>
 <span id="cb2-4"><span class="co">## [1] TRUE</span></span></code></pre>
       </div>
+      <p>
+        <strong><em>Correction:</em></strong> <em>this is</em>
+        <a href="https://laustep.github.io/stlahblog/posts/lazyNumbers2.html"
+          ><em>wrong</em></a
+        ><em>!</em>
+      </p>
       <p>
         In fact, when a binary operation involves a lazy number, the other
         number is automatically converted to a lazy number, so you can shortly
@@ -147,8 +220,8 @@
 <span id="cb7-7">)</span>
 <span id="cb7-8"><span class="co">## Unit: milliseconds</span></span>
 <span id="cb7-9"><span class="co">##  expr   min    lq  mean median    uq   max neval cld</span></span>
-<span id="cb7-10"><span class="co">##  lazy 39.74 40.30 40.82  40.77 41.31 42.75    20  a </span></span>
-<span id="cb7-11"><span class="co">##  mpfr 58.89 60.78 61.69  61.25 62.67 64.95    20   b</span></span></code></pre>
+<span id="cb7-10"><span class="co">##  lazy 38.42 39.57 40.30  40.04 40.68 43.47    20  a </span></span>
+<span id="cb7-11"><span class="co">##  mpfr 59.22 60.09 61.01  60.60 61.94 64.89    20   b</span></span></code></pre>
       </div>
       <p>
         Vectors of lazy numbers and matrices of lazy numbers are available in
