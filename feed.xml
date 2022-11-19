@@ -5,7 +5,125 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Tue, 15 Nov 2022 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Sat, 19 Nov 2022 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>The missing lazy numbers: implementation</title>
+      <link>https://laustep.github.io/stlahblog/posts/lazyNumbers3.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        In Haskell, for any type <code>T</code> (for example
+        <code>Double</code>), there is a corresponding type
+        <code>Maybe T</code>. An object of this type either has form
+        <code>Just x</code>, where <code>x</code> is of type <code>T</code>, or
+        is <code>Nothing</code>. Thus one can use the <code>Maybe T</code> type
+        to extend the type <code>T</code> to a type allowing missing values. One
+        can test whether a <code>Maybe T</code> object <code>y</code> is not
+        “missing” with <code>isJust y</code>, and, if so, one can extract its
+        <code>T</code> value with <code>fromJust y</code>, which returns the
+        object <code>x</code> of type <code>T</code> such that
+        <code>y</code> equals <code>Just x</code>. There is also the function
+        <code>isNothing</code>, whose name is explicit.
+      </p>
+      <p>
+        There is something similar in C++, available since C++ 17: the type
+        <code>std::optional&lt;T&gt;</code>. I used it with
+        <strong>Rcpp</strong> to allow missing values in vectors of
+        <a href="https://laustep.github.io/stlahblog/posts/lazyNumbers.html"
+          >lazy numbers</a
+        >.
+      </p>
+      <p>The <code>lazyNumber</code> type is defined as follows in C++:</p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode cpp"
+        ><code class="sourceCode cpp"><span id="cb1-1"><span class="kw">typedef</span> CGAL::Quotient&lt;CGAL::MP_Float&gt; Quotient;</span>
+<span id="cb1-2"><span class="kw">typedef</span> CGAL::Lazy_exact_nt&lt;Quotient&gt;  lazyNumber;</span></code></pre>
+      </div>
+      <p>Then one can define the <code>maybeLazyNumber</code> type:</p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode cpp"
+        ><code class="sourceCode cpp"><span id="cb2-1"><span class="kw">typedef</span> <span class="bu">std::</span>optional&lt;lazyNumber&gt;      maybeLazyNumber;</span></code></pre>
+      </div>
+      <p>
+        and the type <code>lazyVector</code> to deals with vectors of (maybe)
+        lazy numbers:
+      </p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode cpp"
+        ><code class="sourceCode cpp"><span id="cb3-1"><span class="kw">typedef</span> <span class="bu">std::</span>vector&lt;maybeLazyNumber&gt;   lazyVector;</span></code></pre>
+      </div>
+      <p>
+        Now, what is the equivalent of the Haskell elements
+        <code>Just x</code> and <code>Nothing</code> and the functions
+        <code>isJust</code>, <code>isNothing</code>, and <code>fromJust</code>?
+      </p>
+      <p>
+        Well, <code>Nothing</code> corresponds to <code>std::nullopt</code>. The
+        equivalent of <code>isJust y</code> is obtained as follows. A
+        <code>maybeLazyNumber</code> object <code>y</code> is either
+        <code>std::nullopt</code> or a pointer to a
+        <code>lazyNumber</code> object. To test whether <code>y</code> points to
+        a <code>lazyNumber</code> object <code>x</code>, one simply does
+        <code>if(y)</code>. And if so, the <code>lazyNumber</code> object
+        <code>x</code> is nothing but <code>*y</code>. Thus the equivalent of
+        the Haskell command <code>fromJust y</code> in C++ is <code>*y</code>.
+      </p>
+      <p>
+        For example, here is the implementation of the C++ function which
+        converts a vector of double numbers with possible missing values to a
+        vector of (maybe) lazy numbers:
+      </p>
+      <div class="sourceCode" id="cb4">
+        <pre
+          class="sourceCode cpp"
+        ><code class="sourceCode cpp"><span id="cb4-1">lazyVector doubleVector_to_lazyVector(Rcpp::NumericVector dvector) {</span>
+<span id="cb4-2">  <span class="dt">int</span> n = dvector.size();</span>
+<span id="cb4-3">  lazyVector lvector;</span>
+<span id="cb4-4">  lvector.reserve(n);</span>
+<span id="cb4-5">  <span class="cf">for</span>(<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; n; i++) {</span>
+<span id="cb4-6">    <span class="cf">if</span>(Rcpp::NumericVector::is_na(dvector(i))) {</span>
+<span id="cb4-7">      lvector.emplace_back(<span class="bu">std::</span>nullopt);</span>
+<span id="cb4-8">    } <span class="cf">else</span> {</span>
+<span id="cb4-9">      lvector.emplace_back(lazyNumber(dvector(i)));</span>
+<span id="cb4-10">    }</span>
+<span id="cb4-11">  }</span>
+<span id="cb4-12">  <span class="cf">return</span> lvector;</span>
+<span id="cb4-13">}</span></code></pre>
+      </div>
+      <p>
+        And here is the function performing the conversion in the other
+        direction:
+      </p>
+      <div class="sourceCode" id="cb5">
+        <pre
+          class="sourceCode cpp"
+        ><code class="sourceCode cpp"><span id="cb5-1">Rcpp::NumericVector lazyVector_to_doubleVector(lazyVector lvector) {</span>
+<span id="cb5-2">  <span class="dt">int</span> n = lvector.size();</span>
+<span id="cb5-3">  Rcpp::NumericVector dvector(n);</span>
+<span id="cb5-4">  <span class="cf">for</span>(<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; n; i++) {</span>
+<span id="cb5-5">    maybeLazyNumber y = lvector[i];</span>
+<span id="cb5-6">    <span class="cf">if</span>(y) {</span>
+<span id="cb5-7">      dvector(i) = Rcpp::NumericVector::get_na();</span>
+<span id="cb5-8">    } <span class="cf">else</span> {</span>
+<span id="cb5-9">      dvector(i) = CGAL::to_double&lt;Quotient&gt;((*y).exact());</span>
+<span id="cb5-10">    }</span>
+<span id="cb5-11">  }</span>
+<span id="cb5-12">  <span class="cf">return</span> dvector;</span>
+<span id="cb5-13">}</span></code></pre>
+      </div>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Sat, 19 Nov 2022 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/lazyNumbers3.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>The lazy numbers in R: correction</title>
       <link>https://laustep.github.io/stlahblog/posts/lazyNumbers2.html</link>
