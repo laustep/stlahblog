@@ -89,8 +89,8 @@
         </li>
       </ol>
       <p>
-        <strong>Node.js</strong> is available in the GSK software center. You
-        can alternatively download a portable version on the
+        For Windows, you can download a portable version of
+        <strong>Node.js</strong> on the
         <a href="https://nodejs.org/en/download/">nodejs.org</a> website: choose
         the 64-bit zip, unzip it in a folder and set this folder in your Windows
         path.
@@ -255,7 +255,7 @@
 <span id="cb4-6">  pbiviz[[<span class="st">"visual"</span>]][[<span class="st">"description"</span>]] &lt;-<span class="st"> "Description"</span></span>
 <span id="cb4-7">  pbiviz[[<span class="st">"visual"</span>]][[<span class="st">"supportUrl"</span>]] &lt;-<span class="st"> "https://wwww.example.com"</span></span>
 <span id="cb4-8">  pbiviz[[<span class="st">"author"</span>]][[<span class="st">"name"</span>]] &lt;-<span class="st"> "John Doe"</span></span>
-<span id="cb4-9">  pbiviz[[<span class="st">"author"</span>]][[<span class="st">"email"</span>]] &lt;-<span class="st"> "john.doe@gsk.com"</span></span>
+<span id="cb4-9">  pbiviz[[<span class="st">"author"</span>]][[<span class="st">"email"</span>]] &lt;-<span class="st"> "john.doe@gmail.com"</span></span>
 <span id="cb4-10">  pbiviz &lt;-<span class="st"> </span><span class="kw">toJSON</span>(pbiviz, <span class="dt">auto_unbox =</span> <span class="ot">TRUE</span>, <span class="dt">null =</span> <span class="st">"null"</span>, <span class="dt">pretty =</span> <span class="dv">2</span>)</span>
 <span id="cb4-11">  <span class="kw">writeLines</span>(pbiviz, <span class="st">"pbiviz.json"</span>)</span>
 <span id="cb4-12">}</span></code></pre>
@@ -394,11 +394,13 @@
       <p>
         <img
           src="https://laustep.github.io/stlahblog/posts/figures/pbiviz03.png"
+          style="width: 50%"
         />
       </p>
       <p>
         <img
           src="https://laustep.github.io/stlahblog/posts/figures/pbiviz04.png"
+          style="width: 50%"
         />
       </p>
       <h1 id="arbitrary-html">Arbitrary HTML</h1>
@@ -573,6 +575,7 @@
       <p>
         <img
           src="https://laustep.github.io/stlahblog/posts/figures/pbiviz05.png"
+          style="width: 50%"
         />
       </p>
       <h2 id="helper-function-1">Helper function</h2>
@@ -696,6 +699,7 @@
       <p>
         <img
           src="https://laustep.github.io/stlahblog/posts/figures/pbiviz06.png"
+          style="width: 50%"
         />
       </p>
       <h1 id="prevent-removal-of-duplicated-rows">
@@ -719,6 +723,7 @@
       <p>
         <img
           src="https://laustep.github.io/stlahblog/posts/figures/pbiviz07.gif"
+          style="width: 50%"
         />
       </p>
       <p>

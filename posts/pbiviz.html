@@ -126,7 +126,7 @@
 <li><p>create and install a certificate;</p></li>
 <li><p>install the npm package <code>powerbi-visuals-api</code>.</p></li>
 </ol>
-<p><strong>Node.js</strong> is available in the GSK software center. You can alternatively download a portable version on the <a href="https://nodejs.org/en/download/">nodejs.org</a> website: choose the 64-bit zip, unzip it in a folder and set this folder in your Windows path.</p>
+<p>For Windows, you can download a portable version of <strong>Node.js</strong> on the <a href="https://nodejs.org/en/download/">nodejs.org</a> website: choose the 64-bit zip, unzip it in a folder and set this folder in your Windows path.</p>
 <p>Follow the tutorial for steps 2 and 3. Note that you have to perform step 3 only once, there’s no need to generate a new certificate for each visual you will create.</p>
 <p>For step 4, run <code>npm install -g powerbi-visuals-api</code> in a terminal.</p>
 <h1 id="example">Example</h1>
@@ -188,7 +188,7 @@
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>  pbiviz[[<span class="st">&quot;visual&quot;</span>]][[<span class="st">&quot;description&quot;</span>]] &lt;-<span class="st"> &quot;Description&quot;</span></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>  pbiviz[[<span class="st">&quot;visual&quot;</span>]][[<span class="st">&quot;supportUrl&quot;</span>]] &lt;-<span class="st"> &quot;https://wwww.example.com&quot;</span></span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>  pbiviz[[<span class="st">&quot;author&quot;</span>]][[<span class="st">&quot;name&quot;</span>]] &lt;-<span class="st"> &quot;John Doe&quot;</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>  pbiviz[[<span class="st">&quot;author&quot;</span>]][[<span class="st">&quot;email&quot;</span>]] &lt;-<span class="st"> &quot;john.doe@gsk.com&quot;</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>  pbiviz[[<span class="st">&quot;author&quot;</span>]][[<span class="st">&quot;email&quot;</span>]] &lt;-<span class="st"> &quot;john.doe@gmail.com&quot;</span></span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a>  pbiviz &lt;-<span class="st"> </span><span class="kw">toJSON</span>(pbiviz, <span class="dt">auto_unbox =</span> <span class="ot">TRUE</span>, <span class="dt">null =</span> <span class="st">&quot;null&quot;</span>, <span class="dt">pretty =</span> <span class="dv">2</span>)</span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a>  <span class="kw">writeLines</span>(pbiviz, <span class="st">&quot;pbiviz.json&quot;</span>)</span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a>}</span></code></pre></div>
@@ -245,8 +245,8 @@
 <span id="cb8-17"><a href="#cb8-17" aria-hidden="true"></a>p &lt;-<span class="st"> </span><span class="kw">ggplotly</span>(gg)</span>
 <span id="cb8-18"><a href="#cb8-18" aria-hidden="true"></a><span class="co">####################################################</span></span></code></pre></div>
 <p>Now we can choose the columns we want for the x-axis and for the y-axis, and we can optionally choose the <code>Species</code> color factor:</p>
-<p><img src="./figures/pbiviz03.png" /></p>
-<p><img src="./figures/pbiviz04.png" /></p>
+<p><img src="./figures/pbiviz03.png" style="width:50.0%" /></p>
+<p><img src="./figures/pbiviz04.png" style="width:50.0%" /></p>
 <h1 id="arbitrary-html">Arbitrary HTML</h1>
 <p>In fact, <strong>pbiviz</strong> is not restricted to render a <code>htmlwidget</code>. One can render any HTML file, it suffices to save it under the name <strong><em>out.html</em></strong> in the R script. For instance, in the above example, we render a blank plot if the user does not select at least two columns. We can throw a message instead, with a R script like this:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="kw">source</span>(<span class="st">&quot;./r_files/flatten_HTML.r&quot;</span>)</span>
@@ -367,7 +367,7 @@
 <p>Now you can compile the project: run <code>pbiviz package</code> from the folder <strong><em>pbiwidgets/diamonds</em></strong>.</p>
 <p>Open <strong>Power BI</strong> and load the two Excel files. Select <em>‘Get more visuals’</em> as before (the icon with the three dots), <em>‘Import a visual from a file’</em> and select the <strong>pbiviz</strong> file located in the <strong><em>pbiwidgets/diamonds/dist</em></strong> folder.</p>
 <p>Drag and drop the column names of the two datasets to put them in <strong>Data1</strong> and <strong>Data2</strong>. Here is the result:</p>
-<p><img src="./figures/pbiviz05.png" /></p>
+<p><img src="./figures/pbiviz05.png" style="width:50.0%" /></p>
 <h2 id="helper-function-1">Helper function</h2>
 <p>Here is a R function which generates the <strong><em>capabilities.json</em></strong> file:</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a><span class="kw">library</span>(jsonlite)</span>
@@ -449,12 +449,12 @@
 <span id="cb16-20"><a href="#cb16-20" aria-hidden="true"></a>widget &lt;-<span class="st"> </span><span class="kw">combineWidgets</span>(widget1, widget2)</span>
 <span id="cb16-21"><a href="#cb16-21" aria-hidden="true"></a><span class="kw">internalSaveWidget</span>(widget, <span class="st">'out.html'</span>)</span>
 <span id="cb16-22"><a href="#cb16-22" aria-hidden="true"></a><span class="co">####################################################</span></span></code></pre></div>
-<p><img src="./figures/pbiviz06.png" /></p>
+<p><img src="./figures/pbiviz06.png" style="width:50.0%" /></p>
 <h1 id="prevent-removal-of-duplicated-rows">Prevent removal of duplicated rows</h1>
 <p>Power BI has an undesirable behavior: when sending the data to R, it removes the duplicated rows. To alleviate this problem, you have to add a column without duplicated values. An easy way to get such a column consists in going to the Power Query Editor (<em>“Transform data”</em> button), then going to the tab <em>“Add column”</em> and select <em>“Index Column”</em>. Then include this column in the data exported to R.</p>
 <h1 id="adding-formatting-objects">Adding formatting objects</h1>
 <p>Here we explain how to achieve the result shown on the image below. With this visual, the user is able to add a title to the chart and to select a theme for the chart.</p>
-<p><img src="./figures/pbiviz07.gif" /></p>
+<p><img src="./figures/pbiviz07.gif" style="width:50.0%" /></p>
 <p>This is achieved by modifying two files: the file <strong><em>capabilities.json</em></strong> and the file <strong><em>src/settings.ts</em></strong> in the folder created by <strong>pbiviz</strong>.</p>
 <p>Here is the file <strong><em>capabilities.json</em></strong>. We modified the <code>objects</code> node:</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true"></a><span class="fu">{</span></span>
