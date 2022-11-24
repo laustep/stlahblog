@@ -138,7 +138,7 @@
 <li><p>create a working directory: <code>mkdir pbiwidgets</code> and go into it: <code>cd pbiwidgets</code>;</p></li>
 <li><p>initialize a new visual by running: <code>pbiviz new iris -t rhtml</code>;</p></li>
 <li><p>this creates the folder <strong><em>pbiwidgets/iris</em></strong> with a lot of stuff;</p></li>
-<li><p>in this folder, edit the file <strong><em>pbiviz.json</em></strong>; you have to write something for <code>description</code> (what you want), <code>supportUrl</code>(write anything you want, e.g. <code>https://www.example.com</code>), and you have to write something for the fields <code>name</code> and <code>email</code>;</p></li>
+<li><p>in this folder, edit the file <strong><em>pbiviz.json</em></strong>; you have to write something for <code>description</code> (what you want), <code>supportUrl</code>(write anything you want, e.g. <code>https://www.example.com</code>), and you have to write something for the fields <code>name</code> and <code>email</code>;</p></li>
 <li><p>now you have to edit the file <strong><em>script.r</em></strong>:</p></li>
 </ul>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">source</span>(<span class="st">'./r_files/flatten_HTML.r'</span>)</span>
@@ -187,7 +187,7 @@
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>  pbiviz[[<span class="st">&quot;visual&quot;</span>]][[<span class="st">&quot;description&quot;</span>]] &lt;-<span class="st"> &quot;Description&quot;</span></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>  pbiviz[[<span class="st">&quot;visual&quot;</span>]][[<span class="st">&quot;supportUrl&quot;</span>]] &lt;-<span class="st"> &quot;https://wwww.example.com&quot;</span></span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>  pbiviz[[<span class="st">&quot;author&quot;</span>]][[<span class="st">&quot;name&quot;</span>]] &lt;-<span class="st"> &quot;John Doe&quot;</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>  pbiviz[[<span class="st">&quot;author&quot;</span>]][[<span class="st">&quot;email&quot;</span>]] &lt;-<span class="st"> &quot;john.doe@gsk.com&quot;</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>  pbiviz[[<span class="st">&quot;author&quot;</span>]][[<span class="st">&quot;email&quot;</span>]] &lt;-<span class="st"> &quot;john.doe@gmail.com&quot;</span></span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a>  pbiviz &lt;-<span class="st"> </span><span class="kw">toJSON</span>(pbiviz, <span class="dt">auto_unbox =</span> <span class="ot">TRUE</span>, <span class="dt">null =</span> <span class="st">&quot;null&quot;</span>, <span class="dt">pretty =</span> <span class="dv">2</span>)</span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a>  <span class="kw">writeLines</span>(pbiviz, <span class="st">&quot;pbiviz.json&quot;</span>)</span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a>}</span></code></pre></div>
