@@ -5,7 +5,1025 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Sat, 19 Nov 2022 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Thu, 24 Nov 2022 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>HTML widgets in Power BI</title>
+      <link>https://laustep.github.io/stlahblog/posts/pbiviz.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <ul>
+        <li>
+          <p>
+            <a href="#setting-up-an-environment">Setting up an environment</a>
+          </p>
+        </li>
+        <li>
+          <p><a href="#example">Example</a></p>
+        </li>
+        <li>
+          <p><a href="#notes">Notes</a></p>
+        </li>
+        <li>
+          <p><a href="#advanced-example">Advanced example</a></p>
+        </li>
+        <li>
+          <p><a href="#arbitrary-html">Arbitrary HTML</a></p>
+        </li>
+        <li>
+          <p><a href="#using-multiple-datasets">Using multiple datasets</a></p>
+        </li>
+        <li>
+          <p>
+            <a href="#limiting-the-number-of-selected-columns"
+              >Limiting the number of selected columns</a
+            >
+          </p>
+        </li>
+        <li>
+          <p><a href="#combining-widgets">Combining widgets</a></p>
+        </li>
+        <li>
+          <p>
+            <a href="#prevent-removal-of-duplicated-rows"
+              >Prevent removal of duplicated rows</a
+            >
+          </p>
+        </li>
+        <li>
+          <p>
+            <a href="#adding-formatting-objects">Adding formatting objects</a>
+          </p>
+        </li>
+        <li>
+          <p>
+            <a href="#restricting-a-number-input-to-a-range"
+              >Restricting a number input to a range</a
+            >
+          </p>
+        </li>
+      </ul>
+      <hr />
+      <p>
+        It is possible to include a <code>htmlwidget</code> in a
+        <strong>Power BI</strong> report, such as a <code>plotly</code> graphic.
+      </p>
+      <h1 id="setting-up-an-environment">Setting up an environment</h1>
+      <p>
+        You first have to follow the first three steps of
+        <a
+          href="https://docs.microsoft.com/en-us/power-bi/developer/visuals/environment-setup?tabs=windows"
+          >this tutorial</a
+        >:
+      </p>
+      <ol type="1">
+        <li>
+          <p>install <strong>Node.js</strong>;</p>
+        </li>
+        <li>
+          <p>install <strong>pbiviz</strong>;</p>
+        </li>
+        <li><p>create and install a certificate;</p></li>
+        <li>
+          <p>install the npm package <code>powerbi-visuals-api</code>.</p>
+        </li>
+      </ol>
+      <p>
+        <strong>Node.js</strong> is available in the GSK software center. You
+        can alternatively download a portable version on the
+        <a href="https://nodejs.org/en/download/">nodejs.org</a> website: choose
+        the 64-bit zip, unzip it in a folder and set this folder in your Windows
+        path.
+      </p>
+      <p>
+        Follow the tutorial for steps 2 and 3. Note that you have to perform
+        step 3 only once, there’s no need to generate a new certificate for each
+        visual you will create.
+      </p>
+      <p>
+        For step 4, run <code>npm install -g powerbi-visuals-api</code> in a
+        terminal.
+      </p>
+      <h1 id="example">Example</h1>
+      <p>
+        Let’s assume you want to render the interactive graphic produced by this
+        code:
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1"><span class="kw">library</span>(plotly)</span>
+<span id="cb1-2">gg &lt;-<span class="st"> </span><span class="kw">ggplot</span>(iris, <span class="kw">aes</span>(<span class="dt">x =</span> Petal.Length, <span class="dt">y =</span> Sepal.Length, <span class="dt">color =</span> Species)) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb1-3"><span class="st">  </span><span class="kw">geom_point</span>()</span>
+<span id="cb1-4"><span class="kw">ggplotly</span>(gg)  </span></code></pre>
+      </div>
+      <ul>
+        <li>
+          <p>
+            create a working directory: <code>mkdir pbiwidgets</code> and go
+            into it: <code>cd pbiwidgets</code>;
+          </p>
+        </li>
+        <li>
+          <p>
+            initialize a new visual by running:
+            <code>pbiviz new iris -t rhtml</code>;
+          </p>
+        </li>
+        <li>
+          <p>
+            this creates the folder
+            <strong><em>pbiwidgets/iris</em></strong> with a lot of stuff;
+          </p>
+        </li>
+        <li>
+          <p>
+            in this folder, edit the file <strong><em>pbiviz.json</em></strong
+            >; you have to write something for <code>description</code> (what
+            you want), <code>supportUrl</code>(write anything you want,
+            e.g. <code>https://www.example.com</code>), and you have to write
+            something for the fields <code>name</code> and <code>email</code>;
+          </p>
+        </li>
+        <li>
+          <p>
+            now you have to edit <strong><em>script.r</em></strong
+            >:
+          </p>
+        </li>
+      </ul>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1"><span class="kw">source</span>(<span class="st">'./r_files/flatten_HTML.r'</span>)</span>
+<span id="cb2-2"></span>
+<span id="cb2-3"><span class="co">############### Library Declarations ###############</span></span>
+<span id="cb2-4"><span class="kw">libraryRequireInstall</span>(<span class="st">"plotly"</span>)</span>
+<span id="cb2-5"><span class="co">####################################################</span></span>
+<span id="cb2-6"></span>
+<span id="cb2-7"><span class="co">################### Actual code ####################</span></span>
+<span id="cb2-8">gg &lt;-<span class="st"> </span><span class="kw">ggplot</span>(iris, <span class="kw">aes</span>(<span class="dt">x=</span>Petal.Length, <span class="dt">y=</span>Sepal.Length, <span class="dt">color =</span> Species)) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb2-9"><span class="st">  </span><span class="kw">geom_point</span>()</span>
+<span id="cb2-10">p &lt;-<span class="st"> </span><span class="kw">ggplotly</span>(gg)</span>
+<span id="cb2-11"><span class="co">####################################################</span></span>
+<span id="cb2-12"></span>
+<span id="cb2-13"><span class="co">################## Save widget #####################</span></span>
+<span id="cb2-14"><span class="kw">internalSaveWidget</span>(p, <span class="st">"out.html"</span>)</span>
+<span id="cb2-15"><span class="co">####################################################</span></span>
+<span id="cb2-16"></span>
+<span id="cb2-17"><span class="co">################ Reduce paddings ###################</span></span>
+<span id="cb2-18"><span class="kw">ReadFullFileReplaceString</span>(</span>
+<span id="cb2-19">  <span class="st">"out.html"</span>, <span class="st">"out.html"</span>, <span class="st">',"padding":[0-9]*,'</span>, <span class="st">',"padding":0,'</span></span>
+<span id="cb2-20">)</span>
+<span id="cb2-21"><span class="co">####################################################</span></span></code></pre>
+      </div>
+      <ul>
+        <li>
+          <p>
+            the dataframe <code>Values</code> is the dataset which will be sent
+            to this R script by <strong>Power BI</strong>;
+          </p>
+        </li>
+        <li>
+          <p>
+            since we want to use <code>iris</code> as data, we save it to an
+            Excel file that we will import in <strong>Power BI</strong>; I
+            recommend to use <strong>writexl</strong> (the Excel files written
+            with <strong>openxlsx</strong> cause an issue when one tries to load
+            them in <strong>Power BI</strong>):
+          </p>
+        </li>
+      </ul>
+      <!-- -->
+      <pre><code>writexl::write_xlsx(iris, "iris.xlsx") 
+# or writexl::write_xlsx(list("sheetName" = iris), "iris.xlsx") </code></pre>
+      <ul>
+        <li>
+          <p>
+            go to the folder <strong><em>pbiwidgets/iris</em></strong> in your
+            terminal and run the command <code>pbiviz package</code>;
+          </p>
+        </li>
+        <li>
+          <p>
+            now open Power BI, import <strong><em>iris.xlsx</em></strong
+            >, select and load the sheet;
+          </p>
+        </li>
+        <li>
+          <p>
+            in the <em>‘Visualizations’</em> panel, click the three dots, then
+            <em>‘import a visual from a file’</em>, and select the
+            <strong><em>pbiviz</em></strong> file which is located in
+            <strong><em>pbiwidgets/iris/dist</em></strong>
+          </p>
+        </li>
+        <li>
+          <p>
+            a new
+            <a
+              href="https://laustep.github.io/stlahblog/posts/figures/pbiviz_icon.png"
+              >icon showing some tools</a
+            >
+            appears at the bottom in the <em>‘Visualizations’</em> panel, click
+            it;
+          </p>
+        </li>
+        <li>
+          <p>
+            in the <em>‘Fields’</em> panel, select the columns used for the
+            plot, here <code>Petal.Length</code>, <code>Sepal.Length</code> and
+            <code>Species</code>;
+          </p>
+        </li>
+        <li><p>that’s it, you get the interactive graphic in Power BI.</p></li>
+      </ul>
+      <h2 id="helper-function">Helper function</h2>
+      <p>
+        If you have to deal with multiple widgets, you will be bothered about
+        the filling of the <strong><em>pbiviz.json</em></strong> file. Here is a
+        R function which fills it for you:
+      </p>
+      <div class="sourceCode" id="cb4">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb4-1"><span class="kw">library</span>(jsonlite)</span>
+<span id="cb4-2">fill_pbiviz &lt;-<span class="st"> </span><span class="cf">function</span>(path){</span>
+<span id="cb4-3">  wd &lt;-<span class="st"> </span><span class="kw">setwd</span>(path)</span>
+<span id="cb4-4">  <span class="kw">on.exit</span>(<span class="kw">setwd</span>(wd))</span>
+<span id="cb4-5">  pbiviz &lt;-<span class="st"> </span><span class="kw">fromJSON</span>(<span class="st">"pbiviz.json"</span>)</span>
+<span id="cb4-6">  pbiviz[[<span class="st">"visual"</span>]][[<span class="st">"description"</span>]] &lt;-<span class="st"> "Description"</span></span>
+<span id="cb4-7">  pbiviz[[<span class="st">"visual"</span>]][[<span class="st">"supportUrl"</span>]] &lt;-<span class="st"> "https://wwww.example.com"</span></span>
+<span id="cb4-8">  pbiviz[[<span class="st">"author"</span>]][[<span class="st">"name"</span>]] &lt;-<span class="st"> "John Doe"</span></span>
+<span id="cb4-9">  pbiviz[[<span class="st">"author"</span>]][[<span class="st">"email"</span>]] &lt;-<span class="st"> "john.doe@gsk.com"</span></span>
+<span id="cb4-10">  pbiviz &lt;-<span class="st"> </span><span class="kw">toJSON</span>(pbiviz, <span class="dt">auto_unbox =</span> <span class="ot">TRUE</span>, <span class="dt">null =</span> <span class="st">"null"</span>, <span class="dt">pretty =</span> <span class="dv">2</span>)</span>
+<span id="cb4-11">  <span class="kw">writeLines</span>(pbiviz, <span class="st">"pbiviz.json"</span>)</span>
+<span id="cb4-12">}</span></code></pre>
+      </div>
+      <p>Just run <code>fill_pbiviz("path/to/pbiwidgets/iris")</code>.</p>
+      <h1 id="notes">Notes</h1>
+      <p>
+        This works very well with <code>plotly</code> and
+        <code>ggplotly</code> widgets. I also tested a graphic with the
+        <code>scatterD3</code> package and the result was fine as well. But this
+        can be less fine for other <code>htmlwidgets</code>.
+      </p>
+      <p>
+        For example, with the <code>ggiraph</code> package, I managed to achieve
+        a good result after settings the options
+        <code>width_svg = 3, height_svg = 2.5</code> in the
+        <code>girafe</code> function. I also set the option
+        <code>opts_zoom(min = .7, max = 2)</code> in the
+        <code>girafe_options</code> function:
+      </p>
+      <div class="sourceCode" id="cb5">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb5-1">gg_point &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> data) <span class="op">+</span></span>
+<span id="cb5-2"><span class="st">  </span><span class="kw">geom_point_interactive</span>(......</span>
+<span id="cb5-3">p &lt;-<span class="st"> </span><span class="kw">girafe</span>(<span class="dt">ggobj =</span> gg_point, <span class="dt">width_svg =</span> <span class="dv">3</span>, <span class="dt">height_svg =</span> <span class="fl">2.5</span>)</span>
+<span id="cb5-4">p &lt;-<span class="st"> </span><span class="kw">girafe_options</span>(p, <span class="kw">opts_zoom</span>(<span class="dt">min =</span> <span class="fl">.7</span>, <span class="dt">max =</span> <span class="dv">2</span>))</span>
+<span id="cb5-5"><span class="kw">internalSaveWidget</span>(p, <span class="st">"out.html"</span>)</span></code></pre>
+      </div>
+      <p>
+        I tried a pie chart with the <code>rAmCharts4</code> package and got an
+        empty plot. I finally managed to get the pie chart by removing the last
+        lines of the file <strong><em>script.r</em></strong
+        >:
+      </p>
+      <div class="sourceCode" id="cb6">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb6-1"><span class="co">################ Reduce paddings ###################</span></span>
+<span id="cb6-2"><span class="kw">ReadFullFileReplaceString</span>(</span>
+<span id="cb6-3">  <span class="st">"out.html"</span>, <span class="st">"out.html"</span>, <span class="st">',"padding":[0-9]*,'</span>, <span class="st">',"padding":0,'</span></span>
+<span id="cb6-4">)</span></code></pre>
+      </div>
+      <p>
+        And I set the <code>height</code> option of the
+        <code>amPieChart</code> function to <code>300px</code>, otherwise the
+        legend was truncated.
+      </p>
+      <h1 id="advanced-example">Advanced example</h1>
+      <p>
+        When you select the columns <code>Petal.Length</code>,
+        <code>Sepal.Length</code> and <code>Species</code>, they appear in the
+        <em>‘Visualizations’</em> panel, under the dataset name
+        <strong>Values</strong>:
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/pbiviz01.png"
+        />
+      </p>
+      <p>
+        Then, <strong>Power BI</strong> sends the data to the R script with the
+        help of a CSV file, and
+        <em
+          >the columns of this CSV file are in the same order as your selected
+          columns</em
+        >.
+      </p>
+      <p>
+        Therefore, instead of using the column names in the R script, one can
+        use the column indices.
+      </p>
+      <p>
+        Let’s illustrate. We will create a scatter plot as in the previous
+        example, but the user will have the choice of the variables on the
+        x-axis and the y-axis, and he’ll can also choose or not a color factor.
+      </p>
+      <p>
+        Firstly, we change the display name of the
+        <strong>Values</strong> dataset. Open the file
+        <code>pbiwidgets/iris/capabiities.json</code> (with any text editor),
+        and change the display name in the <code>dataRoles</code> field:
+      </p>
+      <div class="sourceCode" id="cb7">
+        <pre
+          class="sourceCode json"
+        ><code class="sourceCode json"><span id="cb7-1"><span class="fu">{</span></span>
+<span id="cb7-2">    <span class="dt">"dataRoles"</span> <span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb7-3">        <span class="fu">{</span></span>
+<span id="cb7-4">            <span class="dt">"displayName"</span> <span class="fu">:</span> <span class="st">"Data (x, y, by)"</span><span class="fu">,</span></span>
+<span id="cb7-5">            <span class="dt">"kind"</span> <span class="fu">:</span> <span class="st">"GroupingOrMeasure"</span><span class="fu">,</span></span>
+<span id="cb7-6">            <span class="dt">"name"</span> <span class="fu">:</span> <span class="st">"Values"</span></span>
+<span id="cb7-7">        <span class="fu">}</span></span>
+<span id="cb7-8">    <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb7-9">        <span class="er">......</span></span></code></pre>
+      </div>
+      <p>
+        Now we will see <strong>Data (x, y, by)</strong> in the
+        <em>‘Visualizations’</em> panel, instead of <strong>Values</strong>:
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/pbiviz02.png"
+        />
+      </p>
+      <p>
+        Then we use the following R code in <strong><em>script.r</em></strong
+        >:
+      </p>
+      <div class="sourceCode" id="cb8">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb8-1"><span class="co">################### Actual code ####################</span></span>
+<span id="cb8-2">nms &lt;-<span class="st"> </span><span class="kw">colnames</span>(Values)</span>
+<span id="cb8-3">ncols &lt;-<span class="st"> </span><span class="kw">length</span>(nms)</span>
+<span id="cb8-4"><span class="cf">if</span>(ncols <span class="op">==</span><span class="st"> </span>2L){</span>
+<span id="cb8-5">  gg &lt;-<span class="st"> </span><span class="kw">ggplot</span>(</span>
+<span id="cb8-6">    Values, <span class="kw">aes</span>(<span class="dt">x=</span>.data[[nms[<span class="dv">1</span>]]], <span class="dt">y=</span>.data[[nms[<span class="dv">2</span>]]])</span>
+<span id="cb8-7">  ) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb8-8"><span class="st">    </span><span class="kw">geom_point</span>()</span>
+<span id="cb8-9">}<span class="cf">else</span> <span class="cf">if</span>(ncols <span class="op">&gt;=</span><span class="st"> </span>3L){</span>
+<span id="cb8-10">  gg &lt;-<span class="st"> </span><span class="kw">ggplot</span>(</span>
+<span id="cb8-11">    Values, <span class="kw">aes</span>(<span class="dt">x=</span>.data[[nms[<span class="dv">1</span>]]], <span class="dt">y=</span>.data[[nms[<span class="dv">2</span>]]], <span class="dt">color =</span> .data[[nms[<span class="dv">3</span>]]])</span>
+<span id="cb8-12">  ) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb8-13"><span class="st">    </span><span class="kw">geom_point</span>()</span>
+<span id="cb8-14">}<span class="cf">else</span>{</span>
+<span id="cb8-15">  gg &lt;-<span class="st"> </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_blank</span>()</span>
+<span id="cb8-16">}</span>
+<span id="cb8-17">p &lt;-<span class="st"> </span><span class="kw">ggplotly</span>(gg)</span>
+<span id="cb8-18"><span class="co">####################################################</span></span></code></pre>
+      </div>
+      <p>
+        Now we can choose the columns we want for the x-axis and for the y-axis,
+        and we can optionally choose the <code>Species</code> color factor:
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/pbiviz03.png"
+        />
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/pbiviz04.png"
+        />
+      </p>
+      <h1 id="arbitrary-html">Arbitrary HTML</h1>
+      <p>
+        In fact, <strong>pbiviz</strong> is not restricted to render a
+        <code>htmlwidget</code>. One can render any HTML file, it suffices to
+        save it under the name <strong><em>out.html</em></strong> in the R
+        script. For instance, in the above example, we render a blank plot if
+        the user does not select at least two columns. We can throw a message
+        instead, with a R script like this:
+      </p>
+      <div class="sourceCode" id="cb9">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb9-1"><span class="kw">source</span>(<span class="st">"./r_files/flatten_HTML.r"</span>)</span>
+<span id="cb9-2"></span>
+<span id="cb9-3"><span class="co">############### Library Declarations ###############</span></span>
+<span id="cb9-4"><span class="kw">libraryRequireInstall</span>(<span class="st">"plotly"</span>)</span>
+<span id="cb9-5"><span class="co">####################################################</span></span>
+<span id="cb9-6"></span>
+<span id="cb9-7">htmlMessage &lt;-<span class="st"> </span><span class="cf">function</span>(message){</span>
+<span id="cb9-8">  html &lt;-<span class="st"> </span><span class="kw">c</span>(</span>
+<span id="cb9-9">    <span class="st">"&lt;!doctype html&gt;"</span>,</span>
+<span id="cb9-10">    <span class="st">"&lt;html lang=en&gt;"</span>,</span>
+<span id="cb9-11">    <span class="st">"  &lt;head&gt;"</span>,</span>
+<span id="cb9-12">    <span class="st">"    &lt;meta charset=utf-8&gt;"</span>,</span>
+<span id="cb9-13">    <span class="st">"  &lt;/head&gt;"</span>,</span>
+<span id="cb9-14">    <span class="st">"  &lt;body&gt;"</span>,</span>
+<span id="cb9-15">    <span class="kw">sprintf</span>(<span class="st">"    &lt;p&gt;%s&lt;/p&gt;"</span>, message),</span>
+<span id="cb9-16">    <span class="st">"  &lt;/body&gt;"</span>,</span>
+<span id="cb9-17">    <span class="st">"&lt;/html&gt;"</span></span>
+<span id="cb9-18">  )</span>
+<span id="cb9-19">  <span class="kw">writeLines</span>(html, <span class="st">"out.html"</span>)</span>
+<span id="cb9-20">}</span>
+<span id="cb9-21"></span>
+<span id="cb9-22"><span class="co">################### Actual code ####################</span></span>
+<span id="cb9-23">nms &lt;-<span class="st"> </span><span class="kw">colnames</span>(Values)</span>
+<span id="cb9-24">ncols &lt;-<span class="st"> </span><span class="kw">length</span>(nms)</span>
+<span id="cb9-25"><span class="cf">if</span>(ncols <span class="op">==</span><span class="st"> </span>2L){</span>
+<span id="cb9-26">  gg &lt;-<span class="st"> </span><span class="kw">ggplot</span>(</span>
+<span id="cb9-27">    Values, <span class="kw">aes</span>(<span class="dt">x=</span>.data[[nms[<span class="dv">1</span>]]], <span class="dt">y=</span>.data[[nms[<span class="dv">2</span>]]])</span>
+<span id="cb9-28">  ) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb9-29"><span class="st">    </span><span class="kw">geom_point</span>()</span>
+<span id="cb9-30">  p &lt;-<span class="st"> </span><span class="kw">ggplotly</span>(gg) </span>
+<span id="cb9-31">  <span class="kw">internalSaveWidget</span>(p, <span class="st">"out.html"</span>)</span>
+<span id="cb9-32">}<span class="cf">else</span> <span class="cf">if</span>(ncols <span class="op">&gt;=</span><span class="st"> </span>3L){</span>
+<span id="cb9-33">  gg &lt;-<span class="st"> </span><span class="kw">ggplot</span>(</span>
+<span id="cb9-34">    Values, <span class="kw">aes</span>(<span class="dt">x=</span>.data[[nms[<span class="dv">1</span>]]], <span class="dt">y=</span>.data[[nms[<span class="dv">2</span>]]], <span class="dt">color =</span> .data[[nms[<span class="dv">3</span>]]])</span>
+<span id="cb9-35">  ) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb9-36"><span class="st">    </span><span class="kw">geom_point</span>()</span>
+<span id="cb9-37">  p &lt;-<span class="st"> </span><span class="kw">ggplotly</span>(gg) </span>
+<span id="cb9-38">  <span class="kw">internalSaveWidget</span>(p, <span class="st">"out.html"</span>)</span>
+<span id="cb9-39">}<span class="cf">else</span>{</span>
+<span id="cb9-40">  <span class="kw">htmlMessage</span>(</span>
+<span id="cb9-41">    <span class="st">"You have to select at least two columns."</span></span>
+<span id="cb9-42">  )</span>
+<span id="cb9-43">}</span>
+<span id="cb9-44"><span class="co">################## End of script ###################</span></span></code></pre>
+      </div>
+      <h1 id="using-multiple-datasets">Using multiple datasets</h1>
+      <p>
+        Some graphics require more than one dataset. We give an example here.
+      </p>
+      <p>First, we prepare two datasets:</p>
+      <div class="sourceCode" id="cb10">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb10-1"><span class="kw">library</span>(dplyr)</span>
+<span id="cb10-2"><span class="kw">data</span>(<span class="st">"diamonds"</span>, <span class="dt">package =</span> <span class="st">"ggplot2"</span>)</span>
+<span id="cb10-3"></span>
+<span id="cb10-4"><span class="co">## creating dataset #1</span></span>
+<span id="cb10-5">data1 &lt;-<span class="st"> </span></span>
+<span id="cb10-6"><span class="st">  </span>diamonds <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb10-7"><span class="st">  </span><span class="kw">group_by</span>(clarity) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb10-8"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">m =</span> <span class="kw">mean</span>(price))  </span>
+<span id="cb10-9"></span>
+<span id="cb10-10"><span class="co">## creating dataset #2</span></span>
+<span id="cb10-11">data2 &lt;-<span class="st"> </span></span>
+<span id="cb10-12"><span class="st">  </span>diamonds <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb10-13"><span class="st">  </span><span class="kw">group_by</span>(clarity, cut) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb10-14"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">m =</span> <span class="kw">mean</span>(price))</span>
+<span id="cb10-15"></span>
+<span id="cb10-16"><span class="co">## save to Excel files</span></span>
+<span id="cb10-17">writexl<span class="op">::</span><span class="kw">write_xlsx</span>(<span class="kw">list</span>(<span class="st">"data1"</span> =<span class="st"> </span>data1), <span class="st">"diamonds_summarized1.xlsx"</span>)</span>
+<span id="cb10-18">writexl<span class="op">::</span><span class="kw">write_xlsx</span>(<span class="kw">list</span>(<span class="st">"data2"</span> =<span class="st"> </span>data2), <span class="st">"diamonds_summarized2.xlsx"</span>)</span></code></pre>
+      </div>
+      <p>
+        Create the visual project: <code>pbiviz new diamonds -t rhtml</code>.
+        Complete the file
+        <strong><em>pbiwidgets/diamonds/pbiviz.json</em></strong> as previously
+        explained, and modify the file
+        <strong><em>pbiwidgets/diamonds/capabilities.json</em></strong> as
+        follows:
+      </p>
+      <div class="sourceCode" id="cb11">
+        <pre
+          class="sourceCode json"
+        ><code class="sourceCode json"><span id="cb11-1"><span class="fu">{</span></span>
+<span id="cb11-2">  <span class="dt">"dataRoles"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb11-3">    <span class="fu">{</span></span>
+<span id="cb11-4">      <span class="dt">"displayName"</span><span class="fu">:</span> <span class="st">"Data1"</span><span class="fu">,</span></span>
+<span id="cb11-5">      <span class="dt">"kind"</span><span class="fu">:</span> <span class="st">"GroupingOrMeasure"</span><span class="fu">,</span></span>
+<span id="cb11-6">      <span class="dt">"name"</span><span class="fu">:</span> <span class="st">"data1"</span></span>
+<span id="cb11-7">    <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb11-8">    <span class="fu">{</span></span>
+<span id="cb11-9">      <span class="dt">"displayName"</span><span class="fu">:</span> <span class="st">"Data2"</span><span class="fu">,</span></span>
+<span id="cb11-10">      <span class="dt">"kind"</span><span class="fu">:</span> <span class="st">"GroupingOrMeasure"</span><span class="fu">,</span></span>
+<span id="cb11-11">      <span class="dt">"name"</span><span class="fu">:</span> <span class="st">"data2"</span></span>
+<span id="cb11-12">    <span class="fu">}</span></span>
+<span id="cb11-13">  <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb11-14">  <span class="dt">"dataViewMappings"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb11-15">    <span class="fu">{</span></span>
+<span id="cb11-16">      <span class="dt">"scriptResult"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb11-17">        <span class="dt">"dataInput"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb11-18">          <span class="dt">"table"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb11-19">            <span class="dt">"rows"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb11-20">              <span class="dt">"select"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb11-21">                <span class="fu">{</span></span>
+<span id="cb11-22">                  <span class="dt">"for"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb11-23">                    <span class="dt">"in"</span><span class="fu">:</span> <span class="st">"data1"</span></span>
+<span id="cb11-24">                  <span class="fu">}</span></span>
+<span id="cb11-25">                <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb11-26">                <span class="fu">{</span></span>
+<span id="cb11-27">                  <span class="dt">"for"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb11-28">                    <span class="dt">"in"</span><span class="fu">:</span> <span class="st">"data2"</span></span>
+<span id="cb11-29">                  <span class="fu">}</span></span>
+<span id="cb11-30">                <span class="fu">}</span></span>
+<span id="cb11-31">              <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb11-32">              <span class="er">......</span></span></code></pre>
+      </div>
+      <p>
+        Now the R script, in
+        <strong><em>pbiwidgets/diamonds/script.r</em></strong
+        >:
+      </p>
+      <div class="sourceCode" id="cb12">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb12-1"><span class="kw">source</span>(<span class="st">'./r_files/flatten_HTML.r'</span>)</span>
+<span id="cb12-2"></span>
+<span id="cb12-3"><span class="co">############### Library Declarations ###############</span></span>
+<span id="cb12-4"><span class="kw">libraryRequireInstall</span>(<span class="st">"plotly"</span>)</span>
+<span id="cb12-5"><span class="co">####################################################</span></span>
+<span id="cb12-6"></span>
+<span id="cb12-7"><span class="co">################### Actual code ####################</span></span>
+<span id="cb12-8">gg &lt;-<span class="st"> </span><span class="kw">ggplot</span>() <span class="op">+</span></span>
+<span id="cb12-9"><span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">data =</span> data1, <span class="kw">aes</span>(<span class="dt">x =</span> clarity, <span class="dt">y =</span> m), <span class="dt">color =</span> <span class="st">"blue"</span>, <span class="dt">size =</span> <span class="dv">3</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb12-10"><span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">data =</span> data2, <span class="kw">aes</span>(<span class="dt">x =</span> clarity, <span class="dt">y =</span> m), <span class="dt">color =</span> <span class="st">"red"</span>)</span>
+<span id="cb12-11"><span class="co">####################################################</span></span>
+<span id="cb12-12"></span>
+<span id="cb12-13"><span class="co">############# Create and save widget ###############</span></span>
+<span id="cb12-14">p &lt;-<span class="st"> </span><span class="kw">ggplotly</span>(gg)</span>
+<span id="cb12-15"><span class="kw">internalSaveWidget</span>(p, <span class="st">'out.html'</span>)</span>
+<span id="cb12-16"><span class="co">####################################################</span></span></code></pre>
+      </div>
+      <p>
+        Now you can compile the project: run <code>pbiviz package</code> from
+        the folder <strong><em>pbiwidgets/diamonds</em></strong
+        >.
+      </p>
+      <p>
+        Open <strong>Power BI</strong> and load the two Excel files. Select
+        <em>‘Get more visuals’</em> as before (the icon with the three dots),
+        <em>‘Import a visual from a file’</em> and select the
+        <strong>pbiviz</strong> file located in the
+        <strong><em>pbiwidgets/diamonds/dist</em></strong> folder.
+      </p>
+      <p>
+        Drag and drop the column names of the two datasets to put them in
+        <strong>Data1</strong> and <strong>Data2</strong>. Here is the result:
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/pbiviz05.png"
+        />
+      </p>
+      <h2 id="helper-function-1">Helper function</h2>
+      <p>
+        Here is a R function which generates the
+        <strong><em>capabilities.json</em></strong> file:
+      </p>
+      <div class="sourceCode" id="cb13">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb13-1"><span class="kw">library</span>(jsonlite)</span>
+<span id="cb13-2">fill_capabilities &lt;-<span class="st"> </span><span class="cf">function</span>(path, dataNames, dataDisplayNames){</span>
+<span id="cb13-3">  wd &lt;-<span class="st"> </span><span class="kw">setwd</span>(path)</span>
+<span id="cb13-4">  <span class="kw">on.exit</span>(<span class="kw">setwd</span>(wd))</span>
+<span id="cb13-5">  caps &lt;-<span class="st"> </span><span class="kw">fromJSON</span>(<span class="st">"capabilities.json"</span>, <span class="dt">simplifyVector =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb13-6">  caps[[<span class="st">"dataRoles"</span>]] &lt;-<span class="st"> </span><span class="kw">mapply</span>(<span class="cf">function</span>(name, displayName){</span>
+<span id="cb13-7">    <span class="kw">list</span>(</span>
+<span id="cb13-8">      <span class="st">"displayName"</span> =<span class="st"> </span>displayName, </span>
+<span id="cb13-9">      <span class="st">"kind"</span>        =<span class="st"> "GroupingOrMeasure"</span>, </span>
+<span id="cb13-10">      <span class="st">"name"</span>        =<span class="st"> </span>name</span>
+<span id="cb13-11">    )</span>
+<span id="cb13-12">  }, dataNames, dataDisplayNames, <span class="dt">SIMPLIFY =</span> <span class="ot">FALSE</span>, <span class="dt">USE.NAMES =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb13-13">  caps[[<span class="st">"dataViewMappings"</span>]][[</span>
+<span id="cb13-14">    1L</span>
+<span id="cb13-15">  ]][[<span class="st">"scriptResult"</span>]][[<span class="st">"dataInput"</span>]][[<span class="st">"table"</span>]][[<span class="st">"rows"</span>]][[<span class="st">"select"</span>]] &lt;-</span>
+<span id="cb13-16"><span class="st">    </span><span class="kw">lapply</span>(dataNames, <span class="cf">function</span>(dataName){</span>
+<span id="cb13-17">      <span class="kw">list</span>(<span class="st">"for"</span> =<span class="st"> </span><span class="kw">list</span>(<span class="st">"in"</span> =<span class="st"> </span>dataName))</span>
+<span id="cb13-18">    })</span>
+<span id="cb13-19">  caps &lt;-<span class="st"> </span><span class="kw">toJSON</span>(caps, <span class="dt">auto_unbox =</span> <span class="ot">TRUE</span>, <span class="dt">null =</span> <span class="st">"null"</span>, <span class="dt">pretty =</span> <span class="dv">2</span>)</span>
+<span id="cb13-20">  <span class="kw">writeLines</span>(caps, <span class="st">"capabilities.json"</span>)</span>
+<span id="cb13-21">}</span></code></pre>
+      </div>
+      <p>Usage example:</p>
+      <div class="sourceCode" id="cb14">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb14-1"><span class="kw">fill_capabilities</span>(</span>
+<span id="cb14-2">  <span class="st">"path/to/pbiwidgets/diamonds"</span>, <span class="kw">c</span>(<span class="st">"data1"</span>, <span class="st">"data2"</span>), <span class="kw">c</span>(<span class="st">"Data1"</span>, <span class="st">"Data2"</span>)</span>
+<span id="cb14-3">)</span></code></pre>
+      </div>
+      <h1 id="limiting-the-number-of-selected-columns">
+        Limiting the number of selected columns
+      </h1>
+      <p>
+        We can limit the number of columns that the user can select in a table.
+        For instance, let’s take the previous example. The maximum number of
+        columns is set in the file <strong><em>capabilities.json</em></strong
+        >, in the <code>dataViewMappings</code> field:
+      </p>
+      <div class="sourceCode" id="cb15">
+        <pre
+          class="sourceCode json"
+        ><code class="sourceCode json"><span id="cb15-1"><span class="fu">{</span></span>
+<span id="cb15-2">  <span class="dt">"dataRoles"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb15-3">    <span class="fu">{</span></span>
+<span id="cb15-4">      <span class="dt">"displayName"</span><span class="fu">:</span> <span class="st">"Data1"</span><span class="fu">,</span></span>
+<span id="cb15-5">      <span class="dt">"kind"</span><span class="fu">:</span> <span class="st">"GroupingOrMeasure"</span><span class="fu">,</span></span>
+<span id="cb15-6">      <span class="dt">"name"</span><span class="fu">:</span> <span class="st">"data1"</span></span>
+<span id="cb15-7">    <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb15-8">    <span class="fu">{</span></span>
+<span id="cb15-9">      <span class="dt">"displayName"</span><span class="fu">:</span> <span class="st">"Data2"</span><span class="fu">,</span></span>
+<span id="cb15-10">      <span class="dt">"kind"</span><span class="fu">:</span> <span class="st">"GroupingOrMeasure"</span><span class="fu">,</span></span>
+<span id="cb15-11">      <span class="dt">"name"</span><span class="fu">:</span> <span class="st">"data2"</span></span>
+<span id="cb15-12">    <span class="fu">}</span></span>
+<span id="cb15-13">  <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb15-14">  <span class="dt">"dataViewMappings"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb15-15">    <span class="fu">{</span></span>
+<span id="cb15-16">      <span class="dt">"conditions"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb15-17">        <span class="fu">{</span></span>
+<span id="cb15-18">          <span class="dt">"data1"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb15-19">            <span class="dt">"max"</span><span class="fu">:</span> <span class="dv">2</span></span>
+<span id="cb15-20">          <span class="fu">},</span></span>
+<span id="cb15-21">          <span class="dt">"data2"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb15-22">            <span class="dt">"max"</span><span class="fu">:</span> <span class="dv">2</span></span>
+<span id="cb15-23">          <span class="fu">}</span></span>
+<span id="cb15-24">        <span class="fu">}</span></span>
+<span id="cb15-25">      <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb15-26">      <span class="dt">"scriptResult"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb15-27">        <span class="er">......</span></span></code></pre>
+      </div>
+      <h1 id="combining-widgets">Combining widgets</h1>
+      <p>
+        The
+        <a
+          href="https://cran.r-project.org/web/packages/manipulateWidget/vignettes/manipulateWidgets.html"
+          >manipulateWidget package</a
+        >
+        provides a useful function <code>combineWidgets</code> which, as its
+        name indicates, allows to combine several widgets.
+      </p>
+      <p>
+        Here is an example using the widgets of the
+        <strong>dygraphs</strong> package.
+      </p>
+      <div class="sourceCode" id="cb16">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb16-1"><span class="kw">source</span>(<span class="st">'./r_files/flatten_HTML.r'</span>)</span>
+<span id="cb16-2"></span>
+<span id="cb16-3"><span class="co">############### Library Declarations ###############</span></span>
+<span id="cb16-4"><span class="kw">libraryRequireInstall</span>(<span class="st">"dygraphs"</span>)</span>
+<span id="cb16-5"><span class="kw">libraryRequireInstall</span>(<span class="st">"manipulateWidget"</span>)</span>
+<span id="cb16-6"><span class="co">####################################################</span></span>
+<span id="cb16-7"></span>
+<span id="cb16-8"><span class="co">################### Actual code ####################</span></span>
+<span id="cb16-9">y1 &lt;-<span class="st"> </span>Values[[<span class="dv">1</span>]]</span>
+<span id="cb16-10">y2 &lt;-<span class="st"> </span>Values[[<span class="dv">2</span>]]</span>
+<span id="cb16-11">x &lt;-<span class="st"> </span>1L<span class="op">:</span><span class="kw">nrow</span>(Values)</span>
+<span id="cb16-12">columnNames &lt;-<span class="st"> </span><span class="kw">colnames</span>(Values)</span>
+<span id="cb16-13">df1 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y1)</span>
+<span id="cb16-14">df2 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y2)</span>
+<span id="cb16-15">widget1 &lt;-<span class="st"> </span><span class="kw">dygraph</span>(df1, <span class="dt">main =</span> columnNames[1L])</span>
+<span id="cb16-16">widget2 &lt;-<span class="st"> </span><span class="kw">dygraph</span>(df2, <span class="dt">main =</span> columnNames[2L])</span>
+<span id="cb16-17"><span class="co">####################################################</span></span>
+<span id="cb16-18"></span>
+<span id="cb16-19"><span class="co">############# Create and save widget ###############</span></span>
+<span id="cb16-20">widget &lt;-<span class="st"> </span><span class="kw">combineWidgets</span>(widget1, widget2)</span>
+<span id="cb16-21"><span class="kw">internalSaveWidget</span>(widget, <span class="st">'out.html'</span>)</span>
+<span id="cb16-22"><span class="co">####################################################</span></span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/pbiviz06.png"
+        />
+      </p>
+      <h1 id="prevent-removal-of-duplicated-rows">
+        Prevent removal of duplicated rows
+      </h1>
+      <p>
+        Power BI has an undesirable behavior: when sending the data to R, it
+        removes the duplicated rows. To alleviate this problem, you have to add
+        a column without duplicated values. An easy way to get such a column
+        consists in going to the Power Query Editor (<em>“Transform data”</em>
+        button), then going to the tab <em>“Add column”</em> and select
+        <em>“Index Column”</em>. Then include this column in the data exported
+        to R.
+      </p>
+      <h1 id="adding-formatting-objects">Adding formatting objects</h1>
+      <p>
+        Here we explain how to achieve the result shown on the image below. With
+        this visual, the user is able to add a title to the chart and to select
+        a theme for the chart.
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/pbiviz07.gif"
+        />
+      </p>
+      <p>
+        This is achieved by modifying two files: the file
+        <strong><em>capabilities.json</em></strong> and the file
+        <strong><em>src/settings.ts</em></strong> in the folder created by
+        <strong>pbiviz</strong>.
+      </p>
+      <p>
+        Here is the file <strong><em>capabilities.json</em></strong
+        >. We modified the <code>objects</code> node:
+      </p>
+      <div class="sourceCode" id="cb17">
+        <pre
+          class="sourceCode json"
+        ><code class="sourceCode json"><span id="cb17-1"><span class="fu">{</span></span>
+<span id="cb17-2">  <span class="dt">"dataRoles"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb17-3">    <span class="fu">{</span></span>
+<span id="cb17-4">      <span class="dt">"displayName"</span><span class="fu">:</span> <span class="st">"Data (x, y, color, index)"</span><span class="fu">,</span></span>
+<span id="cb17-5">      <span class="dt">"kind"</span><span class="fu">:</span> <span class="st">"GroupingOrMeasure"</span><span class="fu">,</span></span>
+<span id="cb17-6">      <span class="dt">"name"</span><span class="fu">:</span> <span class="st">"dat"</span></span>
+<span id="cb17-7">    <span class="fu">}</span></span>
+<span id="cb17-8">  <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb17-9">  <span class="dt">"objects"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb17-10">    <span class="dt">"ggsettings"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb17-11">      <span class="dt">"displayName"</span><span class="fu">:</span> <span class="st">"Chart Settings"</span><span class="fu">,</span></span>
+<span id="cb17-12">      <span class="dt">"description"</span><span class="fu">:</span> <span class="st">"Chart theme and title"</span><span class="fu">,</span></span>
+<span id="cb17-13">      <span class="dt">"properties"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb17-14">        <span class="dt">"ChartTitle"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb17-15">          <span class="dt">"displayName"</span><span class="fu">:</span> <span class="st">"Chart Title"</span><span class="fu">,</span></span>
+<span id="cb17-16">          <span class="dt">"description"</span><span class="fu">:</span> <span class="st">"Set chart title"</span><span class="fu">,</span></span>
+<span id="cb17-17">          <span class="dt">"type"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb17-18">            <span class="dt">"text"</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb17-19">          <span class="fu">}</span></span>
+<span id="cb17-20">        <span class="fu">},</span></span>
+<span id="cb17-21">        <span class="dt">"ChartTheme"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb17-22">          <span class="dt">"displayName"</span><span class="fu">:</span> <span class="st">"Chart Theme"</span><span class="fu">,</span></span>
+<span id="cb17-23">          <span class="dt">"description"</span><span class="fu">:</span> <span class="st">"Select the Chart Theme"</span><span class="fu">,</span></span>
+<span id="cb17-24">          <span class="dt">"type"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb17-25">            <span class="dt">"enumeration"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb17-26">              <span class="fu">{</span></span>
+<span id="cb17-27">                <span class="dt">"displayName"</span><span class="fu">:</span> <span class="st">"Classic"</span><span class="fu">,</span></span>
+<span id="cb17-28">                <span class="dt">"value"</span><span class="fu">:</span> <span class="st">"classic"</span></span>
+<span id="cb17-29">              <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb17-30">              <span class="fu">{</span></span>
+<span id="cb17-31">                <span class="dt">"displayName"</span><span class="fu">:</span> <span class="st">"Economist"</span><span class="fu">,</span></span>
+<span id="cb17-32">                <span class="dt">"value"</span><span class="fu">:</span> <span class="st">"economist"</span></span>
+<span id="cb17-33">              <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb17-34">              <span class="fu">{</span></span>
+<span id="cb17-35">                <span class="dt">"displayName"</span><span class="fu">:</span> <span class="st">"Excel"</span><span class="fu">,</span></span>
+<span id="cb17-36">                <span class="dt">"value"</span><span class="fu">:</span> <span class="st">"excel"</span></span>
+<span id="cb17-37">              <span class="fu">}</span></span>
+<span id="cb17-38">            <span class="ot">]</span></span>
+<span id="cb17-39">          <span class="fu">}</span></span>
+<span id="cb17-40">        <span class="fu">}</span></span>
+<span id="cb17-41">      <span class="fu">}</span></span>
+<span id="cb17-42">    <span class="fu">}</span></span>
+<span id="cb17-43">  <span class="fu">},</span></span>
+<span id="cb17-44">  <span class="dt">"dataViewMappings"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb17-45">    <span class="fu">{</span></span>
+<span id="cb17-46">     <span class="er">......</span></span></code></pre>
+      </div>
+      <p>
+        And here is the TypeScript file <strong><em>src/settings.ts</em></strong
+        >:
+      </p>
+      <div class="sourceCode" id="cb18">
+        <pre
+          class="sourceCode ts"
+        ><code class="sourceCode typescript"><span id="cb18-1"><span class="st">"use strict"</span><span class="op">;</span></span>
+<span id="cb18-2"></span>
+<span id="cb18-3"><span class="im">import</span> { dataViewObjectsParser } from <span class="st">"powerbi-visuals-utils-dataviewutils"</span><span class="op">;</span></span>
+<span id="cb18-4"><span class="im">import</span> DataViewObjectsParser <span class="op">=</span> dataViewObjectsParser<span class="op">.</span><span class="at">DataViewObjectsParser</span><span class="op">;</span></span>
+<span id="cb18-5"></span>
+<span id="cb18-6">export class VisualSettings extends DataViewObjectsParser {</span>
+<span id="cb18-7">  public ggsettings<span class="op">:</span> ChartSettings <span class="op">=</span> <span class="kw">new</span> <span class="fu">ChartSettings</span>()<span class="op">;</span></span>
+<span id="cb18-8">}</span>
+<span id="cb18-9"></span>
+<span id="cb18-10">export class ChartSettings {</span>
+<span id="cb18-11">  public ChartTitle<span class="op">:</span> <span class="dt">string</span> <span class="op">=</span> <span class="st">""</span><span class="op">;</span></span>
+<span id="cb18-12">  public ChartTheme<span class="op">:</span> <span class="dt">string</span> <span class="op">=</span> <span class="st">"classic"</span><span class="op">;</span></span>
+<span id="cb18-13">}</span></code></pre>
+      </div>
+      <p>
+        Then, in the file <strong><em>script.r</em></strong> the title set by
+        the user and the theme he chooses are named
+        <code>ggsettings_ChartTitle</code> and
+        <code>ggsettings_ChartTheme</code> respectively. But they won’t be
+        available at the first creation of the chart, so we have to check for
+        their existence in the R script:
+      </p>
+      <div class="sourceCode" id="cb19">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb19-1"><span class="cf">if</span>(<span class="kw">exists</span>(<span class="st">"ggsettings_ChartTheme"</span>) <span class="op">&amp;&amp;</span><span class="st"> </span><span class="kw">exists</span>(<span class="st">"ggsettings_ChartTitle"</span>)){</span>
+<span id="cb19-2">  ......</span></code></pre>
+      </div>
+      <p>Here is the full script I used:</p>
+      <div class="sourceCode" id="cb20">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb20-1"><span class="kw">source</span>(<span class="st">'./r_files/flatten_HTML.r'</span>)</span>
+<span id="cb20-2"></span>
+<span id="cb20-3"><span class="co">############### Library Declarations ###############</span></span>
+<span id="cb20-4"><span class="kw">libraryRequireInstall</span>(<span class="st">"plotly"</span>)</span>
+<span id="cb20-5"><span class="kw">library</span>(ggthemes)</span>
+<span id="cb20-6"><span class="co">####################################################</span></span>
+<span id="cb20-7"></span>
+<span id="cb20-8"><span class="co">################### Actual code ####################</span></span>
+<span id="cb20-9">nms &lt;-<span class="st"> </span><span class="kw">colnames</span>(dat)</span>
+<span id="cb20-10">ncols &lt;-<span class="st"> </span><span class="kw">length</span>(nms)</span>
+<span id="cb20-11"><span class="cf">if</span>(ncols <span class="op">==</span><span class="st"> </span><span class="dv">4</span>){</span>
+<span id="cb20-12">  gg &lt;-<span class="st"> </span><span class="kw">ggplot</span>(</span>
+<span id="cb20-13">    dat, <span class="kw">aes_string</span>(<span class="dt">x =</span> nms[<span class="dv">1</span>], <span class="dt">y =</span> nms[<span class="dv">2</span>], <span class="dt">color =</span> nms[<span class="dv">3</span>])</span>
+<span id="cb20-14">  ) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb20-15"><span class="st">    </span><span class="kw">geom_point</span>()</span>
+<span id="cb20-16">}<span class="cf">else</span>{</span>
+<span id="cb20-17">  <span class="kw">stop</span>(<span class="st">"You have to select four columns!"</span>)</span>
+<span id="cb20-18">}</span>
+<span id="cb20-19"></span>
+<span id="cb20-20"><span class="cf">if</span>(<span class="kw">exists</span>(<span class="st">"ggsettings_ChartTheme"</span>) <span class="op">&amp;&amp;</span><span class="st"> </span><span class="kw">exists</span>(<span class="st">"ggsettings_ChartTitle"</span>)){</span>
+<span id="cb20-21">  gg &lt;-<span class="st"> </span>gg <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(ggsettings_ChartTitle)</span>
+<span id="cb20-22">  <span class="cf">if</span>(ggsettings_ChartTheme <span class="op">==</span><span class="st"> "economist"</span>){</span>
+<span id="cb20-23">    gg &lt;-<span class="st"> </span>gg <span class="op">+</span><span class="st"> </span><span class="kw">scale_color_economist</span>() <span class="op">+</span><span class="st"> </span><span class="kw">theme_economist</span>()</span>
+<span id="cb20-24">  }<span class="cf">else</span> <span class="cf">if</span>(ggsettings_ChartTheme <span class="op">==</span><span class="st"> "excel"</span>){</span>
+<span id="cb20-25">    gg &lt;-<span class="st"> </span>gg <span class="op">+</span><span class="st"> </span><span class="kw">scale_color_excel_new</span>() <span class="op">+</span><span class="st"> </span><span class="kw">theme_excel_new</span>()</span>
+<span id="cb20-26">  }</span>
+<span id="cb20-27">}</span>
+<span id="cb20-28"><span class="co">####################################################</span></span>
+<span id="cb20-29"></span>
+<span id="cb20-30"><span class="co">############# Create and save widget ###############</span></span>
+<span id="cb20-31">p &lt;-<span class="st"> </span><span class="kw">ggplotly</span>(gg)</span>
+<span id="cb20-32"><span class="kw">internalSaveWidget</span>(p, <span class="st">'out.html'</span>)</span>
+<span id="cb20-33"><span class="co">####################################################</span></span></code></pre>
+      </div>
+      <h2 id="list-of-available-object-types">
+        List of available object types
+      </h2>
+      <ul>
+        <li>color picker:</li>
+      </ul>
+      <div class="sourceCode" id="cb21">
+        <pre
+          class="sourceCode json"
+        ><code class="sourceCode json"><span id="cb21-1"><span class="er">"type":</span> <span class="fu">{</span></span>
+<span id="cb21-2">  <span class="dt">"fill"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb21-3">    <span class="dt">"solid"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb21-4">      <span class="dt">"color"</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb21-5">    <span class="fu">}</span></span>
+<span id="cb21-6">  <span class="fu">}</span></span>
+<span id="cb21-7"><span class="fu">}</span></span></code></pre>
+      </div>
+      <ul>
+        <li>text input:</li>
+      </ul>
+      <div class="sourceCode" id="cb22">
+        <pre
+          class="sourceCode json"
+        ><code class="sourceCode json"><span id="cb22-1"><span class="er">"type":</span> <span class="fu">{</span></span>
+<span id="cb22-2">  <span class="dt">"text"</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb22-3"><span class="fu">}</span></span></code></pre>
+      </div>
+      <ul>
+        <li>number input:</li>
+      </ul>
+      <div class="sourceCode" id="cb23">
+        <pre
+          class="sourceCode json"
+        ><code class="sourceCode json"><span id="cb23-1"><span class="er">"type":</span> <span class="fu">{</span></span>
+<span id="cb23-2">  <span class="dt">"numeric"</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb23-3"><span class="fu">}</span></span></code></pre>
+      </div>
+      <ul>
+        <li>integer input:</li>
+      </ul>
+      <div class="sourceCode" id="cb24">
+        <pre
+          class="sourceCode json"
+        ><code class="sourceCode json"><span id="cb24-1"><span class="er">"type":</span> <span class="fu">{</span></span>
+<span id="cb24-2">  <span class="dt">"integer"</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb24-3"><span class="fu">}</span></span></code></pre>
+      </div>
+      <ul>
+        <li>switch input (true/false):</li>
+      </ul>
+      <div class="sourceCode" id="cb25">
+        <pre
+          class="sourceCode json"
+        ><code class="sourceCode json"><span id="cb25-1"><span class="er">"type":</span> <span class="fu">{</span></span>
+<span id="cb25-2">  <span class="dt">"bool"</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb25-3"><span class="fu">}</span></span></code></pre>
+      </div>
+      <ul>
+        <li>percentage input:</li>
+      </ul>
+      <div class="sourceCode" id="cb26">
+        <pre
+          class="sourceCode json"
+        ><code class="sourceCode json"><span id="cb26-1"><span class="er">"type":</span> <span class="fu">{</span></span>
+<span id="cb26-2">  <span class="dt">"formatting"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb26-3">    <span class="dt">"fontSize"</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb26-4">  <span class="fu">}</span></span>
+<span id="cb26-5"><span class="fu">}</span></span></code></pre>
+      </div>
+      <ul>
+        <li>dropdown list:</li>
+      </ul>
+      <div class="sourceCode" id="cb27">
+        <pre
+          class="sourceCode json"
+        ><code class="sourceCode json"><span id="cb27-1"><span class="er">"type":</span> <span class="fu">{</span></span>
+<span id="cb27-2">  <span class="dt">"enumeration"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb27-3">    <span class="fu">{</span></span>
+<span id="cb27-4">      <span class="dt">"displayName"</span><span class="fu">:</span> <span class="st">"Item 1"</span><span class="fu">,</span></span>
+<span id="cb27-5">      <span class="dt">"value"</span><span class="fu">:</span> <span class="st">"item1"</span></span>
+<span id="cb27-6">    <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb27-7">    <span class="fu">{</span></span>
+<span id="cb27-8">      <span class="dt">"displayName"</span><span class="fu">:</span> <span class="st">"Item 2"</span><span class="fu">,</span></span>
+<span id="cb27-9">      <span class="dt">"value"</span><span class="fu">:</span> <span class="st">"item2"</span></span>
+<span id="cb27-10">    <span class="fu">}</span></span>
+<span id="cb27-11">  <span class="ot">]</span></span>
+<span id="cb27-12"><span class="fu">}</span></span></code></pre>
+      </div>
+      <h1 id="restricting-a-number-input-to-a-range">
+        Restricting a number input to a range
+      </h1>
+      <p>
+        It might be desirable to have a minimum value and a maximum value for a
+        number input. Assume you have such an <code>objects</code> field in
+        <strong><em>capabilities.json</em></strong
+        >:
+      </p>
+      <div class="sourceCode" id="cb28">
+        <pre
+          class="sourceCode json"
+        ><code class="sourceCode json"><span id="cb28-1">  <span class="er">"objects":</span> <span class="fu">{</span></span>
+<span id="cb28-2">    <span class="dt">"regressionline"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb28-3">      <span class="dt">"displayName"</span><span class="fu">:</span> <span class="st">"Regression Line"</span><span class="fu">,</span></span>
+<span id="cb28-4">      <span class="dt">"description"</span><span class="fu">:</span> <span class="st">"Add regression line"</span><span class="fu">,</span></span>
+<span id="cb28-5">      <span class="dt">"properties"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb28-6">        <span class="dt">"AddLine"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb28-7">          <span class="dt">"displayName"</span><span class="fu">:</span> <span class="st">"Add"</span><span class="fu">,</span></span>
+<span id="cb28-8">          <span class="dt">"description"</span><span class="fu">:</span> <span class="st">"Add regression line"</span><span class="fu">,</span></span>
+<span id="cb28-9">          <span class="dt">"type"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb28-10">            <span class="dt">"bool"</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb28-11">          <span class="fu">}</span></span>
+<span id="cb28-12">        <span class="fu">},</span></span>
+<span id="cb28-13">        <span class="dt">"LineWidth"</span><span class="er">;</span> <span class="er">{</span></span>
+<span id="cb28-14">          <span class="dt">"displayName"</span><span class="fu">:</span> <span class="st">"Line Width"</span><span class="fu">,</span></span>
+<span id="cb28-15">          <span class="dt">"description"</span><span class="fu">:</span> <span class="st">"Width of regression line"</span><span class="fu">,</span></span>
+<span id="cb28-16">          <span class="dt">"type"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb28-17">            <span class="dt">"numeric"</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb28-18">          <span class="fu">}</span></span>
+<span id="cb28-19">        <span class="fu">}</span></span>
+<span id="cb28-20">      <span class="fu">}</span></span>
+<span id="cb28-21">    <span class="fu">}</span><span class="er">,</span></span>
+<span id="cb28-22">    <span class="er">......</span></span>
+<span id="cb28-23">  <span class="er">}</span></span></code></pre>
+      </div>
+      <p>
+        You want to restrict the choice of the line width, say for example it
+        must lie between 2 and 8. Then you have to modify the file
+        <strong><em>src/visual.ts</em></strong
+        >. Firstly, you have to add this import:
+      </p>
+      <div class="sourceCode" id="cb29">
+        <pre
+          class="sourceCode ts"
+        ><code class="sourceCode typescript"><span id="cb29-1"><span class="im">import</span> VisualObjectInstanceEnumeration <span class="op">=</span> powerbi<span class="op">.</span><span class="at">VisualObjectInstanceEnumeration</span><span class="op">;</span></span></code></pre>
+      </div>
+      <p>
+        (add it in the block of imports at the beginning of the file). Secondly,
+        you have to replace the function
+        <code>enumerateObjectInstances</code> defined at the end with:
+      </p>
+      <div class="sourceCode" id="cb30">
+        <pre
+          class="sourceCode ts"
+        ><code class="sourceCode typescript"><span id="cb30-1">public <span class="fu">enumerateObjectInstances</span>(</span>
+<span id="cb30-2">  options<span class="op">:</span> EnumerateVisualObjectInstancesOptions</span>
+<span id="cb30-3">)<span class="op">:</span> VisualObjectInstanceEnumeration {</span>
+<span id="cb30-4">  var enumeratedObjects<span class="op">:</span> VisualObjectInstanceEnumerationObject <span class="op">=</span> <span class="op">&lt;</span></span>
+<span id="cb30-5">    VisualObjectInstanceEnumerationObject</span>
+<span id="cb30-6">  <span class="op">&gt;</span>VisualSettings<span class="op">.</span><span class="fu">enumerateObjectInstances</span>(</span>
+<span id="cb30-7">    this<span class="op">.</span><span class="at">settings</span> <span class="op">||</span> VisualSettings<span class="op">.</span><span class="fu">getDefault</span>()<span class="op">,</span> options</span>
+<span id="cb30-8">  )<span class="op">;</span></span>
+<span id="cb30-9"></span>
+<span id="cb30-10">  <span class="fu">if</span> (options<span class="op">.</span><span class="at">objectName</span> <span class="op">===</span> <span class="st">"regressionline"</span>) {</span>
+<span id="cb30-11">    enumeratedObjects<span class="op">.</span><span class="at">instances</span>[<span class="dv">0</span>]<span class="op">.</span><span class="at">validValues</span> <span class="op">=</span> {</span>
+<span id="cb30-12">      LineWidth<span class="op">:</span> { numberRange<span class="op">:</span> { min<span class="op">:</span> <span class="dv">2</span><span class="op">,</span> max<span class="op">:</span> <span class="dv">8</span> } }</span>
+<span id="cb30-13">    }<span class="op">;</span></span>
+<span id="cb30-14">  }</span>
+<span id="cb30-15"></span>
+<span id="cb30-16">  return enumeratedObjects<span class="op">;</span></span>
+<span id="cb30-17">}</span></code></pre>
+      </div>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Thu, 24 Nov 2022 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/pbiviz.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>The missing lazy numbers: implementation</title>
       <link>https://laustep.github.io/stlahblog/posts/lazyNumbers3.html</link>
@@ -14078,538 +15096,6 @@ Options:
 ]]></description>
       <pubDate>Wed, 20 Nov 2019 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/5pl.html</guid>
-      <dc:creator>Stéphane Laurent</dc:creator>
-      <category>R</category>
-    </item>
-    <item>
-      <title>The Beta distribution of the third kind (or generalised Beta prime)</title>
-      <link>https://laustep.github.io/stlahblog/posts/Beta3.html</link>
-      <description><![CDATA[<div class="container-fluid">
-  <div class="main col-sm-12">
-    <div class="content">
-      <ul>
-        <li>
-          <a href="#preliminaries-the-scaled-beta-prime-distribution"
-            >Preliminaries: the (scaled) Beta prime distribution</a
-          >
-        </li>
-        <li>
-          <a href="#beta-distribution-of-the-third-kind"
-            >Beta distribution of the third kind</a
-          >
-        </li>
-        <li>
-          <a href="#update-2019-09-05-generalised-beta-distribution"
-            >Update 2019-09-05: generalised Beta distribution</a
-          >
-        </li>
-        <li>
-          <a href="#cumulative-distribution-function"
-            >Cumulative distribution function</a
-          >
-        </li>
-        <li>
-          <a href="#sampling-the-beta-distribution-of-the-third-kind"
-            >Sampling the Beta distribution of the third kind</a
-          >
-        </li>
-        <li>
-          <a href="#application-to-the-bayesian-binomial-model"
-            >Application to the Bayesian binomial model</a
-          >
-        </li>
-        <li>
-          <a href="#application-to-the-bayesian-two-poisson-samples-model"
-            >Application to the Bayesian “two Poisson samples” model</a
-          >
-        </li>
-      </ul>
-      <p>
-        We present the family of so-called
-        <em>Beta distributions of the third kind</em>. In the context of
-        Bayesian statistics, it is a conjugate family of prior distributions on
-        the odds parameter of the binomial model. This distribution is known,
-        but nobody provided a way to sample from it. We show how one can sample
-        from this distribution in R.
-      </p>
-      <h1 id="preliminaries-the-scaled-beta-prime-distribution">
-        Preliminaries: the (scaled) Beta prime distribution
-      </h1>
-      <p>
-        The Beta distribution of the third kind generalizes the Beta
-        distribution of the second kind, also known under the name
-        <em>Beta prime distribution</em>.
-      </p>
-      <p>
-        The <em>Beta prime distribution</em>
-        <span class="math inline">\(\mathcal{B}'(c,d,\lambda)\)</span> is the
-        distribution of the random variable
-        <span class="math inline">\(\lambda\frac{U}{1-U}\)</span> where
-        <span class="math inline">\(U \sim \mathcal{B}(c,d)\)</span>.
-      </p>
-      <p>
-        Its density function at
-        <span class="math inline">\(x \geqslant 0\)</span> is
-        <span class="math display"
-          >\[ \frac{1}{\lambda^c B(c,d)}
-          \frac{x^{c-1}}{\left(1+\frac{x}{\lambda}\right)^{c+d}}. \]</span
-        >
-        Usually the definition does not include the scale parameter
-        <span class="math inline">\(\lambda\)</span> (that is, it is usually
-        defined for <span class="math inline">\(\lambda=1\)</span> only).
-      </p>
-      <p>
-        It is easy to implement a sampler for this distribution, the density
-        function and the cumulative density function:
-      </p>
-      <div class="sourceCode" id="cb1">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb1-1">rbetaprime &lt;-<span class="st"> </span><span class="cf">function</span>(n, c, d, <span class="dt">lambda =</span> <span class="dv">1</span>){</span>
-<span id="cb1-2">  <span class="kw">stopifnot</span>(lambda <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</span>
-<span id="cb1-3">  u &lt;-<span class="st"> </span><span class="kw">rbeta</span>(n, c, d)</span>
-<span id="cb1-4">  lambda <span class="op">*</span><span class="st"> </span>u<span class="op">/</span>(<span class="dv">1</span><span class="op">-</span>u)</span>
-<span id="cb1-5">}</span>
-<span id="cb1-6">dbetaprime &lt;-<span class="st"> </span><span class="cf">function</span>(x, c, d, <span class="dt">lambda =</span> <span class="dv">1</span>){</span>
-<span id="cb1-7">  <span class="kw">stopifnot</span>(lambda <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</span>
-<span id="cb1-8">  lambda<span class="op">/</span>(lambda<span class="op">+</span>x)<span class="op">^</span><span class="dv">2</span> <span class="op">*</span><span class="st"> </span><span class="kw">dbeta</span>(x<span class="op">/</span>lambda<span class="op">/</span>(<span class="dv">1</span><span class="op">+</span>x<span class="op">/</span>lambda), c, d)</span>
-<span id="cb1-9">}</span>
-<span id="cb1-10">pbetaprime &lt;-<span class="st"> </span><span class="cf">function</span>(q, c, d, lambda){</span>
-<span id="cb1-11">  <span class="kw">stopifnot</span>(lambda <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</span>
-<span id="cb1-12">  <span class="kw">pbeta</span>(q<span class="op">/</span>lambda<span class="op">/</span>(<span class="dv">1</span><span class="op">+</span>q<span class="op">/</span>lambda), c, d)</span>
-<span id="cb1-13">}</span></code></pre>
-      </div>
-      <h1 id="beta-distribution-of-the-third-kind">
-        Beta distribution of the third kind
-      </h1>
-      <p>
-        The <em>Beta distribution of the third kind</em>
-        <span class="math inline">\(\mathcal{B}_3\)</span> was firstly
-        introduced (as far as I know) in the paper
-        <em>Some Poisson mixtures with a hyperscale parameter</em>, written by
-        myself.
-      </p>
-      <p>
-        For parameters <span class="math inline">\(c&gt;0\)</span>,
-        <span class="math inline">\(d&gt;0\)</span>,
-        <span class="math inline">\(\kappa \in \mathbb{R}\)</span>,
-        <span class="math inline">\(\tau&gt;0\)</span>, the density function of
-        <span class="math inline">\(\mathcal{B}_3(c,d,\kappa,\tau)\)</span> is
-        <span class="math display"
-          >\[ f(\phi) = \frac{1} {B(c,d){}_2\!F_1\left(c, c+d-\kappa, c+d; 1 -
-          \frac{1}{\tau}\right)} \frac{\phi^{c-1}(1+\phi)^{-\kappa}}
-          {\left(1+\frac{\phi}{\tau}\right)^{c+d-\kappa}}, \quad \phi \geqslant
-          0. \]</span
-        >
-        Thus, for <span class="math inline">\(\kappa=0\)</span>, the
-        <span class="math inline">\(\mathcal{B}_3(c,d,\kappa,\tau)\)</span>
-        distribution equals
-        <span class="math inline">\(\mathcal{B}'(c,d,\tau)\)</span>, and for
-        <span class="math inline">\(\kappa = c+d\)</span> or
-        <span class="math inline">\(\tau=1\)</span>, it equals
-        <span class="math inline">\(\mathcal{B}'(c,d,1)\)</span>. Note that in
-        general, <span class="math inline">\(\tau\)</span> is not a scale
-        parameter.
-      </p>
-      <p>Let’s write a R function computing this density:</p>
-      <div class="sourceCode" id="cb2">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb2-1"><span class="kw">library</span>(gsl)</span>
-<span id="cb2-2">Gauss2F1 &lt;-<span class="st"> </span><span class="cf">function</span>(a,b,c,x){ </span>
-<span id="cb2-3">  <span class="cf">if</span>(x<span class="op">&gt;=</span><span class="dv">0</span> <span class="op">&amp;&amp;</span><span class="st"> </span>x<span class="op">&lt;</span><span class="dv">1</span>){ <span class="co"># hyperg_2F1 works fine in this situation</span></span>
-<span id="cb2-4">    <span class="kw">hyperg_2F1</span>(a, b, c, x)</span>
-<span id="cb2-5">  }<span class="cf">else</span>{ <span class="co"># transform to come down to the first situation</span></span>
-<span id="cb2-6">    <span class="kw">hyperg_2F1</span>(c<span class="op">-</span>a, b, c, <span class="dv">1-1</span><span class="op">/</span>(<span class="dv">1</span><span class="op">-</span>x)) <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span><span class="op">-</span>x)<span class="op">^</span>b</span>
-<span id="cb2-7">  }</span>
-<span id="cb2-8">}</span>
-<span id="cb2-9">dB3 &lt;-<span class="st"> </span><span class="cf">function</span>(x, c, d, kappa, tau){</span>
-<span id="cb2-10">  <span class="kw">stopifnot</span>(c <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, d <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, tau <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</span>
-<span id="cb2-11">  <span class="cf">if</span>(kappa <span class="op">==</span><span class="st"> </span><span class="dv">0</span>){</span>
-<span id="cb2-12">    <span class="kw">dbetaprime</span>(x, c, d, tau)</span>
-<span id="cb2-13">  }<span class="cf">else</span> <span class="cf">if</span>(kappa <span class="op">==</span><span class="st"> </span>c<span class="op">+</span>d){</span>
-<span id="cb2-14">    <span class="kw">dbetaprime</span>(x, c, d, <span class="dv">1</span>)</span>
-<span id="cb2-15">  }<span class="cf">else</span>{</span>
-<span id="cb2-16">    <span class="dv">1</span><span class="op">/</span><span class="kw">beta</span>(c,d) <span class="op">*</span><span class="st"> </span>x<span class="op">^</span>(c<span class="dv">-1</span>)<span class="op">*</span>(<span class="dv">1</span><span class="op">+</span>x)<span class="op">^</span>(<span class="op">-</span>kappa)<span class="op">/</span>(<span class="dv">1</span><span class="op">+</span>x<span class="op">/</span>tau)<span class="op">^</span>(c<span class="op">+</span>d<span class="op">-</span>kappa) <span class="op">/</span><span class="st"> </span></span>
-<span id="cb2-17"><span class="st">      </span><span class="kw">Gauss2F1</span>(c, c<span class="op">+</span>d<span class="op">-</span>kappa, c<span class="op">+</span>d, <span class="dv">1-1</span><span class="op">/</span>tau)</span>
-<span id="cb2-18">  }</span>
-<span id="cb2-19">}</span></code></pre>
-      </div>
-      <p>
-        This distribution is related to the
-        <em>four-parameter generalized Beta distribution</em> introduced by Chen
-        &amp; Novick in the paper
-        <em
-          >Bayesian analysis for binomial models with generalized beta prior
-          distributions</em
-        >
-        (1984); this distribution takes its value in
-        <span class="math inline">\([0,1]\)</span>. They are related by an
-        elementary transformation:
-        <span class="math display"
-          >\[ \Theta \sim GB4(c, d, \kappa, \tau) \quad \iff\quad
-          \frac{\Theta}{1-\Theta} \sim \mathcal{B}_3\left(c, d, c+d-\kappa,
-          \frac{1}{\tau}\right). \]</span
-        >
-      </p>
-      <h1 id="update-2019-09-05-generalised-beta-distribution">
-        Update 2019-09-05: generalised Beta distribution
-      </h1>
-      <p>
-        I’ve just discovered that the
-        <span class="math inline">\(GB4\)</span> distribution appears in the
-        paper
-        <em
-          >On Kummer’s distributions of type two and generalized Beta
-          distributions</em
-        >
-        written by Hamza &amp; Vallois. It is named
-        <em>generalised Beta distribution</em> in this paper, it is denoted by
-        <span class="math inline">\(\beta_\delta(a,b,c)\)</span> and its density
-        function at <span class="math inline">\(u \in [0,1]\)</span> is given by
-        <span class="math display"
-          >\[ \frac{1}{\beta(a,b){}_2\!F_1(-c,a;a+b;1-\delta)}
-          u^{a-1}(1-u)^{b-1}\bigl(1+(\delta-1)u\bigr)^c \]</span
-        >
-        for <span class="math inline">\(a,b,\delta&gt;0\)</span> and
-        <span class="math inline">\(c \in \mathbb{R}\)</span>.
-      </p>
-      <p>
-        We have the following relation: if
-        <span class="math inline"
-          >\(\Phi \sim \mathcal{B}_3(c, d, \kappa, \tau)\)</span
-        >, then
-        <span class="math display"
-          >\[ \frac{\Phi}{1+\Phi} \sim \beta_{\frac{1}{\tau}}(c, d, \kappa-c-d).
-          \]</span
-        >
-      </p>
-      <p>
-        So, maybe a better name for
-        <span class="math inline">\(\mathcal{B}_3\)</span> would be
-        <em>generalised Beta prime distribution</em>.
-      </p>
-      <h1 id="cumulative-distribution-function">
-        Cumulative distribution function
-      </h1>
-      <p>
-        The cumulative distribution function of
-        <span class="math inline">\(\mathcal{B}_3\)</span> involves the
-        <em>Appell hypergeometric function</em>
-        <span class="math inline">\(F_1\)</span>. A Fortran implementation of
-        this function is available in the R package <code>appell</code>. This
-        package has been removed from CRAN, but you can still install it. If
-        <span class="math inline"
-          >\(\Phi \sim \mathcal{B}_3(c,d,\kappa,\tau)\)</span
-        >, then, for <span class="math inline">\(q \geqslant 0\)</span>,
-        <span class="math display"
-          >\[ \Pr(\Phi \leqslant q) = \frac{q^c F_1\left(c; \kappa, c+d-\kappa;
-          c+1; -q, -\frac{q}{\tau}\right)} {cB(c,d){}_2\!F_1\left(c, c+d-\kappa,
-          c+d; 1 - \frac{1}{\tau}\right)}. \]</span
-        >
-        Here is a R implementation. I found that it works well with the option
-        <code>userflag = 0</code> of the <code>appellf1</code> function.
-      </p>
-      <div class="sourceCode" id="cb3">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb3-1">pB3 &lt;-<span class="st"> </span><span class="cf">function</span>(q, c, d, kappa, tau, <span class="dt">userflag =</span> <span class="dv">0</span>){</span>
-<span id="cb3-2">  <span class="kw">stopifnot</span>(c <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, d <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, tau <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</span>
-<span id="cb3-3">  <span class="cf">if</span>(kappa <span class="op">==</span><span class="st"> </span><span class="dv">0</span>){</span>
-<span id="cb3-4">    <span class="kw">pbetaprime</span>(q, c, d, tau)</span>
-<span id="cb3-5">  }<span class="cf">else</span> <span class="cf">if</span>(kappa <span class="op">==</span><span class="st"> </span>c<span class="op">+</span>d){</span>
-<span id="cb3-6">    <span class="kw">pbetaprime</span>(q, c, d, <span class="dv">1</span>)</span>
-<span id="cb3-7">  }<span class="cf">else</span>{</span>
-<span id="cb3-8">    C &lt;-<span class="st"> </span><span class="kw">beta</span>(c,d) <span class="op">*</span><span class="st"> </span><span class="kw">Gauss2F1</span>(c, c<span class="op">+</span>d<span class="op">-</span>kappa, c<span class="op">+</span>d, <span class="dv">1-1</span><span class="op">/</span>tau)</span>
-<span id="cb3-9">    Appell &lt;-<span class="st"> </span></span>
-<span id="cb3-10"><span class="st">      </span>appell<span class="op">::</span><span class="kw">appellf1</span>(c, kappa, c<span class="op">+</span>d<span class="op">-</span>kappa, c<span class="op">+</span><span class="dv">1</span>, <span class="op">-</span>q, <span class="op">-</span>q<span class="op">/</span>tau, </span>
-<span id="cb3-11">                       <span class="dt">userflag =</span> userflag)</span>
-<span id="cb3-12">    q<span class="op">^</span>c<span class="op">/</span>c <span class="op">*</span><span class="st"> </span><span class="kw">Re</span>(Appell<span class="op">$</span>val) <span class="op">/</span><span class="st"> </span>C</span>
-<span id="cb3-13">  }</span>
-<span id="cb3-14">}</span></code></pre>
-      </div>
-      <h1 id="sampling-the-beta-distribution-of-the-third-kind">
-        Sampling the Beta distribution of the third kind
-      </h1>
-      <p>
-        It is not very easy to sample the
-        <span class="math inline">\(\mathcal{B}_3\)</span> distribution. In her
-        <a
-          href="https://savoirs.usherbrooke.ca/bitstream/handle/11143/9640/Chabot_Myriam_MSc_2016.pdf"
-          >master thesis</a
-        >, Myriam Chabot proved that it can be represented as a discrete mixture
-        of <span class="math inline">\(\mathcal{B}_2\)</span> distributions, and
-        we will use this result.
-      </p>
-      <p>This result is the following one.</p>
-      <ul>
-        <li>
-          <p>
-            For <span class="math inline">\(\tau &lt; 1\)</span>, let
-            <span class="math inline">\(K\)</span> be a random variable on
-            <span class="math inline">\(\mathbb{N}\)</span> whose probability
-            mass at <span class="math inline">\(k\in\mathbb{N}\)</span> is given
-            by
-            <span class="math display"
-              >\[ \frac{1}{{}_2\!F_1(d, c+d-\kappa, c+d, 1-\tau)}
-              \frac{(1-\tau)^k}{k!} \frac{{(c+d-\kappa)}_k{(d)}_k}{{(c+d)}_k}
-              \]</span
-            >
-            and let <span class="math inline">\(\Phi\)</span> be a random
-            variable such that
-            <span class="math display"
-              >\[ (\Phi \mid K=k) \sim \mathcal{B}'(c, d+k, 1). \]</span
-            >
-            Then
-            <span class="math inline"
-              >\(\Phi \sim \mathcal{B}_3(c,d,\kappa,\tau)\)</span
-            >.
-          </p>
-        </li>
-        <li>
-          <p>
-            For <span class="math inline">\(\tau &gt; 1\)</span>, let
-            <span class="math inline">\(K\)</span> be a random variable on
-            <span class="math inline">\(\mathbb{N}\)</span> whose probability
-            mass at <span class="math inline">\(k\in\mathbb{N}\)</span> is given
-            by
-            <span class="math display"
-              >\[ \frac{1}{{}_2\!F_1\left(c, c+d-\kappa, c+d,
-              1-\frac{1}{\tau}\right)}
-              \frac{\left(1-\frac{1}{\tau}\right)^k}{k!}
-              \frac{{(c+d-\kappa)}_k{(c)}_k}{{(c+d)}_k} \]</span
-            >
-            and let <span class="math inline">\(\Phi\)</span> be a random
-            variable such that
-            <span class="math display"
-              >\[ (\Phi \mid K=k) \sim \mathcal{B}'(c+k, d, 1). \]</span
-            >
-            Then
-            <span class="math inline"
-              >\(\Phi \sim \mathcal{B}_3(c,d,\kappa,\tau)\)</span
-            >.
-          </p>
-        </li>
-      </ul>
-      <p>
-        So we can sample
-        <span class="math inline">\(\mathcal{B}_3(c,d,\kappa,\tau)\)</span> if
-        we are able to sample these discrete distributions. To do so, we use the
-        <code>Runuran</code> package.
-      </p>
-      <div class="sourceCode" id="cb4">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb4-1"><span class="kw">library</span>(Runuran)</span>
-<span id="cb4-2">pmf_unnormalized &lt;-<span class="st"> </span><span class="cf">function</span>(k, c, d, kappa, tau){</span>
-<span id="cb4-3">  out &lt;-<span class="st"> </span><span class="kw">numeric</span>(<span class="kw">length</span>(k))</span>
-<span id="cb4-4">  positive &lt;-<span class="st"> </span>k <span class="op">&gt;=</span><span class="st"> </span><span class="dv">0</span></span>
-<span id="cb4-5">  k &lt;-<span class="st"> </span>k[positive]</span>
-<span id="cb4-6">  out[positive] &lt;-<span class="st"> </span></span>
-<span id="cb4-7"><span class="st">    </span><span class="cf">if</span>(tau <span class="op">&lt;</span><span class="st"> </span><span class="dv">1</span>){</span>
-<span id="cb4-8">      <span class="kw">exp</span>(k<span class="op">*</span><span class="kw">log</span>(<span class="dv">1</span><span class="op">-</span>tau) <span class="op">-</span><span class="st"> </span><span class="kw">lfactorial</span>(k) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb4-9"><span class="st">            </span><span class="kw">lnpoch</span>(c<span class="op">+</span>d<span class="op">-</span>kappa,k) <span class="op">+</span><span class="st"> </span><span class="kw">lnpoch</span>(d,k) <span class="op">-</span><span class="st"> </span><span class="kw">lnpoch</span>(c<span class="op">+</span>d,k)) </span>
-<span id="cb4-10">    }<span class="cf">else</span>{</span>
-<span id="cb4-11">      <span class="kw">exp</span>(k<span class="op">*</span><span class="kw">log</span>(<span class="dv">1-1</span><span class="op">/</span>tau) <span class="op">-</span><span class="st"> </span><span class="kw">lfactorial</span>(k) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb4-12"><span class="st">            </span><span class="kw">lnpoch</span>(c<span class="op">+</span>d<span class="op">-</span>kappa,k) <span class="op">+</span><span class="st"> </span><span class="kw">lnpoch</span>(c,k) <span class="op">-</span><span class="st"> </span><span class="kw">lnpoch</span>(c<span class="op">+</span>d,k))</span>
-<span id="cb4-13">    }</span>
-<span id="cb4-14">  out</span>
-<span id="cb4-15">}</span>
-<span id="cb4-16">NormalizingConstant &lt;-<span class="st"> </span><span class="cf">function</span>(c, d, kappa, tau){</span>
-<span id="cb4-17">  <span class="cf">if</span>(tau <span class="op">&lt;</span><span class="st"> </span><span class="dv">1</span>){</span>
-<span id="cb4-18">    <span class="kw">hyperg_2F1</span>(d, c<span class="op">+</span>d<span class="op">-</span>kappa, c<span class="op">+</span>d, <span class="dv">1</span><span class="op">-</span>tau) </span>
-<span id="cb4-19">  }<span class="cf">else</span>{</span>
-<span id="cb4-20">    <span class="kw">hyperg_2F1</span>(c, c<span class="op">+</span>d<span class="op">-</span>kappa, c<span class="op">+</span>d, <span class="dv">1-1</span><span class="op">/</span>tau) </span>
-<span id="cb4-21">  }</span>
-<span id="cb4-22">}</span>
-<span id="cb4-23">Ksampler &lt;-<span class="st"> </span><span class="cf">function</span>(n, c, d, kappa, tau){</span>
-<span id="cb4-24">  dist &lt;-<span class="st"> </span><span class="kw">unuran.discr.new</span>(</span>
-<span id="cb4-25">    <span class="dt">pmf =</span> <span class="cf">function</span>(k) <span class="kw">pmf_unnormalized</span>(k, c, d, kappa, tau),</span>
-<span id="cb4-26">    <span class="dt">lb =</span> <span class="dv">0</span>, <span class="dt">ub=</span> <span class="ot">Inf</span>, <span class="dt">sum =</span> <span class="kw">NormalizingConstant</span>(c, d, kappa, tau)</span>
-<span id="cb4-27">  )</span>
-<span id="cb4-28">  unuran &lt;-<span class="st"> </span><span class="kw">unuran.new</span>(dist, <span class="dt">method=</span><span class="st">"dgt"</span>) </span>
-<span id="cb4-29">  <span class="kw">ur</span>(unuran, n)</span>
-<span id="cb4-30">}</span>
-<span id="cb4-31">rB3 &lt;-<span class="st"> </span><span class="cf">function</span>(n, c, d, kappa, tau){</span>
-<span id="cb4-32">  <span class="kw">stopifnot</span>(c <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, d <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, tau <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</span>
-<span id="cb4-33">  <span class="cf">if</span>(tau <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">||</span><span class="st"> </span>kappa <span class="op">==</span><span class="st"> </span>c<span class="op">+</span>d){</span>
-<span id="cb4-34">    <span class="kw">rbetaprime</span>(n, c, d, <span class="dv">1</span>)</span>
-<span id="cb4-35">  }<span class="cf">else</span> <span class="cf">if</span>(kappa <span class="op">==</span><span class="st"> </span><span class="dv">0</span>){</span>
-<span id="cb4-36">    <span class="kw">rbetaprime</span>(n, c, d, tau)</span>
-<span id="cb4-37">  }<span class="cf">else</span>{</span>
-<span id="cb4-38">    K &lt;-<span class="st"> </span><span class="kw">Ksampler</span>(n, c, d, kappa, tau)</span>
-<span id="cb4-39">    <span class="cf">if</span>(tau <span class="op">&lt;</span><span class="st"> </span><span class="dv">1</span>){</span>
-<span id="cb4-40">      <span class="kw">rbetaprime</span>(n, c, d <span class="op">+</span><span class="st"> </span>K, <span class="dv">1</span>)</span>
-<span id="cb4-41">    }<span class="cf">else</span>{</span>
-<span id="cb4-42">      <span class="kw">rbetaprime</span>(n, c <span class="op">+</span><span class="st"> </span>K, d, <span class="dv">1</span>)</span>
-<span id="cb4-43">    }</span>
-<span id="cb4-44">  }</span>
-<span id="cb4-45">}</span></code></pre>
-      </div>
-      <p>Let’s check. The density:</p>
-      <div class="sourceCode" id="cb5">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb5-1">c &lt;-<span class="st"> </span><span class="dv">2</span>; d &lt;-<span class="st"> </span><span class="dv">3</span>; kappa &lt;-<span class="st"> </span><span class="dv">4</span>; tau &lt;-<span class="st"> </span><span class="dv">5</span></span>
-<span id="cb5-2">nsims &lt;-<span class="st"> </span><span class="dv">1000000</span></span>
-<span id="cb5-3">sims &lt;-<span class="st"> </span><span class="kw">rB3</span>(nsims, c, d, kappa, tau)</span>
-<span id="cb5-4"><span class="kw">plot</span>(<span class="kw">density</span>(sims, <span class="dt">from =</span> <span class="dv">0</span>, <span class="dt">to =</span> <span class="kw">quantile</span>(sims, <span class="fl">0.95</span>)))</span>
-<span id="cb5-5"><span class="kw">curve</span>(<span class="kw">dB3</span>(x, c, d, kappa, tau), <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">col =</span> <span class="st">"red"</span>, </span>
-<span id="cb5-6">      <span class="dt">lty =</span> <span class="st">"dashed"</span>, <span class="dt">lwd =</span> <span class="dv">2</span>)</span></code></pre>
-      </div>
-      <p>
-        <img
-          src="https://laustep.github.io/stlahblog/posts/figures/Beta3-density-1.png"
-        />
-      </p>
-      <p>The cumulative distribution function:</p>
-      <div class="sourceCode" id="cb6">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb6-1">q &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="fl">0.1</span>, <span class="dv">4</span>, <span class="dt">length.out =</span> <span class="dv">10</span>)[<span class="op">-</span><span class="dv">6</span>]</span>
-<span id="cb6-2">cdfValues &lt;-<span class="st"> </span><span class="kw">sapply</span>(q, <span class="cf">function</span>(x) <span class="kw">pB3</span>(x, c, d, kappa, tau))</span>
-<span id="cb6-3">empirical_cdf &lt;-<span class="st"> </span><span class="kw">ecdf</span>(sims)</span>
-<span id="cb6-4"><span class="kw">plot</span>(empirical_cdf, <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">4</span>))</span>
-<span id="cb6-5"><span class="kw">points</span>(q, cdfValues, <span class="dt">pch=</span><span class="dv">19</span>)</span></code></pre>
-      </div>
-      <p>
-        <img
-          src="https://laustep.github.io/stlahblog/posts/figures/Beta3-cdf-1.png"
-        />
-      </p>
-      <p>
-        I’ve removed the sixth value of the vector <code>q</code> because there
-        is a crash of <code>appellf1</code> for this value:
-      </p>
-      <div class="sourceCode" id="cb7">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb7-1">q &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="fl">0.1</span>, <span class="dv">4</span>, <span class="dt">length.out =</span> <span class="dv">10</span>)</span>
-<span id="cb7-2"><span class="kw">pB3</span>(q[<span class="dv">6</span>], c, d, kappa, tau)</span>
-<span id="cb7-3"><span class="co">## Error in appell::appellf1(c, kappa, c + d - kappa, c + 1, -q, -q/tau, : f1conv: Computation not possible</span></span></code></pre>
-      </div>
-      <p>It works with the option <code>userflag = 1</code>:</p>
-      <div class="sourceCode" id="cb8">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb8-1"><span class="kw">pB3</span>(q[<span class="dv">6</span>], c, d, kappa, tau, <span class="dt">userflag =</span> <span class="dv">1</span>)</span>
-<span id="cb8-2"><span class="co">## [1] 0.849321</span></span></code></pre>
-      </div>
-      <p>
-        Finally perhaps the option <code>userflag = 1</code> is a better default
-        value:
-      </p>
-      <div class="sourceCode" id="cb9">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb9-1">cdfValues &lt;-<span class="st"> </span><span class="kw">sapply</span>(q, <span class="cf">function</span>(x){</span>
-<span id="cb9-2">  <span class="kw">pB3</span>(x, c, d, kappa, tau, <span class="dt">userflag =</span> <span class="dv">1</span>)</span>
-<span id="cb9-3">})</span>
-<span id="cb9-4"><span class="kw">plot</span>(empirical_cdf, <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">4</span>))</span>
-<span id="cb9-5"><span class="kw">points</span>(q, cdfValues, <span class="dt">pch=</span><span class="dv">19</span>)</span></code></pre>
-      </div>
-      <p>
-        <img
-          src="https://laustep.github.io/stlahblog/posts/figures/Beta3-cdfbis-1.png"
-        />
-      </p>
-      <h1 id="application-to-the-bayesian-binomial-model">
-        Application to the Bayesian binomial model
-      </h1>
-      <p>
-        Consider the binomial statistical model parameterized by the odds ratio
-        <span class="math inline">\(\phi\)</span>:
-        <span class="math display"
-          >\[ L(\phi \mid x) \propto \frac{\phi^x}{(1+\phi)^n}. \]</span
-        >
-        Take a
-        <span class="math inline">\(\mathcal{B}_3(c,d,\kappa,\tau)\)</span>
-        prior distribution on <span class="math inline">\(\phi\)</span>:
-        <span class="math display"
-          >\[ \pi(\phi) \propto \frac{\phi^{c-1}(1+\phi)^{-\kappa}}
-          {\left(1+\frac{\phi}{\tau}\right)^{c+d-\kappa}} \]</span
-        >
-        Then the posterior distribution on
-        <span class="math inline">\(\phi\)</span> is
-        <span class="math inline"
-          >\(\mathcal{B}_3(c+x,d+n-x,\kappa+n,\tau)\)</span
-        >.
-      </p>
-      <h1 id="application-to-the-bayesian-two-poisson-samples-model">
-        Application to the Bayesian “two Poisson samples” model
-      </h1>
-      <p>
-        Consider the statistical model given by two independent observations
-        <span class="math display"
-          >\[ x \sim \mathcal{P}(\lambda S), \quad y\sim\mathcal{P}(\mu T)
-          \]</span
-        >
-        where <span class="math inline">\(S\)</span> and
-        <span class="math inline">\(T\)</span> are known “sample sizes”. We
-        parametrize the model by <span class="math inline">\(\mu\)</span> and
-        <span class="math inline">\(\phi := \frac{\lambda}{\mu}\)</span>.
-      </p>
-      <p>
-        Assigning a Gamma prior distribution
-        <span class="math inline">\(\mathcal{G}{B}(a,b)\)</span> on
-        <span class="math inline">\(\mu\)</span>, it is not difficult to get
-        <span class="math display"
-          >\[ (\mu \mid \phi,x,y) \sim\mathcal{G}(a+x+y, b + \phi S + T).
-          \]</span
-        >
-        In their paper
-        <em
-          >A Bayesian framework for the ratio of two Poisson rates in the
-          context of vaccine efficacy trials</em
-        >
-        (2011), Laurent &amp; Legrand derived the marginal likelihood on
-        <span class="math inline">\(\phi\)</span> in the case of the
-        semi-conjuguate family of prior distributions. Their result holds as
-        long as <span class="math inline">\(\mu\)</span> and
-        <span class="math inline">\(\phi\)</span> are independent under the
-        prior distribution, and this result is
-        <span class="math display"
-          >\[ \widetilde{L}(\phi \mid x,y) \propto
-          \frac{\phi^x}{{(1+\rho\phi)}^{a+x+y}} \]</span
-        >
-        where <span class="math inline">\(\rho = \frac{S}{T+b}\)</span>.
-      </p>
-      <p>
-        Now, let’s assign a
-        <span class="math inline">\(\mathcal{B}'(c,d,\tau)\)</span> prior
-        distribution on <span class="math inline">\(\phi\)</span>. Then the
-        posterior distribution on <span class="math inline">\(\phi\)</span> is
-        given by
-        <span class="math display"
-          >\[ \pi(\phi \mid x,y) \propto \pi(\phi) \widetilde{L}(\phi \mid x,y)
-          \propto \frac{\phi^{c+x-1}(1+\rho\phi)^{-(a+x+y)}}
-          {\left(1+\frac{\phi}{\tau}\right)^{c+d}}, \]</span
-        >
-        and by noting that
-        <span class="math inline"
-          >\(\frac{\phi}{\tau} = \frac{\rho\phi}{\rho\tau}\)</span
-        >, we recognize the scaled
-        <span class="math inline">\(\mathcal{B}_3\)</span> distribution
-        <span class="math display"
-          >\[ (\phi \mid x,y) \sim \frac{1}{\rho} \times \mathcal{B}_3(c+x,
-          a+d+y, a+x+y, \rho\tau). \]</span
-        >
-        In particular, if
-        <span class="math inline"
-          >\(\tau = \frac{1}{\rho} = \frac{T+b}{S}\)</span
-        >, then we find
-        <span class="math display"
-          >\[ (\phi \mid x,y) \sim \mathcal{B}_2(c+x, a+d+y, \tau), \]</span
-        >
-        and this is the situation of the semi-conjugate family studied by
-        Laurent &amp; Legrand.
-      </p>
-    </div>
-  </div>
-</div>
-]]></description>
-      <pubDate>Mon, 22 Jul 2019 00:00:00 UT</pubDate>
-      <guid>https://laustep.github.io/stlahblog/posts/Beta3.html</guid>
       <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
