@@ -1,0 +1,326 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Exact integral of a polynomial on a simplex</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Exact integral of a polynomial on a simplex</h1> 
+          <div class="info">
+    Posted on December  2, 2022
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'python'." href="../tags/python.html">python</a>, <a title="All pages tagged 'julia'." href="../tags/julia.html">julia</a>
+    
+</div>
+
+<p>The paper <a href="https://arxiv.org/pdf/1908.06736.pdf">Simple formula for integration of polynomials on a simplex</a> by Jean B. Lasserre provides a method to calculate the exact value of the integral of a multivariate polynomial on a simplex (i.e. a tetrahedron in dimension three). I implemented it in <strong>Julia</strong>, <strong>Python</strong>, and <strong>R</strong>.</p>
+<p>Integration on simplices is important, because any convex polyhedron can be decomposed into simplices, thanks to the Delaunay tessellation. Therefore one can integrate over convex polyhedra once one can integrate over simplices (I wrote an <a href="https://laustep.github.io/stlahblog/posts/integralPolyhedron.html">example</a> of doing so with <strong>R</strong>).</p>
+<h2 id="julia">Julia</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">using</span> TypedPolynomials</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="kw">using</span> LinearAlgebra</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="kw">function</span> integratePolynomialOnSimplex(P<span class="op">,</span> S)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>    gens <span class="op">=</span> variables(P)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>    n <span class="op">=</span> length(gens)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>    v <span class="op">=</span> S[<span class="kw">end</span>]    </span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>    B <span class="op">=</span> <span class="dt">Array</span>{<span class="dt">Float64</span>}(<span class="cn">undef</span><span class="op">,</span> n<span class="op">,</span> <span class="fl">0</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>    <span class="kw">for</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>n</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>        B <span class="op">=</span> hcat(B<span class="op">,</span> S[i] <span class="op">-</span> v)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>    <span class="kw">end</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>    Q <span class="op">=</span> P(gens <span class="op">=&gt;</span> v <span class="op">+</span> B <span class="op">*</span> vec(gens))</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>    s <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>    <span class="kw">for</span> t <span class="kw">in</span> terms(Q)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a>        coef <span class="op">=</span> TypedPolynomials.coefficient(t)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>        powers <span class="op">=</span> TypedPolynomials.exponents(t)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a>        j <span class="op">=</span> sum(powers)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a>        <span class="kw">if</span> j <span class="op">==</span> <span class="fl">0</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a>            s <span class="op">=</span> s <span class="op">+</span> coef</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a>            <span class="kw">continue</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a>        <span class="kw">end</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a>        coef <span class="op">=</span> coef <span class="op">*</span> prod(factorial.(powers))</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a>        s <span class="op">=</span> s <span class="op">+</span> coef <span class="op">/</span> prod((n<span class="op">+</span><span class="fl">1</span>)<span class="op">:</span>(n<span class="op">+</span>j))</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a>    <span class="kw">end</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true"></a>    <span class="kw">return</span> abs(LinearAlgebra.det(B)) <span class="op">/</span> factorial(n) <span class="op">*</span> s</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true"></a><span class="kw">end</span></span></code></pre></div>
+<h3 id="julia-example">Julia example</h3>
+<p>We define the polynomial to be integrated as follows:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">using</span> TypedPolynomials</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="pp">@polyvar</span> x y z</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>P <span class="op">=</span> x<span class="op">^</span><span class="fl">4</span> <span class="op">+</span> y <span class="op">+</span> <span class="fl">2</span><span class="op">*</span>x<span class="op">*</span>y<span class="op">^</span><span class="fl">2</span> <span class="op">-</span> <span class="fl">3</span><span class="op">*</span>z</span></code></pre></div>
+<p><em>Be careful</em>. If the expression of your polynomial does not involve one of the variables, e.g. <span class="math inline">\(P(x, y, z) = x^4 + 2xy^2\)</span>, you must define a polynomial involving this variable:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>P <span class="op">=</span> x<span class="op">^</span><span class="fl">4</span> <span class="op">+</span> <span class="fl">2</span><span class="op">*</span>x<span class="op">*</span>y<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="fl">0.0</span><span class="op">*</span>z</span></code></pre></div>
+<p>Now we define the simplex as a matrix whose rows correspond to the vertices:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="co"># simplex vertices</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>v1 <span class="op">=</span> [<span class="fl">1.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">,</span> <span class="fl">1.0</span>] </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>v2 <span class="op">=</span> [<span class="fl">2.0</span><span class="op">,</span> <span class="fl">2.0</span><span class="op">,</span> <span class="fl">3.0</span>] </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>v3 <span class="op">=</span> [<span class="fl">3.0</span><span class="op">,</span> <span class="fl">4.0</span><span class="op">,</span> <span class="fl">5.0</span>] </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>v4 <span class="op">=</span> [<span class="fl">3.0</span><span class="op">,</span> <span class="fl">2.0</span><span class="op">,</span> <span class="fl">1.0</span>]</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a><span class="co"># simplex</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>S <span class="op">=</span> [v1<span class="op">,</span> v2<span class="op">,</span> v3<span class="op">,</span> v4]</span></code></pre></div>
+<p>And finally we run the function:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>integratePolynomialOnSimplex(P<span class="op">,</span> S)</span></code></pre></div>
+<h2 id="python">Python</h2>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="im">from</span> math <span class="im">import</span> factorial</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="im">from</span> sympy <span class="im">import</span> Poly</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a><span class="kw">def</span> _term(Q, monom):</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>    coef <span class="op">=</span> Q.coeff_monomial(monom)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a>    powers <span class="op">=</span> <span class="bu">list</span>(monom)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a>    j <span class="op">=</span> <span class="bu">sum</span>(powers)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a>    <span class="cf">if</span> j <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a>        <span class="cf">return</span> coef</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a>    coef <span class="op">=</span> coef <span class="op">*</span> np.prod(<span class="bu">list</span>(<span class="bu">map</span>(factorial, powers)))</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a>    n <span class="op">=</span> <span class="bu">len</span>(monom)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a>    <span class="cf">return</span> coef <span class="op">/</span> np.prod(<span class="bu">list</span>(<span class="bu">range</span>(n<span class="op">+</span><span class="dv">1</span>, n<span class="op">+</span>j<span class="op">+</span><span class="dv">1</span>)))</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true"></a><span class="kw">def</span> integratePolynomialOnSimplex(P, S):</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true"></a>    gens <span class="op">=</span> P.gens</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true"></a>    n <span class="op">=</span> <span class="bu">len</span>(gens)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true"></a>    S <span class="op">=</span> np.asarray(S)</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true"></a>    v <span class="op">=</span> S[n,:]</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true"></a>    columns <span class="op">=</span> []</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n):</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true"></a>        columns.append(S[i,:] <span class="op">-</span> v)    </span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true"></a>    B <span class="op">=</span> np.column_stack(<span class="bu">tuple</span>(columns))</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true"></a>    dico <span class="op">=</span> {}</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n):</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true"></a>        newvar <span class="op">=</span> v[i]</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(n):</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true"></a>            newvar <span class="op">=</span> newvar <span class="op">+</span> B[i,j]<span class="op">*</span>Poly(gens[j], gens, domain<span class="op">=</span><span class="st">&quot;RR&quot;</span>)</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true"></a>        dico[gens[i]] <span class="op">=</span> newvar.as_expr()</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true"></a>    Q <span class="op">=</span> P.subs(dico, simultaneous<span class="op">=</span><span class="va">True</span>).as_expr().as_poly(gens)</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true"></a>    <span class="bu">print</span>(Q)</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true"></a>    monoms <span class="op">=</span> Q.monoms()</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true"></a>    s <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true"></a>    <span class="cf">for</span> monom <span class="kw">in</span> monoms:</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true"></a>        s <span class="op">=</span> s <span class="op">+</span> _term(Q, monom)</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true"></a>    <span class="cf">return</span> np.<span class="bu">abs</span>(np.linalg.det(B)) <span class="op">/</span> factorial(n) <span class="op">*</span> s</span></code></pre></div>
+<h3 id="python-example">Python example</h3>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="co"># simplex vertices</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>v1 <span class="op">=</span> [<span class="fl">1.0</span>, <span class="fl">1.0</span>, <span class="fl">1.0</span>] </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>v2 <span class="op">=</span> [<span class="fl">2.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>] </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>v3 <span class="op">=</span> [<span class="fl">3.0</span>, <span class="fl">4.0</span>, <span class="fl">5.0</span>] </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a>v4 <span class="op">=</span> [<span class="fl">3.0</span>, <span class="fl">2.0</span>, <span class="fl">1.0</span>]</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a><span class="co"># simplex</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a>S <span class="op">=</span> [v1, v2, v3, v4]</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true"></a><span class="co"># polynomial to integrate</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true"></a><span class="im">from</span> sympy <span class="im">import</span> Poly</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true"></a><span class="im">from</span> sympy.abc <span class="im">import</span> x, y, z</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true"></a>P <span class="op">=</span> Poly(x<span class="op">**</span><span class="dv">4</span> <span class="op">+</span> y <span class="op">+</span> <span class="dv">2</span><span class="op">*</span>x<span class="op">*</span>y<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> <span class="dv">3</span><span class="op">*</span>z, x, y, z, domain <span class="op">=</span> <span class="st">&quot;RR&quot;</span>)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true"></a><span class="co"># integral</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true"></a>integratePolynomialOnSimplex(P, S)</span></code></pre></div>
+<h2 id="r">R</h2>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="kw">library</span>(spray)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a>integratePolynomialonSimplex &lt;-<span class="st"> </span><span class="cf">function</span>(P, S) {</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a>  n &lt;-<span class="st"> </span><span class="kw">ncol</span>(S)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a>  v &lt;-<span class="st"> </span>S[n<span class="op">+</span>1L, ]</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true"></a>  B &lt;-<span class="st"> </span><span class="kw">t</span>(S[1L<span class="op">:</span>n, ]) <span class="op">-</span><span class="st"> </span>v</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true"></a>  gens &lt;-<span class="st"> </span><span class="kw">lapply</span>(1L<span class="op">:</span>n, <span class="cf">function</span>(i) <span class="kw">lone</span>(i, n))</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true"></a>  newvars &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;list&quot;</span>, n)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true"></a>  <span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span>n) {</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true"></a>    newvar &lt;-<span class="st"> </span>v[i]</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true"></a>    Bi &lt;-<span class="st"> </span>B[i, ]</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true"></a>    <span class="cf">for</span>(j <span class="cf">in</span> 1L<span class="op">:</span>n) {</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true"></a>      newvar &lt;-<span class="st"> </span>newvar <span class="op">+</span><span class="st"> </span>Bi[j] <span class="op">*</span><span class="st"> </span>gens[[j]]</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true"></a>    }</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true"></a>    newvars[[i]] &lt;-<span class="st"> </span>newvar</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true"></a>  }</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true"></a>  Q &lt;-<span class="st"> </span><span class="dv">0</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true"></a>  exponents &lt;-<span class="st"> </span>P[[<span class="st">&quot;index&quot;</span>]]</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true"></a>  coeffs    &lt;-<span class="st"> </span>P[[<span class="st">&quot;value&quot;</span>]] </span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true"></a>  <span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span><span class="kw">nrow</span>(exponents)) {</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true"></a>    powers &lt;-<span class="st"> </span>exponents[i, ]</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true"></a>    term &lt;-<span class="st"> </span><span class="dv">1</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true"></a>    <span class="cf">for</span>(j <span class="cf">in</span> 1L<span class="op">:</span>n) {</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true"></a>      term &lt;-<span class="st"> </span>term <span class="op">*</span><span class="st"> </span>newvars[[j]]<span class="op">^</span>powers[j] </span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true"></a>    }</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true"></a>    Q &lt;-<span class="st"> </span>Q <span class="op">+</span><span class="st"> </span>coeffs[i] <span class="op">*</span><span class="st"> </span>term</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true"></a>  }</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true"></a>  s &lt;-<span class="st"> </span><span class="dv">0</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true"></a>  exponents &lt;-<span class="st"> </span>Q[[<span class="st">&quot;index&quot;</span>]]</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true"></a>  coeffs    &lt;-<span class="st"> </span>Q[[<span class="st">&quot;value&quot;</span>]] </span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true"></a>  <span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span><span class="kw">nrow</span>(exponents)) {</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true"></a>    coef &lt;-<span class="st"> </span>coeffs[i]</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true"></a>    powers &lt;-<span class="st"> </span>exponents[i, ]</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true"></a>    d &lt;-<span class="st"> </span><span class="kw">sum</span>(powers)</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true"></a>    <span class="cf">if</span>(d <span class="op">==</span><span class="st"> </span>0L) {</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true"></a>      s &lt;-<span class="st"> </span>s <span class="op">+</span><span class="st"> </span>coef</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true"></a>      <span class="cf">next</span></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true"></a>    }</span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true"></a>    coef &lt;-<span class="st"> </span>coef <span class="op">*</span><span class="st"> </span><span class="kw">prod</span>(<span class="kw">factorial</span>(powers))</span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true"></a>    s &lt;-<span class="st"> </span>s <span class="op">+</span><span class="st"> </span>coef <span class="op">/</span><span class="st"> </span><span class="kw">prod</span>((n<span class="op">+</span>1L)<span class="op">:</span>(n<span class="op">+</span>d))</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true"></a>  }</span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true"></a>  <span class="kw">abs</span>(<span class="kw">det</span>(B)) <span class="op">/</span><span class="st"> </span><span class="kw">factorial</span>(n) <span class="op">*</span><span class="st"> </span>s</span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true"></a>}</span></code></pre></div>
+<h3 id="r-example">R example</h3>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="kw">library</span>(spray)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="co"># variables</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="kw">lone</span>(<span class="dv">1</span>, <span class="dv">3</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a>y &lt;-<span class="st"> </span><span class="kw">lone</span>(<span class="dv">2</span>, <span class="dv">3</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a>z &lt;-<span class="st"> </span><span class="kw">lone</span>(<span class="dv">3</span>, <span class="dv">3</span>)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a><span class="co"># polynomial</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true"></a>P &lt;-<span class="st"> </span>x<span class="op">^</span><span class="dv">4</span> <span class="op">+</span><span class="st"> </span>y <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>x<span class="op">*</span>y<span class="op">^</span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span><span class="dv">3</span><span class="op">*</span>z</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true"></a><span class="co"># simplex (tetrahedron) vertices</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true"></a>v1 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true"></a>v2 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">3</span>)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true"></a>v3 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>)</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true"></a>v4 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">1</span>)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true"></a><span class="co"># simplex</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true"></a>S &lt;-<span class="st"> </span><span class="kw">rbind</span>(v1, v2, v3, v4)</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true"></a></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true"></a><span class="co"># integral</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true"></a><span class="kw">integratePolynomialonSimplex</span>(P, S)</span></code></pre></div>
+<h2 id="note">Note</h2>
+<p>The functions do not check whether the given matrix <code>S</code> defines a non-degenerate simplex. This is equivalent to the invertibility of the matrix <code>B</code> constructed in the functions.</p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
