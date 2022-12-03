@@ -1,0 +1,233 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Integration over a polyhedron with Julia</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Integration over a polyhedron with Julia</h1> 
+          <div class="info">
+    Posted on December  3, 2022
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'julia'." href="../tags/julia.html">julia</a>
+    
+</div>
+
+<p>The Julia function <code>integrateOnSimplex</code> provided in <a href="https://gist.github.com/stla/57ef3a2dcd869d4b6809fb80f1a4300b">this gist</a> allows to compute the integral of a function over a simplex or more generally a union of simplices (a simplex is a triangle in dimension 2, a tetrahedron in dimension 3). I will package it soon, under the name <strong>SimplicialCubature</strong>.</p>
+<p>The Delaunay tessellation of a convex polyhedron in <span class="math inline">\(\mathbb{R}^n\)</span> provides a partition of this convex polyhedron into <span class="math inline">\(n\)</span>-dimensional simplices. Therefore, once you have a way to integrate a function over a simplex, you are able to integrate over a convex polyhedron.</p>
+<p>Suppose for example you have to evaluate the integral <span class="math display">\[
+\int_{-5}^4\int_{-5}^{3-x}\int_{-10}^{6-x-y} f(x,y,z)
+\,\mathrm{d}z\,\mathrm{d}y\,\mathrm{d}x
+\]</span> for a certain function <span class="math inline">\(f\)</span>.</p>
+<p>The domain of integration is defined by the set of inequalities: <span class="math display">\[
+\left\{\begin{matrix}
+-5 &amp; \leq &amp; x &amp; \leq &amp; 4 \\
+-5 &amp; \leq &amp; y &amp; \leq &amp; 3-x \\
+-10 &amp; \leq &amp; z &amp; \leq &amp; 6-x-y
+\end{matrix}
+\right.
+\]</span> which is equivalent to <span class="math display">\[
+\left\{\begin{matrix}
+-x &amp; \leq &amp; 5 \\
+x &amp; \leq &amp; 4 \\
+-y &amp; \leq &amp; 5 \\
+x+y &amp; \leq &amp; 3 \\
+-z &amp; \leq &amp; 10 \\
+x+y+z &amp; \leq &amp; 6
+\end{matrix}
+\right..
+\]</span> This set of inequalities defines a convex polyhedron. We can get the vertices of this polyhedron with the <code>Polyhedra</code> package:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="co"># define the polyhedron Ax &lt;= b and get its vertices</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="kw">using</span> Polyhedra</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>A <span class="op">=</span> [</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>  <span class="op">-</span><span class="fl">1</span>  <span class="fl">0</span>  <span class="fl">0</span><span class="op">;</span>   <span class="co"># -x</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>   <span class="fl">1</span>  <span class="fl">0</span>  <span class="fl">0</span><span class="op">;</span>   <span class="co"># x</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>   <span class="fl">0</span> <span class="op">-</span><span class="fl">1</span>  <span class="fl">0</span><span class="op">;</span>   <span class="co"># -y</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>   <span class="fl">1</span>  <span class="fl">1</span>  <span class="fl">0</span><span class="op">;</span>   <span class="co"># x + y</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>   <span class="fl">0</span>  <span class="fl">0</span> <span class="op">-</span><span class="fl">1</span><span class="op">;</span>   <span class="co"># -z</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>   <span class="fl">1</span>  <span class="fl">1</span>  <span class="fl">1.0</span>  <span class="co"># x + y + z</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>]</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>b <span class="op">=</span> [<span class="fl">5</span><span class="op">;</span> <span class="fl">4</span><span class="op">;</span> <span class="fl">5</span><span class="op">;</span> <span class="fl">3</span><span class="op">;</span> <span class="fl">10</span><span class="op">;</span> <span class="fl">6.0</span>]</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>H <span class="op">=</span> hrep(A<span class="op">,</span> b)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>PH <span class="op">=</span> polyhedron(H)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>vertices <span class="op">=</span> collect(points(PH))</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a><span class="co">## 8-element Vector{Vector{Float64}}</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a><span class="co">##  [4.0, -1.0, 3.0]</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a><span class="co">##  [-5.0, 8.0, 3.0]</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a><span class="co">##  [4.0, -1.0, -10.0]</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a><span class="co">##  [-5.0, 8.0, -10.0]</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a><span class="co">##  [4.0, -5.0, 7.0]</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a><span class="co">##  [-5.0, -5.0, 16.0]</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a><span class="co">##  [4.0, -5.0, -10.0]</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a><span class="co">##  [-5.0, -5.0, -10.0]</span></span></code></pre></div>
+<p>Then, to evaluate the integral, we proceed as follows:</p>
+<ul>
+<li><p>split the polyhedron into simplices (tetrahedra) with the Delaunay algorithm, implemented in the <code>MiniQhull</code> package;</p></li>
+<li><p>evaluate the integral over the union of these simplices with the <code>integrateOnSimplex</code> function.</p></li>
+</ul>
+<p>Let’s go. We split the polyhedron into tetrahedra:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="co"># decompose the polyhedron into simplices (tetrahedra)</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="kw">using</span> MiniQhull <span class="co"># to use delaunay()</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>indices <span class="op">=</span> delaunay(hcat(vertices<span class="op">...</span>))</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>_<span class="op">,</span> ntetrahedra <span class="op">=</span> size(indices)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>tetrahedra <span class="op">=</span> <span class="dt">Vector</span>{<span class="dt">Vector</span>{<span class="dt">Vector</span>{<span class="dt">Float64</span>}}}(<span class="cn">undef</span><span class="op">,</span> ntetrahedra)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="kw">for</span> j <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>ntetrahedra</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>  ids <span class="op">=</span> vec(indices[<span class="op">:,</span> j])</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>  tetrahedra[j] <span class="op">=</span> vertices[ids]</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a><span class="kw">end</span></span></code></pre></div>
+<p>Now we are ready to use the <code>integrateOnSimplex</code> function. We take as example the function <span class="math inline">\(f(x, y, z) = x + yz\)</span>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="co"># function to be integrated</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="kw">function</span> f(x)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>  <span class="kw">return</span> x[<span class="fl">1</span>] <span class="op">+</span> x[<span class="fl">2</span>]<span class="op">*</span>x[<span class="fl">3</span>]</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="kw">end</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a><span class="co"># integral</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>I <span class="op">=</span> integrateOnSimplex(f<span class="op">,</span> tetrahedra)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>I.integral</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a><span class="co">## -5358.300000000004</span></span></code></pre></div>
+<p>Note that for this example we can do better. The function <span class="math inline">\(f\)</span> is polynomial. So we can get the exact value of its integral over a simplex; see <a href="https://laustep.github.io/stlahblog/posts/integratePolynomialOnSimplex.html">the previous post</a>.</p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
