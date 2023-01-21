@@ -1,0 +1,217 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - More on the 'Reorient' transformation</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>More on the 'Reorient' transformation</h1> 
+          <div class="info">
+    Posted on January 21, 2023
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>, <a title="All pages tagged 'geometry'." href="../tags/geometry.html">geometry</a>
+    
+</div>
+
+<p>I presented the ‘Reorient’ rotation in <a href="https://laustep.github.io/stlahblog/posts/ReorientTransformation.html">a previous post</a>.</p>
+<p>I figured out three things:</p>
+<ul>
+<li>there’s an easy precise definition of this rotation, that I didn’t give;</li>
+<li>this rotation has a simple quaternion representation;</li>
+<li>this is the rotation I used to construct a mesh of a <a href="https://laustep.github.io/stlahblog/posts/rglTorus.html">torus passing through three points</a>.</li>
+</ul>
+<p>Here is the function returning the matrix of this rotation:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="co"># Cross product of two 3D vectors.</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>crossProduct &lt;-<span class="st"> </span><span class="cf">function</span>(v, w){</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>  <span class="kw">c</span>(</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>    v[2L] <span class="op">*</span><span class="st"> </span>w[3L] <span class="op">-</span><span class="st"> </span>v[3L] <span class="op">*</span><span class="st"> </span>w[2L],</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>    v[3L] <span class="op">*</span><span class="st"> </span>w[1L] <span class="op">-</span><span class="st"> </span>v[1L] <span class="op">*</span><span class="st"> </span>w[3L],</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>    v[1L] <span class="op">*</span><span class="st"> </span>w[2L] <span class="op">-</span><span class="st"> </span>v[2L] <span class="op">*</span><span class="st"> </span>w[1L]</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>  )</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>}</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="co"># The 'Reorient' rotation matrix. </span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>Reorient_Trans &lt;-<span class="st"> </span><span class="cf">function</span>(Axis1, Axis2){</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>  vX1 &lt;-<span class="st"> </span>Axis1 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(Axis1)))</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>  vX2 &lt;-<span class="st"> </span>Axis2 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(Axis2)))</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>  Y &lt;-<span class="st"> </span><span class="kw">crossProduct</span>(vX1, vX2)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>  vY &lt;-<span class="st"> </span>Y <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(Y)))</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a>  Z1 &lt;-<span class="st"> </span><span class="kw">crossProduct</span>(vX1, vY)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>  vZ1 &lt;-<span class="st"> </span>Z1 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(Z1)))</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a>  Z2 &lt;-<span class="st"> </span><span class="kw">crossProduct</span>(vX2, vY)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a>  vZ2 &lt;-<span class="st"> </span>Z2 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(Z2)))</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a>  M1 &lt;-<span class="st"> </span><span class="kw">cbind</span>(vX1, vY, vZ1)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a>  M2 &lt;-<span class="st"> </span><span class="kw">rbind</span>(vX2, vY, vZ2)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a>  M1 <span class="op">%*%</span><span class="st"> </span>M2</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a>}</span></code></pre></div>
+<p>This rotation sends <code>Axis2</code> to <code>Axis1</code>. Actually it would be more natural to take its inverse (whose matrix is obtained by transposition) but I used it in the <code>transform3d</code> function of the <strong>rgl</strong> package and this function requires the inverse of the transformation to be applied (oddly).</p>
+<p>Here is how to get its inverse from a quaternion:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">library</span>(onion)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="co"># Get a rotation matrix sending `u` to `v`; </span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="co">#   the vectors `u` and `v` must be normalized.</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>uvRotation &lt;-<span class="st"> </span><span class="cf">function</span>(u, v) {</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>  re &lt;-<span class="st"> </span><span class="kw">sqrt</span>((<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(u<span class="op">*</span>v))<span class="op">/</span><span class="dv">2</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>  w &lt;-<span class="st"> </span><span class="kw">crossProduct</span>(u, v) <span class="op">/</span><span class="st"> </span><span class="dv">2</span> <span class="op">/</span><span class="st"> </span>re</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>  q &lt;-<span class="st"> </span><span class="kw">as.quaternion</span>(<span class="kw">c</span>(re, w), <span class="dt">single =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>  <span class="kw">as.orthogonal</span>(q) <span class="co"># quaternion to rotation matrix</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>}</span></code></pre></div>
+<p>As you can see, these two rotations indeed are inverse (transpose) of each other:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>u &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>v &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="dv">3</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="kw">Reorient_Trans</span>(u, v)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="co">##            [,1]       [,2]       [,3]</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a><span class="co">## [1,]  0.7886751 -0.2113249 -0.5773503</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a><span class="co">## [2,] -0.2113249  0.7886751 -0.5773503</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a><span class="co">## [3,]  0.5773503  0.5773503  0.5773503</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a><span class="kw">uvRotation</span>(u, v)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a><span class="co">##            [,1]       [,2]      [,3]</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a><span class="co">## [1,]  0.7886751 -0.2113249 0.5773503</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a><span class="co">## [2,] -0.2113249  0.7886751 0.5773503</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a><span class="co">## [3,] -0.5773503 -0.5773503 0.5773503</span></span></code></pre></div>
+<p>Thus, <code>uvRotation(u, v)</code> is a rotation sending <code>u</code> to <code>v</code>. Such a rotation is not unique. We can give a precise definition of this rotation: this is the rotation which sends the plane orthogonal to <code>u</code> and passing through the origin to the plane orthogonal to <code>v</code> and passing through the origin.</p>
+<p>And as I said in the introduction, this is the rotation I used to construct a mesh of a torus “passing through three points”. Indeed, I firstly constructed a torus having <span class="math inline">\(\{z = 0\}\)</span> as equatorial plane, and then I mapped it with a rotation and a translation. The rotation in question is simply the <code>uvRotation(u, v)</code> transformation with <span class="math inline">\(u = (0,0,1)\)</span>, orthogonal to the plane <span class="math inline">\(\{z = 0\}\)</span>, and <span class="math inline">\(v\)</span> the normal of the plane passing through the three points. And the translation is the one sending the origin to the circumcenter of the three points.</p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
