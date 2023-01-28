@@ -5,7 +5,149 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Sat, 21 Jan 2023 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Sat, 28 Jan 2023 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>Update of the 'cgalMeshes' package</title>
+      <link>https://laustep.github.io/stlahblog/posts/cgalMeshes2.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        I made some progress on the <strong>cgalMeshes</strong> package, that I
+        introduced
+        <a href="https://laustep.github.io/stlahblog/posts/cgalMeshes.html"
+          >here</a
+        >. The new version is not on CRAN yet.
+      </p>
+      <p>
+        In particular, one can know assign some properties to the meshes (the
+        <code>cgalMesh</code> objects). One can assign some face properties:
+        colors and scalars, and some vertex properties: colors, scalars, and
+        normals. Actually a color can be any character string, but if you really
+        set some colors, and you write the mesh to a file, then you’ll retrieve
+        the colors in this file. Some of these properties are preserved by
+        certain operations on the mesh. For example, all properties are
+        preserved when one splits a mesh into connected components. This was my
+        original motivation by the way, more precisely I wanted to retrieve the
+        normals of the mesh in its connected components, because I had a mesh
+        made with the <strong>rmarchingcubes</strong> package and then it had
+        very good normals (the normals returned by the
+        <strong>rmarchingcubes</strong> package are obtained by an approximation
+        of the gradient of the function defining the isosurface). The union of
+        two meshes preserves the face properties of the two meshes. This is nice
+        when one does not want to lose the colors.
+      </p>
+      <p>
+        Here is a couple of new features. Let’s start by the new methods of the
+        <code>cgalMesh</code> objects. The <code>$clip()</code> method now
+        returns two meshes: the clipped mesh and the modified clipping mesh (it
+        is modified by a corefinement). These two meshes inherit the colors of
+        the original meshes. For example, here is the result one obtains by
+        clipping a cylinder to another cylinder, and then clipping the resulting
+        mesh by a third cylinder, with different colors for the three cylinders:
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/cgalMeshes_clipCylinders.gif"
+          style="width: 50%"
+        />
+      </p>
+      <p>
+        See
+        <a href="http://paulbourke.net/geometry/cylinders/"
+          >this page by Paul Bourke</a
+        >
+        for more fun with intersecting cylinders. I’ve tried to do something
+        similar to the intersection of a bunch of random cylinders but my
+        implementation is too time-consuming.
+      </p>
+      <p>
+        The <code>$fillBoundaryHole()</code> method allows to fill the holes of
+        a mesh. There’s one option, <code>fair</code>, allowing to request a
+        smooth hole filling or a flat hole filling. Here is an example of a
+        sphere with a hole, filled with the option <code>fair=TRUE</code> and
+        <code>fair=FALSE</code>:
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/cgalMeshes_holefilling.png"
+          style="width: 75%"
+        />
+      </p>
+      <p>
+        Also some subdivision and deformation methods are available now. Below
+        is a coarse mesh of a Hopf torus and the mesh obtained after two
+        iterations of the Loop subdivision:
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/cgalMeshes_Hopf_LoopSubdiv.png"
+          style="width: 65%"
+        />
+      </p>
+      <p>
+        Now let’s see some new functions of the package. The
+        <code>algebraicMesh()</code> function allows to construct a mesh of an
+        algebraic surface, that is to say an isosurface of the form
+        <span class="math inline">\(P(x, y, z) = 0\)</span> where
+        <span class="math inline">\(P\)</span> is a polynomial. Of course it is
+        possible to make an isosurface
+        <span class="math inline">\(f(x, y, z) = 0\)</span> where
+        <span class="math inline">\(f\)</span> is arbitrary with
+        <strong>CGAL</strong> but I don’t know an efficient way to pass a
+        function from R to C++. Here is the Barth decic obtained with this
+        function:
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/cgalMeshes_BarthDecic.gif"
+          style="width: 50%"
+        />
+      </p>
+      <p>
+        The algorithm used by <strong>CGAL</strong> is not the marching cubes
+        algorithm. Actually, so far, I didn’t observe any advantage of this
+        algorithm as compared to the marching cubes algorithm (if you know such
+        an advantage, please leave an
+        <a href="https://scicomp.stackexchange.com/q/42410/14840">answer here</a
+        >).
+      </p>
+      <p>
+        There is now the <code>convexHull()</code> function in the package, and
+        also <code>convexHullsIntersection</code> to (fastly) compute a mesh of
+        the intersection of some convex hulls. I used it to get the intersection
+        of the
+        <a
+          href="https://laustep.github.io/stlahblog/posts/tetrahedraCompound.html"
+          >compound of five tetrahedra</a
+        >:
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/cgalMeshes_cxhullinter.png"
+          style="width: 50%"
+        />
+      </p>
+      <p>
+        The <code>sphericalTriangle()</code> function allows to get a mesh of a
+        spherical triangle. Here is a spherical icosahedron:
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/cgalMeshes_sphericalIcosahedron.gif"
+          style="width: 50%"
+        />
+      </p>
+      <p>Hopefully the package will pass the CRAN checks.</p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Sat, 28 Jan 2023 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/cgalMeshes2.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>More on the 'Reorient' transformation</title>
       <link>https://laustep.github.io/stlahblog/posts/ReorientTransformation2.html</link>
