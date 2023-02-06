@@ -5,7 +5,108 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Sat, 28 Jan 2023 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Mon, 06 Feb 2023 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>Passing a function from R to C++</title>
+      <link>https://laustep.github.io/stlahblog/posts/functionParser.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        The <code>algebraicMesh</code> function of my package
+        <a href="https://github.com/stla/cgalMeshes"
+          ><strong>cgalMeshes</strong></a
+        >
+        takes as inputs a trivariate polynomial
+        <span class="math inline">\(P(x,y,z)\)</span>, a number
+        <span class="math inline">\(\ell\)</span> and some other parameters, and
+        it returns a mesh of the isosurface defined by
+        <span class="math inline">\(P(x,y,z) = \ell\)</span>. The computation of
+        this mesh is done in C++ with the help of the
+        <strong>Rcpp</strong> package and the <strong>CGAL</strong> library.
+      </p>
+      <p>
+        Each term of the polynomial is represented by a number, its coefficient,
+        and a vector of three integers, the exponents of the three variables. So
+        there is no difficulty to pass this polynomial from R to C++ with
+        <strong>Rcpp</strong>.
+      </p>
+      <p>
+        I was wondering how one could pass the body of an arbitrary function
+        <span class="math inline">\(f(x,y,z)\)</span> from R to C++, and not
+        only a polynomial, to compute a mesh of an isosurface
+        <span class="math inline">\(f(x,y,z) = \ell\)</span>. I mean a simple
+        function, whose body is given by an elementary mathematical expression.
+        I know it is possible to pass a R function with <strong>Rcpp</strong>,
+        as explained in the quick reference guide, but the evaluation of this
+        function is not efficient enough for this situation.
+      </p>
+      <p>
+        Then I googled, and I discovered the C++ library
+        <a href="http://warp.povusers.org/FunctionParser/"
+          ><strong>Function Parser</strong></a
+        >, written by Juha Nieminen and Joel Yliluoma. I gave it a try today; it
+        works fine and it is easy to use.
+      </p>
+      <p>
+        Here is how to use it with <strong>Rcpp</strong>. First, download the
+        <strong>zip</strong> file given in the above link. Unzip it and then, in
+        the <strong><em>src</em></strong> folder of your package, put the files
+        <strong>fparser.cc</strong>, <strong>fparser.hh</strong>,
+        <strong>fpconfig.hh</strong>, <strong>fpoptimizer.cc</strong>, and the
+        folder <strong>extrasrc</strong>. Now you’re ready to use
+        <strong>Function Parser</strong>. Here is simple example:
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode cpp"
+        ><code class="sourceCode cpp"><span id="cb1-1"><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb1-2"><span class="dt">void</span> helloWorld() {</span>
+<span id="cb1-3">  FunctionParser fp;</span>
+<span id="cb1-4">  fp.Parse(<span class="st">"sqrt(x*x + y*y)"</span>, <span class="st">"x,y"</span>);</span>
+<span id="cb1-5">  <span class="dt">double</span> variables[<span class="dv">2</span>] = { <span class="fl">3.0</span>, <span class="fl">4.0</span> };</span>
+<span id="cb1-6">  <span class="dt">double</span> result = fp.Eval(variables);</span>
+<span id="cb1-7">  Rcpp::Rcout &lt;&lt; result &lt;&lt; <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>;</span>
+<span id="cb1-8">}</span></code></pre>
+      </div>
+      <p>
+        Build the package and run <code>helloWorld()</code> in R. Then
+        <code>5</code> will be printed in the console. Of course this example
+        has no interest. Here is a more interesting one:
+      </p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode cpp"
+        ><code class="sourceCode cpp"><span id="cb2-1"><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb2-2"><span class="dt">double</span> funeval(</span>
+<span id="cb2-3">  <span class="at">const</span> <span class="bu">std::</span>string&amp;        functionBody, </span>
+<span id="cb2-4">  <span class="at">const</span> <span class="bu">std::</span>string&amp;        variableNames, </span>
+<span id="cb2-5">  <span class="at">const</span> Rcpp::NumericVector variableValues</span>
+<span id="cb2-6">) {</span>
+<span id="cb2-7">  FunctionParser fp;</span>
+<span id="cb2-8">  fp.Parse(functionBody, variableNames);</span>
+<span id="cb2-9">  <span class="at">const</span> <span class="dt">int</span> nvariables = variableValues.size();</span>
+<span id="cb2-10">  <span class="dt">double</span> values[nvariables];</span>
+<span id="cb2-11">  <span class="cf">for</span>(<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; nvariables; i++) {</span>
+<span id="cb2-12">    values[i] = variableValues(i);</span>
+<span id="cb2-13">  }</span>
+<span id="cb2-14">  <span class="at">const</span> <span class="dt">double</span> result = fp.Eval(values);</span>
+<span id="cb2-15">  <span class="cf">return</span> result;</span>
+<span id="cb2-16">}</span></code></pre>
+      </div>
+      <p>
+        Build and run <code>funeval("sqrt(x*x + y*y)", "x,y", c(3, 4))</code>,
+        you’ll get <code>5</code>.
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Mon, 06 Feb 2023 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/functionParser.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>Update of the 'cgalMeshes' package</title>
       <link>https://laustep.github.io/stlahblog/posts/cgalMeshes2.html</link>
