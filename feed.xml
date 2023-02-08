@@ -5,7 +5,157 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Mon, 06 Feb 2023 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Wed, 08 Feb 2023 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>The Mandelbulb in R</title>
+      <link>https://laustep.github.io/stlahblog/posts/mandelbulb.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        In this post, I provide some R code which generates a mesh of the
+        Mandelbulb, a well-known 3D fractal.
+      </p>
+      <p>
+        The Mandelbulb is an isosurface, and I use the
+        <strong>rmarchingcubes</strong> package to get a mesh of this
+        isosurface. Since the Mandelbulb has many details, a thin grid of the
+        voxel space is necessary, and that is why I use <strong>Rcpp</strong> to
+        generate the voxel. Here is the C++ code:
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode cpp"
+        ><code class="sourceCode cpp"><span id="cb1-1"><span class="co">// file mandelbulb.cpp</span></span>
+<span id="cb1-2"><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb1-3"><span class="kw">using</span> <span class="kw">namespace</span> Rcpp;</span>
+<span id="cb1-4"></span>
+<span id="cb1-5"><span class="dt">double</span> mandelbulb0(</span>
+<span id="cb1-6">  <span class="dt">double</span> x, <span class="dt">double</span> y, <span class="dt">double</span> z, <span class="at">const</span> <span class="dt">unsigned</span> power, <span class="at">const</span> <span class="dt">double</span> phase</span>
+<span id="cb1-7">) {</span>
+<span id="cb1-8">  <span class="at">const</span> <span class="dt">double</span> x0 = x;</span>
+<span id="cb1-9">  <span class="at">const</span> <span class="dt">double</span> y0 = y;</span>
+<span id="cb1-10">  <span class="at">const</span> <span class="dt">double</span> z0 = z;</span>
+<span id="cb1-11">  <span class="at">const</span> <span class="dt">double</span> k = power;</span>
+<span id="cb1-12">  <span class="dt">double</span> r, rkm1, rk, theta, phi;</span>
+<span id="cb1-13">  <span class="dt">double</span> dr = <span class="fl">1.0</span>;</span>
+<span id="cb1-14">  <span class="dt">int</span> i;</span>
+<span id="cb1-15">  <span class="cf">for</span>(i = <span class="dv">0</span>; i &lt; <span class="dv">10</span>; i++) {</span>
+<span id="cb1-16">    r = sqrt(x*x + y*y + z*z);</span>
+<span id="cb1-17">    <span class="cf">if</span>(r &gt; <span class="dv">2</span>) {</span>
+<span id="cb1-18">      <span class="cf">return</span> <span class="fl">2.0</span> * r * log(r) / dr;</span>
+<span id="cb1-19">    }</span>
+<span id="cb1-20">    rkm1 = pow(r, k - <span class="fl">1.0</span>);</span>
+<span id="cb1-21">    dr = k * rkm1 * dr + <span class="fl">1.0</span>;</span>
+<span id="cb1-22">    theta = k * atan2(sqrt(x*x + y*y), z) + phase;</span>
+<span id="cb1-23">    phi   = k * atan2(y, x);</span>
+<span id="cb1-24">    rk = rkm1 * r;</span>
+<span id="cb1-25">    x = rk * cos(phi) * sin(theta) + x0;</span>
+<span id="cb1-26">    y = rk * sin(phi) * sin(theta) + y0;</span>
+<span id="cb1-27">    z = rk * cos(theta) + z0;</span>
+<span id="cb1-28">  }</span>
+<span id="cb1-29">  <span class="cf">return</span> <span class="fl">0.0</span>;</span>
+<span id="cb1-30">}</span>
+<span id="cb1-31"></span>
+<span id="cb1-32"><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb1-33">NumericVector mandelbulb(</span>
+<span id="cb1-34">  <span class="at">const</span> <span class="dt">double</span> m, <span class="at">const</span> <span class="dt">double</span> M, <span class="at">const</span> <span class="dt">unsigned</span> n, </span>
+<span id="cb1-35">  <span class="at">const</span> <span class="dt">unsigned</span> power, <span class="at">const</span> <span class="dt">double</span> phase</span>
+<span id="cb1-36">) {</span>
+<span id="cb1-37">  NumericVector out(n * n * n);</span>
+<span id="cb1-38">  <span class="at">const</span> <span class="dt">double</span> h = (M - m) / (n - <span class="dv">1</span>);</span>
+<span id="cb1-39">  <span class="dt">double</span> x, y, z;</span>
+<span id="cb1-40">  <span class="dt">unsigned</span> i, j, k;</span>
+<span id="cb1-41">  <span class="dt">unsigned</span> l = <span class="dv">0</span>;</span>
+<span id="cb1-42">  <span class="cf">for</span>(i = <span class="dv">0</span>; i &lt; n; i++) {</span>
+<span id="cb1-43">    x = m + i*h;</span>
+<span id="cb1-44">    <span class="cf">for</span>(j = <span class="dv">0</span>; j &lt; n; j++) {</span>
+<span id="cb1-45">      y = m + j*h;</span>
+<span id="cb1-46">      <span class="cf">for</span>(k = <span class="dv">0</span>; k &lt; n; k++) {</span>
+<span id="cb1-47">        z = m + k*h;</span>
+<span id="cb1-48">        out(l) = mandelbulb0(x, y, z, power, phase);</span>
+<span id="cb1-49">        l++;</span>
+<span id="cb1-50">      }</span>
+<span id="cb1-51">    }</span>
+<span id="cb1-52">  }</span>
+<span id="cb1-53">  out.attr(<span class="st">"dim"</span>) = Dimension(n, n, n);</span>
+<span id="cb1-54">  <span class="cf">return</span> out;</span>
+<span id="cb1-55">}</span></code></pre>
+      </div>
+      <p>
+        In fact, there are several Mandelbulb, each corresponding to a value of
+        the <code>power</code> argument in the above code. The most popular one
+        is the one with <code>power=8</code>. At the end of this post, I’ll show
+        you the effect of the <code>phase</code> argument.
+      </p>
+      <p>Now here is the R code which generates the mesh:</p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1">Rcpp<span class="op">::</span><span class="kw">sourceCpp</span>(<span class="st">"mandelbulb.cpp"</span>)</span>
+<span id="cb2-2"></span>
+<span id="cb2-3"><span class="kw">library</span>(rmarchingcubes)</span>
+<span id="cb2-4"><span class="kw">library</span>(rgl)</span>
+<span id="cb2-5"></span>
+<span id="cb2-6">n &lt;-<span class="st"> </span>512L <span class="co"># more than enough</span></span>
+<span id="cb2-7">x &lt;-<span class="st"> </span>y &lt;-<span class="st"> </span>z &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="fl">1.2</span>, <span class="fl">1.2</span>, <span class="dt">length.out =</span> n)</span>
+<span id="cb2-8"></span>
+<span id="cb2-9">voxel &lt;-<span class="st"> </span><span class="kw">mandelbulb</span>(<span class="op">-</span><span class="fl">1.2</span>, <span class="fl">1.2</span>, n, 8L, <span class="dv">0</span>)</span>
+<span id="cb2-10">ctr   &lt;-<span class="st"> </span><span class="kw">contour3d</span>(voxel, <span class="dt">level =</span> <span class="fl">0.01</span>, <span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">z =</span> z)</span>
+<span id="cb2-11"></span>
+<span id="cb2-12">mesh &lt;-<span class="st"> </span><span class="kw">tmesh3d</span>(</span>
+<span id="cb2-13">  <span class="dt">vertices =</span> <span class="kw">t</span>(ctr[[<span class="st">"vertices"</span>]]),</span>
+<span id="cb2-14">  <span class="dt">indices  =</span> <span class="kw">t</span>(ctr[[<span class="st">"triangles"</span>]]),</span>
+<span id="cb2-15">  <span class="dt">normals  =</span> ctr[[<span class="st">"normals"</span>]],</span>
+<span id="cb2-16">  <span class="dt">homogeneous =</span> <span class="ot">FALSE</span></span>
+<span id="cb2-17">)</span></code></pre>
+      </div>
+      <p>
+        This mesh can be plotted with <strong>rgl</strong>. But let’s add some
+        color before. I like the ‘klingon’ color palette of the
+        <strong>trekcolors</strong> package.
+      </p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb3-1"><span class="kw">library</span>(trekcolors)</span>
+<span id="cb3-2">fpalette &lt;-<span class="st"> </span><span class="kw">colorRamp</span>(<span class="kw">trek_pal</span>(<span class="st">"klingon"</span>, <span class="dt">reverse =</span> <span class="ot">TRUE</span>))</span>
+<span id="cb3-3">d2 &lt;-<span class="st"> </span><span class="kw">apply</span>(mesh[[<span class="st">"vb"</span>]][<span class="op">-</span>4L, ], 2L, crossprod)</span>
+<span id="cb3-4">d2 &lt;-<span class="st"> </span>(d2 <span class="op">-</span><span class="st"> </span><span class="kw">min</span>(d2)) <span class="op">/</span><span class="st"> </span><span class="kw">diff</span>(<span class="kw">range</span>(d2))</span>
+<span id="cb3-5">RGB &lt;-<span class="st"> </span><span class="kw">fpalette</span>(d2)</span>
+<span id="cb3-6">mesh[[<span class="st">"material"</span>]] &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb3-7">  <span class="st">"color"</span> =<span class="st"> </span><span class="kw">rgb</span>(RGB[, 1L], RGB[, 2L], RGB[, 3L], <span class="dt">maxColorValue =</span> <span class="dv">255</span>)</span>
+<span id="cb3-8">)</span>
+<span id="cb3-9"></span>
+<span id="cb3-10"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>), <span class="dt">zoom =</span> <span class="fl">0.7</span>)</span>
+<span id="cb3-11"><span class="kw">shade3d</span>(mesh, <span class="dt">shininess =</span> <span class="dv">128</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/mandelbulb1.gif"
+          style="width: 45%"
+        />
+      </p>
+      <p>
+        The animation below shows the effect of the <code>phase</code> argument,
+        varying from <span class="math inline">\(0\)</span> to
+        <span class="math inline">\(2\pi\)</span>:
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/mandelbulb2.gif"
+          style="width: 45%"
+        />
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Wed, 08 Feb 2023 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/mandelbulb.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>Passing a function from R to C++</title>
       <link>https://laustep.github.io/stlahblog/posts/functionParser.html</link>
@@ -60,14 +210,17 @@
       <div class="sourceCode" id="cb1">
         <pre
           class="sourceCode cpp"
-        ><code class="sourceCode cpp"><span id="cb1-1"><span class="co">// [[Rcpp::export]]</span></span>
-<span id="cb1-2"><span class="dt">void</span> helloWorld() {</span>
-<span id="cb1-3">  FunctionParser fp;</span>
-<span id="cb1-4">  fp.Parse(<span class="st">"sqrt(x*x + y*y)"</span>, <span class="st">"x,y"</span>);</span>
-<span id="cb1-5">  <span class="dt">double</span> variables[<span class="dv">2</span>] = { <span class="fl">3.0</span>, <span class="fl">4.0</span> };</span>
-<span id="cb1-6">  <span class="dt">double</span> result = fp.Eval(variables);</span>
-<span id="cb1-7">  Rcpp::Rcout &lt;&lt; result &lt;&lt; <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>;</span>
-<span id="cb1-8">}</span></code></pre>
+        ><code class="sourceCode cpp"><span id="cb1-1"><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb1-2"><span class="pp">#include </span><span class="im">"fparser.hh"</span></span>
+<span id="cb1-3"></span>
+<span id="cb1-4"><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb1-5"><span class="dt">void</span> helloWorld() {</span>
+<span id="cb1-6">  FunctionParser fp;</span>
+<span id="cb1-7">  fp.Parse(<span class="st">"sqrt(x*x + y*y)"</span>, <span class="st">"x,y"</span>);</span>
+<span id="cb1-8">  <span class="dt">double</span> variables[<span class="dv">2</span>] = { <span class="fl">3.0</span>, <span class="fl">4.0</span> };</span>
+<span id="cb1-9">  <span class="dt">double</span> result = fp.Eval(variables);</span>
+<span id="cb1-10">  Rcpp::Rcout &lt;&lt; result &lt;&lt; <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>;</span>
+<span id="cb1-11">}</span></code></pre>
       </div>
       <p>
         Build the package and run <code>helloWorld()</code> in R. Then

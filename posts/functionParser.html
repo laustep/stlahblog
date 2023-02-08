@@ -108,14 +108,17 @@
 <p>I was wondering how one could pass the body of an arbitrary function <span class="math inline">\(f(x,y,z)\)</span> from R to C++, and not only a polynomial, to compute a mesh of an isosurface <span class="math inline">\(f(x,y,z) = \ell\)</span>. I mean a simple function, whose body is given by an elementary mathematical expression. I know it is possible to pass a R function with <strong>Rcpp</strong>, as explained in the quick reference guide, but the evaluation of this function is not efficient enough for this situation.</p>
 <p>Then I googled, and I discovered the C++ library <a href="http://warp.povusers.org/FunctionParser/"><strong>Function Parser</strong></a>, written by Juha Nieminen and Joel Yliluoma. I gave it a try today; it works fine and it is easy to use.</p>
 <p>Here is how to use it with <strong>Rcpp</strong>. First, download the <strong>zip</strong> file given in the above link. Unzip it and then, in the <strong><em>src</em></strong> folder of your package, put the files <strong>fparser.cc</strong>, <strong>fparser.hh</strong>, <strong>fpconfig.hh</strong>, <strong>fpoptimizer.cc</strong>, and the folder <strong>extrasrc</strong>. Now you’re ready to use <strong>Function Parser</strong>. Here is simple example:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="co">// [[Rcpp::export]]</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="dt">void</span> helloWorld() {</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>  FunctionParser fp;</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>  fp.Parse(<span class="st">&quot;sqrt(x*x + y*y)&quot;</span>, <span class="st">&quot;x,y&quot;</span>);</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>  <span class="dt">double</span> variables[<span class="dv">2</span>] = { <span class="fl">3.0</span>, <span class="fl">4.0</span> };</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>  <span class="dt">double</span> result = fp.Eval(variables);</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>  Rcpp::Rcout &lt;&lt; result &lt;&lt; <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>;</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&quot;fparser.hh&quot;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="dt">void</span> helloWorld() {</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>  FunctionParser fp;</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>  fp.Parse(<span class="st">&quot;sqrt(x*x + y*y)&quot;</span>, <span class="st">&quot;x,y&quot;</span>);</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>  <span class="dt">double</span> variables[<span class="dv">2</span>] = { <span class="fl">3.0</span>, <span class="fl">4.0</span> };</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>  <span class="dt">double</span> result = fp.Eval(variables);</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>  Rcpp::Rcout &lt;&lt; result &lt;&lt; <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>;</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>}</span></code></pre></div>
 <p>Build the package and run <code>helloWorld()</code> in R. Then <code>5</code> will be printed in the console. Of course this example has no interest. Here is a more interesting one:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="co">// [[Rcpp::export]]</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="dt">double</span> funeval(</span>
