@@ -140,10 +140,10 @@
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>  <span class="dt">xlab =</span> <span class="ot">NA</span>, <span class="dt">ylab =</span> <span class="ot">NA</span>, <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">xaxs =</span> <span class="st">&quot;i&quot;</span>, <span class="dt">yaxs =</span> <span class="st">&quot;i&quot;</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>)</span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a><span class="kw">rasterImage</span>(img, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>)</span></code></pre></div>
-<p><img src="figures/plasmaFourier_fig1-1.png" style="display: block; margin: auto;" /></p>
+<p><img src="figures/plasmaFourier_fig1-1.png" width="50%" style="display: block; margin: auto;" /></p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">par</span>(opar)</span></code></pre></div>
 <p>And more images:</p>
-<p><img src="figures/plasmaFourier_fourfigs-1.png" style="display: block; margin: auto;" /></p>
+<p><img src="figures/plasmaFourier_fourfigs-1.png" width="50%" style="display: block; margin: auto;" /></p>
 <p>You can play with the parameters to obtain something different.</p>
 <p>Below I take the first image and I alter the colors by exchanging the green part with the blue part and then by darkening:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">library</span>(colorspace) <span class="co"># for the darken() function</span></span>
@@ -157,7 +157,7 @@
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a></span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a>img      &lt;-<span class="st"> </span><span class="kw">alterColor</span>(img)</span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a><span class="kw">dim</span>(img) &lt;-<span class="st"> </span><span class="kw">c</span>(400L, 400L)</span></code></pre></div>
-<p><img src="figures/plasmaFourier_camouflage-1.png" style="display: block; margin: auto;" /></p>
+<p><img src="figures/plasmaFourier_camouflage-1.png" width="50%" style="display: block; margin: auto;" /></p>
 <p>Looks like a camouflage.</p>
 <p>Note that the images are doubly periodic, so you can map them to a torus.</p>
 <p>Now let’s do an animation. The <code>fplasma2</code> function below does the same thing as <code>fplasma1</code> after adding a number to the matrix <span class="math inline">\(M\)</span>, which will range from <span class="math inline">\(-1\)</span> to <span class="math inline">\(1\)</span>.</p>
