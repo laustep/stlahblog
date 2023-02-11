@@ -5,7 +5,68 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Fri, 10 Feb 2023 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Sat, 11 Feb 2023 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>The plasma effect: correction</title>
+      <link>https://laustep.github.io/stlahblog/posts/plasmaFourier2.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        There’s a kind of error in
+        <a href="https://laustep.github.io/stlahblog/posts/plasmaFourier.html"
+          >the previous post</a
+        >. In this formula:
+        <span class="math display"
+          >\[ \exp\Bigl(-\frac{{(i/n-0.5)}^2 + {(j/n-0.5)}^2}{0.025^2} \Bigr),
+          \]</span
+        >
+        the indices <span class="math inline">\(i\)</span> and
+        <span class="math inline">\(j\)</span> should range from
+        <span class="math inline">\(0\)</span> to
+        <span class="math inline">\(n\)</span>, and
+        <span class="math inline">\(n\)</span> must be even in order to get
+        something centered. See the corrected code for details:
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1">fplasma4 &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">n =</span> 400L, <span class="dt">gaussianMean =</span> <span class="dv">-50</span>, <span class="dt">gaussianSD =</span> <span class="dv">5</span>) {</span>
+<span id="cb1-2">  n &lt;-<span class="st"> </span>n <span class="op">+</span><span class="st"> </span>1L</span>
+<span id="cb1-3">  M &lt;-<span class="st"> </span><span class="kw">matrix</span>(</span>
+<span id="cb1-4">    <span class="kw">rnorm</span>(n<span class="op">*</span>n, gaussianMean, gaussianSD), </span>
+<span id="cb1-5">    <span class="dt">nrow =</span> n, <span class="dt">ncol =</span> n</span>
+<span id="cb1-6">  )</span>
+<span id="cb1-7">  FT &lt;-<span class="st"> </span><span class="kw">dft</span>(M)</span>
+<span id="cb1-8">  n &lt;-<span class="st"> </span>n <span class="op">-</span><span class="st"> </span>1L</span>
+<span id="cb1-9">  <span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq</span>(n<span class="op">+</span>1L)) {</span>
+<span id="cb1-10">    <span class="cf">for</span>(j <span class="cf">in</span> <span class="kw">seq</span>(n<span class="op">+</span>1L)) {</span>
+<span id="cb1-11">      FT[i, j] &lt;-<span class="st"> </span>FT[i, j] <span class="op">*</span><span class="st"> </span></span>
+<span id="cb1-12"><span class="st">        </span><span class="kw">exp</span>(<span class="op">-</span>(((i<span class="op">-</span>1L)<span class="op">/</span>n <span class="op">-</span><span class="st"> </span><span class="fl">0.5</span>)<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>((j<span class="op">-</span>1L)<span class="op">/</span>n <span class="op">-</span><span class="st"> </span><span class="fl">0.5</span>)<span class="op">^</span><span class="dv">2</span>) <span class="op">/</span><span class="st"> </span><span class="fl">0.025</span><span class="op">^</span><span class="dv">2</span>)</span>
+<span id="cb1-13">    }</span>
+<span id="cb1-14">  }</span>
+<span id="cb1-15">  IFT &lt;-<span class="st"> </span><span class="kw">dft</span>(FT, <span class="dt">inverse =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb1-16">  <span class="kw">colorMap1</span>(IFT, <span class="dt">reverse =</span> <span class="kw">c</span>(<span class="ot">FALSE</span>, <span class="ot">FALSE</span>, <span class="ot">TRUE</span>))</span>
+<span id="cb1-17">}</span></code></pre>
+      </div>
+      <p>
+        The funny point is that the result is more interesting with the “error”.
+        But it is not bad without it:
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/plasmaFourier_fixed.gif"
+        />
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Sat, 11 Feb 2023 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/plasmaFourier2.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>A (kind of) plasma effect in R</title>
       <link>https://laustep.github.io/stlahblog/posts/plasmaFourier.html</link>
@@ -86,6 +147,7 @@
       <p>
         <img
           src="https://laustep.github.io/stlahblog/posts/figures/plasmaFourier_fig1-1.png"
+          width="50%"
           style="display: block; margin: auto"
         />
       </p>
@@ -98,6 +160,7 @@
       <p>
         <img
           src="https://laustep.github.io/stlahblog/posts/figures/plasmaFourier_fourfigs-1.png"
+          width="50%"
           style="display: block; margin: auto"
         />
       </p>
@@ -124,6 +187,7 @@
       <p>
         <img
           src="https://laustep.github.io/stlahblog/posts/figures/plasmaFourier_camouflage-1.png"
+          width="50%"
           style="display: block; margin: auto"
         />
       </p>
@@ -13148,310 +13212,6 @@ Options:
 ]]></description>
       <pubDate>Wed, 19 Feb 2020 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/ModularTessellationOrbit.html</guid>
-      <dc:creator>Stéphane Laurent</dc:creator>
-      <category>R</category>
-    </item>
-    <item>
-      <title>Tooltips for the headers of a datatable in Shiny</title>
-      <link>https://laustep.github.io/stlahblog/posts/DTqTips.html</link>
-      <description><![CDATA[<div class="container-fluid">
-  <div class="main col-sm-12">
-    <div class="content">
-      <p>
-        In this post, I show how to use the
-        <a href="http://qtip2.com/">qTip2</a> JavaScript library to create some
-        tooltips on the headers of a <code>DT</code> datatable in Shiny,
-        displaying some information about the columns, such as summary
-        statistics.
-      </p>
-      <p>
-        Firstly, we write a function returning some JavaScript code that creates
-        some hidden <code>div</code> elements which will contain the contents of
-        the tooltips. This function takes two arguments: <code>n</code>, the
-        number of <code>div</code> elements to create (this will be the number
-        of columns of the table), and <code>prefixID</code>; the i-th
-        <code>div</code> will have the identifier <code>{prefixID}-{i}</code>.
-        We also set a class to each <code>div</code>, namely
-        <code>qtip-big</code>.
-      </p>
-      <div class="sourceCode" id="cb1">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb1-1">createDiv &lt;-<span class="st"> </span><span class="cf">function</span>(n, prefixID){</span>
-<span id="cb1-2">  <span class="kw">sprintf</span>(<span class="kw">paste</span>(</span>
-<span id="cb1-3">    <span class="st">"for(var i = 1; i &lt;= %d; i++){"</span>,</span>
-<span id="cb1-4">    <span class="st">"  var div;"</span>,</span>
-<span id="cb1-5">    <span class="kw">sprintf</span>(<span class="st">"  var id = '%s-' + i.toString();"</span>, prefixID),</span>
-<span id="cb1-6">    <span class="st">"  if(document.getElementById(id) === null){"</span>,</span>
-<span id="cb1-7">    <span class="st">"    div = document.createElement('div');"</span>,</span>
-<span id="cb1-8">    <span class="st">"    div.setAttribute('id', id);"</span>,</span>
-<span id="cb1-9">    <span class="st">"    div.setAttribute('class', 'qtip-big');"</span>,</span>
-<span id="cb1-10">    <span class="st">"    div.style.display = 'none';"</span>,</span>
-<span id="cb1-11">    <span class="st">"    document.body.appendChild(div);"</span>,</span>
-<span id="cb1-12">    <span class="st">"  }"</span>,</span>
-<span id="cb1-13">    <span class="st">"}"</span>,</span>
-<span id="cb1-14">    <span class="dt">sep =</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span></span>
-<span id="cb1-15">  ), n)</span>
-<span id="cb1-16">}</span></code></pre>
-      </div>
-      <div class="sourceCode" id="cb2">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb2-1"><span class="kw">cat</span>(<span class="kw">createDiv</span>(<span class="dv">3</span>, <span class="st">"TOOLTIP"</span>))</span>
-<span id="cb2-2"><span class="co">## for(var i = 1; i &lt;= 3; i++){</span></span>
-<span id="cb2-3"><span class="co">##   var div;</span></span>
-<span id="cb2-4"><span class="co">##   var id = 'TOOLTIP-' + i.toString();</span></span>
-<span id="cb2-5"><span class="co">##   if(document.getElementById(id) === null){</span></span>
-<span id="cb2-6"><span class="co">##     div = document.createElement('div');</span></span>
-<span id="cb2-7"><span class="co">##     div.setAttribute('id', id);</span></span>
-<span id="cb2-8"><span class="co">##     div.setAttribute('class', 'qtip-big');</span></span>
-<span id="cb2-9"><span class="co">##     div.style.display = 'none';</span></span>
-<span id="cb2-10"><span class="co">##     document.body.appendChild(div);</span></span>
-<span id="cb2-11"><span class="co">##   }</span></span>
-<span id="cb2-12"><span class="co">## }</span></span></code></pre>
-      </div>
-      <p>
-        Now we write a function returning some JavaScript code that writes the
-        contents of the <code>div</code> elements. It takes as arguments
-        <code>dat</code>, the dataframe for the table, <code>i</code>, the index
-        of a column of <code>dat</code>, and <code>prefixID</code> as in the
-        function <code>createDiv</code>. If the <code>i</code>-th column is
-        numeric, we fill the <code>div</code> element with some summary
-        statistics of this column, otherwise the information we provide in the
-        <code>div</code> element is the number of levels of the contents of the
-        column, an enumeration of the levels (at most three), and the number of
-        missing values.
-      </p>
-      <div class="sourceCode" id="cb3">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb3-1">fillDiv &lt;-<span class="st"> </span><span class="cf">function</span>(dat, i, prefixID){</span>
-<span id="cb3-2">  x &lt;-<span class="st"> </span>dat[[i]]</span>
-<span id="cb3-3">  <span class="cf">if</span>(<span class="kw">is.numeric</span>(x)){</span>
-<span id="cb3-4">    <span class="kw">sprintf</span>(<span class="kw">paste</span>(</span>
-<span id="cb3-5">      <span class="st">"var div = document.getElementById('%s-%d');"</span>,</span>
-<span id="cb3-6">      <span class="st">"var html = '&lt;b&gt; Min: &lt;/b&gt; %s&lt;/br&gt;';"</span>,</span>
-<span id="cb3-7">      <span class="st">"html = html + '&lt;b&gt; Max: &lt;/b&gt; %s&lt;/br&gt;';"</span>,</span>
-<span id="cb3-8">      <span class="st">"html = html + '&lt;b&gt; Mean: &lt;/b&gt; %s&lt;/br&gt;';"</span>,</span>
-<span id="cb3-9">      <span class="st">"html = html + '&lt;b&gt; Std. dev.: &lt;/b&gt; %s&lt;/br&gt;';"</span>,</span>
-<span id="cb3-10">      <span class="st">"html = html + '&lt;b&gt; Missing values: &lt;/b&gt; %d';"</span>,</span>
-<span id="cb3-11">      <span class="st">"div.innerHTML = html;"</span>,</span>
-<span id="cb3-12">      <span class="dt">sep =</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span></span>
-<span id="cb3-13">    ), </span>
-<span id="cb3-14">    prefixID,</span>
-<span id="cb3-15">    i, </span>
-<span id="cb3-16">    <span class="kw">formatC</span>(<span class="kw">min</span>(x, <span class="dt">na.rm=</span><span class="ot">TRUE</span>)),</span>
-<span id="cb3-17">    <span class="kw">formatC</span>(<span class="kw">max</span>(x, <span class="dt">na.rm=</span><span class="ot">TRUE</span>)),</span>
-<span id="cb3-18">    <span class="kw">formatC</span>(<span class="kw">mean</span>(x, <span class="dt">na.rm=</span><span class="ot">TRUE</span>)),</span>
-<span id="cb3-19">    <span class="kw">formatC</span>(<span class="kw">sd</span>(x, <span class="dt">na.rm=</span><span class="ot">TRUE</span>)),</span>
-<span id="cb3-20">    <span class="kw">sum</span>(<span class="kw">is.na</span>(x)))</span>
-<span id="cb3-21">  }<span class="cf">else</span>{</span>
-<span id="cb3-22">    <span class="cf">if</span>(<span class="kw">is.factor</span>(x)) x &lt;-<span class="st"> </span><span class="kw">as.character</span>(x)</span>
-<span id="cb3-23">    levels0 &lt;-<span class="st"> </span><span class="kw">sort</span>(<span class="kw">unique</span>(<span class="kw">na.omit</span>(x)))</span>
-<span id="cb3-24">    nlevels &lt;-<span class="st"> </span><span class="kw">length</span>(levels0)</span>
-<span id="cb3-25">    levels &lt;-<span class="st"> </span></span>
-<span id="cb3-26"><span class="st">      </span><span class="cf">if</span>(nlevels<span class="op">&gt;</span><span class="dv">3</span>) <span class="kw">c</span>(levels0[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>], levels0[nlevels]) <span class="cf">else</span> levels0</span>
-<span id="cb3-27">    ncharMax &lt;-<span class="st"> </span><span class="dv">25</span></span>
-<span id="cb3-28">    nchars &lt;-<span class="st"> </span><span class="kw">nchar</span>(levels)</span>
-<span id="cb3-29">    <span class="cf">if</span>(<span class="dv">7</span><span class="op">+</span><span class="kw">sum</span>(nchars) <span class="op">&gt;</span><span class="st"> </span>ncharMax){</span>
-<span id="cb3-30">      levels[<span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">"&lt;br/&gt;"</span>, levels[<span class="dv">1</span>])</span>
-<span id="cb3-31">      <span class="cf">if</span>(nlevels <span class="op">&gt;=</span><span class="st"> </span><span class="dv">2</span> <span class="op">&amp;&amp;</span><span class="st"> </span><span class="kw">sum</span>(nchars) <span class="op">&gt;</span><span class="st"> </span>ncharMax){</span>
-<span id="cb3-32">        levels[<span class="dv">2</span>] &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">"&lt;br/&gt;"</span>, levels[<span class="dv">2</span>])</span>
-<span id="cb3-33">        <span class="cf">if</span>(nlevels <span class="op">&gt;=</span><span class="st"> </span><span class="dv">3</span> <span class="op">&amp;&amp;</span><span class="st"> </span><span class="kw">sum</span>(nchars[<span class="dv">2</span><span class="op">:</span><span class="dv">3</span>]) <span class="op">&gt;</span><span class="st"> </span>ncharMax){</span>
-<span id="cb3-34">          levels[<span class="dv">3</span>] &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">"&lt;br/&gt;"</span>, levels[<span class="dv">3</span>])</span>
-<span id="cb3-35">        }</span>
-<span id="cb3-36">      }</span>
-<span id="cb3-37">    }</span>
-<span id="cb3-38">    levelsSummary &lt;-<span class="st"> </span><span class="kw">ifelse</span>(nlevels <span class="op">&gt;</span><span class="st"> </span><span class="dv">3</span>,</span>
-<span id="cb3-39">                            <span class="kw">paste0</span>(<span class="kw">c</span>(levels[<span class="dv">1</span>],</span>
-<span id="cb3-40">                                     <span class="kw">paste0</span>(levels[<span class="dv">2</span>], <span class="st">", ..."</span>),</span>
-<span id="cb3-41">                                     levels[<span class="dv">3</span>]),</span>
-<span id="cb3-42">                                   <span class="dt">collapse =</span> <span class="st">", "</span>),</span>
-<span id="cb3-43">                            <span class="kw">paste0</span>(levels, <span class="dt">collapse =</span> <span class="st">", "</span>))</span>
-<span id="cb3-44">    <span class="kw">sprintf</span>(<span class="kw">paste</span>(</span>
-<span id="cb3-45">      <span class="st">"var div = document.getElementById('%s-%d');"</span>,</span>
-<span id="cb3-46">      <span class="st">"var html = '&lt;b&gt; Number of levels: &lt;/b&gt; %d&lt;/br&gt;';"</span>,</span>
-<span id="cb3-47">      <span class="kw">sprintf</span>(<span class="st">"html = html + '&lt;b&gt; Level%s: &lt;/b&gt; %%s&lt;/br&gt;'"</span>, </span>
-<span id="cb3-48">              <span class="kw">ifelse</span>(nlevels<span class="op">==</span><span class="dv">1</span>, <span class="st">""</span>, <span class="st">"s"</span>)),</span>
-<span id="cb3-49">      <span class="st">"html = html + '&lt;b&gt; Missing values: &lt;/b&gt; %d'"</span>,</span>
-<span id="cb3-50">      <span class="st">"div.innerHTML = html;"</span>,</span>
-<span id="cb3-51">      <span class="dt">sep =</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span></span>
-<span id="cb3-52">    ),</span>
-<span id="cb3-53">    prefixID,</span>
-<span id="cb3-54">    i, </span>
-<span id="cb3-55">    nlevels,</span>
-<span id="cb3-56">    levelsSummary,</span>
-<span id="cb3-57">    <span class="kw">sum</span>(<span class="kw">is.na</span>(x)))</span>
-<span id="cb3-58">  }</span>
-<span id="cb3-59">}</span></code></pre>
-      </div>
-      <div class="sourceCode" id="cb4">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb4-1"><span class="kw">cat</span>(<span class="kw">fillDiv</span>(iris, <span class="dv">1</span>, <span class="st">"TOOLTIP"</span>))</span>
-<span id="cb4-2"><span class="co">## var div = document.getElementById('TOOLTIP-1');</span></span>
-<span id="cb4-3"><span class="co">## var html = '&lt;b&gt; Min: &lt;/b&gt; 4.3&lt;/br&gt;';</span></span>
-<span id="cb4-4"><span class="co">## html = html + '&lt;b&gt; Max: &lt;/b&gt; 7.9&lt;/br&gt;';</span></span>
-<span id="cb4-5"><span class="co">## html = html + '&lt;b&gt; Mean: &lt;/b&gt; 5.843&lt;/br&gt;';</span></span>
-<span id="cb4-6"><span class="co">## html = html + '&lt;b&gt; Std. dev.: &lt;/b&gt; 0.8281&lt;/br&gt;';</span></span>
-<span id="cb4-7"><span class="co">## html = html + '&lt;b&gt; Missing values: &lt;/b&gt; 0';</span></span>
-<span id="cb4-8"><span class="co">## div.innerHTML = html;</span></span>
-<span id="cb4-9"><span class="kw">cat</span>(<span class="kw">fillDiv</span>(iris, <span class="dv">5</span>, <span class="st">"TOOLTIP"</span>))</span>
-<span id="cb4-10"><span class="co">## var div = document.getElementById('TOOLTIP-5');</span></span>
-<span id="cb4-11"><span class="co">## var html = '&lt;b&gt; Number of levels: &lt;/b&gt; 3&lt;/br&gt;';</span></span>
-<span id="cb4-12"><span class="co">## html = html + '&lt;b&gt; Levels: &lt;/b&gt; &lt;br/&gt;setosa, versicolor, virginica&lt;/br&gt;'</span></span>
-<span id="cb4-13"><span class="co">## html = html + '&lt;b&gt; Missing values: &lt;/b&gt; 0'</span></span>
-<span id="cb4-14"><span class="co">## div.innerHTML = html;</span></span></code></pre>
-      </div>
-      <p>
-        Finally we write a function returning the JavaScript code of the
-        <code>qTip</code> tooltips. Its arguments are <code>n</code>, the number
-        of columns of the table, and <code>prefixID</code> as before.
-      </p>
-      <div class="sourceCode" id="cb5">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb5-1">tooltips &lt;-<span class="st"> </span><span class="cf">function</span>(n, prefixID){</span>
-<span id="cb5-2">  settings &lt;-<span class="st"> </span><span class="kw">sprintf</span>(<span class="kw">paste</span>(</span>
-<span id="cb5-3">    <span class="st">"{"</span>,</span>
-<span id="cb5-4">    <span class="st">"  overwrite: true,"</span>,</span>
-<span id="cb5-5">    <span class="st">"  content: {"</span>,</span>
-<span id="cb5-6">    <span class="kw">sprintf</span>(<span class="st">"    text: $('#%s-%%s').clone()"</span>, prefixID),</span>
-<span id="cb5-7">    <span class="st">"  },"</span>,</span>
-<span id="cb5-8">    <span class="st">"  show: {"</span>,</span>
-<span id="cb5-9">    <span class="st">"    ready: false"</span>,</span>
-<span id="cb5-10">    <span class="st">"  },"</span>,</span>
-<span id="cb5-11">    <span class="st">"  position: {"</span>,</span>
-<span id="cb5-12">    <span class="st">"    my: 'bottom %%s',"</span>,</span>
-<span id="cb5-13">    <span class="st">"    at: 'top center'"</span>,</span>
-<span id="cb5-14">    <span class="st">"  },"</span>,</span>
-<span id="cb5-15">    <span class="st">"  style: {"</span>,</span>
-<span id="cb5-16">    <span class="st">"    classes: 'qtip-youtube'"</span>,</span>
-<span id="cb5-17">    <span class="st">"  }"</span>,</span>
-<span id="cb5-18">    <span class="st">"}"</span>,</span>
-<span id="cb5-19">    <span class="dt">sep =</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span></span>
-<span id="cb5-20">  ), <span class="dv">1</span><span class="op">:</span>n)</span>
-<span id="cb5-21">  settings &lt;-<span class="st"> </span><span class="kw">sprintf</span>(settings, <span class="kw">ifelse</span>(<span class="dv">1</span><span class="op">:</span>n <span class="op">&gt;</span><span class="st"> </span>n<span class="op">/</span><span class="dv">2</span>, <span class="st">"right"</span>, <span class="st">"left"</span>))</span>
-<span id="cb5-22">  <span class="kw">sprintf</span>(<span class="st">"var tooltips = [%s];"</span>, <span class="kw">paste0</span>(settings, <span class="dt">collapse=</span><span class="st">","</span>))</span>
-<span id="cb5-23">}</span></code></pre>
-      </div>
-      <div class="sourceCode" id="cb6">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb6-1"><span class="kw">cat</span>(<span class="kw">tooltips</span>(<span class="dv">2</span>, <span class="st">"TOOLTIP"</span>))</span>
-<span id="cb6-2"><span class="co">## var tooltips = [{</span></span>
-<span id="cb6-3"><span class="co">##   overwrite: true,</span></span>
-<span id="cb6-4"><span class="co">##   content: {</span></span>
-<span id="cb6-5"><span class="co">##     text: $('#TOOLTIP-1').clone()</span></span>
-<span id="cb6-6"><span class="co">##   },</span></span>
-<span id="cb6-7"><span class="co">##   show: {</span></span>
-<span id="cb6-8"><span class="co">##     ready: false</span></span>
-<span id="cb6-9"><span class="co">##   },</span></span>
-<span id="cb6-10"><span class="co">##   position: {</span></span>
-<span id="cb6-11"><span class="co">##     my: 'bottom left',</span></span>
-<span id="cb6-12"><span class="co">##     at: 'top center'</span></span>
-<span id="cb6-13"><span class="co">##   },</span></span>
-<span id="cb6-14"><span class="co">##   style: {</span></span>
-<span id="cb6-15"><span class="co">##     classes: 'qtip-youtube'</span></span>
-<span id="cb6-16"><span class="co">##   }</span></span>
-<span id="cb6-17"><span class="co">## },{</span></span>
-<span id="cb6-18"><span class="co">##   overwrite: true,</span></span>
-<span id="cb6-19"><span class="co">##   content: {</span></span>
-<span id="cb6-20"><span class="co">##     text: $('#TOOLTIP-2').clone()</span></span>
-<span id="cb6-21"><span class="co">##   },</span></span>
-<span id="cb6-22"><span class="co">##   show: {</span></span>
-<span id="cb6-23"><span class="co">##     ready: false</span></span>
-<span id="cb6-24"><span class="co">##   },</span></span>
-<span id="cb6-25"><span class="co">##   position: {</span></span>
-<span id="cb6-26"><span class="co">##     my: 'bottom right',</span></span>
-<span id="cb6-27"><span class="co">##     at: 'top center'</span></span>
-<span id="cb6-28"><span class="co">##   },</span></span>
-<span id="cb6-29"><span class="co">##   style: {</span></span>
-<span id="cb6-30"><span class="co">##     classes: 'qtip-youtube'</span></span>
-<span id="cb6-31"><span class="co">##   }</span></span>
-<span id="cb6-32"><span class="co">## }];</span></span></code></pre>
-      </div>
-      <p>
-        Now we are ready to write the Shiny app. Put the files
-        <strong>jquery.qtip.min.css</strong> and
-        <strong>jquery.qtip.min.js</strong> in the
-        <strong>www</strong> subfolder. We use the <code>shinyjs</code> package
-        to run the JavaScript code with the function <code>runjs</code>.
-      </p>
-      <div class="sourceCode" id="cb7">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb7-1"><span class="kw">library</span>(shiny)</span>
-<span id="cb7-2"><span class="kw">library</span>(shinyjs)</span>
-<span id="cb7-3"><span class="kw">library</span>(DT)</span>
-<span id="cb7-4"></span>
-<span id="cb7-5">CSS &lt;-<span class="st"> "</span></span>
-<span id="cb7-6"><span class="st">.qtip-big { </span></span>
-<span id="cb7-7"><span class="st">  font-size: 15px;</span></span>
-<span id="cb7-8"><span class="st">  line-height: 18px;</span></span>
-<span id="cb7-9"><span class="st">  white-space: nowrap;</span></span>
-<span id="cb7-10"><span class="st">  word-spacing: 1px;</span></span>
-<span id="cb7-11"><span class="st">}</span></span>
-<span id="cb7-12"><span class="st">"</span></span>
-<span id="cb7-13"></span>
-<span id="cb7-14">ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb7-15">  tags<span class="op">$</span><span class="kw">head</span>(</span>
-<span id="cb7-16">    tags<span class="op">$</span><span class="kw">link</span>(<span class="dt">rel =</span> <span class="st">"stylesheet"</span>, <span class="dt">href =</span> <span class="st">"jquery.qtip.min.css"</span>),</span>
-<span id="cb7-17">    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">"jquery.qtip.min.js"</span>),</span>
-<span id="cb7-18">    tags<span class="op">$</span><span class="kw">style</span>(CSS)</span>
-<span id="cb7-19">  ),</span>
-<span id="cb7-20">  <span class="kw">useShinyjs</span>(),</span>
-<span id="cb7-21">  <span class="kw">br</span>(), <span class="kw">br</span>(), <span class="kw">br</span>(), <span class="kw">br</span>(), <span class="kw">br</span>(), </span>
-<span id="cb7-22">  <span class="kw">DTOutput</span>(<span class="st">"dtable"</span>)</span>
-<span id="cb7-23">)</span>
-<span id="cb7-24"></span>
-<span id="cb7-25">server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb7-26">  </span>
-<span id="cb7-27">  output[[<span class="st">"dtable"</span>]] &lt;-<span class="st"> </span><span class="kw">renderDT</span>({</span>
-<span id="cb7-28">    </span>
-<span id="cb7-29">    dat &lt;-<span class="st"> </span>iris</span>
-<span id="cb7-30">    </span>
-<span id="cb7-31">    <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(dat)){</span>
-<span id="cb7-32">      <span class="kw">runjs</span>(<span class="kw">createDiv</span>(i, <span class="st">"TOOLTIP"</span>))</span>
-<span id="cb7-33">      <span class="kw">runjs</span>(<span class="kw">fillDiv</span>(dat, i, <span class="st">"TOOLTIP"</span>))</span>
-<span id="cb7-34">    }</span>
-<span id="cb7-35">    </span>
-<span id="cb7-36">    headerCallback &lt;-<span class="st"> </span><span class="kw">c</span>(</span>
-<span id="cb7-37">      <span class="st">"function(thead, data, start, end, display){"</span>,</span>
-<span id="cb7-38">      <span class="st">"  var ncols = data[0].length;"</span>,</span>
-<span id="cb7-39">      <span class="kw">tooltips</span>(<span class="kw">ncol</span>(dat), <span class="st">"TOOLTIP"</span>),</span>
-<span id="cb7-40">      <span class="st">"  for(var i = 1; i &lt; ncols; i++){"</span>,</span>
-<span id="cb7-41">      <span class="st">"    $('th:eq(' + i + ')', thead).qtip(tooltips[i-1]);"</span>, </span>
-<span id="cb7-42">      <span class="st">"  }"</span>,</span>
-<span id="cb7-43">      <span class="st">"}"</span></span>
-<span id="cb7-44">    )</span>
-<span id="cb7-45">    </span>
-<span id="cb7-46">    <span class="kw">datatable</span>(</span>
-<span id="cb7-47">      dat, </span>
-<span id="cb7-48">      <span class="dt">options =</span> <span class="kw">list</span>(</span>
-<span id="cb7-49">        <span class="dt">headerCallback =</span> <span class="kw">JS</span>(headerCallback),</span>
-<span id="cb7-50">        <span class="dt">columnDefs =</span> <span class="kw">list</span>(</span>
-<span id="cb7-51">          <span class="kw">list</span>(<span class="dt">className =</span> <span class="st">"dt-center"</span>, <span class="dt">targets =</span> <span class="st">"_all"</span>)</span>
-<span id="cb7-52">        )</span>
-<span id="cb7-53">      )</span>
-<span id="cb7-54">    )</span>
-<span id="cb7-55">  })</span>
-<span id="cb7-56">  </span>
-<span id="cb7-57">}</span>
-<span id="cb7-58"></span>
-<span id="cb7-59"><span class="kw">shinyApp</span>(ui, server)</span></code></pre>
-      </div>
-      <p>
-        <img
-          src="https://laustep.github.io/stlahblog/posts/figures/DTqTip.gif"
-        />
-      </p>
-    </div>
-  </div>
-</div>
-]]></description>
-      <pubDate>Sun, 16 Feb 2020 00:00:00 UT</pubDate>
-      <guid>https://laustep.github.io/stlahblog/posts/DTqTips.html</guid>
       <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
