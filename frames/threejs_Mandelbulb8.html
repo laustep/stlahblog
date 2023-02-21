@@ -1,0 +1,230 @@
+<html>
+
+<head>
+  <title>Mandelbulb</title>
+  <style>
+    html, body {
+       margin: 0;
+       height: 100%;
+       width: 100%;
+    }
+    #c {
+       width: 100%;
+       box-sizing: border-box;
+       display: block;
+    }
+  </style>
+
+  <script src="../libraries/jquery.min.js"></script>
+  <script src="../libraries/three.min.js"></script>
+  <script src="../js/marchingCubes.js"></script>
+  <script src="../libraries/dat.gui.min.js"></script>
+  <script src="../libraries/scale-color-perceptual/bundle.js"></script>
+  <script>
+    var scale = require('scale-color-perceptual');
+  </script>
+
+</head>
+
+<body>
+
+  <canvas id="c"></canvas>
+
+  <script>
+    // dat.gui controls --------------------------------------------------------
+    var z0 = 2.5;
+    var dgcontrols = new function () {
+      this.cameraz = z0;
+      this.rotationSpeed = 0.001;
+    }
+    var gui = new dat.GUI({
+      autoplace: false,
+      width: 300
+    });
+    gui.add(dgcontrols, 'cameraz').min(1).max(10).step(0.25)
+      .name("Camera position");
+    gui.add(dgcontrols, 'rotationSpeed').min(0).max(0.005).step(0.0005)
+      .name("Rotation speed");
+  </script>
+
+  <script>
+    var nv = 300;
+  </script>
+
+  <script>
+    // marching cubes ------------------------------------------------------
+    var f = function (x0, y0, z0) {
+      var x = x0; var y = y0; var z = z0;
+      var dr = 1;
+      var r2, r, r7, r8;
+      var theta, phi;
+      for(var i = 0; i < 10; i++){
+        r2 = x*x + y*y + z*z;
+        r = Math.sqrt(r2);
+        if(r > 2){
+          break;
+        } 
+        r7 = r * r2 * r2 * r2;
+        dr = 8 * r7 * dr + 1;
+        theta = 8 * Math.atan2(Math.sqrt(x * x + y * y), z);
+        phi = 8 * Math.atan2(y, x);
+        r8 = r * r7;
+        x = r8 * Math.cos(phi) * Math.sin(theta) + x0;
+        y = r8 * Math.sin(phi) * Math.sin(theta) + y0;
+        z = r8 * Math.cos(theta) + z0;
+      }
+      return r * Math.log(r2) / dr;
+    }
+    var tris = marchingCubes(f, 0.01,
+      -1.2, 1.2,
+      -1.2, 1.2,
+      -1.2, 1.2,
+      nv, nv, nv);
+
+    // vertex norms for the colors
+    var norms2 = new Array(tris.length);
+    for(var i = 0; i < tris.length; i++){
+      norms2[i] = tris[i][0]*tris[i][0] + tris[i][1] * tris[i][1] + 
+        tris[i][2] * tris[i][2];
+    }
+    function getMinMax(arr) {
+      let min = arr[0];
+      let max = arr[0];
+      let i = arr.length;
+      while (i--) {
+        min = arr[i] < min ? arr[i] : min;
+        max = arr[i] > max ? arr[i] : max;
+      }
+      return { min, max };
+    }
+    var MinMax = getMinMax(norms2);
+    var minNorm = Math.sqrt(MinMax.min);
+    var maxNorm = Math.sqrt(MinMax.max);
+    var rangeNorm = maxNorm - minNorm;
+
+    // mesh ----------------------------------------------------------------
+    var geom = new THREE.BufferGeometry();
+    var positions = new Float32Array(tris.length * 3);
+    var colors = new Float32Array(tris.length * 3);
+    for (var i = 0; i < tris.length; i++) {
+      positions[3 * i] = tris[i][0];
+      positions[3 * i + 1] = tris[i][2];
+      positions[3 * i + 2] = tris[i][1];
+      var color = new THREE.Color(scale.inferno(
+        (Math.sqrt(norms2[i]) - minNorm) / rangeNorm));
+      colors[3 * i] = color.r;
+      colors[3 * i + 1] = color.g;
+      colors[3 * i + 2] = color.b;
+    }
+    geom.addAttribute("position", new THREE.BufferAttribute(positions, 3));
+    geom.addAttribute("color", new THREE.BufferAttribute(colors, 3));
+    geom.computeVertexNormals();
+
+    var Bulb = new THREE.Mesh(geom, 
+      new THREE.MeshPhongMaterial(
+        {
+          vertexColors: THREE.VertexColors,
+          specular: new THREE.Color(0xba3655),
+          shininess: 128
+        }
+      )); 
+  </script>
+
+  <script>
+    var container = document.getElementById("c");
+    $(container).css("height", window.innerHeight);
+    var width = $(container).width();
+    var height = $(container).height(); 
+    var aspect = width / height;
+    var camera = new THREE.PerspectiveCamera(70, aspect, 1, 10000);
+    camera.position.z = z0;
+
+    var renderer = new THREE.WebGLRenderer({canvas: container});
+    renderer.setSize(width, height);
+
+    $(window).on("resize", function(){
+      $(container).css("width", window.innerWidth);
+      $(container).css("height", window.innerHeight); 
+      camera.aspect = 
+        renderer.domElement.clientWidth / renderer.domElement.clientHeight;
+      camera.updateProjectionMatrix();
+    })
+
+    var scene = new THREE.Scene();
+    var ambientLight = new THREE.AmbientLight(0x000000, 1);
+    scene.add(ambientLight);
+    var pointLight = new THREE.PointLight(0xffffff, 0.8);
+    camera.add(pointLight);
+    scene.add(camera);
+    scene.add(Bulb);
+
+    // This will add a starfield to the background
+    var starsGeometry = new THREE.Geometry();
+    for ( var i = 0; i < 10000; i ++ ) {
+    	var star = new THREE.Vector3();
+    	star.x = THREE.Math.randFloatSpread( 2000 );
+    	star.y = THREE.Math.randFloatSpread( 2000 );
+    	star.z = THREE.Math.randFloatSpread( 2000 );
+    	starsGeometry.vertices.push( star );
+    }
+    var starsMaterial = new THREE.PointsMaterial( { color: 0x888888 } );
+    var starField = new THREE.Points( starsGeometry, starsMaterial );
+    scene.add( starField );
+
+    window.requestAnimFrame = (function () {
+      return window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        function (callback) {
+          window.setTimeout(callback, 1000 / 60);
+        };
+    })();
+
+    function render() {
+      renderer.render(scene, camera);
+      camera.position.z = dgcontrols.cameraz;
+      Bulb.rotation.x += dgcontrols.rotationSpeed;
+      Bulb.rotation.y += dgcontrols.rotationSpeed;
+      requestAnimFrame(render);
+    }
+
+  </script>
+
+  <script> // mouse dragging ---------------------------------------------------
+    var isDragging = false;
+    var previousMousePosition = { x: 0, y: 0 };
+    $(renderer.domElement).on('mousedown', function (e) {
+      isDragging = true;
+    }).on('mousemove', function (e) {
+      var deltaMove = {
+        x: e.offsetX - previousMousePosition.x,
+        y: e.offsetY - previousMousePosition.y
+      };
+      if (isDragging) {
+        var deltaRotationQuaternion = new THREE.Quaternion()
+          .setFromEuler(new THREE.Euler(
+            Math.PI / 180 * (deltaMove.y * 0.5),
+            Math.PI / 180 * (deltaMove.x * 0.5),
+            0,
+            'XYZ'
+          ));
+        Bulb.quaternion.multiplyQuaternions(deltaRotationQuaternion,
+            Bulb.quaternion);
+      }
+      previousMousePosition = {
+        x: e.offsetX,
+        y: e.offsetY
+      };
+    });
+    $(document).on('mouseup', function (e) {
+      isDragging = false;
+    });
+  </script>
+
+  <script>
+    requestAnimFrame(render);
+  </script>
+
+</body>
+
+</html>
