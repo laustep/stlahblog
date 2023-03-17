@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Kaleidoscope</title>
+  <title>Orbit trap</title>
   <style>
     html, body { 
       margin: 0; 
@@ -28,6 +28,7 @@
   <div id="container"></div>
 
   <script id="fragmentShader" type="x-shader/x-fragment">
+    precision highp float;
     uniform vec2 iResolution;
     uniform vec2 mouse;
     uniform float iGlobalTime;
@@ -49,20 +50,7 @@
       vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
       return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
     }
-    float perFract(float x, float t, float m, float M){
-      x = x / t;
-      return m + (M - m) * (x - floor(x));
-    }
     float pi = 3.1415926535897932384626433832795;
-    vec3 pair2hsv(vec2 z){
-      float n = 3.0;
-      float h = (atan(z.y, z.x) + pi) / 2.0 / pi;
-      float ph = perFract(h, 1.0 / n, 0.6, 1.0);
-      float l = sqrt(z.x*z.x + z.y*z.y);
-      float plogm = perFract(log(1.0 + l), 2.0 * pi / n, 0.6, 1.0);
-      float v = ph * plogm;
-      return vec3(h, 0.96, v);
-    }
 
     // Mobius transformation
     vec2 product(vec2 a, vec2 b){
@@ -87,33 +75,41 @@
     }
 
     // 
-    vec2 rl(float x) {
-      return vec2(x, 0.0);
+    float f(vec2 z) {
+      return min(abs(z.x), abs(z.y)) / 0.03;
     }
-    vec2 klein(vec2 z){
-      vec2 z5 = product(product(product(product(z, z), z), z), z);
-      vec2 z10 = product(z5, z5);
-      vec2 z15 = product(z5, z10);
-      vec2 z20 = product(z10, z10);
-      vec2 a = product(z, z10 + 11.0 * z5 - rl(1.0));
-      vec2 a5 = product(product(product(product(a, a), a), a), a);
-      vec2 b = -(z20 + rl(1.0)) + 228.0 * (z15 - z5) - 494.0 * z10;
-      vec2 b3 = product(product(b, b), b);
-      return 1728.0 * divide(a5, b3);
+    vec2 orbitTrap(vec2 zc) {
+      vec2 z = vec2(0.0, 0.0);
+      for(int i = 0; i < 100; i += 1) {
+        z = product(z, z) + zc;
+        if((length(z) > 100.0) || (i >= 0 && f(z) < 1.0)) {
+          return z;
+        }
+      }
+      return z;
     }
-    vec2 f(float x, float y, vec2 gamma, float t){
-      return klein(mobius(klein(vec2(x, y)), gamma, t));
+
+    vec2 g(vec2 z, vec2 gamma, float t) {
+      return orbitTrap(mobius(z, gamma, t));
+    }
+
+    vec3 pair2hsv(vec2 z){
+      float h = (atan(z.y, z.x) + pi) / 2.0 / pi;
+      float fz = 2.0*f(z);
+      float s = min(1.0, fz);
+      float v = max(0.0, min(1.0, 2.0 - fz));
+      return vec3(h, s, v);
     }
 
     //
     void main(void){
       float t = (1.0 + cos(iGlobalTime)) / 2.0;
-      float gammax = map(mouse.x, 0.0, iResolution.x, -0.6, 0.6); 
-      float gammay = map(mouse.y, 0.0, iResolution.y, -0.6, 0.6);
+      float gammax = map(mouse.x, 0.0, iResolution.x, -0.7, 0.7); 
+      float gammay = map(mouse.y, 0.0, iResolution.y, -0.7, 0.7);
       float r = iResolution.x / iResolution.y;
-      float x = map(gl_FragCoord.x, 0.0, iResolution.x, -2.0*r, 2.0*r); 
-      float y = map(gl_FragCoord.y, 0.0, iResolution.y, -2.0, 2.0);
-      vec2 z = f(x, y, vec2(gammax, gammay), t);
+      float x = map(gl_FragCoord.x, 0.0, iResolution.x, -2.0*r, 1.0*r); 
+      float y = map(gl_FragCoord.y, 0.0, iResolution.y, -1.5, 1.5);
+      vec2 z = g(vec2(x, y), vec2(gammax, gammay), t);
       gl_FragColor = vec4(hsv2rgb(pair2hsv(z)), 1.0);
     }
   </script>
