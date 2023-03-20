@@ -5,7 +5,133 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Mon, 06 Mar 2023 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Mon, 20 Mar 2023 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>Orbit trapped Julia fractal</title>
+      <link>https://laustep.github.io/stlahblog/posts/JuliaOrbitTrap.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        Given a complex number <span class="math inline">\(z_c\)</span>, called
+        <em>the Julia point</em>, the corresponding <em>Julia fractal</em> is
+        obtained by iterating
+        <span class="math inline">\(z \mapsto z^2 + z_c\)</span> for each
+        complex number <span class="math inline">\(z\)</span> until the modulus
+        of <span class="math inline">\(z\)</span> exceeds a certain threshold or
+        the maximal number of iterations is attained. Then a color is assigned
+        to <span class="math inline">\(z\)</span>.
+      </p>
+      <p>
+        An <em>orbit trapped Julia fractal</em> is obtained in the same way, but
+        the iteration is stopped whenever
+        <span class="math inline">\(z\)</span> is close enough to a given set
+        such as a square or a circle. In the example shown below, we take the
+        two axes as this trapping set.
+      </p>
+      <p>
+        I also add something: instead of looking at the distance between
+        <span class="math inline">\(z\)</span> and the two axes, I look at the
+        distance between <span class="math inline">\(z\)</span> and the axes
+        after having rotated <span class="math inline">\(z\)</span> by an angle
+        <span class="math inline">\(\alpha\)</span>. Then I’ll vary
+        <span class="math inline">\(\alpha\)</span> to get an animation.
+      </p>
+      <p>
+        So here is the code of this algorithm; the color assigned to the final
+        <span class="math inline">\(z\)</span> is defined in function of the
+        value of the trapping function (the distance):
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1"><span class="co"># trapping function:</span></span>
+<span id="cb1-2"><span class="co">#   distance (up to factor 1/0.03) between alpha-rotated z and axes</span></span>
+<span id="cb1-3">f &lt;-<span class="st"> </span><span class="cf">function</span>(z, alpha) {</span>
+<span id="cb1-4">  z &lt;-<span class="st"> </span>z <span class="op">*</span><span class="st"> </span><span class="kw">exp</span>(1i<span class="op">*</span>alpha)</span>
+<span id="cb1-5">  <span class="kw">min</span>(<span class="kw">abs</span>(<span class="kw">Re</span>(z)), <span class="kw">abs</span>(<span class="kw">Im</span>(z))) <span class="op">/</span><span class="st"> </span><span class="fl">0.03</span></span>
+<span id="cb1-6">}</span>
+<span id="cb1-7"></span>
+<span id="cb1-8"><span class="co"># choose the Julia point</span></span>
+<span id="cb1-9">juliaPoint &lt;-<span class="st"> </span><span class="kw">complex</span>(<span class="dt">real =</span> <span class="fl">-0.687</span>, <span class="dt">imaginary =</span> <span class="fl">0.299015</span>)</span>
+<span id="cb1-10"></span>
+<span id="cb1-11"><span class="co"># main function</span></span>
+<span id="cb1-12">Julia &lt;-<span class="st"> </span><span class="kw">Vectorize</span>(<span class="cf">function</span>(x, y, juliaPoint, alpha) {</span>
+<span id="cb1-13">  <span class="co"># counter</span></span>
+<span id="cb1-14">  i &lt;-<span class="st"> </span>0L</span>
+<span id="cb1-15">  <span class="co"># current point, to be iterated</span></span>
+<span id="cb1-16">  z &lt;-<span class="st"> </span><span class="kw">complex</span>(<span class="dt">real =</span> x, <span class="dt">imaginary =</span> y)</span>
+<span id="cb1-17">  <span class="co"># iterations</span></span>
+<span id="cb1-18">  <span class="cf">while</span>(i <span class="op">&lt;</span><span class="st"> </span>100L <span class="op">&amp;&amp;</span><span class="st"> </span><span class="kw">Mod</span>(z) <span class="op">&lt;</span><span class="st"> </span><span class="dv">100</span> <span class="op">&amp;&amp;</span><span class="st"> </span>(i <span class="op">&lt;</span><span class="st"> </span>2L <span class="op">||</span><span class="st"> </span><span class="kw">f</span>(z, alpha) <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span>)) {</span>
+<span id="cb1-19">    z &lt;-<span class="st"> </span>z<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>juliaPoint</span>
+<span id="cb1-20">    i &lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span>1L</span>
+<span id="cb1-21">  }</span>
+<span id="cb1-22">  <span class="co"># now assign a color to the resulting z</span></span>
+<span id="cb1-23">  fz &lt;-<span class="st"> </span><span class="dv">2</span> <span class="op">*</span><span class="st"> </span><span class="kw">f</span>(z, alpha)</span>
+<span id="cb1-24">  <span class="kw">hsv</span>( <span class="co"># h, s, v must be in (0, 1)</span></span>
+<span id="cb1-25">    <span class="dt">h =</span> (<span class="kw">Arg</span>(z) <span class="op">+</span><span class="st"> </span>pi) <span class="op">/</span><span class="st"> </span>(<span class="dv">2</span> <span class="op">*</span><span class="st"> </span>pi), </span>
+<span id="cb1-26">    <span class="dt">s =</span> <span class="kw">min</span>(<span class="dv">1</span>, fz), </span>
+<span id="cb1-27">    <span class="dt">v =</span> <span class="kw">max</span>(<span class="dv">0</span>, <span class="kw">min</span>(<span class="dv">1</span>, <span class="dv">2</span> <span class="op">-</span><span class="st"> </span>fz))</span>
+<span id="cb1-28">  )</span>
+<span id="cb1-29">})</span></code></pre>
+      </div>
+      <p>
+        The condition <code>i &lt; 2L</code> ensures that the iteration is not
+        stopped at the beginning. Let’s plot a first image:
+      </p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1"><span class="co"># run the orbit trapping of Julia</span></span>
+<span id="cb2-2">n &lt;-<span class="st"> </span>2048L</span>
+<span id="cb2-3">x_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">2</span>,   <span class="dv">2</span>,   <span class="dt">length.out =</span> n)</span>
+<span id="cb2-4">y_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="fl">1.5</span>, <span class="fl">1.5</span>, <span class="dt">length.out =</span> n)</span>
+<span id="cb2-5">img &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">outer</span>(x_, y_, Julia, <span class="dt">juliaPoint =</span> juliaPoint, <span class="dt">alpha =</span> <span class="dv">0</span>))</span>
+<span id="cb2-6"><span class="co"># plot</span></span>
+<span id="cb2-7">opar &lt;-<span class="st"> </span><span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="dt">bg =</span> <span class="st">"black"</span>)</span>
+<span id="cb2-8"><span class="kw">plot</span>(<span class="kw">c</span>(<span class="op">-</span><span class="dv">100</span>, <span class="dv">100</span>), <span class="kw">c</span>(<span class="op">-</span><span class="dv">100</span>, <span class="dv">100</span>), <span class="dt">type =</span> <span class="st">"n"</span>, <span class="dt">asp =</span> <span class="dv">3</span><span class="op">/</span><span class="dv">4</span>, </span>
+<span id="cb2-9">     <span class="dt">xlab =</span> <span class="ot">NA</span>, <span class="dt">ylab =</span> <span class="ot">NA</span>, <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">xaxs =</span> <span class="st">"i"</span>, <span class="dt">yaxs =</span> <span class="st">"i"</span>)</span>
+<span id="cb2-10"><span class="kw">rasterImage</span>(img, <span class="dv">-100</span>, <span class="dv">-100</span>, <span class="dv">100</span>, <span class="dv">100</span>)</span>
+<span id="cb2-11"><span class="kw">par</span>(opar)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/JuliaOrbitTrap.png"
+          style="width: 50%"
+        />
+      </p>
+      <p>
+        And here is the animation obtained by varying the angle
+        <span class="math inline">\(\alpha\)</span>:
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/JuliaOrbitTrap.gif"
+          style="width: 50%"
+        />
+      </p>
+      <p>
+        Such a fractal is easily and efficiently rendered as a <em>shader</em>.
+        <a
+          href="https://laustep.github.io/stlahblog/frames/pixijs_orbitTrap_julia.html"
+          >Click here</a
+        >
+        to play with the shader, in which the cursor of the mouse is used to
+        take the Julia point. I also modified the trapping function (<span
+          class="math inline"
+          >\(z^3\)</span
+        >
+        instead of <span class="math inline">\(z\)</span>).
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Mon, 20 Mar 2023 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/JuliaOrbitTrap.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>Interpolating non-gridded data</title>
       <link>https://laustep.github.io/stlahblog/posts/bivariateInterpolation.html</link>
@@ -12090,733 +12216,6 @@ Options:
 ]]></description>
       <pubDate>Fri, 08 May 2020 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/DT_childTables.html</guid>
-      <dc:creator>Stéphane Laurent</dc:creator>
-      <category>R</category>
-    </item>
-    <item>
-      <title>Focal quadrics and their lines of curvature</title>
-      <link>https://laustep.github.io/stlahblog/posts/focalQuadrics.html</link>
-      <description><![CDATA[<div class="container-fluid">
-  <div class="main col-sm-12">
-    <div class="content">
-      <p>
-        This blog post provides some R code for drawing focal quadrics and their
-        curvatures lines with the <code>rgl</code> package.
-      </p>
-      <h1 id="ellipsoid">Ellipsoid</h1>
-      <p>
-        The <code>ellipsoidMesh</code> function below generates a mesh of the
-        ellipsoid of equation
-        <span class="math display"
-          >\[ \frac{x^2}{a^2} + \frac{y^2}{b^2} + \frac{z^2}{c^2} = 1. \]</span
-        >
-      </p>
-      <div class="sourceCode" id="cb1">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb1-1"><span class="kw">library</span>(rgl)</span>
-<span id="cb1-2">ellipsoidMesh &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, <span class="dt">smoothness =</span> <span class="dv">5</span>){</span>
-<span id="cb1-3">  <span class="kw">stopifnot</span>(a <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, b <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, c <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</span>
-<span id="cb1-4">  sphere &lt;-<span class="st"> </span><span class="kw">subdivision3d</span>(<span class="kw">icosahedron3d</span>(), <span class="dt">depth =</span> smoothness)</span>
-<span id="cb1-5">  sphere<span class="op">$</span>vb[4L,] &lt;-<span class="st"> </span></span>
-<span id="cb1-6"><span class="st">    </span><span class="kw">apply</span>(sphere<span class="op">$</span>vb[1L<span class="op">:</span>3L,], 2L, <span class="cf">function</span>(x) <span class="kw">sqrt</span>(<span class="kw">sum</span>(x<span class="op">*</span>x)))</span>
-<span id="cb1-7">  sphere<span class="op">$</span>normals &lt;-<span class="st"> </span>sphere<span class="op">$</span>vb</span>
-<span id="cb1-8">  <span class="kw">scale3d</span>(sphere, a, b, c)</span>
-<span id="cb1-9">}</span></code></pre>
-      </div>
-      <p>
-        The curvature lines of this ellipsoid are generated by the function
-        <code>curvatureLinesE</code> given below. There are two families of
-        curvature lines. The arguments <code>nu</code> and
-        <code>nv</code> control the numbers of curvature lines in these two
-        families. When the ellipsoid is tri-axial, <em>i.e.</em> when
-        <span class="math inline">\(a\)</span>,
-        <span class="math inline">\(b\)</span>,
-        <span class="math inline">\(c\)</span> are distinct, the arguments
-        <code>du</code> and <code>dv</code> must be positive and they control
-        the size of the smallest curvature lines (if they were
-        <span class="math inline">\(0\)</span>, the smallest curvature lines
-        would degenerate to segments). When the ellipsoid is an ellipsoid of
-        revolution, <em>i.e.</em> when two values of
-        <span class="math inline">\(a\)</span>,
-        <span class="math inline">\(b\)</span>,
-        <span class="math inline">\(c\)</span> are equal, the curvature lines
-        are the meridians and the parallels; in this case, <code>du</code> is
-        ignored, and <code>dv</code>, which must be positive and strictly
-        smaller than <span class="math inline">\(\frac{\pi}{2}\)</span>, control
-        the size of the smallest parallel.
-      </p>
-      <div class="sourceCode" id="cb2">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb2-1">curvatureLinesE &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, nu, nv, du, dv, <span class="dt">npoints =</span> <span class="dv">100</span>){</span>
-<span id="cb2-2">  <span class="kw">stopifnot</span>(a <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, b <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, c <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</span>
-<span id="cb2-3">  <span class="cf">if</span>((a <span class="op">!=</span><span class="st"> </span>b <span class="op">&amp;&amp;</span><span class="st"> </span>b <span class="op">!=</span><span class="st"> </span>c) <span class="op">&amp;&amp;</span><span class="st"> </span>(a <span class="op">&lt;</span><span class="st"> </span>b <span class="op">||</span><span class="st"> </span>b <span class="op">&lt;</span><span class="st"> </span>c)){</span>
-<span id="cb2-4">    perm &lt;-<span class="st"> </span><span class="kw">order</span>(<span class="kw">c</span>(a,b,c), <span class="dt">decreasing =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb2-5">    abc &lt;-<span class="st"> </span><span class="kw">c</span>(a,b,c)[perm]</span>
-<span id="cb2-6">    clines &lt;-<span class="st"> </span></span>
-<span id="cb2-7"><span class="st">      </span><span class="kw">curvatureLinesE</span>(abc[1L], abc[2L], abc[3L], nu, nv, du, dv, npoints)</span>
-<span id="cb2-8">    <span class="kw">return</span>(<span class="kw">lapply</span>(clines, <span class="cf">function</span>(l) l[, perm]))</span>
-<span id="cb2-9">  }</span>
-<span id="cb2-10">  <span class="cf">if</span>(a <span class="op">!=</span><span class="st"> </span>b <span class="op">&amp;&amp;</span><span class="st"> </span>b <span class="op">!=</span><span class="st"> </span>c){</span>
-<span id="cb2-11">    <span class="kw">stopifnot</span>(du <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, dv <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</span>
-<span id="cb2-12">    a2 &lt;-<span class="st"> </span>a<span class="op">^</span><span class="dv">2</span>; b2 &lt;-<span class="st"> </span>b<span class="op">^</span><span class="dv">2</span>; c2 &lt;-<span class="st"> </span>c<span class="op">^</span><span class="dv">2</span></span>
-<span id="cb2-13">    h2ab &lt;-<span class="st"> </span>a2 <span class="op">-</span><span class="st"> </span>b2; h2ac &lt;-<span class="st"> </span>a2 <span class="op">-</span><span class="st"> </span>c2; h2bc &lt;-<span class="st"> </span>b2 <span class="op">-</span><span class="st"> </span>c2</span>
-<span id="cb2-14">    <span class="cf">if</span>(du <span class="op">&gt;=</span><span class="st"> </span>h2ab) <span class="kw">stop</span>(<span class="st">"`du` is too large."</span>)</span>
-<span id="cb2-15">    <span class="cf">if</span>(dv <span class="op">&gt;=</span><span class="st"> </span>h2bc) <span class="kw">stop</span>(<span class="st">"`dv` is too large."</span>)</span>
-<span id="cb2-16">    out &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">"list"</span>, <span class="dv">2</span><span class="op">*</span>nv<span class="dv">-1</span> <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>nu<span class="dv">-1</span>)</span>
-<span id="cb2-17">    u_ &lt;-<span class="st"> </span><span class="kw">seq</span>(b2<span class="op">+</span>du, a2, <span class="dt">length.out =</span> nu)</span>
-<span id="cb2-18">    s_ &lt;-<span class="st"> </span><span class="kw">seq</span>(b2, a2, <span class="dt">length.out =</span> npoints)</span>
-<span id="cb2-19">    v_ &lt;-<span class="st"> </span><span class="kw">seq</span>(c2, b2<span class="op">-</span>dv, <span class="dt">length.out =</span> nv) </span>
-<span id="cb2-20">    t_ &lt;-<span class="st"> </span><span class="kw">seq</span>(c2, b2, <span class="dt">length.out =</span> npoints)</span>
-<span id="cb2-21">    mx &lt;-<span class="st"> </span>a <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2ac<span class="op">*</span>h2ab)</span>
-<span id="cb2-22">    my &lt;-<span class="st"> </span>b <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2bc<span class="op">*</span>h2ab)</span>
-<span id="cb2-23">    mz &lt;-<span class="st"> </span>c <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2bc<span class="op">*</span>h2ac)</span>
-<span id="cb2-24">    <span class="cf">for</span>(j <span class="cf">in</span> 1L<span class="op">:</span>nv){</span>
-<span id="cb2-25">      x &lt;-<span class="st"> </span>mx <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((a2<span class="op">-</span>s_)<span class="op">*</span>(a2<span class="op">-</span>v_[j]))</span>
-<span id="cb2-26">      y &lt;-<span class="st"> </span>my <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((s_<span class="op">-</span>b2)<span class="op">*</span>(b2<span class="op">-</span>v_[j]))</span>
-<span id="cb2-27">      z &lt;-<span class="st"> </span>mz <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((s_<span class="op">-</span>c2)<span class="op">*</span>(v_[j]<span class="op">-</span>c2))</span>
-<span id="cb2-28">      M &lt;-<span class="st"> </span><span class="kw">rbind</span>(<span class="kw">cbind</span>(x, y, z), <span class="kw">cbind</span>(<span class="op">-</span>x, y, z)[(npoints<span class="dv">-1</span>)<span class="op">:</span>1L,])</span>
-<span id="cb2-29">      M &lt;-<span class="st"> </span><span class="kw">rbind</span>(M, <span class="kw">cbind</span>(M[,1L], <span class="op">-</span>M[,2L], M[,3L])[(<span class="dv">2</span><span class="op">*</span>npoints<span class="dv">-2</span>)<span class="op">:</span>1L,])</span>
-<span id="cb2-30">      out[[j]] &lt;-<span class="st"> </span>M</span>
-<span id="cb2-31">      <span class="cf">if</span>(j <span class="op">&gt;</span><span class="st"> </span>1L){</span>
-<span id="cb2-32">        out[[nv<span class="op">+</span>j<span class="dv">-1</span>]] &lt;-<span class="st"> </span><span class="kw">cbind</span>(M[,<span class="kw">c</span>(1L,2L)], <span class="op">-</span>M[,3L])</span>
-<span id="cb2-33">      }</span>
-<span id="cb2-34">    }</span>
-<span id="cb2-35">    <span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span>nu){</span>
-<span id="cb2-36">      x &lt;-<span class="st"> </span>mx <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((a2<span class="op">-</span>u_[i])<span class="op">*</span>(a2<span class="op">-</span>t_))</span>
-<span id="cb2-37">      y &lt;-<span class="st"> </span>my <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((u_[i]<span class="op">-</span>b2)<span class="op">*</span>(b2<span class="op">-</span>t_))</span>
-<span id="cb2-38">      z &lt;-<span class="st"> </span>mz <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((u_[i]<span class="op">-</span>c2)<span class="op">*</span>(t_<span class="op">-</span>c2))</span>
-<span id="cb2-39">      M &lt;-<span class="st"> </span><span class="kw">rbind</span>(<span class="kw">cbind</span>(x, y, z), <span class="kw">cbind</span>(x, <span class="op">-</span>y, z)[(npoints<span class="dv">-1</span>)<span class="op">:</span>1L,])</span>
-<span id="cb2-40">      M &lt;-<span class="st"> </span><span class="kw">rbind</span>(M, <span class="kw">cbind</span>(M[,<span class="kw">c</span>(1L,2L)], <span class="op">-</span>M[,3L])[(<span class="dv">2</span><span class="op">*</span>npoints<span class="dv">-2</span>)<span class="op">:</span>1L,])</span>
-<span id="cb2-41">      out[[<span class="dv">2</span><span class="op">*</span>nv<span class="dv">-1</span><span class="op">+</span>i]] &lt;-<span class="st"> </span>M</span>
-<span id="cb2-42">      <span class="cf">if</span>(i <span class="op">&lt;</span><span class="st"> </span>nu){</span>
-<span id="cb2-43">        out[[<span class="dv">2</span><span class="op">*</span>nv<span class="dv">-1</span><span class="op">+</span>nu<span class="op">+</span>i]] &lt;-<span class="st"> </span><span class="kw">cbind</span>(<span class="op">-</span>M[,1L], M[,<span class="kw">c</span>(2L,3L)])</span>
-<span id="cb2-44">      }</span>
-<span id="cb2-45">    }</span>
-<span id="cb2-46">  }<span class="cf">else</span>{ <span class="co"># a == b || b == c </span></span>
-<span id="cb2-47">    <span class="co"># surface of revolution =&gt; curvature lines are meridians and parallels</span></span>
-<span id="cb2-48">    <span class="kw">stopifnot</span>(dv <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, dv <span class="op">&lt;</span><span class="st"> </span>pi<span class="op">/</span><span class="dv">2</span>)</span>
-<span id="cb2-49">    out &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">"list"</span>, nu <span class="op">+</span><span class="st"> </span>nv)</span>
-<span id="cb2-50">    u_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> nu<span class="op">+</span><span class="dv">1</span>)[<span class="op">-</span>1L]</span>
-<span id="cb2-51">    s_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> npoints)</span>
-<span id="cb2-52">    v_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span>pi<span class="op">/</span><span class="dv">2</span><span class="op">+</span>dv, pi<span class="op">/</span><span class="dv">2</span><span class="op">-</span>dv, <span class="dt">length.out =</span> nv) </span>
-<span id="cb2-53">    t_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span>pi, pi, <span class="dt">length.out =</span> npoints)</span>
-<span id="cb2-54">    coss_ &lt;-<span class="st"> </span><span class="kw">cos</span>(s_); sins_ &lt;-<span class="st"> </span><span class="kw">sin</span>(s_)</span>
-<span id="cb2-55">    cost_ &lt;-<span class="st"> </span><span class="kw">cos</span>(t_); sint_ &lt;-<span class="st"> </span><span class="kw">sin</span>(t_)</span>
-<span id="cb2-56">    <span class="cf">for</span>(j <span class="cf">in</span> 1L<span class="op">:</span>nv){</span>
-<span id="cb2-57">      x &lt;-<span class="st"> </span>a <span class="op">*</span><span class="st"> </span>coss_ <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(v_[j])</span>
-<span id="cb2-58">      y &lt;-<span class="st"> </span>b <span class="op">*</span><span class="st"> </span>sins_ <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(v_[j])</span>
-<span id="cb2-59">      z &lt;-<span class="st"> </span>c <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(v_[j])</span>
-<span id="cb2-60">      out[[j]] &lt;-<span class="st"> </span><span class="kw">cbind</span>(x, y, z)</span>
-<span id="cb2-61">    }</span>
-<span id="cb2-62">    <span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span>nu){</span>
-<span id="cb2-63">      x &lt;-<span class="st"> </span>a <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(u_[i]) <span class="op">*</span><span class="st"> </span>cost_</span>
-<span id="cb2-64">      y &lt;-<span class="st"> </span>b <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(u_[i]) <span class="op">*</span><span class="st"> </span>cost_</span>
-<span id="cb2-65">      z &lt;-<span class="st"> </span>c <span class="op">*</span><span class="st"> </span>sint_</span>
-<span id="cb2-66">      out[[nv<span class="op">+</span>i]] &lt;-<span class="st"> </span><span class="kw">cbind</span>(x, y, z)</span>
-<span id="cb2-67">    }</span>
-<span id="cb2-68">  }</span>
-<span id="cb2-69">  out</span>
-<span id="cb2-70">}</span></code></pre>
-      </div>
-      <p>Here is an example:</p>
-      <div class="sourceCode" id="cb3">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb3-1">a =<span class="st"> </span><span class="dv">7</span>; b =<span class="st"> </span><span class="dv">5</span>; c =<span class="st"> </span><span class="dv">3</span></span>
-<span id="cb3-2">mesh &lt;-<span class="st"> </span><span class="kw">ellipsoidMesh</span>(a, b, c)</span>
-<span id="cb3-3">clines &lt;-<span class="st"> </span><span class="kw">curvatureLinesE</span>(a, b, c, <span class="dt">nu =</span> <span class="dv">5</span>, <span class="dt">nv =</span> <span class="dv">5</span>, <span class="dt">du =</span> <span class="fl">0.4</span>, <span class="dt">dv =</span> <span class="dv">1</span>, </span>
-<span id="cb3-4">                          <span class="dt">npoints =</span> <span class="dv">300</span>)</span>
-<span id="cb3-5"><span class="kw">shade3d</span>(mesh, <span class="dt">col =</span> <span class="st">"springgreen"</span>)</span>
-<span id="cb3-6"><span class="kw">invisible</span>(<span class="kw">lapply</span>(clines, <span class="cf">function</span>(l){</span>
-<span id="cb3-7">  <span class="kw">shade3d</span>(<span class="kw">cylinder3d</span>(l, <span class="dt">radius =</span> <span class="fl">0.08</span>, <span class="dt">sides =</span> <span class="dv">30</span>))</span>
-<span id="cb3-8">}))</span></code></pre>
-      </div>
-      <p>
-        <img
-          src="https://laustep.github.io/stlahblog/posts/figures/quadrics_E.png"
-        />
-      </p>
-      <h1 id="one-sheeted-hyperboloid">One-sheeted hyperboloid</h1>
-      <p>
-        There are three types of one-sheeted hyperboloids, corresponding to
-        these equations:
-        <span class="math display"
-          >\[ \frac{x^2}{a^2} + \frac{y^2}{b^2} - \frac{z^2}{c^2} = 1 \\
-          \frac{x^2}{a^2} - \frac{y^2}{b^2} + \frac{z^2}{c^2} = 1 \\
-          -\frac{x^2}{a^2} + \frac{y^2}{b^2} + \frac{z^2}{c^2} = 1. \]</span
-        >
-        The <code>hyperboloidMesh</code> function below generates a mesh of the
-        one-sheeted hyperboloid; the <code>signature</code> argument corresponds
-        to one of the above equations, it must be <code>"++-"</code>,
-        <code>"+-+"</code> or <code>"-++"</code>. The mesh is made of
-        quadrilaterals and their number is controlled by the arguments
-        <code>nu</code> and <code>nv</code>. The hyperboloid is infinite along
-        the direction corresponding to the minus sign, and the argument
-        <code>vmin</code> controls the truncation of the hyperboloid in this
-        direction.
-      </p>
-      <div class="sourceCode" id="cb4">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb4-1">hyperboloidMesh &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, signature, nu, nv, vmin){</span>
-<span id="cb4-2">  <span class="kw">stopifnot</span>(signature <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">"++-"</span>, <span class="st">"+-+"</span>, <span class="st">"-++"</span>))</span>
-<span id="cb4-3">  <span class="kw">stopifnot</span>(vmin <span class="op">&lt;</span><span class="st"> </span><span class="dv">1</span>, a <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, b <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, c <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</span>
-<span id="cb4-4">  <span class="cf">if</span>(signature <span class="op">==</span><span class="st"> "+-+"</span>){</span>
-<span id="cb4-5">    mesh &lt;-<span class="st"> </span><span class="kw">hyperboloidMesh</span>(a, c, b, <span class="st">"++-"</span>, nu, nv, vmin)</span>
-<span id="cb4-6">    mesh<span class="op">$</span>vb &lt;-<span class="st"> </span>mesh<span class="op">$</span>vb[<span class="kw">c</span>(1L,3L,2L,4L),]</span>
-<span id="cb4-7">    mesh<span class="op">$</span>normals &lt;-<span class="st"> </span>mesh<span class="op">$</span>normals[<span class="kw">c</span>(1L,3L,2L),]</span>
-<span id="cb4-8">    mesh<span class="op">$</span>ib &lt;-<span class="st"> </span>mesh<span class="op">$</span>ib[4L<span class="op">:</span>1L,]</span>
-<span id="cb4-9">    <span class="kw">return</span>(mesh)</span>
-<span id="cb4-10">  }<span class="cf">else</span> <span class="cf">if</span>(signature <span class="op">==</span><span class="st"> "-++"</span>){</span>
-<span id="cb4-11">    mesh &lt;-<span class="st"> </span><span class="kw">hyperboloidMesh</span>(c, b, a, <span class="st">"++-"</span>, nu, nv, vmin)</span>
-<span id="cb4-12">    mesh<span class="op">$</span>vb &lt;-<span class="st"> </span>mesh<span class="op">$</span>vb[<span class="kw">c</span>(3L,2L,1L,4L),]</span>
-<span id="cb4-13">    mesh<span class="op">$</span>normals &lt;-<span class="st"> </span>mesh<span class="op">$</span>normals[<span class="kw">c</span>(3L,2L,1L),]</span>
-<span id="cb4-14">    mesh<span class="op">$</span>ib &lt;-<span class="st"> </span>mesh<span class="op">$</span>ib[4L<span class="op">:</span>1L,]</span>
-<span id="cb4-15">    <span class="kw">return</span>(mesh)</span>
-<span id="cb4-16">  }</span>
-<span id="cb4-17">  c0 &lt;-<span class="st"> </span>c</span>
-<span id="cb4-18">  <span class="cf">if</span>(b <span class="op">&gt;</span><span class="st"> </span>a){</span>
-<span id="cb4-19">    exchange &lt;-<span class="st"> </span><span class="ot">TRUE</span></span>
-<span id="cb4-20">    a0 &lt;-<span class="st"> </span>b; b0 &lt;-<span class="st"> </span>a</span>
-<span id="cb4-21">  }<span class="cf">else</span>{</span>
-<span id="cb4-22">    exchange &lt;-<span class="st"> </span><span class="ot">FALSE</span></span>
-<span id="cb4-23">    a0 &lt;-<span class="st"> </span>a; b0 &lt;-<span class="st"> </span>b</span>
-<span id="cb4-24">  }</span>
-<span id="cb4-25">  Mu2 &lt;-<span class="st"> </span>a0<span class="op">^</span><span class="dv">2</span></span>
-<span id="cb4-26">  h2ab &lt;-<span class="st"> </span>Mu2 <span class="op">-</span><span class="st"> </span>b0<span class="op">^</span><span class="dv">2</span>; h2ac &lt;-<span class="st"> </span>c0<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>Mu2</span>
-<span id="cb4-27">  c2 &lt;-<span class="st"> </span><span class="dv">1</span>; a2 &lt;-<span class="st"> </span>c2 <span class="op">+</span><span class="st"> </span>h2ac; b2 &lt;-<span class="st"> </span>a2 <span class="op">-</span><span class="st"> </span>h2ab</span>
-<span id="cb4-28">  h2bc &lt;-<span class="st"> </span>b2 <span class="op">-</span><span class="st"> </span>c2</span>
-<span id="cb4-29">  <span class="co">#</span></span>
-<span id="cb4-30">  vertices &lt;-<span class="st"> </span>Normals &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="ot">NA_real_</span>, <span class="dt">nrow =</span> 3L, <span class="dt">ncol =</span> nu<span class="op">*</span>nv)</span>
-<span id="cb4-31">  indices &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="ot">NA_integer_</span>, <span class="dt">nrow =</span> 4L, <span class="dt">ncol =</span> (nu<span class="dv">-1</span>)<span class="op">*</span>(nv<span class="dv">-1</span>))</span>
-<span id="cb4-32">  v_ &lt;-<span class="st"> </span><span class="kw">seq</span>(vmin, c2, <span class="dt">length.out =</span> nv)</span>
-<span id="cb4-33">  <span class="co">#</span></span>
-<span id="cb4-34">  <span class="cf">if</span>(a0 <span class="op">!=</span><span class="st"> </span>b0){</span>
-<span id="cb4-35">    u_ &lt;-<span class="st"> </span><span class="kw">seq</span>(b2, a2, <span class="dt">length.out =</span> nu)</span>
-<span id="cb4-36">    x &lt;-<span class="st"> </span>a0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2ac<span class="op">*</span>h2ab) <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(a2<span class="op">-</span>u_)</span>
-<span id="cb4-37">    y &lt;-<span class="st"> </span>b0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2bc<span class="op">*</span>h2ab) <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(u_<span class="op">-</span>b2)</span>
-<span id="cb4-38">    z &lt;-<span class="st"> </span>c0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2bc<span class="op">*</span>h2ac) <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(u_<span class="op">-</span>c2)</span>
-<span id="cb4-39">  }<span class="cf">else</span>{</span>
-<span id="cb4-40">    u_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> nu<span class="op">+</span><span class="dv">1</span>)[<span class="op">-</span>1L]</span>
-<span id="cb4-41">    z &lt;-<span class="st"> </span><span class="kw">rep</span>(c0<span class="op">/</span><span class="kw">sqrt</span>(h2ac), nu)</span>
-<span id="cb4-42">    mxy &lt;-<span class="st"> </span>a0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2ac)</span>
-<span id="cb4-43">    x &lt;-<span class="st"> </span>mxy <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(u_)</span>
-<span id="cb4-44">    y &lt;-<span class="st"> </span>mxy <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(u_)</span>
-<span id="cb4-45">  }</span>
-<span id="cb4-46">  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>nu){</span>
-<span id="cb4-47">    <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>nv){</span>
-<span id="cb4-48">      P &lt;-<span class="st"> </span>vertices[, (i<span class="dv">-1</span>)<span class="op">*</span>nv<span class="op">+</span>j] &lt;-<span class="st"> </span><span class="kw">c</span>(</span>
-<span id="cb4-49">        x[i] <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(a2<span class="op">-</span>v_[j]),</span>
-<span id="cb4-50">        y[i] <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(b2<span class="op">-</span>v_[j]),</span>
-<span id="cb4-51">        z[i] <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(c2<span class="op">-</span>v_[j])</span>
-<span id="cb4-52">      )</span>
-<span id="cb4-53">      Normals[, (i<span class="dv">-1</span>)<span class="op">*</span>nv<span class="op">+</span>j] &lt;-<span class="st"> </span><span class="kw">c</span>(P[1L]<span class="op">/</span>a0<span class="op">^</span><span class="dv">2</span>, P[2L]<span class="op">/</span>b0<span class="op">^</span><span class="dv">2</span>, <span class="op">-</span>P[3L]<span class="op">/</span>c0<span class="op">^</span><span class="dv">2</span>)</span>
-<span id="cb4-54">    }</span>
-<span id="cb4-55">  }</span>
-<span id="cb4-56">  <span class="co"># quads</span></span>
-<span id="cb4-57">  <span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span>(nu<span class="dv">-1</span>)){</span>
-<span id="cb4-58">    im1 &lt;-<span class="st"> </span>i<span class="op">-</span>1L</span>
-<span id="cb4-59">    <span class="cf">for</span>(j <span class="cf">in</span> 1L<span class="op">:</span>(nv<span class="dv">-1</span>)){</span>
-<span id="cb4-60">      jp1 &lt;-<span class="st"> </span>j<span class="op">+</span>1L</span>
-<span id="cb4-61">      quad &lt;-<span class="st"> </span><span class="kw">c</span>(im1<span class="op">*</span>nv<span class="op">+</span>j, im1<span class="op">*</span>nv<span class="op">+</span>jp1, i<span class="op">*</span>nv<span class="op">+</span>jp1, i<span class="op">*</span>nv<span class="op">+</span>j)</span>
-<span id="cb4-62">      indices[, im1<span class="op">*</span>(nv<span class="dv">-1</span>)<span class="op">+</span>j] &lt;-<span class="st"> </span><span class="cf">if</span>(exchange) <span class="kw">rev</span>(quad) <span class="cf">else</span> quad</span>
-<span id="cb4-63">    }</span>
-<span id="cb4-64">  }</span>
-<span id="cb4-65">  vertices &lt;-<span class="st"> </span><span class="kw">cbind</span>(vertices, <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>vertices)</span>
-<span id="cb4-66">  indices &lt;-<span class="st"> </span><span class="kw">cbind</span>(indices, indices[4L<span class="op">:</span>1L,] <span class="op">+</span><span class="st"> </span>nu<span class="op">*</span>nv)</span>
-<span id="cb4-67">  Normals &lt;-<span class="st"> </span><span class="kw">cbind</span>(Normals, <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>Normals)</span>
-<span id="cb4-68">  vertices &lt;-<span class="st"> </span><span class="kw">cbind</span>(vertices, <span class="kw">c</span>(<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>vertices)</span>
-<span id="cb4-69">  indices &lt;-<span class="st"> </span><span class="kw">cbind</span>(indices, indices[4L<span class="op">:</span>1L,] <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>nu<span class="op">*</span>nv)</span>
-<span id="cb4-70">  Normals &lt;-<span class="st"> </span><span class="kw">cbind</span>(Normals, <span class="kw">c</span>(<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>Normals)</span>
-<span id="cb4-71">  vertices &lt;-<span class="st"> </span><span class="kw">cbind</span>(vertices, <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>vertices)</span>
-<span id="cb4-72">  indices &lt;-<span class="st"> </span><span class="kw">cbind</span>(indices, indices[4L<span class="op">:</span>1L,] <span class="op">+</span><span class="st"> </span><span class="dv">4</span><span class="op">*</span>nu<span class="op">*</span>nv)</span>
-<span id="cb4-73">  Normals &lt;-<span class="st"> </span><span class="kw">cbind</span>(Normals, <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>Normals)</span>
-<span id="cb4-74">  mesh &lt;-<span class="st"> </span><span class="kw">qmesh3d</span>(</span>
-<span id="cb4-75">    <span class="dt">vertices =</span> <span class="cf">if</span>(exchange) vertices[<span class="kw">c</span>(2L,1L,3L),] <span class="cf">else</span> vertices,</span>
-<span id="cb4-76">    <span class="dt">indices =</span> indices,</span>
-<span id="cb4-77">    <span class="dt">homogeneous =</span> <span class="ot">FALSE</span>,</span>
-<span id="cb4-78">    <span class="dt">normals =</span> <span class="kw">t</span>(<span class="cf">if</span>(exchange) Normals[<span class="kw">c</span>(2L,1L,3L),] <span class="cf">else</span> Normals)</span>
-<span id="cb4-79">  )</span>
-<span id="cb4-80">  mesh</span>
-<span id="cb4-81">}</span></code></pre>
-      </div>
-      <p>
-        The <code>curvatureLinesH1</code> function below generates some
-        curvature lines of the one-sheeted hyperboloid. There are two families
-        of curvature lines and the desired numbers of lines in them are
-        controlled by the arguments <code>nu</code> and <code>nv</code>.
-      </p>
-      <div class="sourceCode" id="cb5">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb5-1">curvatureLinesH1 &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, <span class="dt">signature =</span> <span class="st">"++-"</span>, nu, nv, vmin,  </span>
-<span id="cb5-2">                             <span class="dt">npoints =</span> <span class="dv">100</span>){</span>
-<span id="cb5-3">  <span class="kw">stopifnot</span>(signature <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">"++-"</span>, <span class="st">"+-+"</span>, <span class="st">"-++"</span>))</span>
-<span id="cb5-4">  <span class="kw">stopifnot</span>(vmin <span class="op">&lt;</span><span class="st"> </span><span class="dv">1</span>, a <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, b <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, c <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</span>
-<span id="cb5-5">  <span class="cf">if</span>(signature <span class="op">==</span><span class="st"> "+-+"</span>){</span>
-<span id="cb5-6">    clines &lt;-<span class="st"> </span><span class="kw">curvatureLinesH1</span>(a, c, b, <span class="st">"++-"</span>, nu, nv, vmin, npoints)</span>
-<span id="cb5-7">    <span class="kw">return</span>(<span class="kw">lapply</span>(clines, <span class="cf">function</span>(l) l[,<span class="kw">c</span>(1L,3L,2L)]))</span>
-<span id="cb5-8">  }<span class="cf">else</span> <span class="cf">if</span>(signature <span class="op">==</span><span class="st"> "-++"</span>){</span>
-<span id="cb5-9">    clines &lt;-<span class="st"> </span><span class="kw">curvatureLinesH1</span>(c, b, a, <span class="st">"++-"</span>, nu, nv, vmin, npoints)</span>
-<span id="cb5-10">    <span class="kw">return</span>(<span class="kw">lapply</span>(clines, <span class="cf">function</span>(l) l[,<span class="kw">c</span>(3L,2L,1L)]))</span>
-<span id="cb5-11">  }</span>
-<span id="cb5-12">  c0 &lt;-<span class="st"> </span>c</span>
-<span id="cb5-13">  <span class="cf">if</span>(b <span class="op">&gt;</span><span class="st"> </span>a){</span>
-<span id="cb5-14">    exchange &lt;-<span class="st"> </span><span class="ot">TRUE</span></span>
-<span id="cb5-15">    a0 &lt;-<span class="st"> </span>b; b0 &lt;-<span class="st"> </span>a</span>
-<span id="cb5-16">  }<span class="cf">else</span>{</span>
-<span id="cb5-17">    exchange &lt;-<span class="st"> </span><span class="ot">FALSE</span></span>
-<span id="cb5-18">    a0 &lt;-<span class="st"> </span>a; b0 &lt;-<span class="st"> </span>b</span>
-<span id="cb5-19">  }</span>
-<span id="cb5-20">  Mu2 &lt;-<span class="st"> </span>a0<span class="op">^</span><span class="dv">2</span></span>
-<span id="cb5-21">  h2ab &lt;-<span class="st"> </span>Mu2 <span class="op">-</span><span class="st"> </span>b0<span class="op">^</span><span class="dv">2</span>; h2ac &lt;-<span class="st"> </span>c0<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>Mu2</span>
-<span id="cb5-22">  c2 &lt;-<span class="st"> </span><span class="dv">1</span>; a2 &lt;-<span class="st"> </span>c2 <span class="op">+</span><span class="st"> </span>h2ac; b2 &lt;-<span class="st"> </span>a2 <span class="op">-</span><span class="st"> </span>h2ab</span>
-<span id="cb5-23">  h2bc &lt;-<span class="st"> </span>b2 <span class="op">-</span><span class="st"> </span>c2</span>
-<span id="cb5-24">  <span class="co">#  </span></span>
-<span id="cb5-25">  v_ &lt;-<span class="st"> </span><span class="kw">seq</span>(vmin, c2, <span class="dt">length.out =</span> nv)</span>
-<span id="cb5-26">  t_ &lt;-<span class="st"> </span><span class="kw">seq</span>(vmin, c2, <span class="dt">length.out =</span> npoints)</span>
-<span id="cb5-27">  <span class="co">#</span></span>
-<span id="cb5-28">  <span class="cf">if</span>(a0 <span class="op">!=</span><span class="st"> </span>b0){</span>
-<span id="cb5-29">    u_ &lt;-<span class="st"> </span><span class="kw">seq</span>(b2, a2, <span class="dt">length.out =</span> nu)</span>
-<span id="cb5-30">    s_ &lt;-<span class="st"> </span><span class="kw">seq</span>(b2, a2, <span class="dt">length.out =</span> npoints)</span>
-<span id="cb5-31">    mx &lt;-<span class="st"> </span>a0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2ac<span class="op">*</span>h2ab)</span>
-<span id="cb5-32">    my &lt;-<span class="st"> </span>b0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2bc<span class="op">*</span>h2ab)</span>
-<span id="cb5-33">    mz &lt;-<span class="st"> </span>c0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2bc<span class="op">*</span>h2ac)</span>
-<span id="cb5-34">    out &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">"list"</span>, <span class="dv">2</span><span class="op">*</span>nv <span class="op">+</span><span class="st"> </span><span class="dv">4</span><span class="op">*</span>nu <span class="op">-</span><span class="st"> </span><span class="dv">5</span>)</span>
-<span id="cb5-35">    <span class="cf">for</span>(j <span class="cf">in</span> 1L<span class="op">:</span>nv){</span>
-<span id="cb5-36">      x &lt;-<span class="st"> </span>mx <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((a2<span class="op">-</span>s_)<span class="op">*</span>(a2<span class="op">-</span>v_[j]))</span>
-<span id="cb5-37">      y &lt;-<span class="st"> </span>my <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((s_<span class="op">-</span>b2)<span class="op">*</span>(b2<span class="op">-</span>v_[j]))</span>
-<span id="cb5-38">      z &lt;-<span class="st"> </span>mz <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((s_<span class="op">-</span>c2)<span class="op">*</span>(c2<span class="op">-</span>v_[j]))</span>
-<span id="cb5-39">      M &lt;-<span class="st"> </span><span class="kw">rbind</span>(<span class="kw">cbind</span>(x, y, z), <span class="kw">cbind</span>(<span class="op">-</span>x, y, z)[(npoints<span class="dv">-1</span>)<span class="op">:</span>1L,])</span>
-<span id="cb5-40">      M &lt;-<span class="st"> </span><span class="kw">rbind</span>(M, <span class="kw">cbind</span>(M[,1L], <span class="op">-</span>M[,2L], M[,3L])[(<span class="dv">2</span><span class="op">*</span>npoints<span class="dv">-2</span>)<span class="op">:</span>1L,])</span>
-<span id="cb5-41">      out[[j]] &lt;-<span class="st"> </span>M</span>
-<span id="cb5-42">      <span class="cf">if</span>(j <span class="op">&lt;</span><span class="st"> </span>nv){</span>
-<span id="cb5-43">        out[[nv<span class="op">+</span>j]] &lt;-<span class="st"> </span><span class="kw">cbind</span>(M[,<span class="kw">c</span>(1L,2L)], <span class="op">-</span>M[,3L])</span>
-<span id="cb5-44">      }</span>
-<span id="cb5-45">    }</span>
-<span id="cb5-46">    <span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span>nu){</span>
-<span id="cb5-47">      x &lt;-<span class="st"> </span>mx <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((a2<span class="op">-</span>u_[i])<span class="op">*</span>(a2<span class="op">-</span>t_))</span>
-<span id="cb5-48">      y &lt;-<span class="st"> </span>my <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((u_[i]<span class="op">-</span>b2)<span class="op">*</span>(b2<span class="op">-</span>t_))</span>
-<span id="cb5-49">      z &lt;-<span class="st"> </span>mz <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((u_[i]<span class="op">-</span>c2)<span class="op">*</span>(c2<span class="op">-</span>t_))</span>
-<span id="cb5-50">      M &lt;-<span class="st"> </span><span class="kw">rbind</span>(<span class="kw">cbind</span>(x, y, z), <span class="kw">cbind</span>(x, y, <span class="op">-</span>z)[(npoints<span class="dv">-1</span>)<span class="op">:</span>1L,])</span>
-<span id="cb5-51">      out[[<span class="dv">2</span><span class="op">*</span>nv<span class="dv">-1</span><span class="op">+</span>i]] &lt;-<span class="st"> </span>M</span>
-<span id="cb5-52">      <span class="cf">if</span>(i <span class="op">&lt;</span><span class="st"> </span>nu){</span>
-<span id="cb5-53">        out[[<span class="dv">2</span><span class="op">*</span>nv<span class="dv">-1</span><span class="op">+</span>nu<span class="op">+</span>i]] &lt;-<span class="st"> </span><span class="kw">cbind</span>(<span class="op">-</span>M[,1L], M[,<span class="kw">c</span>(2L,3L)])</span>
-<span id="cb5-54">        <span class="cf">if</span>(i<span class="op">&gt;</span>1L) out[[<span class="dv">2</span><span class="op">*</span>nv<span class="op">+</span><span class="dv">3</span><span class="op">*</span>nu<span class="op">+</span>i<span class="dv">-4</span>]] &lt;-<span class="st"> </span><span class="kw">cbind</span>(<span class="op">-</span>M[,<span class="kw">c</span>(1L,2L)], M[,3L])</span>
-<span id="cb5-55">      }</span>
-<span id="cb5-56">      <span class="cf">if</span>(i <span class="op">&gt;</span><span class="st"> </span>1L){</span>
-<span id="cb5-57">        out[[<span class="dv">2</span><span class="op">*</span>nv<span class="op">+</span><span class="dv">2</span><span class="op">*</span>nu<span class="op">+</span>i<span class="dv">-3</span>]] &lt;-<span class="st"> </span><span class="kw">cbind</span>(M[,1L], <span class="op">-</span>M[,2L], M[,3L])</span>
-<span id="cb5-58">      }</span>
-<span id="cb5-59">    }</span>
-<span id="cb5-60">  }<span class="cf">else</span>{ <span class="co"># a0 = b0</span></span>
-<span id="cb5-61">    u_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> nu<span class="op">+</span><span class="dv">1</span>)[<span class="op">-</span>1L]</span>
-<span id="cb5-62">    s_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> npoints)</span>
-<span id="cb5-63">    coss_ &lt;-<span class="st"> </span><span class="kw">cos</span>(s_); sins_ &lt;-<span class="st"> </span><span class="kw">sin</span>(s_)</span>
-<span id="cb5-64">    mxy &lt;-<span class="st"> </span>a0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2ac)</span>
-<span id="cb5-65">    mz &lt;-<span class="st"> </span>c0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2bc)</span>
-<span id="cb5-66">    out &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">"list"</span>, <span class="dv">2</span><span class="op">*</span>nv <span class="op">+</span><span class="st"> </span><span class="dv">4</span><span class="op">*</span>nu <span class="op">-</span><span class="st"> </span><span class="dv">5</span>)</span>
-<span id="cb5-67">    <span class="cf">for</span>(j <span class="cf">in</span> 1L<span class="op">:</span>nv){</span>
-<span id="cb5-68">      x &lt;-<span class="st"> </span>mxy <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(a2<span class="op">-</span>v_[j]) <span class="op">*</span><span class="st"> </span>coss_</span>
-<span id="cb5-69">      y &lt;-<span class="st"> </span>mxy <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(b2<span class="op">-</span>v_[j]) <span class="op">*</span><span class="st"> </span>sins_</span>
-<span id="cb5-70">      z &lt;-<span class="st"> </span>mz <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(c2<span class="op">-</span>v_[j]) </span>
-<span id="cb5-71">      M &lt;-<span class="st"> </span><span class="kw">cbind</span>(x, y, z)</span>
-<span id="cb5-72">      out[[j]] &lt;-<span class="st"> </span>M</span>
-<span id="cb5-73">      <span class="cf">if</span>(j <span class="op">&lt;</span><span class="st"> </span>nv){</span>
-<span id="cb5-74">        out[[nv<span class="op">+</span>j]] &lt;-<span class="st"> </span><span class="kw">cbind</span>(M[,<span class="kw">c</span>(1L,2L)], <span class="op">-</span>M[,3L])</span>
-<span id="cb5-75">      }</span>
-<span id="cb5-76">    }</span>
-<span id="cb5-77">    r &lt;-<span class="st"> </span>mxy <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(a2<span class="op">-</span>t_)</span>
-<span id="cb5-78">    z &lt;-<span class="st"> </span>mz <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(c2<span class="op">-</span>t_)</span>
-<span id="cb5-79">    <span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span>nu){</span>
-<span id="cb5-80">      x &lt;-<span class="st"> </span>r <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(u_[i])</span>
-<span id="cb5-81">      y &lt;-<span class="st"> </span>r <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(u_[i])</span>
-<span id="cb5-82">      M &lt;-<span class="st"> </span><span class="kw">rbind</span>(<span class="kw">cbind</span>(x, y, z), <span class="kw">cbind</span>(x, y, <span class="op">-</span>z)[(npoints<span class="dv">-1</span>)<span class="op">:</span>1L,])</span>
-<span id="cb5-83">      out[[<span class="dv">2</span><span class="op">*</span>nv<span class="dv">-1</span><span class="op">+</span>i]] &lt;-<span class="st"> </span>M</span>
-<span id="cb5-84">      <span class="cf">if</span>(i <span class="op">&lt;</span><span class="st"> </span>nu){</span>
-<span id="cb5-85">        out[[<span class="dv">2</span><span class="op">*</span>nv<span class="dv">-1</span><span class="op">+</span>nu<span class="op">+</span>i]] &lt;-<span class="st"> </span><span class="kw">cbind</span>(<span class="op">-</span>M[,1L], M[,<span class="kw">c</span>(2L,3L)])</span>
-<span id="cb5-86">        <span class="cf">if</span>(i<span class="op">&gt;</span>1L) out[[<span class="dv">2</span><span class="op">*</span>nv<span class="op">+</span><span class="dv">3</span><span class="op">*</span>nu<span class="op">+</span>i<span class="dv">-4</span>]] &lt;-<span class="st"> </span><span class="kw">cbind</span>(<span class="op">-</span>M[,<span class="kw">c</span>(1L,2L)], M[,3L])</span>
-<span id="cb5-87">      }</span>
-<span id="cb5-88">      <span class="cf">if</span>(i <span class="op">&gt;</span><span class="st"> </span>1L){</span>
-<span id="cb5-89">        out[[<span class="dv">2</span><span class="op">*</span>nv<span class="op">+</span><span class="dv">2</span><span class="op">*</span>nu<span class="op">+</span>i<span class="dv">-3</span>]] &lt;-<span class="st"> </span><span class="kw">cbind</span>(M[,1L], <span class="op">-</span>M[,2L], M[,3L])</span>
-<span id="cb5-90">      }</span>
-<span id="cb5-91">    }</span>
-<span id="cb5-92">  }</span>
-<span id="cb5-93">  <span class="cf">if</span>(exchange){</span>
-<span id="cb5-94">    out &lt;-<span class="st"> </span><span class="kw">lapply</span>(out, <span class="cf">function</span>(M){</span>
-<span id="cb5-95">      M[, <span class="kw">c</span>(2L,1L,3L)]</span>
-<span id="cb5-96">    })</span>
-<span id="cb5-97">  }</span>
-<span id="cb5-98">  out</span>
-<span id="cb5-99">}</span></code></pre>
-      </div>
-      <p>Here is an example:</p>
-      <div class="sourceCode" id="cb6">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb6-1">sgntr =<span class="st"> "++-"</span></span>
-<span id="cb6-2">a =<span class="st"> </span><span class="dv">4</span>; b =<span class="st"> </span><span class="dv">6</span>; c =<span class="st"> </span><span class="dv">5</span></span>
-<span id="cb6-3">mesh &lt;-<span class="st"> </span><span class="kw">hyperboloidMesh</span>(a, b, c, sgntr, <span class="dt">nu =</span> <span class="dv">100</span>, <span class="dt">nv =</span> <span class="dv">100</span>, <span class="dt">vmin =</span> <span class="dv">-150</span>)</span>
-<span id="cb6-4">clines &lt;-<span class="st"> </span><span class="kw">curvatureLinesH1</span>(a, b, c, sgntr, <span class="dt">nu =</span> <span class="dv">5</span>, <span class="dt">nv =</span> <span class="dv">5</span>, <span class="dt">vmin =</span> <span class="dv">-150</span>)</span>
-<span id="cb6-5"><span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">"chartreuse4"</span>, <span class="dt">back =</span> <span class="st">"culled"</span>) </span>
-<span id="cb6-6"><span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">"yellow"</span>, <span class="dt">front =</span> <span class="st">"culled"</span>) </span>
-<span id="cb6-7"><span class="kw">invisible</span>(<span class="kw">lapply</span>(clines, <span class="cf">function</span>(l){</span>
-<span id="cb6-8">  <span class="kw">shade3d</span>(<span class="kw">cylinder3d</span>(l, <span class="dt">radius =</span> <span class="fl">0.1</span>, <span class="dt">sides =</span> <span class="dv">30</span>))</span>
-<span id="cb6-9">}))</span></code></pre>
-      </div>
-      <p>
-        <img
-          src="https://laustep.github.io/stlahblog/posts/figures/quadrics_H1.png"
-        />
-      </p>
-      <h1 id="two-sheeted-hyperboloid">Two-sheeted hyperboloid</h1>
-      <p>
-        There are three types of two-sheeted hyperboloids, corresponding to
-        these equations:
-        <span class="math display"
-          >\[ \frac{x^2}{a^2} - \frac{y^2}{b^2} - \frac{z^2}{c^2} = 1 \\
-          -\frac{x^2}{a^2} - \frac{y^2}{b^2} + \frac{z^2}{c^2} = 1 \\
-          -\frac{x^2}{a^2} + \frac{y^2}{b^2} - \frac{z^2}{c^2} = 1. \]</span
-        >
-        The <code>twoSheetsHyperboloidMesh</code> function below generates a
-        mesh of the two-sheeted hyperboloid; the <code>signature</code> argument
-        corresponds to one of the above equations, it must be
-        <code>"+--"</code>, <code>"--+"</code> or <code>"-+-"</code>. The mesh
-        is made of quadrilaterals and their number is controlled by the
-        arguments <code>nu</code> and <code>nv</code>. The two-sheeted
-        hyperboloid is infinite and the argument <code>vmin</code> is here to
-        control its truncation.
-      </p>
-      <div class="sourceCode" id="cb7">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb7-1">twoSheetsHyperboloidMesh &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, signature, nu, nv, vmin){</span>
-<span id="cb7-2">  <span class="kw">stopifnot</span>(signature <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">"+--"</span>, <span class="st">"--+"</span>, <span class="st">"-+-"</span>))</span>
-<span id="cb7-3">  <span class="kw">stopifnot</span>(vmin <span class="op">&lt;</span><span class="st"> </span><span class="dv">1</span>)</span>
-<span id="cb7-4">  <span class="cf">if</span>(signature <span class="op">==</span><span class="st"> "--+"</span>){</span>
-<span id="cb7-5">    mesh &lt;-<span class="st"> </span><span class="kw">twoSheetsHyperboloidMesh</span>(c, b, a, <span class="st">"+--"</span>, nu, nv, vmin)</span>
-<span id="cb7-6">    mesh<span class="op">$</span>vb &lt;-<span class="st"> </span>mesh<span class="op">$</span>vb[<span class="kw">c</span>(3L,2L,1L,4L),]</span>
-<span id="cb7-7">    mesh<span class="op">$</span>normals &lt;-<span class="st"> </span>mesh<span class="op">$</span>normals[<span class="kw">c</span>(3L,2L,1L),]</span>
-<span id="cb7-8">    mesh<span class="op">$</span>ib &lt;-<span class="st"> </span>mesh<span class="op">$</span>ib[4L<span class="op">:</span>1L,]</span>
-<span id="cb7-9">    <span class="kw">return</span>(mesh)</span>
-<span id="cb7-10">  }<span class="cf">else</span> <span class="cf">if</span>(signature <span class="op">==</span><span class="st"> "-+-"</span>){</span>
-<span id="cb7-11">    mesh &lt;-<span class="st"> </span><span class="kw">twoSheetsHyperboloidMesh</span>(b, a, c, <span class="st">"+--"</span>, nu, nv, vmin)</span>
-<span id="cb7-12">    mesh<span class="op">$</span>vb &lt;-<span class="st"> </span>mesh<span class="op">$</span>vb[<span class="kw">c</span>(2L,1L,3L,4L),]</span>
-<span id="cb7-13">    mesh<span class="op">$</span>normals &lt;-<span class="st"> </span>mesh<span class="op">$</span>normals[<span class="kw">c</span>(2L,1L,3L),]</span>
-<span id="cb7-14">    mesh<span class="op">$</span>ib &lt;-<span class="st"> </span>mesh<span class="op">$</span>ib[4L<span class="op">:</span>1L,]</span>
-<span id="cb7-15">    <span class="kw">return</span>(mesh)</span>
-<span id="cb7-16">  }</span>
-<span id="cb7-17">  a0 &lt;-<span class="st"> </span>a</span>
-<span id="cb7-18">  <span class="cf">if</span>(b <span class="op">&gt;</span><span class="st"> </span>c){</span>
-<span id="cb7-19">    exchange &lt;-<span class="st"> </span><span class="ot">TRUE</span></span>
-<span id="cb7-20">    b0 &lt;-<span class="st"> </span>c; c0 &lt;-<span class="st"> </span>b</span>
-<span id="cb7-21">  }<span class="cf">else</span>{</span>
-<span id="cb7-22">    exchange &lt;-<span class="st"> </span><span class="ot">FALSE</span></span>
-<span id="cb7-23">    b0 &lt;-<span class="st"> </span>b; c0 &lt;-<span class="st"> </span>c</span>
-<span id="cb7-24">  }</span>
-<span id="cb7-25">  Nu2 &lt;-<span class="st"> </span>a0<span class="op">^</span><span class="dv">2</span></span>
-<span id="cb7-26">  h2ab &lt;-<span class="st"> </span>b0<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>Nu2; h2ac &lt;-<span class="st"> </span>c0<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>Nu2</span>
-<span id="cb7-27">  c2 &lt;-<span class="st"> </span><span class="dv">1</span>; a2 &lt;-<span class="st"> </span>c2 <span class="op">+</span><span class="st"> </span>h2ac; b2 &lt;-<span class="st"> </span>a2 <span class="op">-</span><span class="st"> </span>h2ab</span>
-<span id="cb7-28">  h2bc &lt;-<span class="st"> </span>b2 <span class="op">-</span><span class="st"> </span>c2</span>
-<span id="cb7-29">  <span class="co">#</span></span>
-<span id="cb7-30">  vertices &lt;-<span class="st"> </span>Normals &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="ot">NA_real_</span>, <span class="dt">nrow =</span> 3L, <span class="dt">ncol =</span> nu<span class="op">*</span>nv)</span>
-<span id="cb7-31">  indices &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="ot">NA_integer_</span>, <span class="dt">nrow =</span> 4L, <span class="dt">ncol =</span> (nu<span class="dv">-1</span>)<span class="op">*</span>(nv<span class="dv">-1</span>))</span>
-<span id="cb7-32">  v_ &lt;-<span class="st"> </span><span class="kw">seq</span>(vmin, c2, <span class="dt">length.out =</span> nv)</span>
-<span id="cb7-33">  <span class="co">#</span></span>
-<span id="cb7-34">  <span class="cf">if</span>(b0 <span class="op">!=</span><span class="st"> </span>c0){</span>
-<span id="cb7-35">    u_ &lt;-<span class="st"> </span><span class="kw">seq</span>(c2, b2, <span class="dt">length.out =</span> nu)</span>
-<span id="cb7-36">    x &lt;-<span class="st"> </span>a0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2ac<span class="op">*</span>h2ab) <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(a2<span class="op">-</span>u_)</span>
-<span id="cb7-37">    y &lt;-<span class="st"> </span>b0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2bc<span class="op">*</span>h2ab) <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(b2<span class="op">-</span>u_)</span>
-<span id="cb7-38">    z &lt;-<span class="st"> </span>c0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2bc<span class="op">*</span>h2ac) <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(u_<span class="op">-</span>c2)</span>
-<span id="cb7-39">  }<span class="cf">else</span>{</span>
-<span id="cb7-40">    u_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> nu<span class="op">+</span><span class="dv">1</span>)[<span class="op">-</span>1L]</span>
-<span id="cb7-41">    x &lt;-<span class="st"> </span><span class="kw">rep</span>(a0<span class="op">/</span><span class="kw">sqrt</span>(h2ac), nu)</span>
-<span id="cb7-42">    myz &lt;-<span class="st"> </span>b0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2ab)</span>
-<span id="cb7-43">    y &lt;-<span class="st"> </span>myz <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(u_)</span>
-<span id="cb7-44">    z &lt;-<span class="st"> </span>myz <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(u_)</span>
-<span id="cb7-45">  }</span>
-<span id="cb7-46">  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>nu){</span>
-<span id="cb7-47">    <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>nv){</span>
-<span id="cb7-48">      P &lt;-<span class="st"> </span>vertices[, (i<span class="dv">-1</span>)<span class="op">*</span>nv<span class="op">+</span>j] &lt;-<span class="st"> </span><span class="kw">c</span>(</span>
-<span id="cb7-49">        x[i] <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(a2<span class="op">-</span>v_[j]),</span>
-<span id="cb7-50">        y[i] <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(b2<span class="op">-</span>v_[j]),</span>
-<span id="cb7-51">        z[i] <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(c2<span class="op">-</span>v_[j])</span>
-<span id="cb7-52">      )</span>
-<span id="cb7-53">      Normals[, (i<span class="dv">-1</span>)<span class="op">*</span>nv<span class="op">+</span>j] &lt;-<span class="st"> </span><span class="kw">c</span>(P[1L]<span class="op">/</span>a0<span class="op">^</span><span class="dv">2</span>, <span class="op">-</span>P[2L]<span class="op">/</span>b0<span class="op">^</span><span class="dv">2</span>, <span class="op">-</span>P[3L]<span class="op">/</span>c0<span class="op">^</span><span class="dv">2</span>)</span>
-<span id="cb7-54">    }</span>
-<span id="cb7-55">  }</span>
-<span id="cb7-56">  <span class="co"># quads</span></span>
-<span id="cb7-57">  <span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span>(nu<span class="dv">-1</span>)){</span>
-<span id="cb7-58">    im1 &lt;-<span class="st"> </span>i<span class="op">-</span>1L</span>
-<span id="cb7-59">    <span class="cf">for</span>(j <span class="cf">in</span> 1L<span class="op">:</span>(nv<span class="dv">-1</span>)){</span>
-<span id="cb7-60">      jp1 &lt;-<span class="st"> </span>j<span class="op">+</span>1L</span>
-<span id="cb7-61">      quad &lt;-<span class="st"> </span><span class="kw">c</span>(im1<span class="op">*</span>nv<span class="op">+</span>j, im1<span class="op">*</span>nv<span class="op">+</span>jp1, i<span class="op">*</span>nv<span class="op">+</span>jp1, i<span class="op">*</span>nv<span class="op">+</span>j)</span>
-<span id="cb7-62">      indices[, im1<span class="op">*</span>(nv<span class="dv">-1</span>)<span class="op">+</span>j] &lt;-<span class="st"> </span><span class="cf">if</span>(exchange) <span class="kw">rev</span>(quad) <span class="cf">else</span> quad</span>
-<span id="cb7-63">    }</span>
-<span id="cb7-64">  }</span>
-<span id="cb7-65">  vertices &lt;-<span class="st"> </span><span class="kw">cbind</span>(vertices, <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>vertices)</span>
-<span id="cb7-66">  indices &lt;-<span class="st"> </span><span class="kw">cbind</span>(indices, indices[4L<span class="op">:</span>1L,] <span class="op">+</span><span class="st"> </span>nu<span class="op">*</span>nv)</span>
-<span id="cb7-67">  Normals &lt;-<span class="st"> </span><span class="kw">cbind</span>(Normals, <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>Normals)</span>
-<span id="cb7-68">  vertices &lt;-<span class="st"> </span><span class="kw">cbind</span>(vertices, <span class="kw">c</span>(<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>vertices)</span>
-<span id="cb7-69">  indices &lt;-<span class="st"> </span><span class="kw">cbind</span>(indices, indices[4L<span class="op">:</span>1L,] <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>nu<span class="op">*</span>nv)</span>
-<span id="cb7-70">  Normals &lt;-<span class="st"> </span><span class="kw">cbind</span>(Normals, <span class="kw">c</span>(<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>Normals)</span>
-<span id="cb7-71">  vertices &lt;-<span class="st"> </span><span class="kw">cbind</span>(vertices, <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>vertices)</span>
-<span id="cb7-72">  indices &lt;-<span class="st"> </span><span class="kw">cbind</span>(indices, indices[4L<span class="op">:</span>1L,] <span class="op">+</span><span class="st"> </span><span class="dv">4</span><span class="op">*</span>nu<span class="op">*</span>nv)</span>
-<span id="cb7-73">  Normals &lt;-<span class="st"> </span><span class="kw">cbind</span>(Normals, <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>Normals)</span>
-<span id="cb7-74">  mesh &lt;-<span class="st"> </span><span class="kw">qmesh3d</span>(</span>
-<span id="cb7-75">    <span class="dt">vertices =</span> <span class="cf">if</span>(exchange) vertices[<span class="kw">c</span>(1L,3L,2L),] <span class="cf">else</span> vertices,</span>
-<span id="cb7-76">    <span class="dt">indices =</span> indices,</span>
-<span id="cb7-77">    <span class="dt">homogeneous =</span> <span class="ot">FALSE</span>,</span>
-<span id="cb7-78">    <span class="dt">normals =</span> <span class="op">-</span><span class="kw">t</span>(<span class="cf">if</span>(exchange) Normals[<span class="kw">c</span>(1L,3L,2L),] <span class="cf">else</span> Normals)</span>
-<span id="cb7-79">  )</span>
-<span id="cb7-80">  mesh</span>
-<span id="cb7-81">}</span></code></pre>
-      </div>
-      <p>
-        The <code>curvatureLinesH2</code> function below generates some
-        curvature lines of the two-sheeted hyperboloid. The role of the
-        arguments <code>du</code> and <code>dv</code> is similar to the role of
-        the arguments <code>du</code> and <code>dv</code> in
-        <code>curvatureLinesE</code>.
-      </p>
-      <div class="sourceCode" id="cb8">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb8-1">curvatureLinesH2 &lt;-<span class="st"> </span><span class="cf">function</span>(a, b, c, signature, nu, nv, vmin, du, dv, </span>
-<span id="cb8-2">                             <span class="dt">npoints =</span> <span class="dv">100</span>){</span>
-<span id="cb8-3">  <span class="kw">stopifnot</span>(signature <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">"+--"</span>, <span class="st">"--+"</span>, <span class="st">"-+-"</span>))</span>
-<span id="cb8-4">  <span class="kw">stopifnot</span>(du <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, dv <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, vmin <span class="op">&lt;</span><span class="st"> </span><span class="dv">1</span>)</span>
-<span id="cb8-5">  <span class="cf">if</span>(signature <span class="op">==</span><span class="st"> "--+"</span>){</span>
-<span id="cb8-6">    clines &lt;-<span class="st"> </span></span>
-<span id="cb8-7"><span class="st">      </span><span class="kw">curvatureLinesH2</span>(c, b, a, <span class="st">"+--"</span>, nu, nv, vmin, du, dv, npoints)</span>
-<span id="cb8-8">    <span class="kw">return</span>(<span class="kw">lapply</span>(clines, <span class="cf">function</span>(l) l[, <span class="kw">c</span>(3L,2L,1L)]))</span>
-<span id="cb8-9">  }<span class="cf">else</span> <span class="cf">if</span>(signature <span class="op">==</span><span class="st"> "-+-"</span>){</span>
-<span id="cb8-10">    clines &lt;-<span class="st"> </span></span>
-<span id="cb8-11"><span class="st">      </span><span class="kw">curvatureLinesH2</span>(b, a, c, <span class="st">"+--"</span>, nu, nv, vmin, du, dv, npoints)</span>
-<span id="cb8-12">    <span class="kw">return</span>(<span class="kw">lapply</span>(clines, <span class="cf">function</span>(l) l[, <span class="kw">c</span>(2L,1L,3L)]))</span>
-<span id="cb8-13">  }</span>
-<span id="cb8-14">  a0 &lt;-<span class="st"> </span>a</span>
-<span id="cb8-15">  <span class="cf">if</span>(b <span class="op">&gt;</span><span class="st"> </span>c){</span>
-<span id="cb8-16">    exchange &lt;-<span class="st"> </span><span class="ot">TRUE</span></span>
-<span id="cb8-17">    b0 &lt;-<span class="st"> </span>c; c0 &lt;-<span class="st"> </span>b</span>
-<span id="cb8-18">  }<span class="cf">else</span>{</span>
-<span id="cb8-19">    exchange &lt;-<span class="st"> </span><span class="ot">FALSE</span></span>
-<span id="cb8-20">    b0 &lt;-<span class="st"> </span>b; c0 &lt;-<span class="st"> </span>c</span>
-<span id="cb8-21">  }</span>
-<span id="cb8-22">  Nu2 &lt;-<span class="st"> </span>a0<span class="op">^</span><span class="dv">2</span></span>
-<span id="cb8-23">  h2ab &lt;-<span class="st"> </span>b0<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>Nu2; h2ac &lt;-<span class="st"> </span>c0<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>Nu2</span>
-<span id="cb8-24">  c2 &lt;-<span class="st"> </span><span class="dv">1</span>; a2 &lt;-<span class="st"> </span>c2 <span class="op">+</span><span class="st"> </span>h2ac; b2 &lt;-<span class="st"> </span>a2 <span class="op">-</span><span class="st"> </span>h2ab</span>
-<span id="cb8-25">  h2bc &lt;-<span class="st"> </span>b2 <span class="op">-</span><span class="st"> </span>c2</span>
-<span id="cb8-26">  <span class="co">#</span></span>
-<span id="cb8-27">  <span class="cf">if</span>(b0 <span class="op">!=</span><span class="st"> </span>c0 <span class="op">&amp;&amp;</span><span class="st"> </span>c2<span class="op">+</span>du <span class="op">&gt;=</span><span class="st"> </span>b2){</span>
-<span id="cb8-28">    <span class="kw">stop</span>(<span class="st">"`du` is too large."</span>)</span>
-<span id="cb8-29">  }</span>
-<span id="cb8-30">  <span class="cf">if</span>(vmin <span class="op">&gt;=</span><span class="st"> </span>c2<span class="op">-</span>dv){</span>
-<span id="cb8-31">    <span class="kw">stop</span>(<span class="st">"`dv` is too large"</span>)</span>
-<span id="cb8-32">  }</span>
-<span id="cb8-33">  v_ &lt;-<span class="st"> </span><span class="kw">seq</span>(vmin, c2<span class="op">-</span>dv, <span class="dt">length.out =</span> nv)</span>
-<span id="cb8-34">  t_ &lt;-<span class="st"> </span><span class="kw">seq</span>(vmin, c2, <span class="dt">length.out =</span> npoints)</span>
-<span id="cb8-35">  out &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">"list"</span>, <span class="dv">2</span><span class="op">*</span>nv <span class="op">+</span><span class="st"> </span><span class="dv">4</span><span class="op">*</span>nu <span class="op">-</span><span class="st"> </span><span class="dv">2</span>)</span>
-<span id="cb8-36">  <span class="co">#</span></span>
-<span id="cb8-37">  <span class="cf">if</span>(b0 <span class="op">!=</span><span class="st"> </span>c0){</span>
-<span id="cb8-38">    u_ &lt;-<span class="st"> </span><span class="kw">seq</span>(c2<span class="op">+</span>du, b2, <span class="dt">length.out =</span> nu)</span>
-<span id="cb8-39">    s_ &lt;-<span class="st"> </span><span class="kw">seq</span>(c2, b2, <span class="dt">length.out =</span> npoints)</span>
-<span id="cb8-40">    mx &lt;-<span class="st"> </span>a0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2ac<span class="op">*</span>h2ab)</span>
-<span id="cb8-41">    my &lt;-<span class="st"> </span>b0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2bc<span class="op">*</span>h2ab)</span>
-<span id="cb8-42">    mz &lt;-<span class="st"> </span>c0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2bc<span class="op">*</span>h2ac)</span>
-<span id="cb8-43">    <span class="cf">for</span>(j <span class="cf">in</span> 1L<span class="op">:</span>nv){</span>
-<span id="cb8-44">      x &lt;-<span class="st"> </span>mx <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((a2<span class="op">-</span>s_)<span class="op">*</span>(a2<span class="op">-</span>v_[j]))</span>
-<span id="cb8-45">      y &lt;-<span class="st"> </span>my <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((b2<span class="op">-</span>s_)<span class="op">*</span>(b2<span class="op">-</span>v_[j]))</span>
-<span id="cb8-46">      z &lt;-<span class="st"> </span>mz <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((s_<span class="op">-</span>c2)<span class="op">*</span>(c2<span class="op">-</span>v_[j]))</span>
-<span id="cb8-47">      M1 &lt;-<span class="st"> </span><span class="kw">rbind</span>(<span class="kw">cbind</span>(x, y, z), <span class="kw">cbind</span>(x, <span class="op">-</span>y, z)[(npoints<span class="dv">-1</span>)<span class="op">:</span>1L,])</span>
-<span id="cb8-48">      M2 &lt;-<span class="st"> </span><span class="kw">cbind</span>(M1[,<span class="kw">c</span>(1L,2L)], <span class="op">-</span>M1[,3L])</span>
-<span id="cb8-49">      M &lt;-<span class="st"> </span><span class="kw">rbind</span>(M1, M2[(<span class="dv">2</span><span class="op">*</span>npoints<span class="dv">-2</span>)<span class="op">:</span>1L,])</span>
-<span id="cb8-50">      out[[j]] &lt;-<span class="st"> </span><span class="cf">if</span>(exchange) M[,<span class="kw">c</span>(1L,3L,2L)] <span class="cf">else</span> M</span>
-<span id="cb8-51">      out[[nv<span class="op">+</span>j]] &lt;-<span class="st"> </span></span>
-<span id="cb8-52"><span class="st">        </span><span class="kw">cbind</span>(<span class="op">-</span>M[,1L], <span class="cf">if</span>(exchange) M[,<span class="kw">c</span>(3L,2L)] <span class="cf">else</span> M[,<span class="kw">c</span>(2L,3L)])</span>
-<span id="cb8-53">    }</span>
-<span id="cb8-54">    <span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span>nu){</span>
-<span id="cb8-55">      x &lt;-<span class="st"> </span>mx <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((a2<span class="op">-</span>u_[i])<span class="op">*</span>(a2<span class="op">-</span>t_))</span>
-<span id="cb8-56">      y &lt;-<span class="st"> </span>my <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((b2<span class="op">-</span>u_[i])<span class="op">*</span>(b2<span class="op">-</span>t_))</span>
-<span id="cb8-57">      z &lt;-<span class="st"> </span>mz <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((u_[i]<span class="op">-</span>c2)<span class="op">*</span>(c2<span class="op">-</span>t_))</span>
-<span id="cb8-58">      M &lt;-<span class="st"> </span><span class="kw">rbind</span>(<span class="kw">cbind</span>(x, y, z), <span class="kw">cbind</span>(x, y, <span class="op">-</span>z)[(npoints<span class="dv">-1</span>)<span class="op">:</span>1L,])</span>
-<span id="cb8-59">      out[[<span class="dv">2</span><span class="op">*</span>nv<span class="op">+</span>i]] &lt;-<span class="st"> </span><span class="cf">if</span>(exchange) M[,<span class="kw">c</span>(1L,3L,2L)] <span class="cf">else</span> M</span>
-<span id="cb8-60">      <span class="cf">if</span>(i <span class="op">&lt;</span><span class="st"> </span>nu){</span>
-<span id="cb8-61">        out[[<span class="dv">2</span><span class="op">*</span>nv<span class="op">+</span>nu<span class="op">+</span>i]] &lt;-<span class="st"> </span><span class="cf">if</span>(exchange) </span>
-<span id="cb8-62">          <span class="kw">cbind</span>(M[,<span class="kw">c</span>(1L,3L)], <span class="op">-</span>M[,2L]) </span>
-<span id="cb8-63">        <span class="cf">else</span> </span>
-<span id="cb8-64">          <span class="kw">cbind</span>(M[,1L], <span class="op">-</span>M[,2L], M[,3L])</span>
-<span id="cb8-65">      }</span>
-<span id="cb8-66">    }</span>
-<span id="cb8-67">  }<span class="cf">else</span>{ <span class="co"># b0 = c0</span></span>
-<span id="cb8-68">    u_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> nu<span class="op">+</span><span class="dv">1</span>)[<span class="op">-</span>1L] </span>
-<span id="cb8-69">    s_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> npoints)</span>
-<span id="cb8-70">    mx &lt;-<span class="st"> </span>a0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2ac)</span>
-<span id="cb8-71">    myz &lt;-<span class="st"> </span>b0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(h2ab)</span>
-<span id="cb8-72">    <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>nv){</span>
-<span id="cb8-73">      x &lt;-<span class="st"> </span>mx <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(a2<span class="op">-</span>v_[j])</span>
-<span id="cb8-74">      y &lt;-<span class="st"> </span>myz <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(b2<span class="op">-</span>v_[j]) <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(s_)</span>
-<span id="cb8-75">      z &lt;-<span class="st"> </span>myz <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(c2<span class="op">-</span>v_[j]) <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(s_)</span>
-<span id="cb8-76">      M &lt;-<span class="st"> </span><span class="kw">cbind</span>(x, y, z)</span>
-<span id="cb8-77">      out[[j]] &lt;-<span class="st"> </span><span class="cf">if</span>(exchange) M[,<span class="kw">c</span>(1L,3L,2L)] <span class="cf">else</span> M</span>
-<span id="cb8-78">      out[[nv<span class="op">+</span>j]] &lt;-<span class="st"> </span></span>
-<span id="cb8-79"><span class="st">        </span><span class="kw">cbind</span>(<span class="op">-</span>M[,1L], <span class="cf">if</span>(exchange) M[,<span class="kw">c</span>(3L,2L)] <span class="cf">else</span> M[,<span class="kw">c</span>(2L,3L)])</span>
-<span id="cb8-80">    }</span>
-<span id="cb8-81">    <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>nu){</span>
-<span id="cb8-82">      x &lt;-<span class="st"> </span>mx <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(a2<span class="op">-</span>t_)</span>
-<span id="cb8-83">      y &lt;-<span class="st"> </span>myz <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(b2<span class="op">-</span>t_) <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(u_[i])</span>
-<span id="cb8-84">      z &lt;-<span class="st"> </span>myz <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(c2<span class="op">-</span>t_) <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(u_[i])</span>
-<span id="cb8-85">      M &lt;-<span class="st"> </span><span class="kw">rbind</span>(<span class="kw">cbind</span>(x, y, z), <span class="kw">cbind</span>(x, <span class="op">-</span>y, <span class="op">-</span>z)[(npoints<span class="dv">-1</span>)<span class="op">:</span>1L,])</span>
-<span id="cb8-86">      out[[<span class="dv">2</span><span class="op">*</span>nv<span class="op">+</span>i]] &lt;-<span class="st"> </span><span class="cf">if</span>(exchange) M[,<span class="kw">c</span>(1L,3L,2L)] <span class="cf">else</span> M</span>
-<span id="cb8-87">      <span class="cf">if</span>(i <span class="op">&lt;</span><span class="st"> </span>nu){</span>
-<span id="cb8-88">        out[[<span class="dv">2</span><span class="op">*</span>nv<span class="op">+</span>nu<span class="op">+</span>i]] &lt;-<span class="st"> </span><span class="cf">if</span>(exchange) </span>
-<span id="cb8-89">          <span class="kw">cbind</span>(M[,<span class="kw">c</span>(1L,3L)], <span class="op">-</span>M[,2L]) </span>
-<span id="cb8-90">        <span class="cf">else</span> </span>
-<span id="cb8-91">          <span class="kw">cbind</span>(M[,1L], <span class="op">-</span>M[,2L], M[,3L])</span>
-<span id="cb8-92">      }</span>
-<span id="cb8-93">    }</span>
-<span id="cb8-94">  }</span>
-<span id="cb8-95">  <span class="co">#</span></span>
-<span id="cb8-96">  out[(<span class="dv">2</span><span class="op">*</span>nv<span class="op">+</span><span class="dv">2</span><span class="op">*</span>nu)<span class="op">:</span>(<span class="dv">2</span><span class="op">*</span>nv<span class="op">+</span><span class="dv">4</span><span class="op">*</span>nu<span class="dv">-2</span>)] &lt;-<span class="st"> </span></span>
-<span id="cb8-97"><span class="st">    </span><span class="kw">lapply</span>(out[(<span class="dv">2</span><span class="op">*</span>nv<span class="op">+</span><span class="dv">1</span>)<span class="op">:</span>(<span class="dv">2</span><span class="op">*</span>nv<span class="op">+</span><span class="dv">2</span><span class="op">*</span>nu<span class="dv">-1</span>)], <span class="cf">function</span>(M){</span>
-<span id="cb8-98">      <span class="kw">cbind</span>(<span class="op">-</span>M[,1L], M[,<span class="kw">c</span>(2L,3L)])</span>
-<span id="cb8-99">    })</span>
-<span id="cb8-100">  out</span>
-<span id="cb8-101">}</span></code></pre>
-      </div>
-      <p>An example:</p>
-      <div class="sourceCode" id="cb9">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb9-1">a =<span class="st"> </span><span class="dv">6</span>; b =<span class="st"> </span><span class="dv">5</span>; c =<span class="st"> </span><span class="dv">3</span></span>
-<span id="cb9-2">sgntr =<span class="st"> "-+-"</span></span>
-<span id="cb9-3">mesh &lt;-<span class="st"> </span><span class="kw">twoSheetsHyperboloidMesh</span>(a, b, c, sgntr, <span class="dv">100</span>, <span class="dv">100</span>, <span class="dt">vmin =</span> <span class="dv">-500</span>)</span>
-<span id="cb9-4">clines &lt;-<span class="st"> </span><span class="kw">curvatureLinesH2</span>(a, b, c, sgntr, <span class="dt">nu =</span> <span class="dv">5</span>, <span class="dt">nv =</span> <span class="dv">5</span>, <span class="dt">vmin =</span> <span class="dv">-500</span>, </span>
-<span id="cb9-5">                           <span class="dt">du =</span> <span class="dv">1</span>, <span class="dt">dv =</span> <span class="dv">20</span>, <span class="dt">npoints =</span> <span class="dv">300</span>)</span>
-<span id="cb9-6"><span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">"navyblue"</span>, <span class="dt">back =</span> <span class="st">"culled"</span>) </span>
-<span id="cb9-7"><span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">"goldenrod"</span>, <span class="dt">front =</span> <span class="st">"culled"</span>)</span>
-<span id="cb9-8"><span class="kw">invisible</span>(<span class="kw">lapply</span>(clines, <span class="cf">function</span>(l){</span>
-<span id="cb9-9">  <span class="kw">shade3d</span>(<span class="kw">cylinder3d</span>(l, <span class="dt">radius =</span> <span class="fl">0.2</span>, <span class="dt">sides =</span> <span class="dv">30</span>))</span>
-<span id="cb9-10">}))</span></code></pre>
-      </div>
-      <p>
-        <img
-          src="https://laustep.github.io/stlahblog/posts/figures/quadrics_H2.png"
-        />
-      </p>
-      <h1 id="general-quadric">General quadric</h1>
-      <p>
-        A general quadric in
-        <span class="math inline">\(\mathbb{R}^3\)</span> has equation
-        <span class="math display"
-          >\[ (x \quad y \quad z)\, A \begin{pmatrix} x \\ y \\ z \end{pmatrix}
-          + J' \begin{pmatrix} x \\ y \\ z \end{pmatrix} + K = 0, \]</span
-        >
-        where <span class="math inline">\(A\)</span> is a symmetric
-        <span class="math inline">\((3\times 3)\)</span>-matrix,
-        <span class="math inline">\(J \in \mathbb{R}^3\)</span>, and
-        <span class="math inline">\(K \in \mathbb{R}\)</span>. Let’s treat an
-        example. We follow the strategy given at page 45 of Brannan &amp; al’s
-        book <em>Geometry</em> (<a
-          href="http://math.haifa.ac.il/ROVENSKI/B2.pdf"
-          >pdf</a
-        >).
-      </p>
-      <div class="sourceCode" id="cb10">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb10-1">A =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(</span>
-<span id="cb10-2">   <span class="dv">5</span>, <span class="dv">-1</span>, <span class="dv">-1</span>, </span>
-<span id="cb10-3">  <span class="dv">-1</span>,  <span class="dv">3</span>,  <span class="dv">1</span>,</span>
-<span id="cb10-4">  <span class="dv">-1</span>,  <span class="dv">1</span>, <span class="dv">-3</span></span>
-<span id="cb10-5">  ), <span class="dt">nrow =</span> 3L, <span class="dt">ncol =</span> 3L)</span>
-<span id="cb10-6">J =<span class="st"> </span><span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">6</span>, <span class="dv">8</span>)</span>
-<span id="cb10-7">K =<span class="st"> </span><span class="dv">-10</span></span>
-<span id="cb10-8"><span class="co"># computes spectral decomposition of A</span></span>
-<span id="cb10-9">eig &lt;-<span class="st"> </span><span class="kw">eigen</span>(A)</span>
-<span id="cb10-10">P &lt;-<span class="st"> </span>eig<span class="op">$</span>vectors</span>
-<span id="cb10-11">( evalues &lt;-<span class="st"> </span>eig<span class="op">$</span>values )</span>
-<span id="cb10-12"><span class="co">## [1]  5.614627  2.632676 -3.247303</span></span></code></pre>
-      </div>
-      <p>
-        There is no eigenvalue equal to <span class="math inline">\(0\)</span>;
-        this is the first necessary condition in order for the solution of the
-        equation to be a focal quadric.
-      </p>
-      <p>
-        Now we write the equation in the form
-        <span class="math display"
-          >\[ \lambda_1 {(x'')}^2 + \lambda_2 {(y'')}^2 + \lambda_3 {(z'')}^2 =
-          \mathrm{rhs} \]</span
-        >
-        where <span class="math inline">\(\lambda_1\)</span>,
-        <span class="math inline">\(\lambda_2\)</span>,
-        <span class="math inline">\(\lambda_3\)</span> are the eigenvalues of
-        <span class="math inline">\(A\)</span>, and
-        <span class="math inline">\((x'',y'',z'')\)</span> is a new coordinate
-        system.
-      </p>
-      <div class="sourceCode" id="cb11">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb11-1">center &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">t</span>(J) <span class="op">%*%</span><span class="st"> </span>P) <span class="op">/</span><span class="st"> </span>evalues <span class="op">/</span><span class="st"> </span><span class="dv">2</span></span>
-<span id="cb11-2">( rhs &lt;-<span class="st"> </span><span class="kw">sum</span>(evalues <span class="op">*</span><span class="st"> </span>center<span class="op">^</span><span class="dv">2</span>) <span class="op">-</span><span class="st"> </span>K )</span>
-<span id="cb11-3"><span class="co">## [1] 11.5</span></span></code></pre>
-      </div>
-      <div class="sourceCode" id="cb12">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb12-1">( sgntr &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="kw">ifelse</span>(rhs<span class="op">*</span>evalues <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, <span class="st">"+"</span>, <span class="st">"-"</span>), <span class="dt">collapse =</span> <span class="st">""</span>) )</span>
-<span id="cb12-2"><span class="co">## [1] "++-"</span></span></code></pre>
-      </div>
-      <p>
-        We find <span class="math inline">\(\mathrm{rhs} \neq 0\)</span>, so the
-        solution of the equation is a focal quadric. If
-        <span class="math inline">\(\mathrm{rhs} = 0\)</span>, the solution is a
-        cone.
-      </p>
-      <p>
-        The signature is <span class="math inline">\(++-\)</span>, so the
-        solution of the equation is a one-sheeted hyperboloid. By dividing both
-        members of the previous equality by
-        <span class="math inline">\(\mathrm{rhs}\)</span>, we get its equation
-        in standard form.
-      </p>
-      <div class="sourceCode" id="cb13">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb13-1">abc &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">abs</span>(rhs<span class="op">/</span>evalues))</span>
-<span id="cb13-2">a &lt;-<span class="st"> </span>abc[<span class="dv">1</span>]; b &lt;-<span class="st"> </span>abc[<span class="dv">2</span>]; c &lt;-<span class="st"> </span>abc[<span class="dv">3</span>]</span>
-<span id="cb13-3">mesh0 &lt;-<span class="st"> </span><span class="kw">hyperboloidMesh</span>(a, b, c, sgntr, <span class="dv">100</span>, <span class="dv">100</span>, <span class="dv">-5</span>)</span>
-<span id="cb13-4"><span class="co"># final quadric mesh:</span></span>
-<span id="cb13-5">mesh &lt;-<span class="st"> </span><span class="kw">rotate3d</span>(</span>
-<span id="cb13-6">  <span class="kw">translate3d</span>(mesh0, <span class="op">-</span>center[<span class="dv">1</span>], <span class="op">-</span>center[<span class="dv">2</span>], <span class="op">-</span>center[<span class="dv">3</span>]), </span>
-<span id="cb13-7">  <span class="dt">matrix =</span> <span class="kw">t</span>(P)</span>
-<span id="cb13-8">)</span></code></pre>
-      </div>
-      <p>
-        We can check that the equation is fulfilled for some vertices of the
-        final mesh:
-      </p>
-      <div class="sourceCode" id="cb14">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb14-1"><span class="kw">apply</span>(mesh<span class="op">$</span>vb[<span class="op">-</span><span class="dv">4</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>], 2L, <span class="cf">function</span>(x){</span>
-<span id="cb14-2">  <span class="kw">c</span>(<span class="kw">t</span>(x) <span class="op">%*%</span><span class="st"> </span>A <span class="op">%*%</span><span class="st"> </span>x <span class="op">+</span><span class="st"> </span><span class="kw">t</span>(J) <span class="op">%*%</span><span class="st"> </span>x) <span class="op">+</span><span class="st"> </span>K</span>
-<span id="cb14-3">})</span>
-<span id="cb14-4"><span class="co">## [1] 5.684342e-14 7.105427e-14 4.973799e-14 4.973799e-14 4.263256e-14</span></span></code></pre>
-      </div>
-      <p>
-        Up to small numerical errors, we indeed get
-        <span class="math inline">\(0\)</span> for each of the five vertices.
-      </p>
-    </div>
-  </div>
-</div>
-]]></description>
-      <pubDate>Sun, 03 May 2020 00:00:00 UT</pubDate>
-      <guid>https://laustep.github.io/stlahblog/posts/focalQuadrics.html</guid>
       <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
