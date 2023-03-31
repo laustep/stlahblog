@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <title>TEST</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+  <script src="../libraries/three_r136dev.min.js"></script>
+
+<script>
+  const radius = 0.07;
+  // geomUnitCylinder is a cylinder such that:
+  // - the center of the first base is (0, 0, 0)
+  // - the center of the second base is (0, 1, 0)
+  let geomUnitCylinder = new THREE.CylinderGeometry(1, 1, 1, 64, 1, true);
+  geomUnitCylinder.translate(0, 0.5, 0).rotateX(Math.PI * 0.5);
+
+  console.log(geomUnitCylinder);
+
+</script>  
+
+</head>
+
+<body>
+  <div id="container"></div>
+
+<script>
+  // three js scene --------------------------------------------------------
+  const aspect = window.innerWidth / window.innerHeight;
+  camera = new THREE.PerspectiveCamera(50, aspect, 1, 10000);
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x111111);
+  object = new THREE.Object3D();
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.getElementById("container").appendChild(renderer.domElement);
+  camera.position.z = 5;
+  scene.add(camera);
+  function render() {
+    renderer.render(scene, camera);
+  }
+
+  const material = new THREE.MeshBasicMaterial({ color: 0x00FF00 });
+  var geomCylinder = geomUnitCylinder.clone();
+  var mesh = new THREE.Mesh(geomCylinder, material);
+  mesh.scale.set(radius, radius, 1);
+  var object = new THREE.Object3D();
+  object.add(mesh);
+  scene.add(object);
+
+  window.requestAnimFrame = (function () {
+    return (
+      function (callback) {
+        window.setTimeout(callback, 1000 / 1);
+      }
+    );
+  })();
+
+  const O = new THREE.Vector3(0, 0, 0);
+  const alpha = Math.PI / 180;
+  function MM(k) {
+    return new THREE.Vector3(2*Math.sin(k*alpha), Math.cos(k*alpha), 0);
+  }
+  var k = 0;
+  var M0 = MM(0);
+
+  let pStart = O;
+  let pEnd = M0;
+  mesh.position.copy(pStart);
+
+  function animate() {
+    requestAnimFrame(animate);
+
+    mesh.scale.z = pStart.distanceTo(pEnd);
+    mesh.lookAt(pEnd);
+
+    k++;
+    pEnd = MM(k);
+    render();
+  }
+
+  animate();
+
+</script>
+
+
+</body>
+
+</html>
+

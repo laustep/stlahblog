@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <title>DUOPRISM</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+  <script src="../libraries/three_r140.min.js"></script>
+  <script src="../libraries/OrbitControls.js"></script>
+
+<script>
+  var A = 30;
+  var B = 30;
+  const radius = 0.07;
+
+  const nedges = 2 * A * B;
+  const twoPi = 2 * Math.PI;
+
+  // rotation in 4D space
+  function rightIsoclinic(alpha, x) {
+    const 
+      x0 = x[0],
+      x1 = x[1],
+      x2 = x[2],
+      x3 = x[3];
+    const q0 = Math.cos(alpha);
+    const q1 = Math.sin(alpha);
+    return [
+      q0 * x0 - q1 * x1,
+      q1 * x0 + q0 * x1,
+      q0 * x2 + q1 * x3,
+      -q1 * x2 + q0 * x3
+    ];
+  }
+
+  function StereoProj(v, r) {
+    const abs_v3 = Math.abs(v[3]);
+    const F = Math.acos(v[3] / r) / Math.sqrt(r * r - abs_v3 * abs_v3);
+    return [F * v[0], F * v[1], F * v[2]];
+  }
+
+  // modulo function (always returns a positive number) --------------------
+  function mod(n, m) {
+    return ((n % m) + m) % m;
+  }
+
+  // does e2 dominates e1 for the lexicographic order? ---------------------
+  function dominates(e1, e2) {
+    return e2[0] > e1[0] || (e2[0] == e1[0] && e2[1] > e1[1]);
+  }
+
+  // duoprism vertices (4D)
+  function Vertices4D() {
+    let vertices4D = new Array(A);
+    let poly2 = new Array(B);
+    for(let j = 0; j < B; j++) {
+      let angle = (j * twoPi) / B;
+      poly2[j] = [Math.cos(angle), Math.sin(angle)];
+    }
+    for(let i = 0; i < A; i++) {
+      vertices4D[i] = new Array(B);
+      let angle = (i * twoPi) / A;
+      let poly1 = [Math.cos(angle), Math.sin(angle)];
+      for(let j = 0; j < B; j++) {
+        vertices4D[i][j] = poly1.concat(poly2[j]);
+      }
+    }
+    return vertices4D;
+  }
+
+  // duoprism edges
+  function Edges() {
+    let edges = new Array(0);
+    for(let i = 0; i < A; i++) {
+      for(let j = 0; j < B; j++) {
+        const e = [i, j];
+        let candidate = [i, mod(j - 1, B)];
+        if (dominates(e, candidate)) {
+          edges.push([e, candidate]);
+        }
+        candidate = [i, (j + 1) % B];
+        if (dominates(e, candidate)) {
+          edges.push([e, candidate]);
+        }
+        candidate = [mod(i - 1, A), j];
+        if (dominates(e, candidate)) {
+          edges.push([e, candidate]);
+        }
+        candidate = [(i + 1) % A, j];
+        if (dominates(e, candidate)) {
+          edges.push([e, candidate]);
+        }
+      }
+    }
+    return edges;
+  }
+
+  // projected and rotated duoprism vertices
+  function Vertices3D(vertices4D, alpha) {
+    let vertices3D = new Array(A);
+    const r = Math.sqrt(2);
+    for(let i = 0; i < A; i++) {
+      vertices3D[i] = new Array(B);
+      for(let j = 0; j < B; j++) {
+        vertices3D[i][j] = new THREE.Vector3().fromArray(
+          StereoProj(rightIsoclinic(alpha, vertices4D[i][j]), r)
+        );
+      }
+    }
+    return vertices3D;
+  }
+
+  // the "unit cylinder"
+  let unitCylinder = new THREE.CylinderGeometry(1, 1, 1, 64, 1, true);
+  unitCylinder.translate(0, 0.5, 0).rotateX(Math.PI * 0.5);
+
+  // sphere for vertices
+  let sphere = new THREE.SphereGeometry(0.1);
+
+  // materials
+  const edgeMaterial = new THREE.MeshPhongMaterial({
+    color: 0x156289,
+    emissive: 0x072534,
+    flatShading: true
+  });
+  const sphMaterial = new THREE.MeshPhongMaterial({
+    color: 0x1562ff,
+    emissive: 0x0725ff,
+    flatShading: true
+  });
+
+  // 
+  const edges = Edges();
+  const vertices4D = Vertices4D();
+
+
+
+</script>  
+
+</head>
+
+<body>
+  <div id="container"></div>
+
+<script>
+  // three js scene --------------------------------------------------------
+  const aspect = window.innerWidth / window.innerHeight;
+  camera = new THREE.PerspectiveCamera(75, aspect, 1, 10000);
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x111111);
+  object = new THREE.Group();
+  scene.add(object);
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.getElementById("container").appendChild(renderer.domElement);
+  camera.position.z = 5;
+  scene.add(camera);
+  const lights = [];
+  lights[0] = new THREE.PointLight(0xffffff, 1, 0);
+  lights[1] = new THREE.PointLight(0xffffff, 1, 0);
+  lights[2] = new THREE.PointLight(0xffffff, 1, 0);
+  lights[0].position.set(0, 20000, 0);
+  lights[1].position.set(10000, 20000, 10000);
+  lights[2].position.set(-10000, -20000, -10000);
+  scene.add(lights[0]);
+  scene.add(lights[1]);
+  scene.add(lights[2]);
+
+  function render() {
+    renderer.render(scene, camera);
+  }
+
+  const controls = new THREE.OrbitControls( camera, renderer.domElement );
+  controls.update();
+  // --
+
+  let Meshes_vertices = new Array(A);
+  for(let i = 0; i < A; i++) {
+    Meshes_vertices[i] = new Array(B);
+    for(let j = 0; j < B; j++) {
+      let mesh = new THREE.Mesh(sphere, sphMaterial);
+      Meshes_vertices[i][j] = mesh;
+      object.add(mesh);
+    }
+  }
+
+  let Meshes_edges = new Array(nedges);
+  for(let k = 0; k < nedges; k++) {
+    let geomCylinder = unitCylinder.clone();
+    let mesh = new THREE.Mesh(unitCylinder, edgeMaterial);
+    mesh.scale.set(radius, radius, 1);
+    Meshes_edges[k] = mesh;
+    object.add(mesh);
+  }
+
+  window.requestAnimFrame = (function() {
+    return (
+      function(callback) {
+        window.setTimeout(callback, 1000 / 50);
+      }
+    );
+  })();
+
+  const alpha = Math.PI / 180;
+  var k = 0;
+
+  function animate() {
+    requestAnimFrame(animate);
+
+    let vertices3D = Vertices3D(vertices4D, k*alpha);
+
+    for(let i = 0; i < A; i++) {
+      for(let j = 0; j < B; j++) {
+        let vij = vertices3D[i][j];
+        let mesh = Meshes_vertices[i][j];
+        mesh.position.copy(vij);
+      }
+    }
+
+    for(let e = 0; e < nedges; e++) {
+      let edge = edges[e];
+      let source = edge[0], target = edge[1];
+      let vi = vertices3D[source[0]][source[1]];
+      let vj = vertices3D[target[0]][target[1]];
+      let mesh = Meshes_edges[e];
+      mesh.position.copy(vi);
+      mesh.scale.z = vi.distanceTo(vj);
+      mesh.lookAt(vj);
+    }
+
+    k++;
+
+    controls.update();
+    render();
+  }
+
+  animate();
+
+</script>
+
+
+</body>
+
+</html>
+

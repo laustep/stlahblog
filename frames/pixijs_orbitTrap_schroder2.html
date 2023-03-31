@@ -51,6 +51,9 @@
       return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
     }
 
+    //
+    float pi = 3.1415926535897932384626433832795;
+
     // complex operations
     vec2 product(vec2 a, vec2 b){
       return vec2(a.x*b.x-a.y*b.y, a.x*b.y+a.y*b.x);
@@ -61,35 +64,33 @@
     vec2 inverse(vec2 b){
       return vec2(b.x, -b.y) / (b.x*b.x+b.y*b.y);
     }
-
-    //
-    float pi = 3.1415926535897932384626433832795;
+    vec2 cx_log(vec2 a) {
+      float rpart = sqrt((a.x*a.x) + (a.y*a.y));
+      float ipart = atan(a.y, a.x);
+      if(ipart > pi) ipart = ipart - (2.0 * pi);
+      return vec2(log(rpart), ipart);
+    }
 
     // 
     vec2 rl(float x) {
       return vec2(x, 0.0);
     }
     float trap(vec2 z, float alpha) {
-      z = product(z, exp(cos(z)));
+      z = product(cos(z), cos(z));
       z = product(vec2(cos(alpha), sin(alpha)), z);
-      float h = 1.0;
-      return min(abs(z.y + h), min(abs(z.x + h), min(abs(z.x - h), abs(z.y - h)))) / 0.3;
+      float h = 0.5;
+      return min(abs(z.y + h), min(abs(z.x + h), min(abs(z.x - h), abs(z.y - h)))) / 0.025;
     }
     vec2 schroder(vec2 z, float alpha, vec2 zc) {
       for(int i = 0; i < 100; i += 1) {
-        vec2 z2 = product(z, z);
-        vec2 z3 = product(z, z2);
-        vec2 z4 = product(z2, z2);
-        vec2 z6 = product(z3, z3);
-        vec2 z7 = product(z3, z4);
-        vec2 z8 = product(z4, z4);
-        vec2 fz   = z8 + 15.0*z4 - rl(16.0); 
-        vec2 dfz  = 8.0*z7 + 60.0*z3; 
-        vec2 ddfz = 56.0*z6 + 180.0*z2; 
-        if((i >= 2 && (length(fz) < 20.0 || length(dfz) < 20.0)) || (i >= 2 && trap(z, alpha) < 1.0)) {
+        vec2 fz   = product(z, cx_log(z)) - z; 
+        vec2 dfz  = cx_log(z); 
+        vec2 ddfz = inverse(z); 
+        if((i >= 2 && (length(fz) < 0.1 || length(dfz) < 0.1)) || (i >= 2 && trap(z, alpha) < 1.0)) {
           return z;
         }
-        z =  z - product(inverse(divide(dfz, fz) - divide(ddfz,dfz)), zc);
+        z = z - product(divide(fz, dfz) - divide(product(ddfz, product(fz, fz)),  2.0 * product(dfz, product(dfz, dfz))), zc);
+//        z =  z - product(inverse(divide(dfz, fz) - divide(ddfz,dfz)), zc);
       }
       return z;
     }
@@ -113,8 +114,8 @@
       float zcx = map(mouse.x, 0.0, iResolution.x, -1.0, 1.0); 
       float zcy = map(mouse.y, 0.0, iResolution.y, -1.0, 1.0);
       float r = iResolution.x / iResolution.y;
-      float x = map(gl_FragCoord.x, 0.0, iResolution.x, -4.0*r, 4.0*r); 
-      float y = map(gl_FragCoord.y, 0.0, iResolution.y, -4.0, 4.0);
+      float x = map(gl_FragCoord.x, 0.0, iResolution.x, -14.0*r, 14.0*r); 
+      float y = map(gl_FragCoord.y, 0.0, iResolution.y, -14.0, 14.0);
       vec2 z = g(vec2(x, y), vec2(zcx, zcy), alpha);
       gl_FragColor = vec4(hsv2rgb(pair2hsv(z, alpha)), 1.0);
     }

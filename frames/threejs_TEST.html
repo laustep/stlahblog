@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <title>TEST</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+  <script src="../libraries/three_r136dev.min.js"></script>
+
+<script>
+  const radius = 0.07;
+  // geomUnitCylinder is a cylinder such that:
+  // - the center of the first base is (0, 0, 0)
+  // - the center of the second base is (0, 1, 0)
+  let geomUnitCylinder = new THREE.CylinderGeometry(radius, radius, 1, 64, 1, true);
+  geomUnitCylinder.translate(0, 0.5, 0);
+
+  console.log(geomUnitCylinder);
+
+  const J = new THREE.Vector3(0, 1, 0);
+  // UPDATE(geomUnitCylinder, P, Q) transforms geomUnitCylinder to 
+  //   a cylinder with base centers P and Q.
+  function UPDATE(geomCylinder, P, Q, h) { 
+    let vec = Q.clone().sub(P);
+//    const h = vec.length();
+    vec.normalize();
+    const quaternion = new THREE.Quaternion().setFromUnitVectors(J, vec);
+    geomCylinder.scale(1, h, 1);
+    geomCylinder.applyQuaternion(quaternion);
+    geomCylinder.translate(P.x, P.y, P.z);
+  }
+</script>  
+
+</head>
+
+<body>
+  <div id="container"></div>
+
+<script>
+  // three js scene --------------------------------------------------------
+  const aspect = window.innerWidth / window.innerHeight;
+  camera = new THREE.PerspectiveCamera(50, aspect, 1, 10000);
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x111111);
+  object = new THREE.Object3D();
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.getElementById("container").appendChild(renderer.domElement);
+  camera.position.z = 5;
+  scene.add(camera);
+  function render() {
+    renderer.render(scene, camera);
+  }
+
+  const material = new THREE.MeshBasicMaterial({ color: 0x00FF00 });
+  var geomCylinder = geomUnitCylinder.clone();
+  var mesh = new THREE.Mesh(geomCylinder, material);
+  var object = new THREE.Object3D();
+  object.add(mesh);
+  scene.add(object);
+
+  window.requestAnimFrame = (function () {
+    return (
+      function (callback) {
+        window.setTimeout(callback, 1000 / 1);
+      }
+    );
+  })();
+
+  const O = new THREE.Vector3(0, 0, 0);
+  const alpha = Math.PI / 180;
+  const Malpha = new THREE.Vector3(2*Math.sin(alpha), 2*Math.cos(alpha), 0);
+  const MMalpha = new THREE.Vector3(Math.sin(alpha), Math.cos(alpha), 0);
+  function MM(k) {
+    return new THREE.Vector3(2*Math.sin(k*alpha), 2*Math.cos(k*alpha), 0);
+  }
+  var k = 0;
+  var M0 = MM(0);
+  var M1 = MM(1); 
+  function animate() {
+    //let JJ = new THREE.Vector3(0, 1/k, 0);
+    requestAnimFrame(animate);
+    let h = M0.length();
+    M0.normalize();
+    let quaternion1 = new THREE.Quaternion().setFromUnitVectors(M0, J);
+    //geomCylinder.scale(1, 1/h, 1);
+    M1.normalize();
+    geomCylinder.applyQuaternion(quaternion1);
+    geomCylinder.scale(1, h, 1);
+    let quaternion2 = new THREE.Quaternion().setFromUnitVectors(J, M1);
+    geomCylinder.applyQuaternion(quaternion2);
+    k++;
+    M0 = MM(k);
+    M1 = MM(k+1);  
+//    geomCylinder.scale(1, 1, 1);
+//    UPDATE(geomCylinder, O, J, 4);
+//    geomCylinder.scale(1, 2, 1);
+//    UPDATE(geomCylinder, O, MMalpha, 1/2);
+//    geomCylinder.scale(1, 2, 1);
+//    UPDATE(geomCylinder, O, J, 1/k);
+//    k *= 2;
+    render();
+  }
+
+  animate();
+
+</script>
+</body>
+
+</html>
+
