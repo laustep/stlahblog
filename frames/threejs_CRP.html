@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <title>Castellated rhombicosidodecahedral prism</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+  <script src="../libraries/three_r140.min.js"></script>
+  <script src="../libraries/OrbitControls.js"></script>
+
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    #gui {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+    }
+
+    .lil-gui {
+      --name-width: 30%;
+      --slider-input-min-width: 25px;
+      --slider-input-width: 10%;
+    }
+  </style>
+
+  <script>
+
+    // radii
+    const edgeRadius = 0.035;
+    const vertexRadius = 0.05;
+
+    // vertices
+    const phi = (1 + Math.sqrt(5)) / 2;
+    const phi2 = phi * phi;
+    const phi3 = phi * phi2;
+    const vertices4d = [
+      [0, -phi, -phi3, 0], 
+      [0, phi, -phi3, 0], 
+      [0, -phi, phi3, 0], 
+      [0, phi, phi3, 0], 
+      [-phi, -phi3, 0, 0], 
+      [phi, -phi3, 0, 0], 
+      [-phi, phi3, 0, 0], 
+      [phi, phi3, 0, 0], 
+      [-phi3, 0, -phi, 0], 
+      [phi3, 0, -phi, 0], 
+      [-phi3, 0, phi, 0], 
+      [phi3, 0, phi, 0], 
+      [0, -phi3, -phi2, -1], 
+      [0, phi3, -phi2, -1], 
+      [0, -phi3, phi2, -1], 
+      [0, phi3, phi2, -1], 
+      [0, -phi3, -phi2, 1], 
+      [0, phi3, -phi2, 1], 
+      [0, -phi3, phi2, 1], 
+      [0, phi3, phi2, 1], 
+      [-phi2, 0, -phi3, -1], 
+      [phi2, 0, -phi3, -1], 
+      [-phi2, 0, phi3, -1], 
+      [phi2, 0, phi3, -1], 
+      [-phi2, 0, -phi3, 1], 
+      [phi2, 0, -phi3, 1], 
+      [-phi2, 0, phi3, 1], 
+      [phi2, 0, phi3, 1], 
+      [-phi3, -phi2, 0, -1], 
+      [phi3, -phi2, 0, -1], 
+      [-phi3, phi2, 0, -1], 
+      [phi3, phi2, 0, -1], 
+      [-phi3, -phi2, 0, 1], 
+      [phi3, -phi2, 0, 1], 
+      [-phi3, phi2, 0, 1], 
+      [phi3, phi2, 0, 1], 
+      [0, -phi2, -phi-2, -phi], 
+      [0, phi2, -phi-2, -phi], 
+      [0, -phi2, phi+2, -phi], 
+      [0, phi2, phi+2, -phi], 
+      [0, -phi2, -phi-2, phi], 
+      [0, phi2, -phi-2, phi], 
+      [0, -phi2, phi+2, phi], 
+      [0, phi2, phi+2, phi], 
+      [-phi2, -phi-2, 0, -phi], 
+      [phi2, -phi-2, 0, -phi], 
+      [-phi2, phi+2, 0, -phi], 
+      [phi2, phi+2, 0, -phi], 
+      [-phi2, -phi-2, 0, phi], 
+      [phi2, -phi-2, 0, phi], 
+      [-phi2, phi+2, 0, phi], 
+      [phi2, phi+2, 0, phi], 
+      [-phi-2, 0, -phi2, -phi], 
+      [phi+2, 0, -phi2, -phi], 
+      [-phi-2, 0, phi2, -phi], 
+      [phi+2, 0, phi2, -phi], 
+      [-phi-2, 0, -phi2, phi], 
+      [phi+2, 0, -phi2, phi], 
+      [-phi-2, 0, phi2, phi], 
+      [phi+2, 0, phi2, phi], 
+      [-phi2, -phi2, -phi2, 0], 
+      [phi2, -phi2, -phi2, 0], 
+      [-phi2, phi2, -phi2, 0], 
+      [phi2, phi2, -phi2, 0], 
+      [-phi2, -phi2, phi2, 0], 
+      [phi2, -phi2, phi2, 0], 
+      [-phi2, phi2, phi2, 0], 
+      [phi2, phi2, phi2, 0], 
+      [-1, -1, -phi3, -phi], 
+      [1, -1, -phi3, -phi], 
+      [-1, 1, -phi3, -phi], 
+      [1, 1, -phi3, -phi], 
+      [-1, -1, phi3, -phi], 
+      [1, -1, phi3, -phi], 
+      [-1, 1, phi3, -phi], 
+      [1, 1, phi3, -phi], 
+      [-1, -1, -phi3, phi], 
+      [1, -1, -phi3, phi], 
+      [-1, 1, -phi3, phi], 
+      [1, 1, -phi3, phi], 
+      [-1, -1, phi3, phi], 
+      [1, -1, phi3, phi], 
+      [-1, 1, phi3, phi], 
+      [1, 1, phi3, phi], 
+      [-1, -phi3, -1, -phi], 
+      [1, -phi3, -1, -phi], 
+      [-1, phi3, -1, -phi], 
+      [1, phi3, -1, -phi], 
+      [-1, -phi3, 1, -phi], 
+      [1, -phi3, 1, -phi], 
+      [-1, phi3, 1, -phi], 
+      [1, phi3, 1, -phi], 
+      [-1, -phi3, -1, phi], 
+      [1, -phi3, -1, phi], 
+      [-1, phi3, -1, phi], 
+      [1, phi3, -1, phi], 
+      [-1, -phi3, 1, phi], 
+      [1, -phi3, 1, phi], 
+      [-1, phi3, 1, phi], 
+      [1, phi3, 1, phi], 
+      [-phi3, -1, -1, -phi], 
+      [phi3, -1, -1, -phi], 
+      [-phi3, 1, -1, -phi], 
+      [phi3, 1, -1, -phi], 
+      [-phi3, -1, 1, -phi], 
+      [phi3, -1, 1, -phi], 
+      [-phi3, 1, 1, -phi], 
+      [phi3, 1, 1, -phi], 
+      [-phi3, -1, -1, phi], 
+      [phi3, -1, -1, phi], 
+      [-phi3, 1, -1, phi], 
+      [phi3, 1, -1, phi], 
+      [-phi3, -1, 1, phi], 
+      [phi3, -1, 1, phi], 
+      [-phi3, 1, 1, phi], 
+      [phi3, 1, 1, phi], 
+      [-phi, -2*phi, -phi2, -phi], 
+      [phi, -2*phi, -phi2, -phi], 
+      [-phi, 2*phi, -phi2, -phi], 
+      [phi, 2*phi, -phi2, -phi], 
+      [-phi, -2*phi, phi2, -phi], 
+      [phi, -2*phi, phi2, -phi], 
+      [-phi, 2*phi, phi2, -phi], 
+      [phi, 2*phi, phi2, -phi], 
+      [-phi, -2*phi, -phi2, phi], 
+      [phi, -2*phi, -phi2, phi], 
+      [-phi, 2*phi, -phi2, phi], 
+      [phi, 2*phi, -phi2, phi], 
+      [-phi, -2*phi, phi2, phi], 
+      [phi, -2*phi, phi2, phi], 
+      [-phi, 2*phi, phi2, phi], 
+      [phi, 2*phi, phi2, phi], 
+      [-phi2, -phi, -2*phi, -phi], 
+      [phi2, -phi, -2*phi, -phi], 
+      [-phi2, phi, -2*phi, -phi], 
+      [phi2, phi, -2*phi, -phi], 
+      [-phi2, -phi, 2*phi, -phi], 
+      [phi2, -phi, 2*phi, -phi], 
+      [-phi2, phi, 2*phi, -phi], 
+      [phi2, phi, 2*phi, -phi], 
+      [-phi2, -phi, -2*phi, phi], 
+      [phi2, -phi, -2*phi, phi], 
+      [-phi2, phi, -2*phi, phi], 
+      [phi2, phi, -2*phi, phi], 
+      [-phi2, -phi, 2*phi, phi], 
+      [phi2, -phi, 2*phi, phi], 
+      [-phi2, phi, 2*phi, phi], 
+      [phi2, phi, 2*phi, phi], 
+      [-2*phi, -phi2, -phi, -phi], 
+      [2*phi, -phi2, -phi, -phi], 
+      [-2*phi, phi2, -phi, -phi], 
+      [2*phi, phi2, -phi, -phi], 
+      [-2*phi, -phi2, phi, -phi], 
+      [2*phi, -phi2, phi, -phi], 
+      [-2*phi, phi2, phi, -phi], 
+      [2*phi, phi2, phi, -phi], 
+      [-2*phi, -phi2, -phi, phi], 
+      [2*phi, -phi2, -phi, phi], 
+      [-2*phi, phi2, -phi, phi], 
+      [2*phi, phi2, -phi, phi], 
+      [-2*phi, -phi2, phi, phi], 
+      [2*phi, -phi2, phi, phi], 
+      [-2*phi, phi2, phi, phi], 
+      [2*phi, phi2, phi, phi]
+    ];
+    const n_all_vertices = vertices4d.length;
+
+    // indices
+    const tetrahedra = [
+      [112, 114, 10, 58],
+      [142, 158, 62, 126],
+      [146, 130, 66, 162],
+      [81, 80, 42, 2],
+      [111, 109, 57, 9],
+      [76, 77, 0, 40],
+      [79, 41, 78, 1],
+      [48, 92, 96, 4],
+      [49, 97, 93, 5],
+      [140, 124, 156, 60],
+      [98, 94, 50, 6],
+      [56, 108, 110, 8],
+      [160, 128, 144, 64],
+      [85, 45, 89, 5],
+      [129, 161, 145, 65],
+      [115, 59, 113, 11],
+      [159, 143, 63, 127],
+      [43, 83, 82, 3],
+      [53, 101, 103, 9],
+      [61, 157, 141, 125],
+      [102, 52, 100, 8],
+      [149, 61, 133, 117],
+      [136, 120, 152, 64],
+      [7, 51, 95, 99],
+      [116, 148, 132, 60],
+      [44, 88, 84, 4],
+      [69, 68, 36, 0],
+      [135, 151, 119, 63],
+      [154, 138, 122, 66],
+      [106, 54, 104, 10],
+      [107, 105, 55, 11],
+      [67, 163, 147, 131],
+      [38, 72, 73, 2],
+      [134, 150, 118, 62],
+      [46, 86, 90, 6],
+      [75, 39, 74, 3],
+      [153, 121, 137, 65],
+      [37, 71, 70, 1],
+      [123, 155, 67, 139],
+      [47, 91, 7, 87]
+    ]; 
+    const ntetrahedra = tetrahedra.length; // 40
+    const nedges = 6 * ntetrahedra;
+    const usedVertices = [... new Set(tetrahedra.flat(1))]; // unique indices
+    const nvertices = usedVertices.length;
+
+    // a right-isoclinic rotation
+    function rotate4d(vec, xi) {
+      const a = Math.cos(xi);
+      const d = Math.sin(xi);
+      const p = vec[0];
+      const q = vec[1];
+      const r = vec[2];
+      const s = vec[3];
+      return [
+        a*p - d*s,
+        a*q - d*r,
+        a*r + d*q,
+        a*s + d*p   
+      ];
+    }
+
+    // modified stereographic projection
+    //// https://laustep.github.io/stlahblog/posts/ModifiedStereographicProjection.html
+    const gamma = 1.4;
+    function stereoProj(v) {
+      const r = 5.1;
+      const v3 = v[3];
+      const F = 1/(r - v3);
+//      const F = Math.acos(v3 / r) / 
+//        Math.pow(Math.pow(r, gamma) - Math.pow(Math.abs(v3), gamma), 1/gamma);
+      return [F * v[0], F * v[1], F * v[2]];
+    }
+
+    // projected and rotated vertices
+    function makeVertices3d(alpha) {
+      let vertices3d = new Array(n_all_vertices);
+      for(let i = 0; i < n_all_vertices; i++) {
+        vertices3d[i] = new THREE.Vector3().fromArray(
+          stereoProj(rotate4d(vertices4d[i], alpha))
+        );
+      }
+      return vertices3d;
+    }
+
+    // unitCylinder is a cylinder such that:
+    // - the center of the first base is (0, 0, 0)
+    // - the center of the second base is (0, 0, 1)
+    // it will be used to construct the edges
+    let unitCylinder = new THREE.CylinderGeometry(1, 1, 1, 64, 1, true);
+    unitCylinder.translate(0, 0.5, 0).rotateX(Math.PI * 0.5);
+
+    // a sphere for plotting the vertices
+    let sphere = new THREE.SphereGeometry(vertexRadius);
+
+    // an empty tetrahedron
+    const fourVertices = new Float32Array(12);
+    const faces = [
+      2, 1, 0,
+      0, 3, 2,
+      1, 3, 0,
+      2, 3, 1
+    ];
+    let cell = new THREE.BufferGeometry();
+    cell.setIndex(faces);
+    cell.setAttribute("position", new THREE.BufferAttribute( fourVertices, 3 ) );
+
+    // materials
+    const edgeMaterial = new THREE.MeshPhongMaterial({
+      color: 0x156289,
+      emissive: 0x072534,
+      flatShading: true
+    });
+    const vertexMaterial = new THREE.MeshPhongMaterial({
+      color: 0x1562ff,
+      emissive: 0x0725ff,
+      flatShading: true
+    });
+    const cellMaterial = new THREE.MeshPhongMaterial({
+      color: 0xff00ff,
+      emissive: 0xff05ff,
+      transparent: true,
+      opacity: 0.3,
+      flatShading: true,
+      dithering: true,
+      side: THREE.DoubleSide
+    });
+
+  </script>  
+
+</head>
+
+<body>
+  <div id="container"></div>
+
+<script>
+  // three js scene --------------------------------------------------------
+  const aspect = window.innerWidth / window.innerHeight;
+  let camera = new THREE.PerspectiveCamera(75, aspect, 1, 10000);
+  camera.position.z = 4.5;
+  let scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x111111);
+  scene.add(camera);
+  let group = new THREE.Group();
+  scene.add(group);
+
+  let renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.getElementById("container").appendChild(renderer.domElement);
+
+  const lights = new Array(3);
+  lights[0] = new THREE.PointLight(0xffffff, 1, 0);
+  lights[1] = new THREE.PointLight(0xffffff, 1, 0);
+  lights[2] = new THREE.PointLight(0xffffff, 1, 0);
+  lights[0].position.set(0, 20000, 0);
+  lights[1].position.set(10000, 20000, 10000);
+  lights[2].position.set(-10000, -20000, -10000);
+  scene.add(lights[0]);
+  scene.add(lights[1]);
+  scene.add(lights[2]);
+
+  function render() {
+    renderer.render(scene, camera);
+  }
+
+  const controls = new THREE.OrbitControls(camera, renderer.domElement );
+  controls.update();
+  // --
+
+  let Meshes_vertices = new Array(nvertices);
+  let Meshes_edges = new Array(nedges);
+  let Meshes_tetrahedra = new Array(ntetrahedra);
+
+  function makeMeshes() {
+    for(let i = 0; i < nvertices; i++) {
+      let mesh = new THREE.Mesh(sphere, vertexMaterial);
+      Meshes_vertices[i] = mesh;
+      group.add(mesh);
+    }
+    for(let i = 0; i < nedges; i++) {
+      let mesh = new THREE.Mesh(unitCylinder, edgeMaterial);
+      mesh.scale.set(edgeRadius, edgeRadius, 1);
+      Meshes_edges[i] = mesh;
+      group.add(mesh);
+    }
+    for(let i = 0; i < ntetrahedra; i++) {
+      let cell_i = cell.clone();
+      let mesh = new THREE.Mesh(cell_i, cellMaterial);
+      mesh.geometry.attributes.position.needsUpdate = true;
+      Meshes_tetrahedra[i] = mesh;
+      group.add(mesh);
+    }
+  }
+  makeMeshes(); 
+
+  window.requestAnimFrame = (function() {
+    return (
+      function(callback) {
+        window.setTimeout(callback, 1000 / 40);
+      }
+    );
+  })();
+
+  // --------------------------------------------------------------------------
+
+  // --------------------------------------------------------------------------
+  const alpha = Math.PI / 180;
+  var k = 0;
+
+  function animate() {
+    requestAnimFrame(animate);
+
+    let vertices3d = makeVertices3d(k*alpha);
+
+    for(let i = 0; i < nvertices; i++) {
+      let mesh = Meshes_vertices[i];
+      mesh.position.copy(vertices3d[usedVertices[i]]);
+    }
+
+    let counter = 0;
+    for(let t = 0; t < ntetrahedra; t++) {
+      let tetrahedron = tetrahedra[t];
+      for(let i = 0; i < 3; i++) {
+        let vi = vertices3d[tetrahedron[i]];
+        for(let j = i+1; j < 4; j++) {
+          let vj = vertices3d[tetrahedron[j]];
+          let mesh = Meshes_edges[counter];
+          mesh.position.copy(vi);
+          mesh.scale.z = vi.distanceTo(vj);
+          mesh.lookAt(vj);
+          counter++;
+        }
+      }
+    }
+
+    for(let t = 0; t < ntetrahedra; t++) {
+      let mesh = Meshes_tetrahedra[t];
+      let tetrahedron = tetrahedra[t];
+      let cellVertices = new Array(0);
+      for(let i = 0; i < 4; i++) {
+        let vi = vertices3d[tetrahedron[i]];
+        cellVertices.push(vi.x, vi.y, vi.z);
+      }
+      mesh.geometry.setAttribute(
+        "position", new THREE.Float32BufferAttribute(cellVertices, 3)
+      );
+      mesh.geometry.computeBoundingBox();
+      mesh.geometry.computeBoundingSphere();
+      //console.log(mesh);
+    }
+
+    k++;
+
+    controls.update();
+    render();
+
+  }
+
+  animate();
+
+</script>
+
+
+</body>
+
+</html>
+
