@@ -321,7 +321,7 @@
     let cell = new THREE.BufferGeometry();
     cell.setIndex(faces);
     cell.setAttribute(
-      "position", new THREE.BufferAttribute(new Float32Array(4*3), 3)
+      "position", new THREE.BufferAttribute(new Float32Array(4 * 3), 3)
     );
 
     // -- materials -----------------------------------------------------------
@@ -397,40 +397,29 @@
 
   const controls = new THREE.OrbitControls(camera, renderer.domElement );
   controls.update();
-  // --
 
+  // -- prepare meshes --------------------------------------------------------
   let Meshes_vertices = new Array(nvertices);
   let Meshes_edges = new Array(nedges);
   let Meshes_tetrahedra = new Array(ntetrahedra);
 
-  function makeMeshes() {
-    for(let i = 0; i < nvertices; i++) {
-      let mesh = new THREE.Mesh(sphere, vertexMaterial);
-      Meshes_vertices[i] = mesh;
-      group.add(mesh);
-    }
-    for(let i = 0; i < nedges; i++) {
-      let mesh = new THREE.Mesh(unitCylinder, edgeMaterial);
-      mesh.scale.set(edgeRadius, edgeRadius, 1);
-      Meshes_edges[i] = mesh;
-      group.add(mesh);
-    }
-    for(let i = 0; i < ntetrahedra; i++) {
-      let mesh = new THREE.Mesh(cell.clone(), cellMaterial);
-      mesh.geometry.attributes.position.needsUpdate = true;
-      Meshes_tetrahedra[i] = mesh;
-      group.add(mesh);
-    }
+  for(let i = 0; i < nvertices; i++) {
+    let mesh = new THREE.Mesh(sphere, vertexMaterial);
+    Meshes_vertices[i] = mesh;
+    group.add(mesh);
   }
-  makeMeshes(); 
-
-  window.requestAnimFrame = (function () {
-    return (
-      window.requestAnimationFrame ||
-      window.webkitRequestAnimationFrame ||
-      window.mozRequestAnimationFrame 
-    );
-  })();
+  for(let i = 0; i < nedges; i++) {
+    let mesh = new THREE.Mesh(unitCylinder, edgeMaterial);
+    mesh.scale.set(edgeRadius, edgeRadius, 1);
+    Meshes_edges[i] = mesh;
+    group.add(mesh);
+  }
+  for(let i = 0; i < ntetrahedra; i++) {
+    let mesh = new THREE.Mesh(cell.clone(), cellMaterial);
+    mesh.geometry.attributes.position.needsUpdate = true;
+    Meshes_tetrahedra[i] = mesh;
+    group.add(mesh);
+  }
 
   // lil.gui controls ------------------------------------------------------
   let lgcontrols = {
@@ -449,17 +438,25 @@
   gui
     .add(lgcontrols, "theta")
     .min(0)
-    .max(6.3)
-    .step(0.1)
-    .name("theta");
+    .max(2)
+    .step(0.25)
+    .name("theta/pi");
   gui
     .add(lgcontrols, "phi")
     .min(0)
-    .max(3.2)
-    .step(0.05)
-    .name("phi");
+    .max(1)
+    .step(0.125)
+    .name("phi/pi");
 
   // -- animation -------------------------------------------------------------
+  window.requestAnimFrame = (function () {
+    return (
+      window.requestAnimationFrame ||
+      window.webkitRequestAnimationFrame ||
+      window.mozRequestAnimationFrame 
+    );
+  })();
+
   const alpha = Math.PI / 180;
   var k = 0;
 
@@ -469,7 +466,7 @@
     }, 1000 / lgcontrols.rotationSpeed);
 
     let vertices3d = makeVertices3d(
-      lgcontrols.theta, lgcontrols.phi, k*alpha
+      lgcontrols.theta * Math.PI, lgcontrols.phi * Math.PI, k * alpha
     );
 
     for(let i = 0; i < nvertices; i++) {
