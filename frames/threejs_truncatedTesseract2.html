@@ -398,6 +398,22 @@
   const controls = new THREE.OrbitControls(camera, renderer.domElement );
   controls.update();
 
+  // -- space background ------------------------------------------------------
+  const stars = new Array(0);
+  for(let i = 0; i < 10000; i++) {
+    let x = THREE.Math.randFloatSpread( 2000 );
+    let y = THREE.Math.randFloatSpread( 2000 );
+    let z = THREE.Math.randFloatSpread( 2000 );
+    stars.push(x, y, z);
+  }
+  let starsGeometry = new THREE.BufferGeometry();
+  starsGeometry.setAttribute(
+    "position", new THREE.Float32BufferAttribute(stars, 3)
+  );
+  const starsMaterial = new THREE.PointsMaterial({ color: 0x888888 });
+  const starField = new THREE.Points(starsGeometry, starsMaterial);
+  scene.add(starField);
+
   // -- prepare meshes --------------------------------------------------------
   let Meshes_vertices = new Array(nvertices);
   let Meshes_edges = new Array(nedges);
