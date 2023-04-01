@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <title>Snub disicositetrachoron</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+  <script src="../libraries/three_r140.min.js"></script>
+  <script src="../libraries/OrbitControls.js"></script>
+  <script src="../libraries/lil-gui.umd.js"></script>
+
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    #gui {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+    }
+
+    .lil-gui {
+      --name-width: 30%;
+      --slider-input-min-width: 25px;
+      --slider-input-width: 10%;
+    }
+  </style>
+
+  <script>
+    // radii for cylinders and spheres ----------------------------------------
+    const edgeRadius = 0.2;
+    const vertexRadius = 0.3;
+
+    // vertices ---------------------------------------------------------------
+    const golden = (1 + Math.sqrt(5)) / 2;
+    const vxnorm2 = // squared vertex norm
+      1 + golden*golden + (golden+1)*(golden+1); 
+    const vertices4d = [
+      [0, -1, -golden, -golden-1],
+      [0, 1, -golden, -golden-1],
+      [0, -1, golden, -golden-1],
+      [0, 1, golden, -golden-1],
+      [0, -1, -golden, golden+1],
+      [0, 1, -golden, golden+1],
+      [0, -1, golden, golden+1],
+      [0, 1, golden, golden+1],
+      [0, -golden, -golden-1, -1],
+      [0, golden, -golden-1, -1],
+      [0, -golden, golden+1, -1],
+      [0, golden, golden+1, -1],
+      [0, -golden, -golden-1, 1],
+      [0, golden, -golden-1, 1],
+      [0, -golden, golden+1, 1],
+      [0, golden, golden+1, 1],
+      [0, -golden-1, -1, -golden],
+      [0, golden+1, -1, -golden],
+      [0, -golden-1, 1, -golden],
+      [0, golden+1, 1, -golden],
+      [0, -golden-1, -1, golden],
+      [0, golden+1, -1, golden],
+      [0, -golden-1, 1, golden],
+      [0, golden+1, 1, golden],
+      [-1, 0, -golden-1, -golden],
+      [1, 0, -golden-1, -golden],
+      [-1, 0, golden+1, -golden],
+      [1, 0, golden+1, -golden],
+      [-1, 0, -golden-1, golden],
+      [1, 0, -golden-1, golden],
+      [-1, 0, golden+1, golden],
+      [1, 0, golden+1, golden],
+      [-1, -golden, 0, -golden-1],
+      [1, -golden, 0, -golden-1],
+      [-1, golden, 0, -golden-1],
+      [1, golden, 0, -golden-1],
+      [-1, -golden, 0, golden+1],
+      [1, -golden, 0, golden+1],
+      [-1, golden, 0, golden+1],
+      [1, golden, 0, golden+1],
+      [-1, -golden-1, -golden, 0],
+      [1, -golden-1, -golden, 0],
+      [-1, golden+1, -golden, 0],
+      [1, golden+1, -golden, 0],
+      [-1, -golden-1, golden, 0],
+      [1, -golden-1, golden, 0],
+      [-1, golden+1, golden, 0],
+      [1, golden+1, golden, 0],
+      [-golden, 0, -1, -golden-1],
+      [golden, 0, -1, -golden-1],
+      [-golden, 0, 1, -golden-1],
+      [golden, 0, 1, -golden-1],
+      [-golden, 0, -1, golden+1],
+      [golden, 0, -1, golden+1],
+      [-golden, 0, 1, golden+1],
+      [golden, 0, 1, golden+1],
+      [-golden, -1, -golden-1, 0],
+      [golden, -1, -golden-1, 0],
+      [-golden, 1, -golden-1, 0],
+      [golden, 1, -golden-1, 0],
+      [-golden, -1, golden+1, 0],
+      [golden, -1, golden+1, 0],
+      [-golden, 1, golden+1, 0],
+      [golden, 1, golden+1, 0],
+      [-golden, -golden-1, 0, -1],
+      [golden, -golden-1, 0, -1],
+      [-golden, golden+1, 0, -1],
+      [golden, golden+1, 0, -1],
+      [-golden, -golden-1, 0, 1],
+      [golden, -golden-1, 0, 1],
+      [-golden, golden+1, 0, 1],
+      [golden, golden+1, 0, 1],
+      [-golden-1, 0, -golden, -1],
+      [golden+1, 0, -golden, -1],
+      [-golden-1, 0, golden, -1],
+      [golden+1, 0, golden, -1],
+      [-golden-1, 0, -golden, 1],
+      [golden+1, 0, -golden, 1],
+      [-golden-1, 0, golden, 1],
+      [golden+1, 0, golden, 1],
+      [-golden-1, -1, 0, -golden],
+      [golden+1, -1, 0, -golden],
+      [-golden-1, 1, 0, -golden],
+      [golden+1, 1, 0, -golden],
+      [-golden-1, -1, 0, golden],
+      [golden+1, -1, 0, golden],
+      [-golden-1, 1, 0, golden],
+      [golden+1, 1, 0, golden],
+      [-golden-1, -golden, -1, 0],
+      [golden+1, -golden, -1, 0],
+      [-golden-1, golden, -1, 0],
+      [golden+1, golden, -1, 0],
+      [-golden-1, -golden, 1, 0],
+      [golden+1, -golden, 1, 0],
+      [-golden-1, golden, 1, 0],
+      [golden+1, golden, 1, 0]
+    ];
+    const nvertices = vertices4d.length;
+
+    // edges -------------------------------------------------------------------
+    const edges = [
+      [0,1], [6,30], [13,28], [21,38], [32,33], [44,45], [58,72], [73,81],
+      [0,8], [6,31], [13,29], [21,39], [32,48], [44,60], [58,76], [73,83],
+      [0,16], [6,36], [13,42], [21,42], [32,50], [44,64], [58,90], [73,89],
+      [0,24], [6,37], [13,43], [21,43], [32,64], [44,68], [59,73], [73,91],
+      [0,25], [6,54], [13,58], [21,70], [32,80], [44,92], [59,77], [74,78],
+      [0,32], [6,55], [13,59], [21,71], [33,49], [45,61], [59,91], [74,80],
+      [0,33], [7,15], [14,22], [22,36], [33,51], [45,65], [60,62], [74,82],
+      [0,48], [7,23], [14,30], [22,37], [33,65], [45,69], [60,74], [74,92],
+      [0,49], [7,30], [14,31], [22,44], [33,81], [45,93], [60,78], [74,94],
+      [1,9], [7,31], [14,44], [22,45], [34,35], [46,47], [60,92], [75,79],
+      [1,17], [7,38], [14,45], [22,68], [34,48], [46,62], [61,63], [75,81],
+      [1,24], [7,39], [14,60], [22,69], [34,50], [46,66], [61,75], [75,83],
+      [1,25], [7,54], [14,61], [23,38], [34,66], [46,70], [61,79], [75,93],
+      [1,34], [7,55], [15,23], [23,39], [34,82], [46,94], [61,93], [75,95],
+      [1,35], [8,12], [15,30], [23,46], [35,49], [47,63], [62,74], [76,84],
+      [1,48], [8,16], [15,31], [23,47], [35,51], [47,67], [62,78], [76,86],
+      [1,49], [8,24], [15,46], [23,70], [35,67], [47,71], [62,94], [76,88],
+      [2,3], [8,25], [15,47], [23,71], [35,83], [47,95], [63,75], [76,90],
+      [2,10], [8,40], [15,62], [24,25], [36,37], [48,50], [63,79], [77,85],
+      [2,18], [8,41], [15,63], [24,48], [36,52], [48,72], [63,95], [77,87],
+      [2,26], [8,56], [16,18], [24,56], [36,54], [48,80], [64,68], [77,89],
+      [2,27], [8,57], [16,32], [24,58], [36,68], [48,82], [64,80], [77,91],
+      [2,32], [9,13], [16,33], [24,72], [36,84], [49,51], [64,88], [78,84],
+      [2,33], [9,17], [16,40], [25,49], [37,53], [49,73], [64,92], [78,86],
+      [2,50], [9,24], [16,41], [25,57], [37,55], [49,81], [65,69], [78,92],
+      [2,51], [9,25], [16,64], [25,59], [37,69], [49,83], [65,81], [78,94],
+      [3,11], [9,42], [16,65], [25,73], [37,85], [50,74], [65,89], [79,85],
+      [3,19], [9,43], [17,19], [26,27], [38,39], [50,80], [65,93], [79,87],
+      [3,26], [9,58], [17,34], [26,50], [38,52], [50,82], [66,70], [79,93],
+      [3,27], [9,59], [17,35], [26,60], [38,54], [51,75], [66,82], [79,95],
+      [3,34], [10,14], [17,42], [26,62], [38,70], [51,81], [66,90], [80,82],
+      [3,35], [10,18], [17,43], [26,74], [38,86], [51,83], [66,94], [80,88],
+      [3,50], [10,26], [17,66], [27,51], [39,53], [52,54], [67,71], [80,92],
+      [3,51], [10,27], [17,67], [27,61], [39,55], [52,76], [67,83], [81,83],
+      [4,5], [10,44], [18,32], [27,63], [39,71], [52,84], [67,91], [81,89],
+      [4,12], [10,45], [18,33], [27,75], [39,87], [52,86], [67,95], [81,93],
+      [4,20], [10,60], [18,44], [28,29], [40,41], [53,55], [68,84], [82,90],
+      [4,28], [10,61], [18,45], [28,52], [40,56], [53,77], [68,88], [82,94],
+      [4,29], [11,15], [18,64], [28,56], [40,64], [53,85], [68,92], [83,91],
+      [4,36], [11,19], [18,65], [28,58], [40,68], [53,87], [69,85], [83,95],
+      [4,37], [11,26], [19,34], [28,76], [40,88], [54,78], [69,89], [84,86],
+      [4,52], [11,27], [19,35], [29,53], [41,57], [54,84], [69,93], [84,88],
+      [4,53], [11,46], [19,46], [29,57], [41,65], [54,86], [70,86], [84,92],
+      [5,13], [11,47], [19,47], [29,59], [41,69], [55,79], [70,90], [85,87],
+      [5,21], [11,62], [19,66], [29,77], [41,89], [55,85], [70,94], [85,89],
+      [5,28], [11,63], [19,67], [30,31], [42,43], [55,87], [71,87], [85,93],
+      [5,29], [12,20], [20,22], [30,54], [42,58], [56,58], [71,91], [86,90],
+      [5,38], [12,28], [20,36], [30,60], [42,66], [56,72], [71,95], [86,94],
+      [5,39], [12,29], [20,37], [30,62], [42,70], [56,76], [72,76], [87,91],
+      [5,52], [12,40], [20,40], [30,78], [42,90], [56,88], [72,80], [87,95],
+      [5,53], [12,41], [20,41], [31,55], [43,59], [57,59], [72,82], [88,92],
+      [6,7], [12,56], [20,68], [31,61], [43,67], [57,73], [72,88], [89,93],
+      [6,14], [12,57], [20,69], [31,63], [43,71], [57,77], [72,90], [90,94],
+      [6,22], [13,21], [21,23], [31,79], [43,91], [57,89], [73,77], [91,95]
+    ];
+    const nedges = edges.length;
+
+    // a right-isoclinic rotation ---------------------------------------------
+    function rotate4d(theta, phi, alpha, x) {
+      const x0 = x[0], x1 = x[1], x2 = x[2], x3 = x[3];
+      const sin_theta = Math.sin(theta);
+      const sin_alpha = Math.sin(alpha);
+      const q0 = Math.cos(alpha);
+      const q1 = sin_theta * Math.cos(phi) * sin_alpha;
+      const q2 = sin_theta * Math.sin(phi) * sin_alpha;
+      const q3 = Math.cos(theta) * sin_alpha;
+      return [
+        q0 * x0 - q1 * x1 - q2 * x2 - q3 * x3,
+        q1 * x0 + q0 * x1 + q3 * x2 - q2 * x3,
+        q2 * x0 - q3 * x1 + q0 * x2 + q1 * x3,
+        q3 * x0 + q2 * x1 - q1 * x2 + q0 * x3
+      ];
+    }
+
+    
+    // modified stereographic projection
+    function stereoProj(x) {
+      const x3 = x[3];
+      const f = Math.acos(x3 / Math.sqrt(vxnorm2)) * Math.sqrt(vxnorm2 - x3*x3);
+      return [x[0] * f, x[1] * f, x[2] * f];
+    }
+    /*
+    // stereographic projection
+    function stereoProj(x) {
+      const d = Math.sqrt(vxnorm2) - x[3];
+      return [x[0] / d, x[1] / d, x[2] / d];
+    }
+    */
+
+    // projected and rotated vertices
+    function makeVertices3d(theta, phi, alpha) {
+      let vertices3d = new Array(nvertices);
+      for(let i = 0; i < nvertices; i++) {
+        vertices3d[i] = new THREE.Vector3().fromArray(
+          stereoProj(rotate4d(theta, phi, alpha, vertices4d[i]))
+        );
+      }
+      return vertices3d;
+    }
+
+    // -- geometries ----------------------------------------------------------
+
+    // unitCylinder is a cylinder such that:
+    // - the center of the first base is (0, 0, 0)
+    // - the center of the second base is (0, 0, 1)
+    // it will be used to construct the edges (the radius will be set later)
+    const unitCylinder = new THREE.CylinderGeometry(1, 1, 1, 64, 1, true);
+    unitCylinder.translate(0, 0.5, 0).rotateX(Math.PI * 0.5);
+
+    // a sphere for plotting the vertices
+    const sphere = new THREE.SphereGeometry(vertexRadius);
+
+    // -- materials -----------------------------------------------------------
+    const edgeMaterial = new THREE.MeshPhongMaterial({
+      color: 0x156289,
+      emissive: 0x072534,
+      flatShading: true
+    });
+    const vertexMaterial = new THREE.MeshPhongMaterial({
+      color: 0x1562ff,
+      emissive: 0x0725ff,
+      flatShading: true
+    });
+
+  </script>  
+
+</head>
+
+<body>
+  <!-- container of the three.js scene -->
+  <div id="container"></div>
+
+<script>
+  // three js scene --------------------------------------------------------
+  const aspect = window.innerWidth / window.innerHeight;
+  let camera = new THREE.PerspectiveCamera(75, aspect, 1, 10000);
+  camera.position.z = 36;
+  let scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x111111);
+  scene.add(camera);
+  let group = new THREE.Group();
+  scene.add(group);
+
+  let renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.getElementById("container").appendChild(renderer.domElement);
+
+  function onWindowResize() {
+    const windowX = window.innerWidth;
+    const windowY = window.innerHeight;
+    camera.aspect = windowX / windowY;
+    camera.updateProjectionMatrix();
+    renderer.setSize(windowX, windowY);
+  }
+  window.addEventListener("resize", onWindowResize);
+
+  const lights = new Array(4);
+  lights[0] = new THREE.PointLight(0xffffff, 1, 0);
+  lights[1] = new THREE.PointLight(0xffffff, 1, 0);
+  lights[2] = new THREE.PointLight(0xffffff, 1, 0);
+  lights[3] = new THREE.PointLight(0xffffff, 1, 0);
+  lights[0].position.set(-10000, 20000, -10000);
+  lights[1].position.set(10000, -20000, 10000);
+  lights[2].position.set(10000, 20000, 10000);
+  lights[3].position.set(-10000, -20000, -10000);
+  scene.add(lights[0]);
+  scene.add(lights[1]);
+  scene.add(lights[2]);
+  scene.add(lights[3]);
+
+  function render() {
+    renderer.render(scene, camera);
+  }
+
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.update();
+
+  // -- space background ------------------------------------------------------
+  const stars = new Array(0);
+  for(let i = 0; i < 10000; i++) {
+    let x = THREE.Math.randFloatSpread( 2000 );
+    let y = THREE.Math.randFloatSpread( 2000 );
+    let z = THREE.Math.randFloatSpread( 2000 );
+    stars.push(x, y, z);
+  }
+  let starsGeometry = new THREE.BufferGeometry();
+  starsGeometry.setAttribute(
+    "position", new THREE.Float32BufferAttribute(stars, 3)
+  );
+  const starsMaterial = new THREE.PointsMaterial( { color: 0x888888 } );
+  const starField = new THREE.Points( starsGeometry, starsMaterial );
+  scene.add(starField);
+
+  // -- prepare meshes --------------------------------------------------------
+  let Meshes_vertices = new Array(nvertices);
+  let Meshes_edges = new Array(nedges);
+
+  for(let i = 0; i < nvertices; i++) {
+    let mesh = new THREE.Mesh(sphere, vertexMaterial);
+    Meshes_vertices[i] = mesh;
+    group.add(mesh);
+  }
+  for(let i = 0; i < nedges; i++) {
+    let mesh = new THREE.Mesh(unitCylinder, edgeMaterial);
+    mesh.scale.set(edgeRadius, edgeRadius, 1);
+    Meshes_edges[i] = mesh;
+    group.add(mesh);
+  }
+
+  // -- lil.gui controls ------------------------------------------------------
+  let lgcontrols = {
+    rotationSpeed: 50,
+    theta: 0.5,
+    phi: 0
+  };
+  const gui = new GUI({ autoplace: false, width: 310 });
+  gui.domElement.id = "gui";
+  gui
+    .add(lgcontrols, "rotationSpeed")
+    .min(1)
+    .max(250)
+    .step(3)
+    .name("4d rotation speed");
+  gui
+    .add(lgcontrols, "theta")
+    .min(0)
+    .max(2)
+    .step(0.25)
+    .name("theta/pi");
+  gui
+    .add(lgcontrols, "phi")
+    .min(0)
+    .max(1)
+    .step(0.125)
+    .name("phi/pi");
+
+  // -- animation -------------------------------------------------------------
+  window.requestAnimFrame = (function () {
+    return (
+      window.requestAnimationFrame ||
+      window.webkitRequestAnimationFrame ||
+      window.mozRequestAnimationFrame 
+    );
+  })();
+
+  const alpha = Math.PI / 180;
+  var k = 0;
+
+  function animate() {
+    setTimeout(function() {
+      requestAnimFrame(animate);
+    }, 1000 / lgcontrols.rotationSpeed);
+
+    let vertices3d = makeVertices3d(
+      lgcontrols.theta * Math.PI, lgcontrols.phi * Math.PI, k * alpha
+    );
+
+    for(let i = 0; i < nvertices; i++) {
+      let mesh = Meshes_vertices[i];
+      mesh.position.copy(vertices3d[i]);
+    }
+
+    for(let i = 0; i < nedges; i++) {
+      const edge = edges[i];
+      const vi = vertices3d[edge[0]];
+      const vj = vertices3d[edge[1]];
+      let mesh = Meshes_edges[i];
+      mesh.position.copy(vi);
+      mesh.scale.z = vi.distanceTo(vj);
+      mesh.lookAt(vj);
+    }
+
+    k++;
+
+    controls.update();
+    render();
+
+  }
+
+  animate();
+
+</script>
+
+
+</body>
+
+</html>
+
