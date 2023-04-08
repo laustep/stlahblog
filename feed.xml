@@ -5,7 +5,200 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Mon, 20 Mar 2023 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Sat, 08 Apr 2023 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>Heatmap formatting of a table with 'DT'</title>
+      <link>https://laustep.github.io/stlahblog/posts/TempCitiesUSA.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        Googling “heatmap format excel” returns a lot of results. Here we will
+        see how to do a heatmap formatting with a <strong>DT</strong> table in
+        R.
+      </p>
+      <p>
+        The dataset we use provides the average monthly temperatures over a year
+        for some cities in USA. It is available in a
+        <a
+          href="https://github.com/FanWangEcon/Stat4Econ/blob/master/data/TempCitiesUSA.csv"
+          >CSV file here</a
+        >.
+      </p>
+      <p>
+        The table is in long format. Below we turn it into a table in wide
+        format. We also convert the temperatures to Celsius degrees and we
+        rename the months which are given as numbers in the original data.
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1"><span class="co"># read the CSV data</span></span>
+<span id="cb1-2">dat0 &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">"TempCitiesUSA.csv"</span>)</span>
+<span id="cb1-3"><span class="co"># it is in long format:</span></span>
+<span id="cb1-4"><span class="kw">head</span>(dat0)</span>
+<span id="cb1-5"><span class="co">##   state      city month temp.f</span></span>
+<span id="cb1-6"><span class="co">## 1    AK ANCHORAGE     1   15.8</span></span>
+<span id="cb1-7"><span class="co">## 2    AK ANCHORAGE     2   18.7</span></span>
+<span id="cb1-8"><span class="co">## 3    AK ANCHORAGE     3   25.9</span></span>
+<span id="cb1-9"><span class="co">## 4    AK ANCHORAGE     4   36.3</span></span>
+<span id="cb1-10"><span class="co">## 5    AK ANCHORAGE     5   46.9</span></span>
+<span id="cb1-11"><span class="co">## 6    AK ANCHORAGE     6   54.7</span></span>
+<span id="cb1-12"><span class="co"># I prefer Celsius degrees</span></span>
+<span id="cb1-13">dat0[[<span class="st">"temp.f"</span>]] &lt;-<span class="st"> </span><span class="kw">round</span>((dat0[[<span class="st">"temp.f"</span>]] <span class="op">-</span><span class="st"> </span><span class="dv">32</span>) <span class="op">/</span><span class="st"> </span><span class="fl">1.8</span>, <span class="dt">digits =</span> 1L) </span>
+<span id="cb1-14"><span class="co"># convert to wide format</span></span>
+<span id="cb1-15"><span class="kw">library</span>(tidyr)</span>
+<span id="cb1-16">dat &lt;-<span class="st"> </span>dat0 <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1-17"><span class="st">  </span><span class="kw">pivot_wider</span>(</span>
+<span id="cb1-18">    <span class="dt">names_from  =</span> month,</span>
+<span id="cb1-19">    <span class="dt">values_from =</span> temp.f</span>
+<span id="cb1-20">)</span>
+<span id="cb1-21"><span class="co"># replace the month numbers in the column names</span></span>
+<span id="cb1-22"><span class="kw">colnames</span>(dat)[<span class="dv">3</span><span class="op">:</span><span class="dv">14</span>] &lt;-<span class="st"> </span>month.abb</span>
+<span id="cb1-23"><span class="co"># have a look</span></span>
+<span id="cb1-24">pillar<span class="op">::</span><span class="kw">glimpse</span>(dat, <span class="dt">width =</span> <span class="dv">65</span>)</span>
+<span id="cb1-25"><span class="co">## Rows: 261</span></span>
+<span id="cb1-26"><span class="co">## Columns: 14</span></span>
+<span id="cb1-27"><span class="co">## $ state &lt;chr&gt; "AK", "AK", "AK", "AK", "AK", "AK", "AK", "AK", "…</span></span>
+<span id="cb1-28"><span class="co">## $ city  &lt;chr&gt; "ANCHORAGE", "ANNETTE", "BARROW", "BETHEL", "FAIR…</span></span>
+<span id="cb1-29"><span class="co">## $ Jan   &lt;dbl&gt; -9.0, 1.7, -25.4, -14.1, -23.2, -4.8, -3.5, -9.2,…</span></span>
+<span id="cb1-30"><span class="co">## $ Feb   &lt;dbl&gt; -7.4, 2.8, -26.6, -13.6, -19.9, -3.9, -1.7, -9.1,…</span></span>
+<span id="cb1-31"><span class="co">## $ Mar   &lt;dbl&gt; -3.4, 4.2, -25.4, -9.7, -11.6, -1.4, 0.9, -4.7, 0…</span></span>
+<span id="cb1-32"><span class="co">## $ Apr   &lt;dbl&gt; 2.4, 6.6, -18.1, -3.4, -0.2, 2.4, 4.9, 0.6, 2.9, …</span></span>
+<span id="cb1-33"><span class="co">## $ May   &lt;dbl&gt; 8.3, 9.7, -6.6, 5.2, 9.3, 6.5, 8.8, 6.4, 6.4, -0.…</span></span>
+<span id="cb1-34"><span class="co">## $ Jun   &lt;dbl&gt; 12.6, 12.4, 1.7, 10.8, 15.4, 10.0, 12.2, 10.5, 9.…</span></span>
+<span id="cb1-35"><span class="co">## $ Jul   &lt;dbl&gt; 14.7, 14.6, 4.7, 13.3, 16.9, 12.3, 13.8, 13.2, 12…</span></span>
+<span id="cb1-36"><span class="co">## $ Aug   &lt;dbl&gt; 13.6, 14.8, 3.7, 12.0, 13.4, 12.1, 13.2, 12.7, 12…</span></span>
+<span id="cb1-37"><span class="co">## $ Sep   &lt;dbl&gt; 9.0, 12.1, -0.4, 7.4, 6.9, 8.8, 10.0, 8.7, 9.7, 5…</span></span>
+<span id="cb1-38"><span class="co">## $ Oct   &lt;dbl&gt; 1.2, 8.1, -9.7, -1.1, -4.7, 3.2, 5.7, 0.7, 4.6, -…</span></span>
+<span id="cb1-39"><span class="co">## $ Nov   &lt;dbl&gt; -5.7, 4.3, -18.3, -8.1, -16.5, -1.4, 0.7, -4.9, 1…</span></span>
+<span id="cb1-40"><span class="co">## $ Dec   &lt;dbl&gt; -8.1, 2.4, -23.7, -12.6, -21.1, -3.4, -1.8, -8.2,…</span></span></code></pre>
+      </div>
+      <p>
+        We will use the lowest temperature and the highest temperature later.
+      </p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1"><span class="co"># get the lowest and highest temperatures</span></span>
+<span id="cb2-2">lowest  &lt;-<span class="st"> </span><span class="kw">min</span>(dat0[[<span class="st">"temp.f"</span>]])</span>
+<span id="cb2-3">highest &lt;-<span class="st"> </span><span class="kw">max</span>(dat0[[<span class="st">"temp.f"</span>]])</span></code></pre>
+      </div>
+      <p>
+        Now let’s detail our manipulation for one column. We map the
+        temperatures to the interval <span class="math inline">\((0,1)\)</span>,
+        in such a way that <span class="math inline">\(0\)</span> is sent to
+        <span class="math inline">\(0.5\)</span>.
+      </p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb3-1"><span class="co"># let's detail for one column, January</span></span>
+<span id="cb3-2">x &lt;-<span class="st"> </span>dat[[<span class="st">"Jan"</span>]]</span>
+<span id="cb3-3"><span class="co"># function to map from (lowest, highest) to (0, 1), mapping 0 to 0.5</span></span>
+<span id="cb3-4">interpfun &lt;-<span class="st"> </span><span class="kw">splinefun</span>(</span>
+<span id="cb3-5">  <span class="kw">c</span>(lowest, <span class="dv">0</span>, highest),</span>
+<span id="cb3-6">  <span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.5</span>, <span class="dv">1</span>)</span>
+<span id="cb3-7">)</span>
+<span id="cb3-8"><span class="co"># map the January data</span></span>
+<span id="cb3-9">y &lt;-<span class="st"> </span><span class="kw">interpfun</span>(x)</span></code></pre>
+      </div>
+      <p>
+        Now we map each value of <code>y</code> to a color, such that
+        <span class="math inline">\(0.5\)</span> is sent to white.
+      </p>
+      <div class="sourceCode" id="cb4">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb4-1"><span class="co"># function mapping (0, 1) to a color; 0.5 is sent to white </span></span>
+<span id="cb4-2">colfunc &lt;-<span class="st"> </span><span class="kw">colorRamp</span>(<span class="kw">c</span>(<span class="st">"blue"</span>, <span class="st">"white"</span>, <span class="st">"red"</span>))</span>
+<span id="cb4-3"><span class="co"># get the colors for January</span></span>
+<span id="cb4-4">cols &lt;-<span class="st"> </span><span class="kw">colfunc</span>(y)</span>
+<span id="cb4-5"><span class="co"># these are rgb codes, we convert them to hex codes</span></span>
+<span id="cb4-6">clrs &lt;-<span class="st"> </span><span class="kw">rgb</span>(cols[, 1L], cols[, 2L], cols[, 3L], <span class="dt">maxColorValue =</span> <span class="dv">255</span>)</span></code></pre>
+      </div>
+      <p>
+        In this way the negative temperatures will be colored in blue and the
+        positive temperatures in red.
+      </p>
+      <p>Now we apply this manipulation for each month.</p>
+      <div class="sourceCode" id="cb5">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb5-1"><span class="co"># now we perform this stuff for each month</span></span>
+<span id="cb5-2">Colors &lt;-<span class="st"> </span><span class="kw">lapply</span>(dat[, month.abb], <span class="cf">function</span>(x) {</span>
+<span id="cb5-3">  y &lt;-<span class="st"> </span><span class="kw">interpfun</span>(x)</span>
+<span id="cb5-4">  cols &lt;-<span class="st"> </span><span class="kw">colfunc</span>(y)</span>
+<span id="cb5-5">  <span class="kw">rgb</span>(cols[, 1L], cols[, 2L], cols[, 3L], <span class="dt">maxColorValue =</span> <span class="dv">255</span>)</span>
+<span id="cb5-6">})</span>
+<span id="cb5-7"><span class="co"># have a look</span></span>
+<span id="cb5-8"><span class="kw">str</span>(Colors)</span>
+<span id="cb5-9"><span class="co">## List of 12</span></span>
+<span id="cb5-10"><span class="co">##  $ Jan: chr [1:261] "#AEAEFF" "#FFF0F0" "#0C0CFF" "#7E7EFF" ...</span></span>
+<span id="cb5-11"><span class="co">##  $ Feb: chr [1:261] "#BDBDFF" "#FFE7E7" "#0000FF" "#8282FF" ...</span></span>
+<span id="cb5-12"><span class="co">##  $ Mar: chr [1:261] "#E1E1FF" "#FFDBDB" "#0C0CFF" "#A7A7FF" ...</span></span>
+<span id="cb5-13"><span class="co">##  $ Apr: chr [1:261] "#FFEAEA" "#FFC7C7" "#5757FF" "#E1E1FF" ...</span></span>
+<span id="cb5-14"><span class="co">##  $ May: chr [1:261] "#FFB9B9" "#FFAEAE" "#C4C4FF" "#FFD3D3" ...</span></span>
+<span id="cb5-15"><span class="co">##  $ Jun: chr [1:261] "#FF9797" "#FF9999" "#FFF0F0" "#FFA5A5" ...</span></span>
+<span id="cb5-16"><span class="co">##  $ Jul: chr [1:261] "#FF8787" "#FF8888" "#FFD7D7" "#FF9292" ...</span></span>
+<span id="cb5-17"><span class="co">##  $ Aug: chr [1:261] "#FF9090" "#FF8787" "#FFDFDF" "#FF9C9C" ...</span></span>
+<span id="cb5-18"><span class="co">##  $ Sep: chr [1:261] "#FFB4B4" "#FF9B9B" "#FBFBFF" "#FFC1C1" ...</span></span>
+<span id="cb5-19"><span class="co">##  $ Oct: chr [1:261] "#FFF4F4" "#FFBBBB" "#A7A7FF" "#F5F5FF" ...</span></span>
+<span id="cb5-20"><span class="co">##  $ Nov: chr [1:261] "#CCCCFF" "#FFDADA" "#5555FF" "#B6B6FF" ...</span></span>
+<span id="cb5-21"><span class="co">##  $ Dec: chr [1:261] "#B6B6FF" "#FFEAEA" "#1E1EFF" "#8C8CFF" ...</span></span></code></pre>
+      </div>
+      <p>
+        Now let’s do the <strong>DT</strong> table. I use the
+        <strong>RowGroup</strong> extension to group the data by state (the 0-th
+        column in JavaScript).
+      </p>
+      <div class="sourceCode" id="cb6">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb6-1"><span class="kw">library</span>(DT)</span>
+<span id="cb6-2">dtable &lt;-<span class="st"> </span><span class="kw">datatable</span>(</span>
+<span id="cb6-3">  dat, <span class="dt">rownames =</span> <span class="ot">FALSE</span>, <span class="dt">extensions =</span> <span class="st">"RowGroup"</span>, </span>
+<span id="cb6-4">  <span class="dt">options =</span> <span class="kw">list</span>(</span>
+<span id="cb6-5">    <span class="dt">rowGroup =</span> <span class="kw">list</span>(<span class="dt">dataSrc =</span> <span class="kw">list</span>(<span class="dv">0</span>)),</span>
+<span id="cb6-6">    <span class="dt">columnDefs =</span> <span class="kw">list</span>( <span class="co"># hide the grouping column</span></span>
+<span id="cb6-7">      <span class="kw">list</span>(<span class="dt">targets =</span> <span class="dv">0</span>, <span class="dt">visible =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb6-8">    )</span>
+<span id="cb6-9">  )</span>
+<span id="cb6-10">)</span></code></pre>
+      </div>
+      <p>And now we format this table.</p>
+      <div class="sourceCode" id="cb7">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb7-1"><span class="cf">for</span>(month <span class="cf">in</span> month.abb) {</span>
+<span id="cb7-2">  dtable &lt;-<span class="st"> </span>dtable <span class="op">%&gt;%</span></span>
+<span id="cb7-3"><span class="st">    </span><span class="kw">formatStyle</span>(</span>
+<span id="cb7-4">      month, </span>
+<span id="cb7-5">      <span class="dt">backgroundColor =</span> <span class="kw">styleEqual</span>(dat[[month]], Colors[[month]])</span>
+<span id="cb7-6">    )</span>
+<span id="cb7-7">}</span></code></pre>
+      </div>
+      <p>That’s done.</p>
+      <div class="sourceCode" id="cb8">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb8-1">dtable</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/TempCitiesUSA.png"
+          style="width: 60%"
+        />
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Sat, 08 Apr 2023 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/TempCitiesUSA.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>Orbit trapped Julia fractal</title>
       <link>https://laustep.github.io/stlahblog/posts/JuliaOrbitTrap.html</link>
@@ -11623,599 +11816,6 @@ Options:
 ]]></description>
       <pubDate>Thu, 08 Oct 2020 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/MyRGLartworks.html</guid>
-      <dc:creator>Stéphane Laurent</dc:creator>
-      <category>R</category>
-    </item>
-    <item>
-      <title>Child tables with DT, editing, exporting</title>
-      <link>https://laustep.github.io/stlahblog/posts/DT_childTables.html</link>
-      <description><![CDATA[<div class="container-fluid">
-  <div class="main col-sm-12">
-    <div class="content">
-      <p>
-        I’m going to show how to use the <code>DT</code> package to do a table
-        with child tables, and how to edit and export such a table.
-      </p>
-      <p>
-        In order to do a table with child tables, one adds a list column to the
-        dataframe of the main table; each cell of this column contains the child
-        table of the corresponding row, given as a list. This is done by the
-        <code>NestedData</code> function below.
-      </p>
-      <div class="sourceCode" id="cb1">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb1-1">NestedData &lt;-<span class="st"> </span><span class="cf">function</span>(dat, children){</span>
-<span id="cb1-2">  <span class="kw">stopifnot</span>(<span class="kw">length</span>(children) <span class="op">==</span><span class="st"> </span><span class="kw">nrow</span>(dat))</span>
-<span id="cb1-3">  g &lt;-<span class="st"> </span><span class="cf">function</span>(d){</span>
-<span id="cb1-4">    <span class="cf">if</span>(<span class="kw">is.data.frame</span>(d)){</span>
-<span id="cb1-5">      purrr<span class="op">::</span><span class="kw">transpose</span>(d)</span>
-<span id="cb1-6">    }<span class="cf">else</span>{</span>
-<span id="cb1-7">      purrr<span class="op">::</span><span class="kw">transpose</span>(<span class="kw">NestedData</span>(d[[<span class="dv">1</span>]], <span class="dt">children =</span> d<span class="op">$</span>children))</span>
-<span id="cb1-8">    }</span>
-<span id="cb1-9">  }</span>
-<span id="cb1-10">  subdats &lt;-<span class="st"> </span><span class="kw">lapply</span>(children, g)</span>
-<span id="cb1-11">  oplus &lt;-<span class="st"> </span><span class="kw">ifelse</span>(<span class="kw">lengths</span>(subdats), <span class="st">"&amp;oplus;"</span>, <span class="st">""</span>) </span>
-<span id="cb1-12">  <span class="kw">cbind</span>(<span class="st">" "</span> =<span class="st"> </span>oplus, dat, <span class="st">"_details"</span> =<span class="st"> </span><span class="kw">I</span>(subdats), </span>
-<span id="cb1-13">        <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</span>
-<span id="cb1-14">}</span></code></pre>
-      </div>
-      <p>
-        The usage of <code>NestedData</code> is easy to understand with an
-        example:
-      </p>
-      <div class="sourceCode" id="cb2">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb2-1">dat0   =<span class="st"> </span>iris[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>,]        <span class="co"># main table, with three rows</span></span>
-<span id="cb2-2">dat01  =<span class="st"> </span>airquality[<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>,]  <span class="co"># |- child of first row</span></span>
-<span id="cb2-3">dat02  =<span class="st"> </span>cars[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,]        <span class="co"># |- child of second row, with two rows</span></span>
-<span id="cb2-4">dat021 =<span class="st"> </span>mtcars[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>,]      <span class="co"># |  |- child of first row of dat02</span></span>
-<span id="cb2-5">dat022 =<span class="st"> </span>PlantGrowth[<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>,] <span class="co"># |  |- child of second row of dat02</span></span>
-<span id="cb2-6">dat03  =<span class="st"> </span><span class="kw">data.frame</span>(<span class="ot">NULL</span>)  <span class="co"># |- third row has no child</span></span>
-<span id="cb2-7"></span>
-<span id="cb2-8">Dat &lt;-<span class="st"> </span><span class="kw">NestedData</span>(</span>
-<span id="cb2-9">  <span class="dt">dat =</span> dat0, </span>
-<span id="cb2-10">  <span class="dt">children =</span> <span class="kw">list</span>(</span>
-<span id="cb2-11">    dat01, </span>
-<span id="cb2-12">    <span class="kw">list</span>(  </span>
-<span id="cb2-13">      dat02, </span>
-<span id="cb2-14">      <span class="dt">children =</span> <span class="kw">list</span>(</span>
-<span id="cb2-15">        dat021, </span>
-<span id="cb2-16">        dat022</span>
-<span id="cb2-17">      )</span>
-<span id="cb2-18">    ), </span>
-<span id="cb2-19">    dat03 </span>
-<span id="cb2-20">  )</span>
-<span id="cb2-21">)</span></code></pre>
-      </div>
-      <p>
-        Now we define the JavaScript callback which will be used. The code
-        depends on whether one wants to display the row names of the main table,
-        so the user has to enter this information before.
-      </p>
-      <div class="sourceCode" id="cb3">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb3-1"><span class="kw">library</span>(DT)</span>
-<span id="cb3-2"></span>
-<span id="cb3-3"><span class="co">## whether to show row names</span></span>
-<span id="cb3-4">rowNames =<span class="st"> </span><span class="ot">FALSE</span></span>
-<span id="cb3-5">colIdx &lt;-<span class="st"> </span><span class="kw">as.integer</span>(rowNames)</span>
-<span id="cb3-6"></span>
-<span id="cb3-7"><span class="co">## the callback</span></span>
-<span id="cb3-8">parentRows &lt;-<span class="st"> </span><span class="kw">which</span>(Dat[,<span class="dv">1</span>] <span class="op">!=</span><span class="st"> ""</span>)</span>
-<span id="cb3-9">callback &lt;-<span class="st"> </span><span class="kw">JS</span>(</span>
-<span id="cb3-10">  <span class="kw">sprintf</span>(<span class="st">"var parentRows = [%s];"</span>, <span class="kw">toString</span>(parentRows<span class="dv">-1</span>)),</span>
-<span id="cb3-11">  <span class="kw">sprintf</span>(<span class="st">"var j0 = %d;"</span>, colIdx),</span>
-<span id="cb3-12">  <span class="st">"var nrows = table.rows().count();"</span>,</span>
-<span id="cb3-13">  <span class="st">"for(let i = 0; i &lt; nrows; ++i){"</span>,</span>
-<span id="cb3-14">  <span class="st">"  var $cell = table.cell(i,j0).nodes().to$();"</span>,</span>
-<span id="cb3-15">  <span class="st">"  if(parentRows.indexOf(i) &gt; -1){"</span>,</span>
-<span id="cb3-16">  <span class="st">"    $cell.css({cursor: 'pointer'});"</span>,</span>
-<span id="cb3-17">  <span class="st">"  }else{"</span>,</span>
-<span id="cb3-18">  <span class="st">"    $cell.removeClass('details-control');"</span>,</span>
-<span id="cb3-19">  <span class="st">"  }"</span>,</span>
-<span id="cb3-20">  <span class="st">"}"</span>,</span>
-<span id="cb3-21">  <span class="st">""</span>,</span>
-<span id="cb3-22">  <span class="st">"// --- make the table header of the nested table --- //"</span>,</span>
-<span id="cb3-23">  <span class="st">"var formatHeader = function(d, childId){"</span>,</span>
-<span id="cb3-24">  <span class="st">"  if(d !== null){"</span>,</span>
-<span id="cb3-25">  <span class="st">"    var html = "</span>, </span>
-<span id="cb3-26">  <span class="st">"      '&lt;table class=</span><span class="ch">\"</span><span class="st">display compact hover</span><span class="ch">\"</span><span class="st"> ' + "</span>,</span>
-<span id="cb3-27">  <span class="st">"      'style=</span><span class="ch">\"</span><span class="st">padding-left: 30px;</span><span class="ch">\"</span><span class="st"> id=</span><span class="ch">\"</span><span class="st">' + childId + "</span>, </span>
-<span id="cb3-28">  <span class="st">"      '</span><span class="ch">\"</span><span class="st">&gt;&lt;thead&gt;&lt;tr&gt;';"</span>,</span>
-<span id="cb3-29">  <span class="st">"    var data = d[d.length-1] || d._details;"</span>,</span>
-<span id="cb3-30">  <span class="st">"    for(let key in data[0]){"</span>,</span>
-<span id="cb3-31">  <span class="st">"      html += '&lt;th&gt;' + key + '&lt;/th&gt;';"</span>,</span>
-<span id="cb3-32">  <span class="st">"    }"</span>,</span>
-<span id="cb3-33">  <span class="st">"    html += '&lt;/tr&gt;&lt;/thead&gt;&lt;/table&gt;'"</span>,</span>
-<span id="cb3-34">  <span class="st">"    return html;"</span>,</span>
-<span id="cb3-35">  <span class="st">"  } else {"</span>,</span>
-<span id="cb3-36">  <span class="st">"    return '';"</span>,</span>
-<span id="cb3-37">  <span class="st">"  }"</span>,</span>
-<span id="cb3-38">  <span class="st">"};"</span>,</span>
-<span id="cb3-39">  <span class="st">""</span>,</span>
-<span id="cb3-40">  <span class="st">"// --- row callback to style rows of child tables --- //"</span>,</span>
-<span id="cb3-41">  <span class="st">"var rowCallback = function(row, dat, displayNum, index){"</span>,</span>
-<span id="cb3-42">  <span class="st">"  if($(row).hasClass('odd')){"</span>,</span>
-<span id="cb3-43">  <span class="st">"    $(row).css('background-color', 'papayawhip');"</span>,</span>
-<span id="cb3-44">  <span class="st">"    $(row).hover(function(){"</span>,</span>
-<span id="cb3-45">  <span class="st">"      $(this).css('background-color', '#E6FF99');"</span>,</span>
-<span id="cb3-46">  <span class="st">"    }, function(){"</span>,</span>
-<span id="cb3-47">  <span class="st">"      $(this).css('background-color', 'papayawhip');"</span>,</span>
-<span id="cb3-48">  <span class="st">"    });"</span>,</span>
-<span id="cb3-49">  <span class="st">"  } else {"</span>,</span>
-<span id="cb3-50">  <span class="st">"    $(row).css('background-color', 'lemonchiffon');"</span>,</span>
-<span id="cb3-51">  <span class="st">"    $(row).hover(function(){"</span>,</span>
-<span id="cb3-52">  <span class="st">"      $(this).css('background-color', '#DDFF75');"</span>,</span>
-<span id="cb3-53">  <span class="st">"    }, function(){"</span>,</span>
-<span id="cb3-54">  <span class="st">"      $(this).css('background-color', 'lemonchiffon');"</span>,</span>
-<span id="cb3-55">  <span class="st">"    });"</span>,</span>
-<span id="cb3-56">  <span class="st">"  }"</span>,</span>
-<span id="cb3-57">  <span class="st">"};"</span>,</span>
-<span id="cb3-58">  <span class="st">""</span>,</span>
-<span id="cb3-59">  <span class="st">"// --- header callback to style header of child tables --- //"</span>,</span>
-<span id="cb3-60">  <span class="st">"var headerCallback = function(thead, data, start, end, display){"</span>,</span>
-<span id="cb3-61">  <span class="st">"  $('th', thead).css({"</span>,</span>
-<span id="cb3-62">  <span class="st">"    'border-top': '3px solid indigo',"</span>, </span>
-<span id="cb3-63">  <span class="st">"    'color': 'indigo',"</span>,</span>
-<span id="cb3-64">  <span class="st">"    'background-color': '#fadadd'"</span>,</span>
-<span id="cb3-65">  <span class="st">"  });"</span>,</span>
-<span id="cb3-66">  <span class="st">"};"</span>,</span>
-<span id="cb3-67">  <span class="st">""</span>,</span>
-<span id="cb3-68">  <span class="st">"// --- make the datatable --- //"</span>,</span>
-<span id="cb3-69">  <span class="st">"var formatDatatable = function(d, childId){"</span>,</span>
-<span id="cb3-70">  <span class="st">"  var data = d[d.length-1] || d._details;"</span>,</span>
-<span id="cb3-71">  <span class="st">"  var colNames = Object.keys(data[0]);"</span>,</span>
-<span id="cb3-72">  <span class="st">"  var columns = colNames.map(function(x){"</span>,</span>
-<span id="cb3-73">  <span class="st">"    return {data: x.replace(/</span><span class="ch">\\</span><span class="st">./g, '</span><span class="ch">\\\\\\</span><span class="st">.'), title: x};"</span>,</span>
-<span id="cb3-74">  <span class="st">"  });"</span>,</span>
-<span id="cb3-75">  <span class="st">"  var id = 'table#' + childId;"</span>,</span>
-<span id="cb3-76">  <span class="st">"  if(colNames.indexOf('_details') === -1){"</span>,</span>
-<span id="cb3-77">  <span class="st">"    var subtable = $(id).DataTable({"</span>,</span>
-<span id="cb3-78">  <span class="st">"      'data': data,"</span>,</span>
-<span id="cb3-79">  <span class="st">"      'columns': columns,"</span>,</span>
-<span id="cb3-80">  <span class="st">"      'autoWidth': true,"</span>,</span>
-<span id="cb3-81">  <span class="st">"      'deferRender': true,"</span>,</span>
-<span id="cb3-82">  <span class="st">"      'info': false,"</span>,</span>
-<span id="cb3-83">  <span class="st">"      'lengthChange': false,"</span>,</span>
-<span id="cb3-84">  <span class="st">"      'ordering': data.length &gt; 1,"</span>,</span>
-<span id="cb3-85">  <span class="st">"      'order': [],"</span>,</span>
-<span id="cb3-86">  <span class="st">"      'paging': false,"</span>,</span>
-<span id="cb3-87">  <span class="st">"      'scrollX': false,"</span>,</span>
-<span id="cb3-88">  <span class="st">"      'scrollY': false,"</span>,</span>
-<span id="cb3-89">  <span class="st">"      'searching': false,"</span>,</span>
-<span id="cb3-90">  <span class="st">"      'sortClasses': false,"</span>,</span>
-<span id="cb3-91">  <span class="st">"      'rowCallback': rowCallback,"</span>,</span>
-<span id="cb3-92">  <span class="st">"      'headerCallback': headerCallback,"</span>,</span>
-<span id="cb3-93">  <span class="st">"      'columnDefs': [{targets: '_all', className: 'dt-center'}]"</span>,</span>
-<span id="cb3-94">  <span class="st">"    });"</span>,</span>
-<span id="cb3-95">  <span class="st">"  } else {"</span>,</span>
-<span id="cb3-96">  <span class="st">"    var subtable = $(id).DataTable({"</span>,</span>
-<span id="cb3-97">  <span class="st">"      'data': data,"</span>,</span>
-<span id="cb3-98">  <span class="st">"      'columns': columns,"</span>,</span>
-<span id="cb3-99">  <span class="st">"      'autoWidth': true,"</span>,</span>
-<span id="cb3-100">  <span class="st">"      'deferRender': true,"</span>,</span>
-<span id="cb3-101">  <span class="st">"      'info': false,"</span>,</span>
-<span id="cb3-102">  <span class="st">"      'lengthChange': false,"</span>,</span>
-<span id="cb3-103">  <span class="st">"      'ordering': data.length &gt; 1,"</span>,</span>
-<span id="cb3-104">  <span class="st">"      'order': [],"</span>,</span>
-<span id="cb3-105">  <span class="st">"      'paging': false,"</span>,</span>
-<span id="cb3-106">  <span class="st">"      'scrollX': false,"</span>,</span>
-<span id="cb3-107">  <span class="st">"      'scrollY': false,"</span>,</span>
-<span id="cb3-108">  <span class="st">"      'searching': false,"</span>,</span>
-<span id="cb3-109">  <span class="st">"      'sortClasses': false,"</span>,</span>
-<span id="cb3-110">  <span class="st">"      'rowCallback': rowCallback,"</span>,</span>
-<span id="cb3-111">  <span class="st">"      'headerCallback': headerCallback,"</span>,</span>
-<span id="cb3-112">  <span class="st">"      'columnDefs': ["</span>, </span>
-<span id="cb3-113">  <span class="st">"        {targets: -1, visible: false},"</span>, </span>
-<span id="cb3-114">  <span class="st">"        {targets: 0, orderable: false, className: 'details-control'},"</span>, </span>
-<span id="cb3-115">  <span class="st">"        {targets: '_all', className: 'dt-center'}"</span>,</span>
-<span id="cb3-116">  <span class="st">"      ]"</span>,</span>
-<span id="cb3-117">  <span class="st">"    }).column(0).nodes().to$().css({cursor: 'pointer'});"</span>,</span>
-<span id="cb3-118">  <span class="st">"  }"</span>,</span>
-<span id="cb3-119">  <span class="st">"};"</span>,</span>
-<span id="cb3-120">  <span class="st">""</span>,</span>
-<span id="cb3-121">  <span class="st">"// --- display the child table on click --- //"</span>,</span>
-<span id="cb3-122">  <span class="st">"// array to store id's of already created child tables"</span>,</span>
-<span id="cb3-123">  <span class="st">"var children = [];"</span>, </span>
-<span id="cb3-124">  <span class="st">"table.on('click', 'td.details-control', function(){"</span>,</span>
-<span id="cb3-125">  <span class="st">"  var tbl = $(this).closest('table'),"</span>,</span>
-<span id="cb3-126">  <span class="st">"      tblId = tbl.attr('id'),"</span>,</span>
-<span id="cb3-127">  <span class="st">"      td = $(this),"</span>,</span>
-<span id="cb3-128">  <span class="st">"      row = $(tbl).DataTable().row(td.closest('tr')),"</span>,</span>
-<span id="cb3-129">  <span class="st">"      rowIdx = row.index();"</span>,</span>
-<span id="cb3-130">  <span class="st">"  if(row.child.isShown()){"</span>,</span>
-<span id="cb3-131">  <span class="st">"    row.child.hide();"</span>,</span>
-<span id="cb3-132">  <span class="st">"    td.html('&amp;oplus;');"</span>,</span>
-<span id="cb3-133">  <span class="st">"  } else {"</span>,</span>
-<span id="cb3-134">  <span class="st">"    var childId = tblId + '-child-' + rowIdx;"</span>,</span>
-<span id="cb3-135">  <span class="st">"    if(children.indexOf(childId) === -1){"</span>, </span>
-<span id="cb3-136">  <span class="st">"      // this child has not been created yet"</span>,</span>
-<span id="cb3-137">  <span class="st">"      children.push(childId);"</span>,</span>
-<span id="cb3-138">  <span class="st">"      row.child(formatHeader(row.data(), childId)).show();"</span>,</span>
-<span id="cb3-139">  <span class="st">"      td.html('&amp;CircleMinus;');"</span>,</span>
-<span id="cb3-140">  <span class="st">"      formatDatatable(row.data(), childId, rowIdx);"</span>,</span>
-<span id="cb3-141">  <span class="st">"    }else{"</span>,</span>
-<span id="cb3-142">  <span class="st">"      // this child has already been created"</span>,</span>
-<span id="cb3-143">  <span class="st">"      row.child(true);"</span>,</span>
-<span id="cb3-144">  <span class="st">"      td.html('&amp;CircleMinus;');"</span>,</span>
-<span id="cb3-145">  <span class="st">"    }"</span>,</span>
-<span id="cb3-146">  <span class="st">"  }"</span>,</span>
-<span id="cb3-147">  <span class="st">"});"</span>)</span></code></pre>
-      </div>
-      <p>
-        Now, here is the code which generates the table. The first column
-        contains some HTML (⊕) so we have to not escape it. The last column
-        contains the child data, it has to be hidden. Finally we assign the
-        class <code>details-control</code> to the first column, this is used by
-        the callback.
-      </p>
-      <div class="sourceCode" id="cb4">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb4-1"><span class="kw">datatable</span>(</span>
-<span id="cb4-2">  Dat, </span>
-<span id="cb4-3">  <span class="dt">callback =</span> callback, <span class="dt">rownames =</span> rowNames, <span class="dt">escape =</span> <span class="op">-</span>colIdx<span class="dv">-1</span>,</span>
-<span id="cb4-4">  <span class="dt">options =</span> <span class="kw">list</span>(</span>
-<span id="cb4-5">    <span class="dt">paging =</span> <span class="ot">FALSE</span>,</span>
-<span id="cb4-6">    <span class="dt">searching =</span> <span class="ot">FALSE</span>,</span>
-<span id="cb4-7">    <span class="dt">columnDefs =</span> <span class="kw">list</span>(</span>
-<span id="cb4-8">      <span class="kw">list</span>(</span>
-<span id="cb4-9">        <span class="dt">visible =</span> <span class="ot">FALSE</span>, </span>
-<span id="cb4-10">        <span class="dt">targets =</span> <span class="kw">ncol</span>(Dat)<span class="op">-</span><span class="dv">1</span><span class="op">+</span>colIdx</span>
-<span id="cb4-11">      ),</span>
-<span id="cb4-12">      <span class="kw">list</span>(</span>
-<span id="cb4-13">        <span class="dt">orderable =</span> <span class="ot">FALSE</span>, </span>
-<span id="cb4-14">        <span class="dt">className =</span> <span class="st">"details-control"</span>, </span>
-<span id="cb4-15">        <span class="dt">targets =</span> colIdx</span>
-<span id="cb4-16">      ),</span>
-<span id="cb4-17">      <span class="kw">list</span>(</span>
-<span id="cb4-18">        <span class="dt">className =</span> <span class="st">"dt-center"</span>, </span>
-<span id="cb4-19">        <span class="dt">targets =</span> <span class="st">"_all"</span></span>
-<span id="cb4-20">      )</span>
-<span id="cb4-21">    )</span>
-<span id="cb4-22">  )</span>
-<span id="cb4-23">)</span></code></pre>
-      </div>
-      <p>
-        <img
-          src="https://laustep.github.io/stlahblog/posts/figures/DTchildRows1.gif"
-        />
-      </p>
-      <h1 id="editing">Editing</h1>
-      <p>
-        We use the JavaScript library
-        <a href="https://github.com/ejbeaty/CellEdit">CellEdit</a> to allow
-        cells, including the cells of the child tables, to be editable. Download
-        the file <strong>dataTables.cellEdit.js</strong>.
-      </p>
-      <p>
-        Some CSS is required in order to make things pretty. Save the following
-        CSS code in a file <strong>dataTables.cellEdit.css</strong>.
-      </p>
-      <div class="sourceCode" id="cb5">
-        <pre
-          class="sourceCode css"
-        ><code class="sourceCode css"><span id="cb5-1"><span class="fu">.my-input-class</span> {</span>
-<span id="cb5-2">  <span class="kw">padding</span>: <span class="dv">3</span><span class="dt">px</span> <span class="dv">6</span><span class="dt">px</span><span class="op">;</span></span>
-<span id="cb5-3">  <span class="kw">border</span>: <span class="dv">1</span><span class="dt">px</span> <span class="dv">solid</span> <span class="cn">#ccc</span><span class="op">;</span></span>
-<span id="cb5-4">  <span class="kw">border-radius</span>: <span class="dv">4</span><span class="dt">px</span><span class="op">;</span></span>
-<span id="cb5-5">  <span class="kw">width</span>: <span class="dv">60</span><span class="dt">px</span><span class="op">;</span></span>
-<span id="cb5-6">}</span>
-<span id="cb5-7"></span>
-<span id="cb5-8"><span class="fu">.my-confirm-class</span> {</span>
-<span id="cb5-9">  <span class="kw">padding</span>: <span class="dv">3</span><span class="dt">px</span> <span class="dv">6</span><span class="dt">px</span><span class="op">;</span></span>
-<span id="cb5-10">  <span class="kw">font-size</span>: <span class="dv">12</span><span class="dt">px</span><span class="op">;</span></span>
-<span id="cb5-11">  <span class="kw">color</span>: <span class="cn">white</span><span class="op">;</span></span>
-<span id="cb5-12">  <span class="kw">text-align</span>: <span class="dv">center</span><span class="op">;</span></span>
-<span id="cb5-13">  <span class="kw">vertical-align</span>: <span class="dv">middle</span><span class="op">;</span></span>
-<span id="cb5-14">  <span class="kw">border-radius</span>: <span class="dv">4</span><span class="dt">px</span><span class="op">;</span></span>
-<span id="cb5-15">  <span class="kw">background-color</span>: <span class="cn">#337ab7</span><span class="op">;</span></span>
-<span id="cb5-16">  <span class="kw">text-decoration</span>: <span class="dv">none</span><span class="op">;</span></span>
-<span id="cb5-17">}</span>
-<span id="cb5-18"></span>
-<span id="cb5-19"><span class="fu">.my-cancel-class</span> {</span>
-<span id="cb5-20">  <span class="kw">padding</span>: <span class="dv">3</span><span class="dt">px</span> <span class="dv">6</span><span class="dt">px</span><span class="op">;</span></span>
-<span id="cb5-21">  <span class="kw">font-size</span>: <span class="dv">12</span><span class="dt">px</span><span class="op">;</span></span>
-<span id="cb5-22">  <span class="kw">color</span>: <span class="cn">white</span><span class="op">;</span></span>
-<span id="cb5-23">  <span class="kw">text-align</span>: <span class="dv">center</span><span class="op">;</span></span>
-<span id="cb5-24">  <span class="kw">vertical-align</span>: <span class="dv">middle</span><span class="op">;</span></span>
-<span id="cb5-25">  <span class="kw">border-radius</span>: <span class="dv">4</span><span class="dt">px</span><span class="op">;</span></span>
-<span id="cb5-26">  <span class="kw">background-color</span>: <span class="cn">#a94442</span><span class="op">;</span></span>
-<span id="cb5-27">  <span class="kw">text-decoration</span>: <span class="dv">none</span><span class="op">;</span></span>
-<span id="cb5-28">}</span></code></pre>
-      </div>
-      <p>Now modify the callback as follows:</p>
-      <div class="sourceCode" id="cb6">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb6-1">callback &lt;-<span class="st"> </span><span class="kw">JS</span>(</span>
-<span id="cb6-2">  <span class="st">"function onUpdate(updatedCell, updatedRow, oldValue) {};"</span>,</span>
-<span id="cb6-3">  <span class="st">"table.MakeCellsEditable({"</span>,</span>
-<span id="cb6-4">  <span class="st">"  onUpdate: onUpdate,"</span>,</span>
-<span id="cb6-5">  <span class="st">"  inputCss: 'my-input-class',"</span>,</span>
-<span id="cb6-6">  <span class="st">"  confirmationButton: {"</span>,</span>
-<span id="cb6-7">  <span class="st">"    confirmCss: 'my-confirm-class',"</span>,</span>
-<span id="cb6-8">  <span class="st">"    cancelCss: 'my-cancel-class'"</span>,</span>
-<span id="cb6-9">  <span class="st">"  }"</span>,</span>
-<span id="cb6-10">  <span class="st">"});"</span>,</span>
-<span id="cb6-11">  <span class="kw">sprintf</span>(<span class="st">"var parentRows = [%s];"</span>, <span class="kw">toString</span>(parentRows<span class="dv">-1</span>)),</span>
-<span id="cb6-12">  </span>
-<span id="cb6-13">  ......</span>
-<span id="cb6-14">  </span>
-<span id="cb6-15">  <span class="st">"// --- make the datatable --- //"</span>,</span>
-<span id="cb6-16">  <span class="st">"var formatDatatable = function(d, childId){"</span>,</span>
-<span id="cb6-17">  </span>
-<span id="cb6-18">  ......</span>
-<span id="cb6-19"></span>
-<span id="cb6-20">  <span class="st">"    }).column(0).nodes().to$().css({cursor: 'pointer'});"</span>,</span>
-<span id="cb6-21">  <span class="st">"  }"</span>,</span>
-<span id="cb6-22">  <span class="st">"  subtable.MakeCellsEditable({"</span>,</span>
-<span id="cb6-23">  <span class="st">"    onUpdate: onUpdate,"</span>,</span>
-<span id="cb6-24">  <span class="st">"    inputCss: 'my-input-class',"</span>,</span>
-<span id="cb6-25">  <span class="st">"    confirmationButton: {"</span>,</span>
-<span id="cb6-26">  <span class="st">"      confirmCss: 'my-confirm-class',"</span>,</span>
-<span id="cb6-27">  <span class="st">"      cancelCss: 'my-cancel-class'"</span>,</span>
-<span id="cb6-28">  <span class="st">"    }"</span>,</span>
-<span id="cb6-29">  <span class="st">"  });"</span>,</span>
-<span id="cb6-30">  <span class="st">"};"</span>,</span>
-<span id="cb6-31">  <span class="st">""</span>,</span>
-<span id="cb6-32">  <span class="st">"// --- display the child table on click --- //"</span>,</span>
-<span id="cb6-33"></span>
-<span id="cb6-34">  ......</span>
-<span id="cb6-35">  </span>
-<span id="cb6-36">  <span class="st">"});"</span>)</span></code></pre>
-      </div>
-      <p>
-        Use the same code as before to generate the table but store the output:
-      </p>
-      <div class="sourceCode" id="cb7">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb7-1">dtable &lt;-<span class="st"> </span><span class="kw">datatable</span>(</span>
-<span id="cb7-2">  Dat, </span>
-<span id="cb7-3">  <span class="dt">callback =</span> callback, <span class="dt">rownames =</span> rowNames, <span class="dt">escape =</span> <span class="op">-</span>colIdx<span class="dv">-1</span>,</span>
-<span id="cb7-4">  <span class="dt">options =</span> <span class="kw">list</span>(</span>
-<span id="cb7-5">    <span class="dt">paging =</span> <span class="ot">FALSE</span>,</span>
-<span id="cb7-6">    <span class="dt">searching =</span> <span class="ot">FALSE</span>,</span>
-<span id="cb7-7">    <span class="dt">columnDefs =</span> <span class="kw">list</span>(</span>
-<span id="cb7-8">      <span class="kw">list</span>(</span>
-<span id="cb7-9">        <span class="dt">visible =</span> <span class="ot">FALSE</span>, </span>
-<span id="cb7-10">        <span class="dt">targets =</span> <span class="kw">ncol</span>(Dat)<span class="op">-</span><span class="dv">1</span><span class="op">+</span>colIdx</span>
-<span id="cb7-11">      ),</span>
-<span id="cb7-12">      <span class="kw">list</span>(</span>
-<span id="cb7-13">        <span class="dt">orderable =</span> <span class="ot">FALSE</span>, </span>
-<span id="cb7-14">        <span class="dt">className =</span> <span class="st">"details-control"</span>, </span>
-<span id="cb7-15">        <span class="dt">targets =</span> colIdx</span>
-<span id="cb7-16">      ),</span>
-<span id="cb7-17">      <span class="kw">list</span>(</span>
-<span id="cb7-18">        <span class="dt">className =</span> <span class="st">"dt-center"</span>, </span>
-<span id="cb7-19">        <span class="dt">targets =</span> <span class="st">"_all"</span></span>
-<span id="cb7-20">      )</span>
-<span id="cb7-21">    )</span>
-<span id="cb7-22">  )</span>
-<span id="cb7-23">)</span></code></pre>
-      </div>
-      <p>Now we add the dependencies to the <code>datatable</code>:</p>
-      <div class="sourceCode" id="cb8">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb8-1">path &lt;-<span class="st"> "path/to/cellEdit"</span> <span class="co"># folder containing the files </span></span>
-<span id="cb8-2">                           <span class="co"># dataTables.cellEdit.js and </span></span>
-<span id="cb8-3">                           <span class="co"># dataTables.cellEdit.css</span></span>
-<span id="cb8-4">dep &lt;-<span class="st"> </span>htmltools<span class="op">::</span><span class="kw">htmlDependency</span>(</span>
-<span id="cb8-5">  <span class="st">"CellEdit"</span>, <span class="st">"1.0.19"</span>, path, </span>
-<span id="cb8-6">  <span class="dt">script =</span> <span class="st">"dataTables.cellEdit.js"</span>, </span>
-<span id="cb8-7">  <span class="dt">stylesheet =</span> <span class="st">"dataTables.cellEdit.css"</span>)</span>
-<span id="cb8-8">dtable<span class="op">$</span>dependencies &lt;-<span class="st"> </span><span class="kw">c</span>(dtable<span class="op">$</span>dependencies, <span class="kw">list</span>(dep))</span>
-<span id="cb8-9"></span>
-<span id="cb8-10">dtable</span></code></pre>
-      </div>
-      <p>
-        <img
-          src="https://laustep.github.io/stlahblog/posts/figures/DTchildRows2.gif"
-        />
-      </p>
-      <h1 id="exporting">Exporting</h1>
-      <p>
-        Now we show how to export a table with its child tables to an Excel
-        file, when there is only one level of child tables (<em>i.e.</em> when
-        the child tables of the main table do not have child tables themselves).
-        To do so, we use the <code>customize</code> callback of the Excel button
-        provided by the <code>Buttons</code> extension. I found this code on the
-        DataTables forum. In the first row of the callback,
-        <code>mytable</code> is the id of the datatable:
-      </p>
-      <div class="sourceCode" id="cb9">
-        <pre
-          class="sourceCode js"
-        ><code class="sourceCode javascript"><span id="cb9-1"><span class="kw">var</span> table <span class="op">=</span> <span class="fu">$</span>(<span class="st">'#mytable'</span>)<span class="op">.</span><span class="fu">find</span>(<span class="st">'table'</span>)<span class="op">.</span><span class="fu">DataTable</span>()<span class="op">;</span></span></code></pre>
-      </div>
-      <p>
-        If you don’t use Shiny, you have to set this id in the
-        <code>elementId</code> argument of the <code>datatable</code> function.
-        If you use Shiny, this id is the key of the element of the
-        <code>output</code> object in which you assign a <code>renderDT</code>:
-      </p>
-      <div class="sourceCode" id="cb10">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb10-1">output[[<span class="st">"mytable"</span>]] &lt;-<span class="st"> </span><span class="kw">renderDT</span>({</span>
-<span id="cb10-2">  ......</span>
-<span id="cb10-3">})</span></code></pre>
-      </div>
-      <p>
-        The JavaScript code depends on whether the user desires a title in the
-        Excel file, so this information has to be provided first.
-      </p>
-      <div class="sourceCode" id="cb11">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb11-1">excelTitle =<span class="st"> </span><span class="ot">NULL</span> <span class="co"># enter title or set to NULL if you don't want a title</span></span>
-<span id="cb11-2">js_customXLSX &lt;-<span class="st"> </span><span class="kw">JS</span>(</span>
-<span id="cb11-3">  <span class="st">"function(xlsx){"</span>,</span>
-<span id="cb11-4">  <span class="st">"  var table = $('#mytable').find('table').DataTable();"</span>,</span>
-<span id="cb11-5">  <span class="st">"  // Number of columns."</span>,</span>
-<span id="cb11-6">  <span class="kw">sprintf</span>(<span class="st">"  var ncols = %d;"</span>, <span class="kw">ncol</span>(Dat)),</span>
-<span id="cb11-7">  <span class="st">"  // Is there a title?"</span>,</span>
-<span id="cb11-8">  <span class="kw">sprintf</span>(<span class="st">"  var title = %s;"</span>, </span>
-<span id="cb11-9">          <span class="kw">ifelse</span>(<span class="kw">is.null</span>(excelTitle), <span class="st">"false"</span>, <span class="st">"true"</span>)),</span>
-<span id="cb11-10">  <span class="st">"  // Integer to Excel column: 0 -&gt; A, 1 -&gt; B, ..., 25 -&gt; Z, 26 -&gt; AA, ..."</span>,</span>
-<span id="cb11-11">  <span class="st">"  var XLcolumn = function(j){"</span>, </span>
-<span id="cb11-12">  <span class="st">"    return j &lt; 0 ? "</span>,</span>
-<span id="cb11-13">  <span class="st">"      '' : XLcolumn(j/26-1) + String.fromCharCode(j % 26 + 65);"</span>,</span>
-<span id="cb11-14">  <span class="st">"  };"</span>,</span>
-<span id="cb11-15">  <span class="st">"  // Get sheet."</span>,</span>
-<span id="cb11-16">  <span class="st">"  var sheet = xlsx.xl.worksheets['sheet1.xml'];"</span>,</span>
-<span id="cb11-17">  <span class="st">"  // Get a clone of the sheet data.        "</span>,</span>
-<span id="cb11-18">  <span class="st">"  var sheetData = $('sheetData', sheet).clone();"</span>,</span>
-<span id="cb11-19">  <span class="st">"  // Clear the current sheet data for appending rows."</span>,</span>
-<span id="cb11-20">  <span class="st">"  $('sheetData', sheet).empty();"</span>,</span>
-<span id="cb11-21">  <span class="st">"  // Row count in Excel sheet."</span>,</span>
-<span id="cb11-22">  <span class="st">"  var rowCount = 1;"</span>,</span>
-<span id="cb11-23">  <span class="st">"  // Iterate each row in the sheet data."</span>,</span>
-<span id="cb11-24">  <span class="st">"  $(sheetData).children().each(function (index) {"</span>,</span>
-<span id="cb11-25">  <span class="st">"    // Used for DT row() API to get child data."</span>,</span>
-<span id="cb11-26">  <span class="st">"    var rowIndex = title ? index - 2 : index - 1;"</span>, </span>
-<span id="cb11-27">  <span class="st">"    // Don't process row if it's the title row or the header row."</span>,</span>
-<span id="cb11-28">  <span class="st">"    var i0 = title ? 1 : 0;"</span>,</span>
-<span id="cb11-29">  <span class="st">"    if (index &gt; i0) {"</span>, </span>
-<span id="cb11-30">  <span class="st">"      // Get row"</span>,</span>
-<span id="cb11-31">  <span class="st">"      var row = $(this.outerHTML);"</span>,</span>
-<span id="cb11-32">  <span class="st">"      // Set the Excel row attr to the current Excel row count."</span>,</span>
-<span id="cb11-33">  <span class="st">"      row.attr('r', rowCount);"</span>,</span>
-<span id="cb11-34">  <span class="st">"      // Iterate each cell in the row to change the row number."</span>,</span>
-<span id="cb11-35">  <span class="st">"      row.children().each(function (index) {"</span>,</span>
-<span id="cb11-36">  <span class="st">"        var cell = $(this);"</span>,</span>
-<span id="cb11-37">  <span class="st">"        // Set each cell's row value."</span>,</span>
-<span id="cb11-38">  <span class="st">"        var rc = cell.attr('r');"</span>,</span>
-<span id="cb11-39">  <span class="st">"        rc = rc.replace(/</span><span class="ch">\\</span><span class="st">d+$/, </span><span class="ch">\"\"</span><span class="st">) + rowCount;"</span>,</span>
-<span id="cb11-40">  <span class="st">"        cell.attr('r', rc);"</span>,</span>
-<span id="cb11-41">  <span class="st">"      });"</span>,</span>
-<span id="cb11-42">  <span class="st">"      // Get the row HTML and append to sheetData."</span>,</span>
-<span id="cb11-43">  <span class="st">"      row = row[0].outerHTML;"</span>,</span>
-<span id="cb11-44">  <span class="st">"      $('sheetData', sheet).append(row);"</span>,</span>
-<span id="cb11-45">  <span class="st">"      rowCount++;"</span>,</span>
-<span id="cb11-46">  <span class="st">"      // Get the child data - could be any data attached to the row."</span>,</span>
-<span id="cb11-47">  <span class="st">"      var data = table.row(':eq(' + rowIndex + ')').data();"</span>,</span>
-<span id="cb11-48">  <span class="st">"      var childData = data[ncols-1];"</span>, </span>
-<span id="cb11-49">  <span class="st">"      if(childData.length &gt; 0){"</span>,</span>
-<span id="cb11-50">  <span class="st">"        var colNames = Object.keys(childData[0]);"</span>,</span>
-<span id="cb11-51">  <span class="st">"        // Prepare Excel formatted row"</span>,</span>
-<span id="cb11-52">  <span class="st">"        var headerRow = '&lt;row r=</span><span class="ch">\"</span><span class="st">' + rowCount +"</span>,</span>
-<span id="cb11-53">  <span class="st">"          '</span><span class="ch">\"</span><span class="st">&gt;&lt;c t=</span><span class="ch">\"</span><span class="st">inlineStr</span><span class="ch">\"</span><span class="st"> r=</span><span class="ch">\"</span><span class="st">A' + rowCount +"</span>,</span>
-<span id="cb11-54">  <span class="st">"          '</span><span class="ch">\"</span><span class="st">&gt;&lt;is&gt;&lt;t&gt;&lt;/t&gt;&lt;/is&gt;&lt;/c&gt;';"</span>,</span>
-<span id="cb11-55">  <span class="st">"        for(let i = 0; i &lt; colNames.length; i++){"</span>,</span>
-<span id="cb11-56">  <span class="st">"          headerRow = headerRow +"</span>,</span>
-<span id="cb11-57">  <span class="st">"            '&lt;c t=</span><span class="ch">\"</span><span class="st">inlineStr</span><span class="ch">\"</span><span class="st"> r=</span><span class="ch">\"</span><span class="st">' + XLcolumn(i+1) + rowCount +"</span>,</span>
-<span id="cb11-58">  <span class="st">"            '</span><span class="ch">\"</span><span class="st"> s=</span><span class="ch">\"</span><span class="st">7</span><span class="ch">\"</span><span class="st">&gt;&lt;is&gt;&lt;t&gt;' + colNames[i] +"</span>, </span>
-<span id="cb11-59">  <span class="st">"            '&lt;/t&gt;&lt;/is&gt;&lt;/c&gt;';"</span>,</span>
-<span id="cb11-60">  <span class="st">"        }"</span>,</span>
-<span id="cb11-61">  <span class="st">"        headerRow = headerRow + '&lt;/row&gt;';"</span>,</span>
-<span id="cb11-62">  <span class="st">"        // Append header row to sheetData."</span>,</span>
-<span id="cb11-63">  <span class="st">"        $('sheetData', sheet).append(headerRow);"</span>,</span>
-<span id="cb11-64">  <span class="st">"        rowCount++; // Increment excel row counter."</span>,</span>
-<span id="cb11-65">  <span class="st">"      }"</span>,</span>
-<span id="cb11-66">  <span class="st">"      // The child data is an array of rows"</span>,</span>
-<span id="cb11-67">  <span class="st">"      for(let c = 0; c &lt; childData.length; c++){"</span>,</span>
-<span id="cb11-68">  <span class="st">"        // Get row data."</span>,</span>
-<span id="cb11-69">  <span class="st">"        var child = childData[c];"</span>,</span>
-<span id="cb11-70">  <span class="st">"        // Prepare Excel formatted row"</span>,</span>
-<span id="cb11-71">  <span class="st">"        var childRow = '&lt;row r=</span><span class="ch">\"</span><span class="st">' + rowCount +"</span>,</span>
-<span id="cb11-72">  <span class="st">"          '</span><span class="ch">\"</span><span class="st">&gt;&lt;c t=</span><span class="ch">\"</span><span class="st">inlineStr</span><span class="ch">\"</span><span class="st"> r=</span><span class="ch">\"</span><span class="st">A' + rowCount +"</span>,</span>
-<span id="cb11-73">  <span class="st">"          '</span><span class="ch">\"</span><span class="st">&gt;&lt;is&gt;&lt;t&gt;&lt;/t&gt;&lt;/is&gt;&lt;/c&gt;';"</span>,</span>
-<span id="cb11-74">  <span class="st">"        for(let i = 0; i &lt; colNames.length; i++){"</span>,</span>
-<span id="cb11-75">  <span class="st">"          childRow = childRow +"</span>,</span>
-<span id="cb11-76">  <span class="st">"            '&lt;c t=</span><span class="ch">\"</span><span class="st">inlineStr</span><span class="ch">\"</span><span class="st"> r=</span><span class="ch">\"</span><span class="st">' + XLcolumn(i+1) + rowCount +"</span>,</span>
-<span id="cb11-77">  <span class="st">"            '</span><span class="ch">\"</span><span class="st"> s=</span><span class="ch">\"</span><span class="st">5</span><span class="ch">\"</span><span class="st">&gt;&lt;is&gt;&lt;t&gt;' + child[colNames[i]] +"</span>, </span>
-<span id="cb11-78">  <span class="st">"            '&lt;/t&gt;&lt;/is&gt;&lt;/c&gt;';"</span>,</span>
-<span id="cb11-79">  <span class="st">"        }"</span>,</span>
-<span id="cb11-80">  <span class="st">"        childRow = childRow + '&lt;/row&gt;';"</span>,</span>
-<span id="cb11-81">  <span class="st">"        // Append row to sheetData."</span>,</span>
-<span id="cb11-82">  <span class="st">"        $('sheetData', sheet).append(childRow);"</span>,</span>
-<span id="cb11-83">  <span class="st">"        rowCount++; // Increment excel row counter."</span>,</span>
-<span id="cb11-84">  <span class="st">"      }"</span>,</span>
-<span id="cb11-85">  <span class="st">"      // Just append the header row and increment excel row counter."</span>,</span>
-<span id="cb11-86">  <span class="st">"    } else {"</span>,</span>
-<span id="cb11-87">  <span class="st">"      $('sheetData', sheet).append(this.outerHTML);"</span>,</span>
-<span id="cb11-88">  <span class="st">"      rowCount++;"</span>,</span>
-<span id="cb11-89">  <span class="st">"    }"</span>,</span>
-<span id="cb11-90">  <span class="st">"  });"</span>,</span>
-<span id="cb11-91">  <span class="st">"}"</span></span>
-<span id="cb11-92">)</span></code></pre>
-      </div>
-      <p>Let’s see an example.</p>
-      <div class="sourceCode" id="cb12">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb12-1">dat0  =<span class="st"> </span>iris[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>,]         <span class="co"># main table, with three rows</span></span>
-<span id="cb12-2">dat01 =<span class="st"> </span>airquality[<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>,]   <span class="co"># |- child of first row</span></span>
-<span id="cb12-3">dat02 =<span class="st"> </span>cars[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,]         <span class="co"># |- child of second row</span></span>
-<span id="cb12-4">dat03 =<span class="st"> </span>PlantGrowth[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>,]  <span class="co"># |- child of third row</span></span>
-<span id="cb12-5">Dat &lt;-<span class="st"> </span><span class="kw">NestedData</span>(</span>
-<span id="cb12-6">  <span class="dt">dat =</span> dat0, </span>
-<span id="cb12-7">  <span class="dt">children =</span> <span class="kw">list</span>(dat01, dat02, dat03)</span>
-<span id="cb12-8">)</span></code></pre>
-      </div>
-      <p>
-        Below is the code generating the table with a button for the exporting.
-        Remember, if you use Shiny, do not set <code>elementId</code>.
-      </p>
-      <div class="sourceCode" id="cb13">
-        <pre
-          class="sourceCode numberSource r numberLines"
-        ><code class="sourceCode r"><span id="cb13-1">dtable &lt;-<span class="st"> </span><span class="kw">datatable</span>(</span>
-<span id="cb13-2">  Dat, </span>
-<span id="cb13-3">  <span class="dt">callback =</span> callback, <span class="dt">rownames =</span> rowNames, <span class="dt">escape =</span> <span class="op">-</span>colIdx<span class="dv">-1</span>,</span>
-<span id="cb13-4">  <span class="dt">extensions =</span> <span class="st">"Buttons"</span>, <span class="dt">elementId =</span> <span class="st">"mytable"</span>,</span>
-<span id="cb13-5">  <span class="dt">options =</span> <span class="kw">list</span>(</span>
-<span id="cb13-6">    <span class="dt">paging =</span> <span class="ot">FALSE</span>,</span>
-<span id="cb13-7">    <span class="dt">searching =</span> <span class="ot">FALSE</span>,</span>
-<span id="cb13-8">    <span class="dt">dom =</span> <span class="st">"Bfrtip"</span>,</span>
-<span id="cb13-9">    <span class="dt">columnDefs =</span> <span class="kw">list</span>(</span>
-<span id="cb13-10">      <span class="kw">list</span>(</span>
-<span id="cb13-11">        <span class="dt">visible =</span> <span class="ot">FALSE</span>, </span>
-<span id="cb13-12">        <span class="dt">targets =</span> <span class="kw">ncol</span>(Dat)<span class="op">-</span><span class="dv">1</span><span class="op">+</span>colIdx</span>
-<span id="cb13-13">      ),</span>
-<span id="cb13-14">      <span class="kw">list</span>(</span>
-<span id="cb13-15">        <span class="dt">orderable =</span> <span class="ot">FALSE</span>, </span>
-<span id="cb13-16">        <span class="dt">className =</span> <span class="st">"details-control"</span>, </span>
-<span id="cb13-17">        <span class="dt">targets =</span> colIdx</span>
-<span id="cb13-18">      ),</span>
-<span id="cb13-19">      <span class="kw">list</span>(</span>
-<span id="cb13-20">        <span class="dt">className =</span> <span class="st">"dt-center"</span>, </span>
-<span id="cb13-21">        <span class="dt">targets =</span> <span class="st">"_all"</span></span>
-<span id="cb13-22">      )</span>
-<span id="cb13-23">    ),</span>
-<span id="cb13-24">    <span class="dt">buttons =</span> <span class="kw">list</span>(</span>
-<span id="cb13-25">      <span class="kw">list</span>(</span>
-<span id="cb13-26">        <span class="dt">extend =</span> <span class="st">"excel"</span>,</span>
-<span id="cb13-27">        <span class="dt">exportOptions =</span> <span class="kw">list</span>(</span>
-<span id="cb13-28">          <span class="dt">orthogonal =</span> <span class="st">"export"</span>, </span>
-<span id="cb13-29">          <span class="dt">columns =</span> <span class="dv">0</span><span class="op">:</span>(<span class="kw">ncol</span>(Dat)<span class="op">-</span><span class="dv">2</span>)</span>
-<span id="cb13-30">        ),</span>
-<span id="cb13-31">        <span class="dt">title =</span> excelTitle,</span>
-<span id="cb13-32">        <span class="dt">orientation =</span> <span class="st">"landscape"</span>,</span>
-<span id="cb13-33">        <span class="dt">customize =</span> js_customXLSX</span>
-<span id="cb13-34">      )</span>
-<span id="cb13-35">    )</span>
-<span id="cb13-36">  )</span>
-<span id="cb13-37">)</span></code></pre>
-      </div>
-      <p>Here is the Excel file one gets:</p>
-      <p>
-        <img
-          src="https://laustep.github.io/stlahblog/posts/figures/DTchildRows3.png"
-        />
-      </p>
-    </div>
-  </div>
-</div>
-]]></description>
-      <pubDate>Fri, 08 May 2020 00:00:00 UT</pubDate>
-      <guid>https://laustep.github.io/stlahblog/posts/DT_childTables.html</guid>
       <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>

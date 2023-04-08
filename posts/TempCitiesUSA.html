@@ -1,0 +1,270 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Heatmap formatting of a table with 'DT'</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Heatmap formatting of a table with 'DT'</h1> 
+          <div class="info">
+    Posted on April  8, 2023
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'datatables'." href="../tags/datatables.html">datatables</a>
+    
+</div>
+
+<p>Googling “heatmap format excel” returns a lot of results. Here we will see how to do a heatmap formatting with a <strong>DT</strong> table in R.</p>
+<p>The dataset we use provides the average monthly temperatures over a year for some cities in USA. It is available in a <a href="https://github.com/FanWangEcon/Stat4Econ/blob/master/data/TempCitiesUSA.csv">CSV file here</a>.</p>
+<p>The table is in long format. Below we turn it into a table in wide format. We also convert the temperatures to Celsius degrees and we rename the months which are given as numbers in the original data.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="co"># read the CSV data</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>dat0 &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;TempCitiesUSA.csv&quot;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="co"># it is in long format:</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="kw">head</span>(dat0)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="co">##   state      city month temp.f</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="co">## 1    AK ANCHORAGE     1   15.8</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="co">## 2    AK ANCHORAGE     2   18.7</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="co">## 3    AK ANCHORAGE     3   25.9</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="co">## 4    AK ANCHORAGE     4   36.3</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a><span class="co">## 5    AK ANCHORAGE     5   46.9</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a><span class="co">## 6    AK ANCHORAGE     6   54.7</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a><span class="co"># I prefer Celsius degrees</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>dat0[[<span class="st">&quot;temp.f&quot;</span>]] &lt;-<span class="st"> </span><span class="kw">round</span>((dat0[[<span class="st">&quot;temp.f&quot;</span>]] <span class="op">-</span><span class="st"> </span><span class="dv">32</span>) <span class="op">/</span><span class="st"> </span><span class="fl">1.8</span>, <span class="dt">digits =</span> 1L) </span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a><span class="co"># convert to wide format</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a><span class="kw">library</span>(tidyr)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>dat &lt;-<span class="st"> </span>dat0 <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a><span class="st">  </span><span class="kw">pivot_wider</span>(</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a>    <span class="dt">names_from  =</span> month,</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a>    <span class="dt">values_from =</span> temp.f</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a><span class="co"># replace the month numbers in the column names</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a><span class="kw">colnames</span>(dat)[<span class="dv">3</span><span class="op">:</span><span class="dv">14</span>] &lt;-<span class="st"> </span>month.abb</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a><span class="co"># have a look</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a>pillar<span class="op">::</span><span class="kw">glimpse</span>(dat, <span class="dt">width =</span> <span class="dv">65</span>)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true"></a><span class="co">## Rows: 261</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true"></a><span class="co">## Columns: 14</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true"></a><span class="co">## $ state &lt;chr&gt; &quot;AK&quot;, &quot;AK&quot;, &quot;AK&quot;, &quot;AK&quot;, &quot;AK&quot;, &quot;AK&quot;, &quot;AK&quot;, &quot;AK&quot;, &quot;…</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true"></a><span class="co">## $ city  &lt;chr&gt; &quot;ANCHORAGE&quot;, &quot;ANNETTE&quot;, &quot;BARROW&quot;, &quot;BETHEL&quot;, &quot;FAIR…</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true"></a><span class="co">## $ Jan   &lt;dbl&gt; -9.0, 1.7, -25.4, -14.1, -23.2, -4.8, -3.5, -9.2,…</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true"></a><span class="co">## $ Feb   &lt;dbl&gt; -7.4, 2.8, -26.6, -13.6, -19.9, -3.9, -1.7, -9.1,…</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true"></a><span class="co">## $ Mar   &lt;dbl&gt; -3.4, 4.2, -25.4, -9.7, -11.6, -1.4, 0.9, -4.7, 0…</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true"></a><span class="co">## $ Apr   &lt;dbl&gt; 2.4, 6.6, -18.1, -3.4, -0.2, 2.4, 4.9, 0.6, 2.9, …</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true"></a><span class="co">## $ May   &lt;dbl&gt; 8.3, 9.7, -6.6, 5.2, 9.3, 6.5, 8.8, 6.4, 6.4, -0.…</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true"></a><span class="co">## $ Jun   &lt;dbl&gt; 12.6, 12.4, 1.7, 10.8, 15.4, 10.0, 12.2, 10.5, 9.…</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true"></a><span class="co">## $ Jul   &lt;dbl&gt; 14.7, 14.6, 4.7, 13.3, 16.9, 12.3, 13.8, 13.2, 12…</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true"></a><span class="co">## $ Aug   &lt;dbl&gt; 13.6, 14.8, 3.7, 12.0, 13.4, 12.1, 13.2, 12.7, 12…</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true"></a><span class="co">## $ Sep   &lt;dbl&gt; 9.0, 12.1, -0.4, 7.4, 6.9, 8.8, 10.0, 8.7, 9.7, 5…</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true"></a><span class="co">## $ Oct   &lt;dbl&gt; 1.2, 8.1, -9.7, -1.1, -4.7, 3.2, 5.7, 0.7, 4.6, -…</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true"></a><span class="co">## $ Nov   &lt;dbl&gt; -5.7, 4.3, -18.3, -8.1, -16.5, -1.4, 0.7, -4.9, 1…</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true"></a><span class="co">## $ Dec   &lt;dbl&gt; -8.1, 2.4, -23.7, -12.6, -21.1, -3.4, -1.8, -8.2,…</span></span></code></pre></div>
+<p>We will use the lowest temperature and the highest temperature later.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="co"># get the lowest and highest temperatures</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>lowest  &lt;-<span class="st"> </span><span class="kw">min</span>(dat0[[<span class="st">&quot;temp.f&quot;</span>]])</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>highest &lt;-<span class="st"> </span><span class="kw">max</span>(dat0[[<span class="st">&quot;temp.f&quot;</span>]])</span></code></pre></div>
+<p>Now let’s detail our manipulation for one column. We map the temperatures to the interval <span class="math inline">\((0,1)\)</span>, in such a way that <span class="math inline">\(0\)</span> is sent to <span class="math inline">\(0.5\)</span>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="co"># let's detail for one column, January</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>x &lt;-<span class="st"> </span>dat[[<span class="st">&quot;Jan&quot;</span>]]</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="co"># function to map from (lowest, highest) to (0, 1), mapping 0 to 0.5</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>interpfun &lt;-<span class="st"> </span><span class="kw">splinefun</span>(</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>  <span class="kw">c</span>(lowest, <span class="dv">0</span>, highest),</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>  <span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.5</span>, <span class="dv">1</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a><span class="co"># map the January data</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a>y &lt;-<span class="st"> </span><span class="kw">interpfun</span>(x)</span></code></pre></div>
+<p>Now we map each value of <code>y</code> to a color, such that <span class="math inline">\(0.5\)</span> is sent to white.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="co"># function mapping (0, 1) to a color; 0.5 is sent to white </span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>colfunc &lt;-<span class="st"> </span><span class="kw">colorRamp</span>(<span class="kw">c</span>(<span class="st">&quot;blue&quot;</span>, <span class="st">&quot;white&quot;</span>, <span class="st">&quot;red&quot;</span>))</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="co"># get the colors for January</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>cols &lt;-<span class="st"> </span><span class="kw">colfunc</span>(y)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a><span class="co"># these are rgb codes, we convert them to hex codes</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>clrs &lt;-<span class="st"> </span><span class="kw">rgb</span>(cols[, 1L], cols[, 2L], cols[, 3L], <span class="dt">maxColorValue =</span> <span class="dv">255</span>)</span></code></pre></div>
+<p>In this way the negative temperatures will be colored in blue and the positive temperatures in red.</p>
+<p>Now we apply this manipulation for each month.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="co"># now we perform this stuff for each month</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>Colors &lt;-<span class="st"> </span><span class="kw">lapply</span>(dat[, month.abb], <span class="cf">function</span>(x) {</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>  y &lt;-<span class="st"> </span><span class="kw">interpfun</span>(x)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>  cols &lt;-<span class="st"> </span><span class="kw">colfunc</span>(y)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>  <span class="kw">rgb</span>(cols[, 1L], cols[, 2L], cols[, 3L], <span class="dt">maxColorValue =</span> <span class="dv">255</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>})</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a><span class="co"># have a look</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a><span class="kw">str</span>(Colors)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a><span class="co">## List of 12</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a><span class="co">##  $ Jan: chr [1:261] &quot;#AEAEFF&quot; &quot;#FFF0F0&quot; &quot;#0C0CFF&quot; &quot;#7E7EFF&quot; ...</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true"></a><span class="co">##  $ Feb: chr [1:261] &quot;#BDBDFF&quot; &quot;#FFE7E7&quot; &quot;#0000FF&quot; &quot;#8282FF&quot; ...</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true"></a><span class="co">##  $ Mar: chr [1:261] &quot;#E1E1FF&quot; &quot;#FFDBDB&quot; &quot;#0C0CFF&quot; &quot;#A7A7FF&quot; ...</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true"></a><span class="co">##  $ Apr: chr [1:261] &quot;#FFEAEA&quot; &quot;#FFC7C7&quot; &quot;#5757FF&quot; &quot;#E1E1FF&quot; ...</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true"></a><span class="co">##  $ May: chr [1:261] &quot;#FFB9B9&quot; &quot;#FFAEAE&quot; &quot;#C4C4FF&quot; &quot;#FFD3D3&quot; ...</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true"></a><span class="co">##  $ Jun: chr [1:261] &quot;#FF9797&quot; &quot;#FF9999&quot; &quot;#FFF0F0&quot; &quot;#FFA5A5&quot; ...</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true"></a><span class="co">##  $ Jul: chr [1:261] &quot;#FF8787&quot; &quot;#FF8888&quot; &quot;#FFD7D7&quot; &quot;#FF9292&quot; ...</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true"></a><span class="co">##  $ Aug: chr [1:261] &quot;#FF9090&quot; &quot;#FF8787&quot; &quot;#FFDFDF&quot; &quot;#FF9C9C&quot; ...</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true"></a><span class="co">##  $ Sep: chr [1:261] &quot;#FFB4B4&quot; &quot;#FF9B9B&quot; &quot;#FBFBFF&quot; &quot;#FFC1C1&quot; ...</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true"></a><span class="co">##  $ Oct: chr [1:261] &quot;#FFF4F4&quot; &quot;#FFBBBB&quot; &quot;#A7A7FF&quot; &quot;#F5F5FF&quot; ...</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true"></a><span class="co">##  $ Nov: chr [1:261] &quot;#CCCCFF&quot; &quot;#FFDADA&quot; &quot;#5555FF&quot; &quot;#B6B6FF&quot; ...</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true"></a><span class="co">##  $ Dec: chr [1:261] &quot;#B6B6FF&quot; &quot;#FFEAEA&quot; &quot;#1E1EFF&quot; &quot;#8C8CFF&quot; ...</span></span></code></pre></div>
+<p>Now let’s do the <strong>DT</strong> table. I use the <strong>RowGroup</strong> extension to group the data by state (the 0-th column in JavaScript).</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">library</span>(DT)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>dtable &lt;-<span class="st"> </span><span class="kw">datatable</span>(</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>  dat, <span class="dt">rownames =</span> <span class="ot">FALSE</span>, <span class="dt">extensions =</span> <span class="st">&quot;RowGroup&quot;</span>, </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>  <span class="dt">options =</span> <span class="kw">list</span>(</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>    <span class="dt">rowGroup =</span> <span class="kw">list</span>(<span class="dt">dataSrc =</span> <span class="kw">list</span>(<span class="dv">0</span>)),</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>    <span class="dt">columnDefs =</span> <span class="kw">list</span>( <span class="co"># hide the grouping column</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a>      <span class="kw">list</span>(<span class="dt">targets =</span> <span class="dv">0</span>, <span class="dt">visible =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a>    )</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a>  )</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a>)</span></code></pre></div>
+<p>And now we format this table.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="cf">for</span>(month <span class="cf">in</span> month.abb) {</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>  dtable &lt;-<span class="st"> </span>dtable <span class="op">%&gt;%</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a><span class="st">    </span><span class="kw">formatStyle</span>(</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>      month, </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a>      <span class="dt">backgroundColor =</span> <span class="kw">styleEqual</span>(dat[[month]], Colors[[month]])</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a>    )</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a>}</span></code></pre></div>
+<p>That’s done.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>dtable</span></code></pre></div>
+<p><img src="./figures/TempCitiesUSA.png" style="width:60.0%" /></p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
