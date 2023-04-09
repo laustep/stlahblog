@@ -32,8 +32,12 @@
     uniform vec2 iResolution;
     uniform vec2 mouse;
     uniform float iGlobalTime;
+    uniform float x0;
+    uniform float y0;
+    uniform float sx;
+    uniform float sy;
 
-    // map function: map(x a, b, c, d) sends (a,b) to (b,c)
+    // map function: map(x, a, b, c, d) sends (a,b) to (b,c)
     float lerp(float t, float a, float b){
       return a + t*(b-a);
     }
@@ -86,12 +90,14 @@
 
     //
     void main(void){
-      float alpha = (1.0 + cos(iGlobalTime)) * pi;
+      float alpha = (1.0 + cos(iGlobalTime/10.0)) * pi;
       float mx = map(mouse.x, 0.0, iResolution.x, -2.0, 2.0); 
       float my = map(mouse.y, 0.0, iResolution.y, -1.5, 1.5);
       float r = iResolution.x / iResolution.y * 3.0 / 4.0;
-      float x = map(gl_FragCoord.x, 0.0, iResolution.x, -2.0*r, 2.0*r); 
-      float y = map(gl_FragCoord.y, 0.0, iResolution.y, -1.5, 1.5);
+//      float x = map(gl_FragCoord.x, 0.0, iResolution.x, -2.0*r, 2.0*r); 
+//      float y = map(gl_FragCoord.y, 0.0, iResolution.y, -1.5, 1.5);
+      float x = r * (sx*(gl_FragCoord.x - iResolution.x/2.0) + x0);
+      float y = sy*(gl_FragCoord.y - iResolution.y/2.0) + y0;
       vec2 z = g(vec2(x, y), mx, my, alpha);
       gl_FragColor = vec4(hsv2rgb(pair2hsv(z, mx, my, alpha)), 1.0);
     }
@@ -103,14 +109,33 @@
 
     let fragmentShader = document.getElementById('fragmentShader').textContent;
 
+    let xmin = -2, xmax = 2, ymin = -1.5, ymax = 1.5;
+
     let filter = new PIXI.Filter(null, fragmentShader);
-    filter.uniforms.iResolution = [app.screen.width, app.screen.height];
+    filter.uniforms.iResolution = {x: app.screen.width, y: app.screen.height};
     filter.uniforms.mouse = {x: app.screen.width/2, y: app.screen.height/2}; 
     filter.uniforms.iGlobalTime = 0.0;
+    filter.uniforms.x0 = (xmin + xmax) / 2;
+    filter.uniforms.y0 = (ymin + ymax) / 2;
+    filter.uniforms.sx = (xmax - xmin) / app.screen.width;
+    filter.uniforms.sy = (ymax - ymin) / app.screen.height;
 
     document.onmousemove = function(evt){
       filter.uniforms.mouse = {x: evt.clientX, y: evt.clientY};
     };
+
+    document.onclick = function(evt){
+      let offsetx = evt.clientX - filter.uniforms.iResolution.x / 2;
+      let offsety = filter.uniforms.iResolution.y / 2 - evt.clientY;
+      let ox = offsetx * filter.uniforms.sx; 
+      let oy = offsety * filter.uniforms.sy; 
+      filter.uniforms.sx /= 1.1;
+      filter.uniforms.sy /= 1.1;
+      let scrx = ox / filter.uniforms.sx;
+      let scry = oy / filter.uniforms.sy;
+      filter.uniforms.x0 += (scrx - offsetx) * filter.uniforms.sx;
+      filter.uniforms.y0 += (scry - offsety) * filter.uniforms.sy;
+    }
 
     let container = new PIXI.Container();
     container.filterArea = app.screen;
@@ -123,7 +148,7 @@
       if(app.resize)
         app.resize();
       container.filterArea = app.screen;
-      filter.uniforms.iResolution = [app.screen.width, app.screen.height];
+      filter.uniforms.iResolution = {x: app.screen.width, y: app.screen.height};
     }
     window.addEventListener('resize', onresize, false);
 
