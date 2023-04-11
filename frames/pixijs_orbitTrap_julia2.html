@@ -125,7 +125,11 @@
       filter.uniforms.mouse = {x: evt.clientX, y: evt.clientY};
     };
 
+    let X = filter.uniforms.iResolution.x / 2;
+    let Y = filter.uniforms.iResolution.y / 2;
     document.onclick = function(evt){
+      X = evt.clientX;
+      Y = evt.clientY;
       let offsetx = evt.clientX - filter.uniforms.iResolution.x / 2;
       let offsety = filter.uniforms.iResolution.y / 2 - evt.clientY;
       let ox = offsetx * filter.uniforms.sx; 
@@ -141,8 +145,9 @@
     let factor0 = 1.001;
     let hamster = Hamster(document.body);
     hamster.wheel(function (evt, delta, deltaX, deltaY) {
-      let offsetx = evt.clientX - filter.uniforms.iResolution.x / 2;
-      let offsety = filter.uniforms.iResolution.y / 2 - evt.clientY;
+      console.log(deltaY);
+      let offsetx = X - filter.uniforms.iResolution.x / 2;
+      let offsety = filter.uniforms.iResolution.y / 2 - Y;
       let ox = offsetx * filter.uniforms.sx; 
       let oy = offsety * filter.uniforms.sy; 
       let factor = Math.max(0.1, Math.pow(factor0, deltaY));
