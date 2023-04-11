@@ -3,7 +3,6 @@
 
 <head>
   <meta charset="utf-8">
-  <script src="../libraries/hamster.min.js"></script>
   <title>Orbit trap</title>
   <style>
     html, body { 
@@ -91,9 +90,9 @@
 
     //
     void main(void){
-      float alpha = (1.0 + cos(iGlobalTime/10.0)) * pi;
-      float mx = map(mouse.x, 0.0, iResolution.x, -2.0, 2.0); 
-      float my = map(mouse.y, 0.0, iResolution.y, -1.5, 1.5);
+      float alpha = 0.0;//(1.0 + cos(iGlobalTime/10.0)) * pi;
+      float mx = 0.0; //map(mouse.x, 0.0, iResolution.x, -2.0, 2.0); 
+      float my = 0.0; //map(mouse.y, 0.0, iResolution.y, -1.5, 1.5);
       float r = iResolution.x / iResolution.y * 3.0 / 4.0;
 //      float x = map(gl_FragCoord.x, 0.0, iResolution.x, -2.0*r, 2.0*r); 
 //      float y = map(gl_FragCoord.y, 0.0, iResolution.y, -1.5, 1.5);
@@ -125,34 +124,45 @@
       filter.uniforms.mouse = {x: evt.clientX, y: evt.clientY};
     };
 
+    // screenshots
+    let i = 0;
+    function takeScreenshot() {
+      if (i < 200) {
+        let ii = i < 10 ? '00' + i : (i < 100 ? '0' + i : i);
+        let filename = 'juliaScreenshot' + ii;
+        i += 1;
+        const renderTexture = new PIXI.RenderTexture.create({ width: app.screen.width, height: app.screen.height }); // enter your size , maybe from app.screen
+        app.renderer.render(container, renderTexture);
+        app.renderer.extract.canvas(renderTexture).toBlob((b) => {
+          const a = document.createElement('a');
+          document.body.append(a);
+          a.download = filename;
+          a.href = URL.createObjectURL(b);
+          a.click();
+          a.remove();
+          renderTexture.destroy();
+        }, 'image/png');
+      }
+    }
+
+    let X, Y;
     document.onclick = function(evt){
-      let offsetx = evt.clientX - filter.uniforms.iResolution.x / 2;
-      let offsety = filter.uniforms.iResolution.y / 2 - evt.clientY;
+      if(i === 0) {
+        X = evt.clientX;
+        Y = evt.clientY;
+      }
+      takeScreenshot();
+      let offsetx = X - filter.uniforms.iResolution.x / 2;
+      let offsety = filter.uniforms.iResolution.y / 2 - Y;
       let ox = offsetx * filter.uniforms.sx; 
       let oy = offsety * filter.uniforms.sy; 
-      filter.uniforms.sx /= 1.1;
-      filter.uniforms.sy /= 1.1;
+      filter.uniforms.sx /= 1.025;
+      filter.uniforms.sy /= 1.025;
       let scrx = ox / filter.uniforms.sx;
       let scry = oy / filter.uniforms.sy;
       filter.uniforms.x0 += (scrx - offsetx) * filter.uniforms.sx;
       filter.uniforms.y0 += (scry - offsety) * filter.uniforms.sy;
     }
-
-    let factor0 = 1.001;
-    let hamster = Hamster(document.body);
-    hamster.wheel(function (event, delta, deltaX, deltaY) {
-      let offsetx = evt.clientX - filter.uniforms.iResolution.x / 2;
-      let offsety = filter.uniforms.iResolution.y / 2 - evt.clientY;
-      let ox = offsetx * filter.uniforms.sx; 
-      let oy = offsety * filter.uniforms.sy; 
-      let factor = Math.max(0.1, Math.pow(factor0, deltaY));
-      filter.uniforms.sx /= factor;
-      filter.uniforms.sy /= factor;
-      let scrx = ox / filter.uniforms.sx;
-      let scry = oy / filter.uniforms.sy;
-      filter.uniforms.x0 += (scrx - offsetx) * filter.uniforms.sx;
-      filter.uniforms.y0 += (scry - offsety) * filter.uniforms.sy;
-    });
 
     let container = new PIXI.Container();
     container.filterArea = app.screen;

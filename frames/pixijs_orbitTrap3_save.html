@@ -3,7 +3,6 @@
 
 <head>
   <meta charset="utf-8">
-  <script src="../libraries/hamster.min.js"></script>
   <title>Orbit trap</title>
   <style>
     html, body { 
@@ -38,7 +37,7 @@
     uniform float sx;
     uniform float sy;
 
-    // map function: map(x, a, b, c, d) sends (a,b) to (b,c)
+    // map function: map(x a, b, c, d) sends (a,b) to (b,c)
     float lerp(float t, float a, float b){
       return a + t*(b-a);
     }
@@ -63,27 +62,28 @@
     }
 
     // 
-    float f(vec2 z, float tx, float ty, float alpha) {
-      z = product(vec2(cos(alpha), sin(alpha)), z);
-      return min(abs(z.x - tx), abs(z.y - ty)) / 0.03;
+    float f(vec2 z, float alpha) {
+      z = product(vec2(cos(alpha), sin(alpha)), product(z, product(z, z)));
+      return min(abs(z.x), abs(z.y)) / 0.0025;
     }
-    vec2 orbitTrap(vec2 z, float tx, float ty, float alpha) {
+    vec2 orbitTrap(vec2 zc, float alpha) {
+      vec2 z = vec2(0.0, 0.0);
       for(int i = 0; i < 100; i += 1) {
-        z = product(z, z) + vec2(-0.687, 0.299015);
-        if((length(z) > 100.0) || (i >= 2 && f(z, tx, ty, alpha) < 1.0)) {
+        z = product(z, z) + zc;
+        if((length(z) > 100.0) || (i >= 0 && f(z, alpha) < 1.0)) {
           return z;
         }
       }
       return z;
     }
 
-    vec2 g(vec2 z, float tx, float ty, float alpha) {
-      return orbitTrap(z, tx, ty, alpha);
+    vec2 g(vec2 z, float alpha) {
+      return orbitTrap(z, alpha);
     }
 
-    vec3 pair2hsv(vec2 z, float tx, float ty, float alpha){
+    vec3 pair2hsv(vec2 z, float alpha){
       float h = (atan(z.y, z.x) + pi) / 2.0 / pi;
-      float fz = 2.0*f(z, tx, ty, alpha);
+      float fz = 2.0*f(z, alpha);
       float s = min(1.0, fz);
       float v = max(0.0, min(1.0, 2.0 - fz));
       return vec3(h, s, v);
@@ -91,16 +91,12 @@
 
     //
     void main(void){
-      float alpha = (1.0 + cos(iGlobalTime/10.0)) * pi;
-      float mx = map(mouse.x, 0.0, iResolution.x, -2.0, 2.0); 
-      float my = map(mouse.y, 0.0, iResolution.y, -1.5, 1.5);
-      float r = iResolution.x / iResolution.y * 3.0 / 4.0;
-//      float x = map(gl_FragCoord.x, 0.0, iResolution.x, -2.0*r, 2.0*r); 
-//      float y = map(gl_FragCoord.y, 0.0, iResolution.y, -1.5, 1.5);
+      float alpha = pi/4.0;
+      float r = iResolution.x / iResolution.y;
       float x = r * (sx*(gl_FragCoord.x - iResolution.x/2.0) + x0);
       float y = sy*(gl_FragCoord.y - iResolution.y/2.0) + y0;
-      vec2 z = g(vec2(x, y), mx, my, alpha);
-      gl_FragColor = vec4(hsv2rgb(pair2hsv(z, mx, my, alpha)), 1.0);
+      vec2 z = g(vec2(x, y), alpha);
+      gl_FragColor = vec4(hsv2rgb(pair2hsv(z, alpha)), 1.0);
     }
   </script>
 
@@ -110,7 +106,7 @@
 
     let fragmentShader = document.getElementById('fragmentShader').textContent;
 
-    let xmin = -2, xmax = 2, ymin = -1.5, ymax = 1.5;
+    let xmin = -2, xmax = 1, ymin = -1.5, ymax = 1.5;
 
     let filter = new PIXI.Filter(null, fragmentShader);
     filter.uniforms.iResolution = {x: app.screen.width, y: app.screen.height};
@@ -125,34 +121,45 @@
       filter.uniforms.mouse = {x: evt.clientX, y: evt.clientY};
     };
 
+        // screenshots
+    let i = 0;
+    function takeScreenshot() {
+      if (i < 20) {
+        let ii = i < 10 ? '00' + i : (i < 100 ? '0' + i : i);
+        let filename = 'orbittrap' + ii;
+        i += 1;
+        const renderTexture = new PIXI.RenderTexture.create({ width: app.screen.width, height: app.screen.height }); // enter your size , maybe from app.screen
+        app.renderer.render(container, renderTexture);
+        app.renderer.extract.canvas(renderTexture).toBlob((b) => {
+          const a = document.createElement('a');
+          document.body.append(a);
+          a.download = filename;
+          a.href = URL.createObjectURL(b);
+          a.click();
+          a.remove();
+          renderTexture.destroy();
+        }, 'image/png');
+      }
+    }
+
+    let X, Y;
     document.onclick = function(evt){
-      let offsetx = evt.clientX - filter.uniforms.iResolution.x / 2;
-      let offsety = filter.uniforms.iResolution.y / 2 - evt.clientY;
+      if(i === 0) {
+        X = evt.clientX;
+        Y = evt.clientY;
+      }
+      takeScreenshot();
+      let offsetx = X - filter.uniforms.iResolution.x / 2;
+      let offsety = filter.uniforms.iResolution.y / 2 - Y;
       let ox = offsetx * filter.uniforms.sx; 
       let oy = offsety * filter.uniforms.sy; 
-      filter.uniforms.sx /= 1.1;
-      filter.uniforms.sy /= 1.1;
+      filter.uniforms.sx /= 1.025;
+      filter.uniforms.sy /= 1.025;
       let scrx = ox / filter.uniforms.sx;
       let scry = oy / filter.uniforms.sy;
       filter.uniforms.x0 += (scrx - offsetx) * filter.uniforms.sx;
       filter.uniforms.y0 += (scry - offsety) * filter.uniforms.sy;
     }
-
-    let factor0 = 1.001;
-    let hamster = Hamster(document.body);
-    hamster.wheel(function (event, delta, deltaX, deltaY) {
-      let offsetx = evt.clientX - filter.uniforms.iResolution.x / 2;
-      let offsety = filter.uniforms.iResolution.y / 2 - evt.clientY;
-      let ox = offsetx * filter.uniforms.sx; 
-      let oy = offsety * filter.uniforms.sy; 
-      let factor = Math.max(0.1, Math.pow(factor0, deltaY));
-      filter.uniforms.sx /= factor;
-      filter.uniforms.sy /= factor;
-      let scrx = ox / filter.uniforms.sx;
-      let scry = oy / filter.uniforms.sy;
-      filter.uniforms.x0 += (scrx - offsetx) * filter.uniforms.sx;
-      filter.uniforms.y0 += (scry - offsety) * filter.uniforms.sy;
-    });
 
     let container = new PIXI.Container();
     container.filterArea = app.screen;
