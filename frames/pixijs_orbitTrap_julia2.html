@@ -145,7 +145,6 @@
     let factor0 = 1.001;
     let hamster = Hamster(document.body);
     hamster.wheel(function (evt, delta, deltaX, deltaY) {
-      console.log(deltaY);
       let offsetx = X - filter.uniforms.iResolution.x / 2;
       let offsety = filter.uniforms.iResolution.y / 2 - Y;
       let ox = offsetx * filter.uniforms.sx; 
