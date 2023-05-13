@@ -3,8 +3,8 @@
     <script src="../libraries/paper-full.min.js"></script>
     <style>
       canvas {
-        width: 500px;
-        height: 500px;
+        width: 512px;
+        height: 512px;
       }
     </style>
   </head>
@@ -148,6 +148,63 @@
       }
     </script>
 
-    <canvas id="quad" resize></canvas>
+    <script type="text/paperscript" canvas="quad2">
+      function gradientDisk(center, radius, color1, color2){
+        var circle = new Path.Circle(view.center + new Point(center.x, center.y-0.5), radius);
+        circle.fillColor = {
+          gradient: {
+              stops: [color1, color2],
+              radial: true
+          },
+          origin: circle.position,
+          destination: circle.bounds.rightCenter
+        };
+        return circle.scale(1);
+      }
+
+      view.zoom = view.viewSize.width;
+
+      var coordlist = precomputeCircles(-1, 20, 0.5, 1);
+      var circles = 
+        filterCirclesCircular(coordlist, 1, 20, 0, 0.5, 0.25, false);
+      var paperCircles = new Array(circles.length);
+      var parameters1 = [1, 2];
+      var parameters2 = [1, 2];
+      for(var i = 0; i < circles.length; ++i){
+        var color1 = modularColour(rainbow, parameters1, circles[i].c);
+        var color2 = modularColour(inferno_dark, parameters2, circles[i].c);
+        paperCircles[i] = gradientDisk(circles[i].center, circles[i].radius, color1, color2);
+      }
+      var group = new Group(paperCircles);
+    </script>
+
+    <div>
+      <div style="display: inline-block;">
+        <canvas id="quad" resize></canvas>      
+      </div>
+      <div style="display: inline-block; width: 100px;"></div>
+      <div style="display: inline-block;">
+        <canvas id="quad2" resize></canvas>
+        <button id="download">Download</button>          
+      </div>
+    </div> 
+
+    
+    <script>
+      let canvas = document.getElementById('quad2');
+      document.getElementById('download').addEventListener('click', function(e) {
+        // Convert our canvas to a data URL
+        let canvasUrl = canvas.toDataURL();
+        // Create an anchor, and set the href value to our data URL
+        const createEl = document.createElement('a');
+        createEl.href = canvasUrl;
+        // This is the name of our downloaded file
+        createEl.download = "schmidt.png";
+        // Click the download button, causing a download, and then remove it
+        createEl.click();
+        createEl.remove();
+      });
+    </script>
+
   </body>
 </html>

@@ -5,7 +5,151 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Sat, 29 Apr 2023 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Sat, 13 May 2023 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>Tooltips for a dropdown list in Shiny</title>
+      <link>https://laustep.github.io/stlahblog/posts/selectizeTooltips.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        Here is how to have some tooltips for the options and their headers of a
+        <code>selectizeInput</code> in Shiny.
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1"><span class="kw">library</span>(shiny)</span>
+<span id="cb1-2"></span>
+<span id="cb1-3">ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb1-4">  <span class="kw">selectizeInput</span>(</span>
+<span id="cb1-5">    <span class="dt">inputId =</span> <span class="st">"selectAnimals"</span>,</span>
+<span id="cb1-6">    <span class="dt">label =</span> <span class="st">"Select some animals"</span>,</span>
+<span id="cb1-7">    <span class="dt">choices =</span> <span class="ot">NULL</span>,</span>
+<span id="cb1-8">    <span class="dt">multiple =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb1-9">    <span class="dt">options =</span> <span class="kw">list</span>(</span>
+<span id="cb1-10">      <span class="dt">options =</span> <span class="kw">list</span>(</span>
+<span id="cb1-11">        <span class="kw">list</span>(</span>
+<span id="cb1-12">          <span class="dt">species =</span> <span class="st">"mammal"</span>, <span class="dt">value =</span> <span class="st">"dog"</span>, <span class="dt">name =</span> <span class="st">"Dog"</span>, </span>
+<span id="cb1-13">          <span class="dt">tooltip =</span> <span class="st">"it's a pet"</span></span>
+<span id="cb1-14">        ),</span>
+<span id="cb1-15">        <span class="kw">list</span>(</span>
+<span id="cb1-16">          <span class="dt">species =</span> <span class="st">"mammal"</span>, <span class="dt">value =</span> <span class="st">"cat"</span>, <span class="dt">name =</span> <span class="st">"Cat"</span>, </span>
+<span id="cb1-17">          <span class="dt">tooltip =</span> <span class="st">"another pet"</span></span>
+<span id="cb1-18">        ),</span>
+<span id="cb1-19">        <span class="kw">list</span>(</span>
+<span id="cb1-20">          <span class="dt">species =</span> <span class="st">"mammal"</span>, <span class="dt">value =</span> <span class="st">"kangaroo"</span>, <span class="dt">name =</span> <span class="st">"Kangaroo"</span>,</span>
+<span id="cb1-21">          <span class="dt">tooltip =</span> <span class="st">"it jumps"</span></span>
+<span id="cb1-22">        ),</span>
+<span id="cb1-23">        <span class="kw">list</span>(</span>
+<span id="cb1-24">          <span class="dt">species =</span> <span class="st">"bird"</span>, <span class="dt">value =</span> <span class="st">"duck"</span>, <span class="dt">name =</span> <span class="st">"Duck"</span>,</span>
+<span id="cb1-25">          <span class="dt">tooltip =</span> <span class="st">"like Donald"</span></span>
+<span id="cb1-26">        ),</span>
+<span id="cb1-27">        <span class="kw">list</span>(</span>
+<span id="cb1-28">          <span class="dt">species =</span> <span class="st">"bird"</span>, <span class="dt">value =</span> <span class="st">"ostrich"</span>, <span class="dt">name =</span> <span class="st">"Ostrich"</span>,</span>
+<span id="cb1-29">          <span class="dt">tooltip =</span> <span class="st">"very tasty"</span></span>
+<span id="cb1-30">        ),</span>
+<span id="cb1-31">        <span class="kw">list</span>(</span>
+<span id="cb1-32">          <span class="dt">species =</span> <span class="st">"bird"</span>, <span class="dt">value =</span> <span class="st">"seagull"</span>, <span class="dt">name =</span> <span class="st">"Seagull"</span>,</span>
+<span id="cb1-33">          <span class="dt">tooltip =</span> <span class="st">"it's a seabird"</span></span>
+<span id="cb1-34">        ),</span>
+<span id="cb1-35">        <span class="kw">list</span>(</span>
+<span id="cb1-36">          <span class="dt">species =</span> <span class="st">"reptile"</span>, <span class="dt">value =</span> <span class="st">"snake"</span>, <span class="dt">name =</span> <span class="st">"Snake"</span>,</span>
+<span id="cb1-37">          <span class="dt">tooltip =</span> <span class="st">"it has no leg"</span></span>
+<span id="cb1-38">        ),</span>
+<span id="cb1-39">        <span class="kw">list</span>(</span>
+<span id="cb1-40">          <span class="dt">species =</span> <span class="st">"reptile"</span>, <span class="dt">value =</span> <span class="st">"lizard"</span>, <span class="dt">name =</span> <span class="st">"Lizard"</span>,</span>
+<span id="cb1-41">          <span class="dt">tooltip =</span> <span class="st">"mainly carnivorous"</span></span>
+<span id="cb1-42">        ),</span>
+<span id="cb1-43">        <span class="kw">list</span>(</span>
+<span id="cb1-44">          <span class="dt">species =</span> <span class="st">"reptile"</span>, <span class="dt">value =</span> <span class="st">"turtle"</span>, <span class="dt">name =</span> <span class="st">"Turtle"</span>,</span>
+<span id="cb1-45">          <span class="dt">tooltip =</span> <span class="st">"it is slow"</span></span>
+<span id="cb1-46">        )</span>
+<span id="cb1-47">      ),</span>
+<span id="cb1-48">      <span class="dt">optgroups =</span> <span class="kw">list</span>(</span>
+<span id="cb1-49">        <span class="kw">list</span>(</span>
+<span id="cb1-50">          <span class="dt">value =</span> <span class="st">"mammal"</span>,  <span class="dt">label =</span> <span class="st">"Mammal"</span>,  <span class="dt">tooltip =</span> <span class="st">"like us"</span></span>
+<span id="cb1-51">        ),</span>
+<span id="cb1-52">        <span class="kw">list</span>(</span>
+<span id="cb1-53">          <span class="dt">value =</span> <span class="st">"bird"</span>,    <span class="dt">label =</span> <span class="st">"Bird"</span>,    <span class="dt">tooltip =</span> <span class="st">"they fly"</span></span>
+<span id="cb1-54">        ),</span>
+<span id="cb1-55">        <span class="kw">list</span>(</span>
+<span id="cb1-56">          <span class="dt">value =</span> <span class="st">"reptile"</span>, <span class="dt">label =</span> <span class="st">"Reptile"</span>, <span class="dt">tooltip =</span> <span class="st">"not only snakes"</span></span>
+<span id="cb1-57">        )</span>
+<span id="cb1-58">      ),</span>
+<span id="cb1-59">      <span class="dt">optgroupField =</span> <span class="st">"species"</span>,</span>
+<span id="cb1-60">      <span class="dt">labelField =</span> <span class="st">"name"</span>,</span>
+<span id="cb1-61">      <span class="dt">render =</span> <span class="kw">I</span>(</span>
+<span id="cb1-62">        <span class="st">"{</span></span>
+<span id="cb1-63"><span class="st">          optgroup_header: function(data, escape) {</span></span>
+<span id="cb1-64"><span class="st">            return '&lt;div class=</span><span class="ch">\"</span><span class="st">optgroup-header</span><span class="ch">\"</span><span class="st">&gt;&lt;span ' + </span></span>
+<span id="cb1-65"><span class="st">              'title=</span><span class="ch">\"</span><span class="st">' + data.tooltip + '</span><span class="ch">\"</span><span class="st">&gt;' + escape(data.label) + </span></span>
+<span id="cb1-66"><span class="st">              '&lt;/span&gt;&lt;/div&gt;';</span></span>
+<span id="cb1-67"><span class="st">          },</span></span>
+<span id="cb1-68"><span class="st">          option: function(data, escape) {</span></span>
+<span id="cb1-69"><span class="st">            return '&lt;div class=</span><span class="ch">\"</span><span class="st">option</span><span class="ch">\"</span><span class="st">&gt;&lt;span ' + </span></span>
+<span id="cb1-70"><span class="st">              title=</span><span class="ch">\"</span><span class="st">' + data.tooltip + '</span><span class="ch">\"</span><span class="st">&gt;' + escape(data.name) + </span></span>
+<span id="cb1-71"><span class="st">              '&lt;/span&gt;&lt;/div&gt;';</span></span>
+<span id="cb1-72"><span class="st">          }</span></span>
+<span id="cb1-73"><span class="st">        }"</span></span>
+<span id="cb1-74">      )</span>
+<span id="cb1-75">    )</span>
+<span id="cb1-76">  )</span>
+<span id="cb1-77">)</span>
+<span id="cb1-78"></span>
+<span id="cb1-79">server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {}</span>
+<span id="cb1-80"></span>
+<span id="cb1-81"><span class="kw">shinyApp</span>(ui, server)</span></code></pre>
+      </div>
+      <p>
+        It’s also possible to have Bootstrap tooltips. They are prettier, and
+        customizable. To do so, replace the <code>render</code> option with the
+        following one (that could differ if you use Bootstrap 5) and add this
+        <code>onDropdownOpen</code> option and this
+        <code>onChange</code> options to initialize them or reinitialize them:
+      </p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1">render =<span class="st"> </span><span class="kw">I</span>(</span>
+<span id="cb2-2">  <span class="st">"{</span></span>
+<span id="cb2-3"><span class="st">    optgroup_header: function(data, escape) {</span></span>
+<span id="cb2-4"><span class="st">      return '&lt;div class=</span><span class="ch">\"</span><span class="st">optgroup-header</span><span class="ch">\"</span><span class="st">&gt;&lt;span ' + </span></span>
+<span id="cb2-5"><span class="st">        'data-toggle=</span><span class="ch">\"</span><span class="st">tooltip</span><span class="ch">\"</span><span class="st"> data-placement=</span><span class="ch">\"</span><span class="st">right</span><span class="ch">\"</span><span class="st"> title=</span><span class="ch">\"</span><span class="st">' + </span></span>
+<span id="cb2-6"><span class="st">        data.tooltip + '</span><span class="ch">\"</span><span class="st">&gt;' + escape(data.label) + '&lt;/span&gt;&lt;/div&gt;';</span></span>
+<span id="cb2-7"><span class="st">    },</span></span>
+<span id="cb2-8"><span class="st">    option: function(data, escape) {</span></span>
+<span id="cb2-9"><span class="st">      return '&lt;div class=</span><span class="ch">\"</span><span class="st">option</span><span class="ch">\"</span><span class="st">&gt;&lt;span ' + </span></span>
+<span id="cb2-10"><span class="st">        'data-toggle=</span><span class="ch">\"</span><span class="st">tooltip</span><span class="ch">\"</span><span class="st"> data-placement=</span><span class="ch">\"</span><span class="st">top</span><span class="ch">\"</span><span class="st"> title=</span><span class="ch">\"</span><span class="st">' + </span></span>
+<span id="cb2-11"><span class="st">        data.tooltip + '</span><span class="ch">\"</span><span class="st">&gt;' + escape(data.name) + '&lt;/span&gt;&lt;/div&gt;';</span></span>
+<span id="cb2-12"><span class="st">    }</span></span>
+<span id="cb2-13"><span class="st">  }"</span></span>
+<span id="cb2-14">),</span>
+<span id="cb2-15">onDropdownOpen =<span class="st"> </span><span class="kw">I</span>(</span>
+<span id="cb2-16">  <span class="st">"function() {</span></span>
+<span id="cb2-17"><span class="st">     setTimeout(function(){$('[data-toggle=tooltip]').tooltip();}, 100);</span></span>
+<span id="cb2-18"><span class="st">  }"</span></span>
+<span id="cb2-19">),</span>
+<span id="cb2-20">onChange =<span class="st"> </span><span class="kw">I</span>(</span>
+<span id="cb2-21">  <span class="st">"function() {</span></span>
+<span id="cb2-22"><span class="st">     setTimeout(function(){$('[data-toggle=tooltip]').tooltip();}, 100);</span></span>
+<span id="cb2-23"><span class="st">  }"</span></span>
+<span id="cb2-24">)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/selectizeTooltips.gif"
+        />
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Sat, 13 May 2023 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/selectizeTooltips.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>Fisheye effect with R</title>
       <link>https://laustep.github.io/stlahblog/posts/fisheye.html</link>
