@@ -5,7 +5,188 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Sat, 13 May 2023 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Sat, 20 May 2023 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>Maximum volume inscribed ellipsoid</title>
+      <link>https://laustep.github.io/stlahblog/posts/maximumVolumeEllipse.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        I’ve just discovered the excellent book
+        <a href="https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf"
+          >Convex Optimization</a
+        >
+        written by Stephen Boyd and Lieven Vandenberghe.
+      </p>
+      <p>
+        It gives methods for many interesting geometric problems. In this blog
+        post I will construct the maximum volume ellipsoid inscribed in a convex
+        polyhedron.
+      </p>
+      <p>Let’s take the vertices of a convex polyhedron:</p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1">vertices &lt;-<span class="st"> </span><span class="kw">rbind</span>(</span>
+<span id="cb1-2">  <span class="kw">c</span>( <span class="dv">0</span>,  <span class="dv">0</span>,  <span class="dv">0</span>),</span>
+<span id="cb1-3">  <span class="kw">c</span>( <span class="dv">0</span>,  <span class="dv">1</span>,  <span class="dv">0</span>),</span>
+<span id="cb1-4">  <span class="kw">c</span>( <span class="dv">1</span>,  <span class="dv">1</span>,  <span class="dv">0</span>),</span>
+<span id="cb1-5">  <span class="kw">c</span>( <span class="dv">1</span>,  <span class="dv">0</span>,  <span class="dv">0</span>),</span>
+<span id="cb1-6">  <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">-1</span>,  <span class="dv">4</span>),</span>
+<span id="cb1-7">  <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>,  <span class="dv">2</span>,  <span class="dv">4</span>),</span>
+<span id="cb1-8">  <span class="kw">c</span>( <span class="dv">2</span>,  <span class="dv">2</span>,  <span class="dv">4</span>),</span>
+<span id="cb1-9">  <span class="kw">c</span>( <span class="dv">2</span>, <span class="dv">-1</span>,  <span class="dv">4</span>)</span>
+<span id="cb1-10">)</span></code></pre>
+      </div>
+      <p>Let’s see how it looks like:</p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1"><span class="kw">library</span>(cxhull)</span>
+<span id="cb2-2"><span class="kw">library</span>(rgl)</span>
+<span id="cb2-3">polyhedron &lt;-<span class="st"> </span><span class="kw">cxhull</span>(vertices, <span class="dt">triangulate =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb2-4"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>))</span>
+<span id="cb2-5"><span class="kw">plotConvexHull3d</span>(polyhedron, <span class="dt">facesColor =</span> <span class="st">"red"</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/maxvolume_polyhedron.png"
+        />
+      </p>
+      <p>
+        The goal is to inscribe an ellipsoid in this polyhedron with the maximum
+        volume.
+      </p>
+      <p>
+        We first need to represent the polyhedron by a set of linear
+        inequalities. To do so, we use the <strong>rcdd</strong> package.
+      </p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb3-1"><span class="kw">library</span>(rcdd)</span>
+<span id="cb3-2">V &lt;-<span class="st"> </span><span class="kw">makeV</span>(vertices)     <span class="co"># V-representation</span></span>
+<span id="cb3-3">H &lt;-<span class="st"> </span><span class="kw">scdd</span>(V)[[<span class="st">"output"</span>]] <span class="co"># H-representation</span></span>
+<span id="cb3-4">A &lt;-<span class="st"> </span><span class="op">-</span><span class="st"> </span>H[, <span class="op">-</span><span class="kw">c</span>(1L, 2L)]   <span class="co"># matrix A</span></span>
+<span id="cb3-5">b &lt;-<span class="st"> </span>H[, 2L]             <span class="co"># column vector b</span></span></code></pre>
+      </div>
+      <p>
+        Now we have a matrix <span class="math inline">\(A\)</span> and a column
+        vector <span class="math inline">\(b\)</span> such that our polyhedron
+        is defined by <span class="math inline">\(Ax \leqslant b\)</span>.
+      </p>
+      <p>
+        Then we’re ready to define the optimization problem, with the
+        <strong>CVXR</strong> package. See the book for the details
+      </p>
+      <div class="sourceCode" id="cb4">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb4-1"><span class="kw">library</span>(CVXR)</span>
+<span id="cb4-2">Bvar &lt;-<span class="st"> </span><span class="kw">Variable</span>(<span class="dv">3</span>, <span class="dv">3</span>, <span class="dt">symmetric =</span> <span class="ot">TRUE</span>) <span class="co"># a symmetric 3x3 matrix</span></span>
+<span id="cb4-3">dvar &lt;-<span class="st"> </span><span class="kw">Variable</span>(<span class="dv">3</span>)                      <span class="co"># a length three vector</span></span>
+<span id="cb4-4">objective &lt;-<span class="st"> </span><span class="kw">Minimize</span>(<span class="op">-</span><span class="kw">log_det</span>(Bvar))    <span class="co"># objective</span></span>
+<span id="cb4-5"><span class="co"># now we define the constraints</span></span>
+<span id="cb4-6">constraints &lt;-<span class="st"> </span><span class="kw">list</span>()</span>
+<span id="cb4-7"><span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span><span class="kw">nrow</span>(A)) {</span>
+<span id="cb4-8">  constraints &lt;-<span class="st"> </span><span class="kw">append</span>(</span>
+<span id="cb4-9">    constraints, <span class="kw">list</span>(<span class="kw">norm2</span>(Bvar <span class="op">%*%</span><span class="st"> </span>A[i,]) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(A[i,]<span class="op">*</span>dvar) <span class="op">&lt;=</span><span class="st"> </span>b[i])</span>
+<span id="cb4-10">  )</span>
+<span id="cb4-11">}</span></code></pre>
+      </div>
+      <p>It remains to solve this problem.</p>
+      <div class="sourceCode" id="cb5">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb5-1">program &lt;-<span class="st"> </span><span class="kw">Problem</span>(objective, constraints)</span>
+<span id="cb5-2">solution &lt;-<span class="st"> </span><span class="kw">solve</span>(program, <span class="dt">solver =</span> <span class="st">"SCS"</span>)</span>
+<span id="cb5-3"><span class="co"># extract the solutions</span></span>
+<span id="cb5-4">B &lt;-<span class="st"> </span>solution<span class="op">$</span><span class="kw">getValue</span>(Bvar)</span>
+<span id="cb5-5">d &lt;-<span class="st"> </span><span class="kw">c</span>(solution<span class="op">$</span><span class="kw">getValue</span>(dvar))</span></code></pre>
+      </div>
+      <p>
+        The matrix <span class="math inline">\(B\)</span> is the shape matrix of
+        the ellipsoid and the vector <span class="math inline">\(d\)</span> is
+        its center. That means that the ellipsoid is the set of vector
+        <span class="math inline">\(Bu + d\)</span> for
+        <span class="math inline">\(u\)</span> in the unit ball. This is a
+        parameterization of the ellipsoid. We can plot it with the help of
+        spherical coordinates.
+      </p>
+      <div class="sourceCode" id="cb6">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb6-1"><span class="kw">library</span>(misc3d) <span class="co"># to use parametric3d</span></span>
+<span id="cb6-2">h &lt;-<span class="st"> </span><span class="cf">function</span>(θ, ϕ) {</span>
+<span id="cb6-3">  x &lt;-<span class="st"> </span><span class="kw">cos</span>(θ) <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(ϕ)</span>
+<span id="cb6-4">  y &lt;-<span class="st"> </span><span class="kw">sin</span>(θ) <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(ϕ)</span>
+<span id="cb6-5">  z &lt;-<span class="st"> </span><span class="kw">cos</span>(ϕ)</span>
+<span id="cb6-6">  u &lt;-<span class="st"> </span><span class="kw">c</span>(x, y, z)</span>
+<span id="cb6-7">  B <span class="op">%*%</span><span class="st"> </span>u <span class="op">+</span><span class="st"> </span>d</span>
+<span id="cb6-8">}</span>
+<span id="cb6-9">fx &lt;-<span class="st"> </span><span class="kw">Vectorize</span>(<span class="cf">function</span>(u, v) {<span class="kw">h</span>(u, v)[1L]})</span>
+<span id="cb6-10">fy &lt;-<span class="st"> </span><span class="kw">Vectorize</span>(<span class="cf">function</span>(u, v) {<span class="kw">h</span>(u, v)[2L]})</span>
+<span id="cb6-11">fz &lt;-<span class="st"> </span><span class="kw">Vectorize</span>(<span class="cf">function</span>(u, v) {<span class="kw">h</span>(u, v)[3L]})</span>
+<span id="cb6-12"><span class="co"># plot</span></span>
+<span id="cb6-13"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>))</span>
+<span id="cb6-14"><span class="kw">plotConvexHull3d</span>(polyhedron, <span class="dt">facesColor =</span> <span class="st">"red"</span>, <span class="dt">alpha =</span> <span class="fl">0.2</span>)</span>
+<span id="cb6-15"><span class="kw">parametric3d</span>(</span>
+<span id="cb6-16">  fx, fy, fz, <span class="dt">umin =</span> <span class="dv">0</span>, <span class="dt">umax =</span> <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">vmin =</span> <span class="dv">0</span>, <span class="dt">vmax =</span> pi, <span class="dt">n =</span> <span class="dv">250</span>,</span>
+<span id="cb6-17">  <span class="dt">color =</span> <span class="st">"maroon"</span>, <span class="dt">add =</span> <span class="ot">TRUE</span></span>
+<span id="cb6-18">)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/maxvolume_polyhedron_ellipse1.png"
+        />
+      </p>
+      <p>
+        Another way to plot it is to use the central matrix of the ellipsoid,
+        which defines the ellipsoid as an isosurface. The central matrix is
+        <span class="math inline">\(S = {(BB')^{-1}}\)</span>, and then the
+        ellipsoid is the set of points
+        <span class="math inline">\(x\)</span> satisfying
+        <span class="math inline">\((x-d)' S (x-d) \leqslant 1\)</span>.
+      </p>
+      <div class="sourceCode" id="cb7">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb7-1"><span class="kw">library</span>(misc3d)</span>
+<span id="cb7-2">S &lt;-<span class="st"> </span><span class="kw">chol2inv</span>(<span class="kw">chol</span>(<span class="kw">tcrossprod</span>(B)))</span>
+<span id="cb7-3">x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span>, <span class="dt">length.out =</span> 150L)</span>
+<span id="cb7-4">y &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span>, <span class="dt">length.out =</span> 150L)</span>
+<span id="cb7-5">z &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dt">length.out =</span> 150L)</span>
+<span id="cb7-6">Grid &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(<span class="kw">expand.grid</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">z =</span> z))</span>
+<span id="cb7-7">voxel &lt;-<span class="st"> </span><span class="kw">array</span>(</span>
+<span id="cb7-8">  <span class="kw">apply</span>(Grid, 1L, <span class="cf">function</span>(v) <span class="kw">c</span>(<span class="kw">t</span>(v<span class="op">-</span>d) <span class="op">%*%</span><span class="st"> </span>S <span class="op">%*%</span><span class="st"> </span>(v<span class="op">-</span>d))), </span>
+<span id="cb7-9">  <span class="dt">dim =</span> <span class="kw">c</span>(150L, 150L, 150L)</span>
+<span id="cb7-10">)</span>
+<span id="cb7-11">isosurface &lt;-<span class="st"> </span><span class="kw">computeContour3d</span>(voxel, <span class="kw">max</span>(voxel), <span class="dv">1</span>, <span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">z =</span> z)</span>
+<span id="cb7-12"><span class="co"># plot</span></span>
+<span id="cb7-13"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>))</span>
+<span id="cb7-14"><span class="kw">drawScene.rgl</span>(<span class="kw">makeTriangles</span>(isosurface), <span class="dt">color =</span> <span class="st">"maroon"</span>)</span>
+<span id="cb7-15"><span class="kw">plotConvexHull3d</span>(polyhedron, <span class="dt">facesColor =</span> <span class="st">"red"</span>, <span class="dt">alpha =</span> <span class="fl">0.2</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/maxvolume_polyhedron_ellipse2.png"
+        />
+      </p>
+      <p>
+        The same method can be performed in any dimension. In the latest update
+        of my package <strong>PlaneGeometry</strong>, I implemented it for
+        dimension 2.
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Sat, 20 May 2023 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/maximumVolumeEllipse.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>Tooltips for a dropdown list in Shiny</title>
       <link>https://laustep.github.io/stlahblog/posts/selectizeTooltips.html</link>
@@ -12080,116 +12261,6 @@ Options:
 ]]></description>
       <pubDate>Thu, 15 Oct 2020 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/kde1d.html</guid>
-      <dc:creator>Stéphane Laurent</dc:creator>
-      <category>R</category>
-    </item>
-    <item>
-      <title>My RGL artworks</title>
-      <link>https://laustep.github.io/stlahblog/posts/MyRGLartworks.html</link>
-      <description><![CDATA[<div class="container-fluid">
-  <div class="main col-sm-12">
-    <div class="content">
-      <p>
-        These are some of my artworks realized with the R package
-        <code>rgl</code>. Source code is available in
-        <a href="https://gist.github.com/stla">my gists</a>.
-      </p>
-      <p>
-        <img
-          src="https://camo.githubusercontent.com/3a27a77e8d60a10ea347017bb4f78a85f28dce7f/68747470733a2f2f7468756d62732e6766796361742e636f6d2f45737465656d656453686f7779446f6c7068696e2d73697a655f726573747269637465642e676966"
-        />
-      </p>
-      <p>
-        <img
-          src="https://camo.githubusercontent.com/62bb1cef024c3353381dbadfdb75d8839d5ed1e3/68747470733a2f2f7468756d62732e6766796361742e636f6d2f48656c7066756c506c6173746963416e74626561722d73697a655f726573747269637465642e676966"
-        />
-      </p>
-      <p>
-        <img
-          src="https://camo.githubusercontent.com/5ea6d902f0f85b3fff29e87251e6977e28ba0c3c/68747470733a2f2f7468756d62732e6766796361742e636f6d2f506c756d70496d70617373696f6e65644265617665722d73697a655f726573747269637465642e676966"
-        />
-      </p>
-      <p>
-        <img
-          src="https://camo.githubusercontent.com/978e0f0f42673e22685f350e3c6dd6b1c8fe6dff/68747470733a2f2f7468756d62732e6766796361742e636f6d2f4269746573697a6564457175616c476175722d73697a655f726573747269637465642e676966"
-        />
-      </p>
-      <p>
-        <img
-          src="https://camo.githubusercontent.com/93c6b1b2f80818492f9714858d7fc0ffe66f3266/68747470733a2f2f7468756d62732e6766796361742e636f6d2f416d626974696f757354616d6541646461782d73697a655f726573747269637465642e676966"
-        />
-      </p>
-      <p>
-        <img
-          src="https://camo.githubusercontent.com/d1e218228c4efdf6085e5ae80f5cc9feeea1e04d/68747470733a2f2f7468756d62732e6766796361742e636f6d2f4b696e64686561727465644f726e6572794865646765686f672d73697a655f726573747269637465642e676966"
-        />
-      </p>
-      <p>
-        <img
-          src="https://camo.githubusercontent.com/dcd38ed43716c092ae0723d1075b32e082a6cd5b/68747470733a2f2f7468756d62732e6766796361742e636f6d2f466c6177656453656c6672656c69616e7443697272697065642d73697a655f726573747269637465642e676966"
-        />
-      </p>
-      <p>
-        <img
-          src="https://camo.githubusercontent.com/5ed40dd4b6e85f75621a47d3dc4230e1ad46dc75/68747470733a2f2f7468756d62732e6766796361742e636f6d2f556e73746561647957656570794672696c6c6e65636b65646c697a6172642d73697a655f726573747269637465642e676966"
-        />
-      </p>
-      <p>
-        <img
-          src="https://camo.githubusercontent.com/14d6b4ef37daab1a761c14cc4e237510958615ae/68747470733a2f2f7468756d62732e6766796361742e636f6d2f59656c6c6f77496465616c496e6368776f726d2d73697a655f726573747269637465642e676966"
-        />
-      </p>
-      <p>
-        <img
-          src="https://camo.githubusercontent.com/9b47e1d657392cd29e9d684864b0d531d701cf18/68747470733a2f2f7468756d62732e6766796361742e636f6d2f426f6e794964656e746963616c426f696c77656576696c2d73697a655f726573747269637465642e676966"
-        />
-      </p>
-      <p>
-        <img
-          src="https://camo.githubusercontent.com/59629ef36e30e73ebf584a45435a5e9fcd8ab1ae/68747470733a2f2f7468756d62732e6766796361742e636f6d2f4c696b656c794561726c7942656e67616c74696765722d73697a655f726573747269637465642e676966"
-        />
-      </p>
-      <p>
-        <img
-          src="https://camo.githubusercontent.com/94af9461f70bf88fed1ce3eaa9fbf0374b5d0883/68747470733a2f2f7468756d62732e6766796361742e636f6d2f5765656b6c79517561727465726c794963746572696e65776172626c65722d73697a655f726573747269637465642e676966"
-        />
-      </p>
-      <p>
-        <img
-          src="https://camo.githubusercontent.com/460582ebfe5d8ef2724fb11970e634385a3ecc4d/68747470733a2f2f7468756d62732e6766796361742e636f6d2f546f726e536e65616b794b6f616c61626561722d73697a655f726573747269637465642e676966"
-        />
-      </p>
-      <p>
-        <img
-          src="https://camo.githubusercontent.com/9cb20d35d9ad95e96c76946e65c3165d91726006/68747470733a2f2f7468756d62732e6766796361742e636f6d2f556e666f7274756e617465436172656672656547726f756e64626565746c652d73697a655f726573747269637465642e676966"
-        />
-      </p>
-      <p>
-        <img
-          src="https://camo.githubusercontent.com/ff1d85320bd032c9082b008b6dec2df37ea073b8/68747470733a2f2f7468756d62732e6766796361742e636f6d2f46616d6f75734c6176697368416e7469706f646573677265656e706172616b6565742d73697a655f726573747269637465642e676966"
-        />
-      </p>
-      <p>
-        <img
-          src="https://camo.githubusercontent.com/6a397f4022cb0794053f7e3f980dbf50e119c10c/68747470733a2f2f7468756d62732e6766796361742e636f6d2f537069666679536d616c6c42757a7a6172642d73697a655f726573747269637465642e676966"
-        />
-      </p>
-      <p>
-        <img
-          src="https://camo.githubusercontent.com/184b3b5000b26e83ea3fe399352105d07df746d5/68747470733a2f2f7468756d62732e6766796361742e636f6d2f43697263756c6172536d6172744861636b65652d73697a655f726573747269637465642e676966"
-        />
-      </p>
-      <p>
-        <img
-          src="https://camo.githubusercontent.com/abacd39b34b5b57c6c9db5d9c11c1b07c59de371/68747470733a2f2f7468756d62732e6766796361742e636f6d2f536572696f7573446972656374426f6e6f626f2d73697a655f726573747269637465642e676966"
-        />
-      </p>
-    </div>
-  </div>
-</div>
-]]></description>
-      <pubDate>Thu, 08 Oct 2020 00:00:00 UT</pubDate>
-      <guid>https://laustep.github.io/stlahblog/posts/MyRGLartworks.html</guid>
       <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>

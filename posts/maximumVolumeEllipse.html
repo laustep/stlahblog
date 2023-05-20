@@ -1,0 +1,245 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Maximum volume inscribed ellipsoid</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Maximum volume inscribed ellipsoid</h1> 
+          <div class="info">
+    Posted on May 20, 2023
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'geometry'." href="../tags/geometry.html">geometry</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>, <a title="All pages tagged 'rgl'." href="../tags/rgl.html">rgl</a>, <a title="All pages tagged 'misc3d'." href="../tags/misc3d.html">misc3d</a>
+    
+</div>
+
+<p>I’ve just discovered the excellent book <a href="https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf">Convex Optimization</a> written by Stephen Boyd and Lieven Vandenberghe.</p>
+<p>It gives methods for many interesting geometric problems. In this blog post I will construct the maximum volume ellipsoid inscribed in a convex polyhedron.</p>
+<p>Let’s take the vertices of a convex polyhedron:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>vertices &lt;-<span class="st"> </span><span class="kw">rbind</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>  <span class="kw">c</span>( <span class="dv">0</span>,  <span class="dv">0</span>,  <span class="dv">0</span>),</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>  <span class="kw">c</span>( <span class="dv">0</span>,  <span class="dv">1</span>,  <span class="dv">0</span>),</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>  <span class="kw">c</span>( <span class="dv">1</span>,  <span class="dv">1</span>,  <span class="dv">0</span>),</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>  <span class="kw">c</span>( <span class="dv">1</span>,  <span class="dv">0</span>,  <span class="dv">0</span>),</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>  <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">-1</span>,  <span class="dv">4</span>),</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>  <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>,  <span class="dv">2</span>,  <span class="dv">4</span>),</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>  <span class="kw">c</span>( <span class="dv">2</span>,  <span class="dv">2</span>,  <span class="dv">4</span>),</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>  <span class="kw">c</span>( <span class="dv">2</span>, <span class="dv">-1</span>,  <span class="dv">4</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>)</span></code></pre></div>
+<p>Let’s see how it looks like:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">library</span>(cxhull)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="kw">library</span>(rgl)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>polyhedron &lt;-<span class="st"> </span><span class="kw">cxhull</span>(vertices, <span class="dt">triangulate =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>))</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="kw">plotConvexHull3d</span>(polyhedron, <span class="dt">facesColor =</span> <span class="st">&quot;red&quot;</span>)</span></code></pre></div>
+<p><img src="./figures/maxvolume_polyhedron.png" /></p>
+<p>The goal is to inscribe an ellipsoid in this polyhedron with the maximum volume.</p>
+<p>We first need to represent the polyhedron by a set of linear inequalities. To do so, we use the <strong>rcdd</strong> package.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">library</span>(rcdd)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>V &lt;-<span class="st"> </span><span class="kw">makeV</span>(vertices)     <span class="co"># V-representation</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>H &lt;-<span class="st"> </span><span class="kw">scdd</span>(V)[[<span class="st">&quot;output&quot;</span>]] <span class="co"># H-representation</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>A &lt;-<span class="st"> </span><span class="op">-</span><span class="st"> </span>H[, <span class="op">-</span><span class="kw">c</span>(1L, 2L)]   <span class="co"># matrix A</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>b &lt;-<span class="st"> </span>H[, 2L]             <span class="co"># column vector b</span></span></code></pre></div>
+<p>Now we have a matrix <span class="math inline">\(A\)</span> and a column vector <span class="math inline">\(b\)</span> such that our polyhedron is defined by <span class="math inline">\(Ax \leqslant b\)</span>.</p>
+<p>Then we’re ready to define the optimization problem, with the <strong>CVXR</strong> package. See the book for the details</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">library</span>(CVXR)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>Bvar &lt;-<span class="st"> </span><span class="kw">Variable</span>(<span class="dv">3</span>, <span class="dv">3</span>, <span class="dt">symmetric =</span> <span class="ot">TRUE</span>) <span class="co"># a symmetric 3x3 matrix</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>dvar &lt;-<span class="st"> </span><span class="kw">Variable</span>(<span class="dv">3</span>)                      <span class="co"># a length three vector</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>objective &lt;-<span class="st"> </span><span class="kw">Minimize</span>(<span class="op">-</span><span class="kw">log_det</span>(Bvar))    <span class="co"># objective</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a><span class="co"># now we define the constraints</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>constraints &lt;-<span class="st"> </span><span class="kw">list</span>()</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a><span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span><span class="kw">nrow</span>(A)) {</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>  constraints &lt;-<span class="st"> </span><span class="kw">append</span>(</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>    constraints, <span class="kw">list</span>(<span class="kw">norm2</span>(Bvar <span class="op">%*%</span><span class="st"> </span>A[i,]) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(A[i,]<span class="op">*</span>dvar) <span class="op">&lt;=</span><span class="st"> </span>b[i])</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a>  )</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a>}</span></code></pre></div>
+<p>It remains to solve this problem.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>program &lt;-<span class="st"> </span><span class="kw">Problem</span>(objective, constraints)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>solution &lt;-<span class="st"> </span><span class="kw">solve</span>(program, <span class="dt">solver =</span> <span class="st">&quot;SCS&quot;</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="co"># extract the solutions</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>B &lt;-<span class="st"> </span>solution<span class="op">$</span><span class="kw">getValue</span>(Bvar)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>d &lt;-<span class="st"> </span><span class="kw">c</span>(solution<span class="op">$</span><span class="kw">getValue</span>(dvar))</span></code></pre></div>
+<p>The matrix <span class="math inline">\(B\)</span> is the shape matrix of the ellipsoid and the vector <span class="math inline">\(d\)</span> is its center. That means that the ellipsoid is the set of vector <span class="math inline">\(Bu + d\)</span> for <span class="math inline">\(u\)</span> in the unit ball. This is a parameterization of the ellipsoid. We can plot it with the help of spherical coordinates.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">library</span>(misc3d) <span class="co"># to use parametric3d</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>h &lt;-<span class="st"> </span><span class="cf">function</span>(θ, ϕ) {</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>  x &lt;-<span class="st"> </span><span class="kw">cos</span>(θ) <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(ϕ)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>  y &lt;-<span class="st"> </span><span class="kw">sin</span>(θ) <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(ϕ)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>  z &lt;-<span class="st"> </span><span class="kw">cos</span>(ϕ)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>  u &lt;-<span class="st"> </span><span class="kw">c</span>(x, y, z)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a>  B <span class="op">%*%</span><span class="st"> </span>u <span class="op">+</span><span class="st"> </span>d</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a>}</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a>fx &lt;-<span class="st"> </span><span class="kw">Vectorize</span>(<span class="cf">function</span>(u, v) {<span class="kw">h</span>(u, v)[1L]})</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a>fy &lt;-<span class="st"> </span><span class="kw">Vectorize</span>(<span class="cf">function</span>(u, v) {<span class="kw">h</span>(u, v)[2L]})</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a>fz &lt;-<span class="st"> </span><span class="kw">Vectorize</span>(<span class="cf">function</span>(u, v) {<span class="kw">h</span>(u, v)[3L]})</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a><span class="co"># plot</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>))</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a><span class="kw">plotConvexHull3d</span>(polyhedron, <span class="dt">facesColor =</span> <span class="st">&quot;red&quot;</span>, <span class="dt">alpha =</span> <span class="fl">0.2</span>)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true"></a><span class="kw">parametric3d</span>(</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true"></a>  fx, fy, fz, <span class="dt">umin =</span> <span class="dv">0</span>, <span class="dt">umax =</span> <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">vmin =</span> <span class="dv">0</span>, <span class="dt">vmax =</span> pi, <span class="dt">n =</span> <span class="dv">250</span>,</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true"></a>  <span class="dt">color =</span> <span class="st">&quot;maroon&quot;</span>, <span class="dt">add =</span> <span class="ot">TRUE</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true"></a>)</span></code></pre></div>
+<p><img src="./figures/maxvolume_polyhedron_ellipse1.png" /></p>
+<p>Another way to plot it is to use the central matrix of the ellipsoid, which defines the ellipsoid as an isosurface. The central matrix is <span class="math inline">\(S = {(BB')^{-1}}\)</span>, and then the ellipsoid is the set of points <span class="math inline">\(x\)</span> satisfying <span class="math inline">\((x-d)' S (x-d) \leqslant 1\)</span>.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="kw">library</span>(misc3d)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>S &lt;-<span class="st"> </span><span class="kw">chol2inv</span>(<span class="kw">chol</span>(<span class="kw">tcrossprod</span>(B)))</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span>, <span class="dt">length.out =</span> 150L)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>y &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span>, <span class="dt">length.out =</span> 150L)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a>z &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dt">length.out =</span> 150L)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a>Grid &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(<span class="kw">expand.grid</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">z =</span> z))</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a>voxel &lt;-<span class="st"> </span><span class="kw">array</span>(</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a>  <span class="kw">apply</span>(Grid, 1L, <span class="cf">function</span>(v) <span class="kw">c</span>(<span class="kw">t</span>(v<span class="op">-</span>d) <span class="op">%*%</span><span class="st"> </span>S <span class="op">%*%</span><span class="st"> </span>(v<span class="op">-</span>d))), </span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true"></a>  <span class="dt">dim =</span> <span class="kw">c</span>(150L, 150L, 150L)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true"></a>)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true"></a>isosurface &lt;-<span class="st"> </span><span class="kw">computeContour3d</span>(voxel, <span class="kw">max</span>(voxel), <span class="dv">1</span>, <span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">z =</span> z)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true"></a><span class="co"># plot</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>))</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true"></a><span class="kw">drawScene.rgl</span>(<span class="kw">makeTriangles</span>(isosurface), <span class="dt">color =</span> <span class="st">&quot;maroon&quot;</span>)</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true"></a><span class="kw">plotConvexHull3d</span>(polyhedron, <span class="dt">facesColor =</span> <span class="st">&quot;red&quot;</span>, <span class="dt">alpha =</span> <span class="fl">0.2</span>)</span></code></pre></div>
+<p><img src="./figures/maxvolume_polyhedron_ellipse2.png" /></p>
+<p>The same method can be performed in any dimension. In the latest update of my package <strong>PlaneGeometry</strong>, I implemented it for dimension 2.</p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
