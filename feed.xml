@@ -5,7 +5,245 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Sat, 20 May 2023 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Thu, 01 Jun 2023 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>3D alpha wrapping with R</title>
+      <link>https://laustep.github.io/stlahblog/posts/alphaWrapping.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        The <strong>RcppCGAL</strong> package now contains version 5.5.2 of the
+        <strong>CGAL</strong> library. There is something new in this version:
+        the <em>3D alpha wrapping</em>. This is a bit similar to the
+        <em>3D alpha hull</em> but this can work better.
+      </p>
+      <p>
+        So I implemented the alpha wrapping in my package
+        <a href="https://github.com/stla/cgalMeshes">cgalMeshes</a> (currently
+        it is only in the <strong>github</strong> branch of the repository).
+      </p>
+      <p>
+        To illustrate the alpha wrapping, I will take a pseudo-gyroid. It is an
+        isosurface, and it is qualified as “pseudo” because the true gyroid has
+        a more complicated isosurface equation. The pseudo-gyroid is an
+        approximation of the gyroid.
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1"><span class="co"># the pseudo-gyroid is the isosurface f(x,y,z)=0</span></span>
+<span id="cb1-2">f &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, z) {</span>
+<span id="cb1-3">  <span class="kw">cos</span>(x) <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(y) <span class="op">+</span><span class="st"> </span><span class="kw">cos</span>(y) <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(z) <span class="op">+</span><span class="st"> </span><span class="kw">cos</span>(z) <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(x)</span>
+<span id="cb1-4">}</span>
+<span id="cb1-5"><span class="co"># construct the isosurface f=0</span></span>
+<span id="cb1-6">ngrid &lt;-<span class="st"> </span>70L</span>
+<span id="cb1-7">x &lt;-<span class="st"> </span>y &lt;-<span class="st"> </span>z &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">5</span>, <span class="dv">5</span>, <span class="dt">length.out =</span> ngrid)</span>
+<span id="cb1-8">Grid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">X =</span> x, <span class="dt">Y =</span> y, <span class="dt">Z =</span> z)</span>
+<span id="cb1-9">voxel &lt;-<span class="st"> </span><span class="kw">array</span>(</span>
+<span id="cb1-10">  <span class="kw">with</span>(Grid, <span class="kw">f</span>(X, Y, Z)), <span class="dt">dim =</span> <span class="kw">c</span>(ngrid, ngrid, ngrid)</span>
+<span id="cb1-11">)</span>
+<span id="cb1-12"><span class="kw">library</span>(rmarchingcubes)</span>
+<span id="cb1-13">contour_shape &lt;-<span class="st"> </span><span class="kw">contour3d</span>(</span>
+<span id="cb1-14">  <span class="dt">griddata =</span> voxel, <span class="dt">level =</span> <span class="dv">0</span>, <span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">z =</span> z</span>
+<span id="cb1-15">)</span>
+<span id="cb1-16"><span class="co"># make mesh</span></span>
+<span id="cb1-17"><span class="kw">library</span>(rgl)</span>
+<span id="cb1-18">rglMesh &lt;-<span class="st"> </span><span class="kw">tmesh3d</span>(</span>
+<span id="cb1-19">  <span class="dt">vertices =</span> <span class="kw">t</span>(contour_shape[[<span class="st">"vertices"</span>]]),</span>
+<span id="cb1-20">  <span class="dt">indices  =</span> <span class="kw">t</span>(contour_shape[[<span class="st">"triangles"</span>]]),</span>
+<span id="cb1-21">  <span class="dt">normals  =</span> contour_shape[[<span class="st">"normals"</span>]]</span>
+<span id="cb1-22">)</span></code></pre>
+      </div>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>))</span>
+<span id="cb2-2"><span class="kw">view3d</span>(<span class="op">-</span><span class="dv">40</span>, <span class="dv">35</span>)</span>
+<span id="cb2-3"><span class="kw">shade3d</span>(rglMesh, <span class="dt">color =</span> <span class="st">"orange"</span>)</span>
+<span id="cb2-4"></span>
+<span id="cb2-5"></span>
+<span id="cb2-6">bdry &lt;-<span class="st"> </span><span class="kw">getBoundary3d</span>(rglMesh, <span class="dt">color =</span> <span class="st">"black"</span>, <span class="dt">lwd =</span> <span class="dv">3</span>)</span>
+<span id="cb2-7"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>))</span>
+<span id="cb2-8"><span class="kw">view3d</span>(<span class="op">-</span><span class="dv">40</span>, <span class="dv">35</span>)</span>
+<span id="cb2-9"><span class="kw">shade3d</span>(rglMesh, <span class="dt">color =</span> <span class="st">"orange"</span>)</span>
+<span id="cb2-10"><span class="kw">shade3d</span>(bdry)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/pseudogyroid_cube.png"
+        />
+      </p>
+      <p>Maybe adding the boundary to the plot is helpful for visualization:</p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb3-1">bdry &lt;-<span class="st"> </span><span class="kw">getBoundary3d</span>(rglMesh, <span class="dt">color =</span> <span class="st">"black"</span>, <span class="dt">lwd =</span> <span class="dv">3</span>)</span>
+<span id="cb3-2"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>))</span>
+<span id="cb3-3"><span class="kw">view3d</span>(<span class="op">-</span><span class="dv">40</span>, <span class="dv">35</span>)</span>
+<span id="cb3-4"><span class="kw">shade3d</span>(rglMesh, <span class="dt">color =</span> <span class="st">"orange"</span>)</span>
+<span id="cb3-5"><span class="kw">shade3d</span>(bdry)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/pseudogyroid_cube_boundary.png"
+        />
+      </p>
+      <p>
+        This pseudo-gyroid is inscribed in the cube
+        <span class="math inline">\((-5,5)\times(-5,5)\times(-5,5)\)</span>. I
+        prefer the spherical pseudo-gyroid, obtained by clipping the cubical
+        pseudo-gyroid to a sphere:
+      </p>
+      <div class="sourceCode" id="cb4">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb4-1"><span class="co"># returns the squared norms of the vertices</span></span>
+<span id="cb4-2">sqnorm &lt;-<span class="st"> </span><span class="cf">function</span>(vertices) { </span>
+<span id="cb4-3">  <span class="kw">apply</span>(vertices, 1L, <span class="cf">function</span>(row) <span class="kw">crossprod</span>(row))</span>
+<span id="cb4-4">}</span>
+<span id="cb4-5"><span class="co"># clipping</span></span>
+<span id="cb4-6">rglMesh2 &lt;-<span class="st"> </span><span class="kw">clipMesh3d</span>(rglMesh, sqnorm, <span class="dt">bound =</span> <span class="dv">25</span>, <span class="dt">greater =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb4-7"><span class="co"># extract boundary</span></span>
+<span id="cb4-8">bdry &lt;-<span class="st"> </span><span class="kw">getBoundary3d</span>(rglMesh2, <span class="dt">color =</span> <span class="st">"black"</span>, <span class="dt">lwd =</span> <span class="dv">3</span>)</span></code></pre>
+      </div>
+      <div class="sourceCode" id="cb5">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb5-1"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>), <span class="dt">zoom =</span> <span class="fl">0.7</span>)</span>
+<span id="cb5-2"><span class="kw">shade3d</span>(rglMesh2, <span class="dt">color =</span> <span class="st">"orangered"</span>)</span>
+<span id="cb5-3"><span class="kw">shade3d</span>(bdry)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/pseudogyroid_sphere.png"
+        />
+      </p>
+      <p>
+        This mesh has <span class="math inline">\(21371\)</span> vertices and
+        <span class="math inline">\(40919\)</span> triangles:
+      </p>
+      <div class="sourceCode" id="cb6">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb6-1">rglMesh2</span>
+<span id="cb6-2"><span class="co">##  mesh3d object with 21731 vertices, 40919 triangles.</span></span></code></pre>
+      </div>
+      <p>Let’s extract its vertices:</p>
+      <div class="sourceCode" id="cb7">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb7-1">vertices &lt;-<span class="st"> </span><span class="kw">t</span>(rglMesh2<span class="op">$</span>vb[<span class="op">-</span>4L, ])</span></code></pre>
+      </div>
+      <p>
+        And now we will try to reconstruct the surface from its vertices only.
+      </p>
+      <p>The <em>advanced front surface reconstruction</em> fails:</p>
+      <div class="sourceCode" id="cb8">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb8-1"><span class="kw">library</span>(cgalMeshes)</span>
+<span id="cb8-2">AFSmesh &lt;-<span class="st"> </span><span class="kw">AFSreconstruction</span>(vertices)</span>
+<span id="cb8-3">AFSmesh<span class="op">$</span><span class="kw">computeNormals</span>()</span></code></pre>
+      </div>
+      <div class="sourceCode" id="cb9">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb9-1"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>), <span class="dt">zoom =</span> <span class="fl">0.7</span>)</span>
+<span id="cb9-2"><span class="kw">shade3d</span>(AFSmesh<span class="op">$</span><span class="kw">getMesh</span>(), <span class="dt">color =</span> <span class="st">"red"</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/pseudogyroid_AFS.png"
+        />
+      </p>
+      <p>
+        The pseudo-gyroid does not bound a volume (it has no width), so the
+        Poisson reconstruction cannot be applied.
+      </p>
+      <p>Let’s try the alpha hull.</p>
+      <div class="sourceCode" id="cb10">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb10-1"><span class="kw">library</span>(AlphaHull3D)</span>
+<span id="cb10-2">ahull &lt;-<span class="st"> </span><span class="kw">fullAhull3d</span>(vertices)</span>
+<span id="cb10-3">amesh &lt;-<span class="st"> </span><span class="kw">setAlpha</span>(ahull, <span class="dt">alpha =</span> <span class="fl">1.8</span>)</span></code></pre>
+      </div>
+      <p>
+        This value of <span class="math inline">\(\alpha\)</span> is both too
+        big (we get some faces that shouldn’t be there) and too small (we get
+        some holes):
+      </p>
+      <div class="sourceCode" id="cb11">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb11-1"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>), <span class="dt">zoom =</span> <span class="fl">0.7</span>)</span>
+<span id="cb11-2"><span class="kw">shade3d</span>(amesh, <span class="dt">color =</span> <span class="st">"green"</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/pseudogyroid_alphaHull.png"
+        />
+      </p>
+      <p>So there’s no way.</p>
+      <p>
+        Finally, the alpha wrapping comes to our rescue. The alpha wrapping
+        depends on two parameters:
+      </p>
+      <ul>
+        <li>
+          <p>
+            <span class="math inline">\(\alpha\)</span>: the smallest
+            <span class="math inline">\(\alpha\)</span>, the smallest triangles
+            in the output mesh;
+          </p>
+        </li>
+        <li>
+          <p><em>offset</em>: the distance between the input and the output.</p>
+        </li>
+      </ul>
+      <p>
+        In the <code>alphaWrap</code> function, we give the relative
+        <span class="math inline">\(\alpha\)</span> and the relative offset.
+        Then <span class="math inline">\(\alpha\)</span> and the offset are both
+        obtained by dividing the length of the diagonal of the bounding box of
+        the vertices by their relative version. You have to play with these
+        parameters to get a nice mesh. A too small
+        <span class="math inline">\(\alpha\)</span> yields some holes in the
+        mesh, and the mesh has less details when
+        <span class="math inline">\(\alpha\)</span> increases.
+      </p>
+      <div class="sourceCode" id="cb12">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb12-1">wrapMesh &lt;-<span class="st"> </span><span class="kw">alphaWrap</span>(vertices, <span class="dt">ralpha =</span> <span class="dv">100</span>, <span class="dt">roffset =</span> <span class="dv">1000</span>) </span>
+<span id="cb12-2">wrapMesh<span class="op">$</span><span class="kw">computeNormals</span>()</span></code></pre>
+      </div>
+      <div class="sourceCode" id="cb13">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb13-1">wrapRglMesh &lt;-<span class="st"> </span>wrapMesh<span class="op">$</span><span class="kw">getMesh</span>()</span>
+<span id="cb13-2"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>), <span class="dt">zoom =</span> <span class="fl">0.7</span>)</span>
+<span id="cb13-3"><span class="kw">shade3d</span>(wrapRglMesh, <span class="dt">color =</span> <span class="st">"orangered"</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/pseudogyroid_wrapped.png"
+        />
+      </p>
+      <p>
+        Note that we cannot add the boundary to this mesh: it has no boundary.
+        It has a width, controlled by the offset parameter.
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Thu, 01 Jun 2023 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/alphaWrapping.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>Maximum volume inscribed ellipsoid</title>
       <link>https://laustep.github.io/stlahblog/posts/maximumVolumeEllipse.html</link>
