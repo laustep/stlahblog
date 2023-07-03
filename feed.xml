@@ -5,7 +5,165 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Thu, 01 Jun 2023 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Tue, 04 Jul 2023 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>Fast expansion of a polynomial with R</title>
+      <link>https://laustep.github.io/stlahblog/posts/expandPolynomialWithSpray.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        In
+        <a href="https://laustep.github.io/stlahblog/posts/caracas01.html"
+          >this previous post</a
+        >,
+        <a href="https://laustep.github.io/stlahblog/posts/caracas02.html"
+          >this previous post</a
+        >, and
+        <a
+          href="https://laustep.github.io/stlahblog/posts/juliaPolynomialExpansion.html"
+          >this previous post</a
+        >, I showed how to expand a polynomial with symbolic parameters. In the
+        first two posts, I used the R package <strong>caracas</strong>, a
+        wrapper of <strong>SymPy</strong>, and in the third post I used Julia.
+      </p>
+      <p>
+        Now I’ve found a pure R solution, with the help of the
+        <strong>spray</strong> package, and it is very fast. That’s what I’m
+        going to demonstrate here, with the same example I treated with Julia.
+      </p>
+      <p>
+        We will lost something as compared to Julia: the
+        <strong>spray</strong> package does not handle rational numbers, so we
+        will replace them by their double approximation. We could use the
+        <strong>qspray</strong> package instead, to deal with the rational
+        numbers.
+      </p>
+      <p>Here is the starting polynomial expression:</p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1"><span class="co"># define the polynomial expression as a function</span></span>
+<span id="cb1-2">f &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, z, w, sqrt3) {</span>
+<span id="cb1-3">  ((x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span><span class="op">+</span>z<span class="op">^</span><span class="dv">2</span><span class="op">+</span>w<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">145</span><span class="op">/</span><span class="dv">3</span>)<span class="op">^</span><span class="dv">2-4</span><span class="op">*</span>(<span class="dv">9</span><span class="op">*</span>z<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">16</span><span class="op">*</span>w<span class="op">^</span><span class="dv">2</span>))<span class="op">^</span><span class="dv">2</span> <span class="op">*</span><span class="st"> </span></span>
+<span id="cb1-4"><span class="st">    </span>((x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span><span class="op">+</span>z<span class="op">^</span><span class="dv">2</span><span class="op">+</span>w<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">145</span><span class="op">/</span><span class="dv">3</span>)<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">296</span><span class="op">*</span>(x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span>)<span class="op">-</span><span class="dv">4</span><span class="op">*</span>(<span class="dv">9</span><span class="op">*</span>z<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">16</span><span class="op">*</span>w<span class="op">^</span><span class="dv">2</span>)) <span class="op">-</span><span class="st"> </span></span>
+<span id="cb1-5"><span class="st">    </span><span class="dv">16</span><span class="op">*</span>(x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span>)<span class="op">*</span>(x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span><span class="op">+</span>z<span class="op">^</span><span class="dv">2</span><span class="op">+</span>w<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">145</span><span class="op">/</span><span class="dv">3</span>)<span class="op">^</span><span class="dv">2</span> <span class="op">*</span><span class="st"> </span></span>
+<span id="cb1-6"><span class="st">    </span>(<span class="dv">37</span><span class="op">*</span>(x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span><span class="op">+</span>z<span class="op">^</span><span class="dv">2</span><span class="op">+</span>w<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">145</span><span class="op">/</span><span class="dv">3</span>)<span class="op">^</span><span class="dv">2-1369</span><span class="op">*</span>(x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span>)<span class="op">-</span><span class="dv">7</span><span class="op">*</span>(<span class="dv">225</span><span class="op">*</span>z<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">448</span><span class="op">*</span>w<span class="op">^</span><span class="dv">2</span>)) <span class="op">-</span><span class="st"> </span></span>
+<span id="cb1-7"><span class="st">    </span>sqrt3<span class="op">*</span><span class="dv">16</span><span class="op">/</span><span class="dv">9</span><span class="op">*</span>(x<span class="op">^</span><span class="dv">3-3</span><span class="op">*</span>x<span class="op">*</span>y<span class="op">^</span><span class="dv">2</span>) <span class="op">*</span><span class="st"> </span></span>
+<span id="cb1-8"><span class="st">    </span>(<span class="dv">110</span><span class="op">*</span>(x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span><span class="op">+</span>z<span class="op">^</span><span class="dv">2</span><span class="op">+</span>w<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">145</span><span class="op">/</span><span class="dv">3</span>)<span class="op">^</span><span class="dv">3-148</span><span class="op">*</span>(x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span><span class="op">+</span>z<span class="op">^</span><span class="dv">2</span><span class="op">+</span>w<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">145</span><span class="op">/</span><span class="dv">3</span>) <span class="op">*</span><span class="st"> </span></span>
+<span id="cb1-9"><span class="st">       </span>(<span class="dv">110</span><span class="op">*</span>x<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">110</span><span class="op">*</span>y<span class="op">^</span><span class="dv">2-297</span><span class="op">*</span>z<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">480</span><span class="op">*</span>w<span class="op">^</span><span class="dv">2</span>)) <span class="op">-</span><span class="st"> </span></span>
+<span id="cb1-10"><span class="st">    </span><span class="dv">64</span><span class="op">*</span>(x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span>)<span class="op">*</span>(<span class="dv">3</span><span class="op">*</span>(<span class="dv">729</span><span class="op">*</span>z<span class="op">^</span><span class="dv">4</span><span class="op">+</span><span class="dv">4096</span><span class="op">*</span>w<span class="op">^</span><span class="dv">4</span>)<span class="op">+</span><span class="dv">168</span><span class="op">*</span>(x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span>)<span class="op">*</span>(<span class="dv">15</span><span class="op">*</span>z<span class="op">^</span><span class="dv">2-22</span><span class="op">*</span>w<span class="op">^</span><span class="dv">2</span>)) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb1-11"><span class="st">    </span><span class="dv">64</span><span class="op">*</span>(<span class="dv">12100</span><span class="op">/</span><span class="dv">27</span><span class="op">*</span>(x<span class="op">^</span><span class="dv">3-3</span><span class="op">*</span>x<span class="op">*</span>y<span class="op">^</span><span class="dv">2</span>)<span class="op">^</span><span class="dv">2-7056</span><span class="op">*</span>(<span class="dv">3</span><span class="op">*</span>x<span class="op">^</span><span class="dv">2</span><span class="op">*</span>y<span class="op">-</span>y<span class="op">^</span><span class="dv">3</span>)<span class="op">^</span><span class="dv">2</span>)<span class="op">-</span><span class="dv">592240896</span><span class="op">*</span>z<span class="op">^</span><span class="dv">2</span><span class="op">*</span>w<span class="op">^</span><span class="dv">2</span></span>
+<span id="cb1-12">}</span></code></pre>
+      </div>
+      <p>We transform it to the polynomial of interest:</p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1"><span class="co"># there are 3 variables (x,y,z) and 6 parameters (w0,a,b,c,d,sqrt3)</span></span>
+<span id="cb2-2"><span class="kw">library</span>(spray)</span>
+<span id="cb2-3">x     &lt;-<span class="st"> </span><span class="kw">lone</span>(<span class="dv">1</span>, <span class="dv">9</span>)</span>
+<span id="cb2-4">y     &lt;-<span class="st"> </span><span class="kw">lone</span>(<span class="dv">2</span>, <span class="dv">9</span>)</span>
+<span id="cb2-5">z     &lt;-<span class="st"> </span><span class="kw">lone</span>(<span class="dv">3</span>, <span class="dv">9</span>)</span>
+<span id="cb2-6">w0    &lt;-<span class="st"> </span><span class="kw">lone</span>(<span class="dv">4</span>, <span class="dv">9</span>)</span>
+<span id="cb2-7">a     &lt;-<span class="st"> </span><span class="kw">lone</span>(<span class="dv">5</span>, <span class="dv">9</span>)</span>
+<span id="cb2-8">b     &lt;-<span class="st"> </span><span class="kw">lone</span>(<span class="dv">6</span>, <span class="dv">9</span>)</span>
+<span id="cb2-9">c     &lt;-<span class="st"> </span><span class="kw">lone</span>(<span class="dv">7</span>, <span class="dv">9</span>)</span>
+<span id="cb2-10">d     &lt;-<span class="st"> </span><span class="kw">lone</span>(<span class="dv">8</span>, <span class="dv">9</span>)</span>
+<span id="cb2-11">sqrt3 &lt;-<span class="st"> </span><span class="kw">lone</span>(<span class="dv">9</span>, <span class="dv">9</span>)</span>
+<span id="cb2-12"></span>
+<span id="cb2-13"><span class="co"># define the substitutions</span></span>
+<span id="cb2-14">X &lt;-<span class="st"> </span>a<span class="op">*</span>x  <span class="op">-</span><span class="st"> </span>b<span class="op">*</span>y  <span class="op">-</span><span class="st"> </span>c<span class="op">*</span>z  <span class="op">-</span><span class="st"> </span>d<span class="op">*</span>w0</span>
+<span id="cb2-15">Y &lt;-<span class="st"> </span>a<span class="op">*</span>y  <span class="op">+</span><span class="st"> </span>b<span class="op">*</span>x  <span class="op">+</span><span class="st"> </span>c<span class="op">*</span>w0 <span class="op">-</span><span class="st"> </span>d<span class="op">*</span>z</span>
+<span id="cb2-16">Z &lt;-<span class="st"> </span>a<span class="op">*</span>z  <span class="op">-</span><span class="st"> </span>b<span class="op">*</span>w0 <span class="op">+</span><span class="st"> </span>c<span class="op">*</span>x  <span class="op">+</span><span class="st"> </span>d<span class="op">*</span>y</span>
+<span id="cb2-17">W &lt;-<span class="st"> </span>a<span class="op">*</span>w0 <span class="op">+</span><span class="st"> </span>b<span class="op">*</span>z  <span class="op">-</span><span class="st"> </span>c<span class="op">*</span>y  <span class="op">+</span><span class="st"> </span>d<span class="op">*</span>x</span>
+<span id="cb2-18"></span>
+<span id="cb2-19"><span class="co"># here is the polynomial of interest</span></span>
+<span id="cb2-20">P &lt;-<span class="st"> </span><span class="kw">f</span>(X, Y, Z, W, sqrt3)</span></code></pre>
+      </div>
+      <p>Now we take the “xyz” part of each term:</p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb3-1"><span class="co"># the exponents of x, y, z</span></span>
+<span id="cb3-2">xyz_powers &lt;-<span class="st"> </span>P[[<span class="st">"index"</span>]][, <span class="kw">c</span>(1L, 2L, 3L)]</span>
+<span id="cb3-3"></span>
+<span id="cb3-4"><span class="co"># the "keys" xyz(i,j,k) for POV-Ray</span></span>
+<span id="cb3-5">xyz_povray &lt;-<span class="st"> </span><span class="kw">apply</span>(xyz_powers, 1L, <span class="cf">function</span>(comp) {</span>
+<span id="cb3-6">  <span class="kw">sprintf</span>(<span class="st">"xyz(%s): "</span>, <span class="kw">toString</span>(comp))</span>
+<span id="cb3-7">})</span></code></pre>
+      </div>
+      <p>Now we take the remaining part of each term:</p>
+      <div class="sourceCode" id="cb4">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb4-1"><span class="co"># the other exponents, those of w0, a, b, c, d, sqrt3</span></span>
+<span id="cb4-2">other_powers &lt;-<span class="st"> </span>P[[<span class="st">"index"</span>]][, <span class="kw">c</span>(4L, 5L, 6L, 7L, 8L, 9L)]</span>
+<span id="cb4-3"></span>
+<span id="cb4-4"><span class="co"># the polynomials in w0, a, b, c, d, sqrt3</span></span>
+<span id="cb4-5">nterms &lt;-<span class="st"> </span><span class="kw">length</span>(P)</span>
+<span id="cb4-6">coeffs &lt;-<span class="st"> </span>P[[<span class="st">"value"</span>]]</span>
+<span id="cb4-7">polynomials &lt;-<span class="st"> </span><span class="kw">lapply</span>(1L<span class="op">:</span>nterms, <span class="cf">function</span>(i) {</span>
+<span id="cb4-8">  <span class="kw">spray</span>(other_powers[i, ], coeffs[i])</span>
+<span id="cb4-9">})</span></code></pre>
+      </div>
+      <p>
+        And we group these polynomials, putting together those which share the
+        same “xyz” part:
+      </p>
+      <div class="sourceCode" id="cb5">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb5-1"><span class="co"># group the polynomials which have the same x,y,z exponents</span></span>
+<span id="cb5-2">polynomials_groups &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="kw">split</span>(polynomials, xyz_povray), <span class="cf">function</span>(polys) {</span>
+<span id="cb5-3">  polysum &lt;-<span class="st"> </span>polys[[<span class="dv">1</span>]]</span>
+<span id="cb5-4">  <span class="cf">for</span>(poly <span class="cf">in</span> polys[<span class="op">-</span><span class="dv">1</span>]) {</span>
+<span id="cb5-5">    polysum &lt;-<span class="st"> </span><span class="kw">spray_add</span>(</span>
+<span id="cb5-6">      polysum<span class="op">$</span>index, polysum<span class="op">$</span>value, poly<span class="op">$</span>index, poly<span class="op">$</span>value</span>
+<span id="cb5-7">    )</span>
+<span id="cb5-8">  }</span>
+<span id="cb5-9">  <span class="kw">as.spray</span>(polysum)</span>
+<span id="cb5-10">}, <span class="dt">simplify =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb5-11"><span class="co"># remove the empty polynomials, if there are some</span></span>
+<span id="cb5-12">polynomials_groups &lt;-<span class="st"> </span><span class="kw">Filter</span>(<span class="kw">Negate</span>(is.empty), polynomials_groups)</span></code></pre>
+      </div>
+      <p>We want these polynomials as character strings:</p>
+      <div class="sourceCode" id="cb6">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb6-1"><span class="co"># there's no as.character function for sprays (polynomials), so we make one</span></span>
+<span id="cb6-2">asCharacter &lt;-<span class="st"> </span><span class="cf">function</span>(poly) {</span>
+<span id="cb6-3">  op &lt;-<span class="st"> </span><span class="kw">options</span>(<span class="dt">sprayvars =</span> <span class="kw">c</span>(<span class="st">"w0"</span>, <span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>, <span class="st">"d"</span>, <span class="st">"sqrt3"</span>))</span>
+<span id="cb6-4">  x &lt;-<span class="st"> </span><span class="kw">capture.output</span>(<span class="kw">print_spray_polyform</span>(poly))</span>
+<span id="cb6-5">  <span class="kw">options</span>(op)</span>
+<span id="cb6-6">  <span class="kw">paste0</span>(x, <span class="dt">collapse =</span> <span class="st">" "</span>)</span>
+<span id="cb6-7">}</span>
+<span id="cb6-8"></span>
+<span id="cb6-9">polynomials_strings &lt;-<span class="st"> </span></span>
+<span id="cb6-10"><span class="st">  </span><span class="kw">sapply</span>(polynomials_groups, asCharacter, <span class="dt">simplify =</span> <span class="ot">FALSE</span>)</span></code></pre>
+      </div>
+      <p>
+        And that’s it. We have everything needed to construct the POV-Ray code:
+      </p>
+      <div class="sourceCode" id="cb7">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb7-1"><span class="kw">head</span>(polynomials_strings, 2L)</span>
+<span id="cb7-2"><span class="co">## $`xyz(0, 0, 0): `</span></span>
+<span id="cb7-3"><span class="co">## [1] "12749128107.8532 +1760*w0^7*c^6*d*sqrt3 -6*w0^10*d^10 +w0^12*b^12 +60*w0^12*b^2*c^4*d^6 +180*w0^12*a^4*b^2*c^2*d^4 +9498*w0^8*b^4*c^4 +44148*w0^8*a^4*b^2*d^2 +180*w0^12*a^4*b^2*c^4*d^2 +1068*w0^10*a^4*c^4*d^2 +30*w0^12*a^2*c^8*d^2 +2196*w0^10*a^4*b^2*d^4 +2519250.2222222*w0^6*a^2*b^4 +10209.6666667*w0^8*a^8 +6*w0^12*a^10*d^2 -12537.3333333*w0^8*a^2*d^6 +31964*w0^8*b^6*d^2 +2076*w0^10*b^4*c^4*d^2 +182*w0^10*b^10 +296*w0^10*a^2*c^6*d^2 +w0^12*a^12 +593516.8888889*w0^6*b^4*d^2 +2076*w0^10*b^4*c^2*d^4 -2933.3333333*w0^9*a^2*c^4*d^3*sqrt3 -1345147.5555556*w0^6*a^2*c^2*d^2 -1760*w0^9*a^2*c^6*d*sqrt3 -4697.3333333*w0^8*b^2*c^6 +18996*w0^8*b^4*c^2*d^2 -14022*w0^8*a^4*c^4 +386*w0^10*a^8*d^2 +6*w0^12*a^10*c^2 -317738.6666667*w0^7*b^2*c^4*d*sqrt3 -60*w0^10*c^6*d^4 +15*w0^12*a^4*c^8 +2136*w0^10*b^6*c^2*d^2 +180*w0^12*a^2*b^4*c^4*d^2 +60*w0^12*a^6*b^2*c^4 -6876*w0^8*a^2*b^2*c^4 +67668*w0^8*a^2*b^4*d^2 +60*w0^12*b^4*c^6*d^2 +15*w0^12*a^8*b^4 +30*w0^12*a^8*c^2*d^2 +20*w0^12*a^6*c^6 +632*w0^10*b^2*c^2*d^6 +722*w0^10*b^8*c^2 +67668*w0^8*a^2*b^4*c^2 +120*w0^12*a^6*b^2*c^2*d^2 -28355.5555556*w0^5*d^5*sqrt3 -37612*w0^8*a^2*c^2*d^4 +6*w0^12*a^2*d^10 -1124*w0^8*c^6*d^2 +1105545.7777778*w0^6*a^2*b^2*c^2 +722*w0^10*b^8*d^2 -586.6666667*w0^9*a^6*c^2*d*sqrt3 +6*w0^12*a^10*b^2 +2933.3333333*w0^7*c^4*d^3*sqrt3 -1173.3333333*w0^9*c^4*d^5*sqrt3 -1760*w0^9*a^2*b^4*c^2*d*sqrt3 +6*w0^12*a^2*b^10 +60*w0^12*a^2*b^4*d^6 +3144*w0^10*a^2*b^2*c^2*d^4 +30*w0^12*a^8*b^2*d^2 +30*w0^12*a^2*b^2*d^8 +356*w0^10*a^4*c^6 +1484*w0^10*a^4*b^6 +56711.1111111*w0^5*c^2*d^3*sqrt3 +44148*w0^8*a^4*b^2*c^2 +90*w0^12*a^4*c^4*d^4 +6*w0^12*a^2*c^10 -1124*w0^8*c^2*d^6 -37612*w0^8*a^2*c^4*d^2 +564*w0^10*a^6*c^4 -4733659.2592593*w0^5*a^2*d^3*sqrt3 +2552*w0^10*a^2*b^6*c^2 +15*w0^12*b^8*c^4 +85066.6666667*w0^5*c^4*d*sqrt3 +60*w0^12*a^2*b^6*c^4 +60*w0^12*b^6*c^2*d^4 -3520*w0^9*a^2*b^2*c^4*d*sqrt3 +1173.3333333*w0^9*a^2*b^2*d^5*sqrt3 +15*w0^12*a^4*d^8 +30*w0^12*a^8*b^2*c^2 +18049.6666667*w0^8*b^8 -1409995.5555556*w0^6*b^2*c^2*d^2 +w0^12*c^12 +60*w0^12*b^6*c^4*d^2 -14022*w0^8*a^4*d^4 +w0^12*d^12 +98*w0^10*a^10 +1048*w0^10*a^2*b^2*c^6 +90*w0^12*a^4*b^4*d^4 +60*w0^12*a^6*b^2*d^4 +5147478.5185185*w0^5*b^2*d^3*sqrt3 +31964*w0^8*b^6*c^2 +993249552.469136*w0^2*b^2 -281*w0^8*d^8 +30*w0^12*a^2*b^2*c^8 +90*w0^12*a^4*b^4*c^4 -656447.2222222*w0^4*d^4 +8444*w0^8*a^6*c^2 -211825.7777778*w0^7*b^2*c^2*d^3*sqrt3 +586.6666667*w0^7*c^2*d^5*sqrt3 +15*w0^12*b^4*d^8 +1073624.7407407*w0^6*b^6 -1760*w0^9*a^4*b^2*c^2*d*sqrt3 -66241728.3950617*w0^3*c^2*d*sqrt3 -1760*w0^9*b^2*c^6*d*sqrt3 +20*w0^12*a^6*b^6 -586.6666667*w0^9*b^6*c^2*d*sqrt3 +60*w0^12*b^2*c^6*d^4 +106499.5555556*w0^7*b^4*d^3*sqrt3 -656447.2222222*w0^4*c^4 -586.6666667*w0^9*b^2*c^2*d^5*sqrt3 +30*w0^12*a^2*b^8*c^2 +60*w0^12*a^4*b^6*d^2 -9660598.1481482*w0^4*b^2*d^2 -12537.3333333*w0^8*a^2*c^6 -97937.7777778*w0^7*a^4*d^3*sqrt3 -672573.7777778*w0^6*a^2*c^4 +586.6666667*w0^9*a^4*b^2*d^3*sqrt3 -1312894.4444444*w0^4*c^2*d^2 +3324*w0^10*a^4*b^4*d^2 +60*w0^12*a^4*b^6*c^2 +1880*w0^10*a^6*b^2*d^2 +586.6666667*w0^9*a^2*b^4*d^3*sqrt3 +5400*w0^10*a^2*b^4*c^2*d^2 +1048*w0^10*a^2*b^2*d^6 +23850915.7407407*w0^4*a^4 +60*w0^12*a^2*b^6*d^4 +60*w0^12*a^4*b^2*c^6 +586.6666667*w0^9*a^4*d^5*sqrt3 -27975709.2592593*w0^4*a^2*d^2 -30*w0^10*c^2*d^8 +60*w0^12*a^2*c^6*d^4 -30*w0^10*c^8*d^2 -704997.7777778*w0^6*b^2*d^4 +30*w0^12*a^2*b^8*d^2 +120*w0^12*a^2*b^2*c^6*d^2 +46326.6666667*w0^8*a^6*b^2 +255375.5555556*w0^6*d^6 +1068*w0^10*b^6*d^4 +20*w0^12*c^6*d^6 +60*w0^12*a^6*b^4*d^2 -224889.9259259*w0^6*c^6 +120*w0^12*a^2*b^2*c^2*d^6 +60*w0^12*a^6*b^4*c^2 +62006.6666667*w0^8*a^2*b^6 +8561.7777778*w0^7*a^2*b^2*d^3*sqrt3 +492736.7407407*w0^6*a^6 +60*w0^12*a^2*c^4*d^6 +3647719.5555556*w0^6*c^4*d^2 +60*w0^12*a^4*c^2*d^6 +20*w0^12*b^6*c^6 +15*w0^12*c^4*d^8 +15*w0^12*b^8*d^4 +6*w0^12*c^2*d^10 -14092*w0^8*b^2*c^2*d^4 +586.6666667*w0^9*b^2*d^7*sqrt3 +158*w0^10*b^2*d^8 +2700*w0^10*a^2*b^4*d^4 -32744490.7407408*w0^2*c^2 +586.6666667*w0^9*a^2*d^7*sqrt3 +692*w0^10*b^4*c^6 +90*w0^12*b^4*c^4*d^4 -704997.7777778*w0^6*b^2*c^4 +593516.8888889*w0^6*b^4*c^2 +195.5555556*w0^9*d^9*sqrt3 -25685.3333333*w0^7*a^2*b^2*c^2*d*sqrt3 +45052.8888889*w0^6*a^4*c^2 -6*w0^10*c^10 -319498.6666667*w0^7*b^4*c^2*d*sqrt3 +42166026.8518519*w0^4*b^4 +195.5555556*w0^9*b^6*d^3*sqrt3 +1105545.7777778*w0^6*a^2*b^2*d^2 +293813.3333333*w0^7*a^4*c^2*d*sqrt3 -586.6666667*w0^9*c^8*d*sqrt3 -531718486.740741*w0^4*a^2*b^2 +120*w0^12*a^2*b^6*c^2*d^2 -2933.3333333*w0^9*b^2*c^4*d^3*sqrt3 +2552*w0^10*a^2*b^6*d^2 +296*w0^10*a^2*c^2*d^6 +2700*w0^10*a^2*b^4*c^4 -32744490.7407408*w0^2*d^2 +6*w0^12*b^2*d^10 +444*w0^10*a^2*c^4*d^4 +3144*w0^10*a^2*b^2*c^4*d^2 +105912.8888889*w0^7*b^2*d^5*sqrt3 +195.5555556*w0^9*a^6*d^3*sqrt3 -3556262.6666667*w0^6*c^2*d^4 +180*w0^12*a^4*b^4*c^2*d^2 -4697.3333333*w0^8*b^2*d^6 +2196*w0^10*a^4*b^2*c^4 -15442435.5555556*w0^5*b^2*c^2*d*sqrt3 +6*w0^12*b^2*c^10 -60*w0^10*c^4*d^6 +158*w0^10*b^2*c^8 -1564.4444444*w0^9*c^6*d^3*sqrt3 +1880*w0^10*a^6*b^2*c^2 +295573.3333333*w0^7*a^2*c^4*d*sqrt3 +632*w0^10*b^2*c^6*d^2 +6*w0^12*b^10*d^2 +6*w0^12*b^10*c^2 +1068*w0^10*b^6*c^4 +60*w0^12*b^4*c^2*d^6 -1173.3333333*w0^9*a^4*c^2*d^3*sqrt3 +14200977.7777778*w0^5*a^2*c^2*d*sqrt3 +8444*w0^8*a^6*d^2 +564*w0^10*a^6*d^4 +15*w0^12*c^8*d^4 +9498*w0^8*b^4*d^4 +15*w0^12*a^8*d^4 +574*w0^10*a^8*b^2 -27975709.2592593*w0^4*a^2*c^2 +15*w0^12*b^4*c^8 +15*w0^12*a^4*b^8 -9660598.1481482*w0^4*b^2*c^2 +534826682.098766*w0^2*a^2 +60*w0^12*a^2*b^4*c^6 +180*w0^12*a^2*b^2*c^4*d^4 -98524.4444444*w0^7*a^2*d^5*sqrt3 +60*w0^12*a^6*c^2*d^4 +20*w0^12*b^6*d^6 +1960314.2222222*w0^6*a^4*b^2 +586.6666667*w0^9*b^4*d^5*sqrt3 +1068*w0^10*a^4*c^2*d^4 -1173.3333333*w0^9*b^4*c^2*d^3*sqrt3 +80074*w0^8*a^4*b^4 +20*w0^12*a^6*d^6 +74*w0^10*a^2*c^8 -14092*w0^8*b^2*c^4*d^2 +948*w0^10*b^2*c^4*d^4 +3324*w0^10*a^4*b^4*c^2 +30*w0^12*b^2*c^8*d^2 -586.6666667*w0^7*d^7*sqrt3 -1760*w0^9*b^4*c^4*d*sqrt3 +30*w0^12*b^2*c^2*d^8 +30*w0^12*a^2*c^2*d^8 -1686*w0^8*c^4*d^4 +15*w0^12*a^8*c^4 +180*w0^12*a^2*b^4*c^2*d^4 +356*w0^10*a^4*d^6 +692*w0^10*b^4*d^6 -6876*w0^8*a^2*b^2*d^4 +74*w0^10*a^2*d^8 -28044*w0^8*a^4*c^2*d^2 +826*w0^10*a^2*b^8 +1316*w0^10*a^6*b^4 +60*w0^12*a^4*b^2*d^6 +30*w0^12*b^8*c^2*d^2 -2346.6666667*w0^9*a^2*b^2*c^2*d^3*sqrt3 +6*w0^12*c^10*d^2 +1128*w0^10*a^6*c^2*d^2 +197048.8888889*w0^7*a^2*c^2*d^3*sqrt3 +60*w0^12*a^4*c^6*d^2 +60*w0^12*a^6*c^4*d^2 -672573.7777778*w0^6*a^2*d^4 +386*w0^10*a^8*c^2 +45052.8888889*w0^6*a^4*d^2 -13752*w0^8*a^2*b^2*c^2*d^2 +4392*w0^10*a^4*b^2*c^2*d^2 +22080576.1316872*w0^3*d^3*sqrt3 -586.6666667*w0^9*a^2*c^2*d^5*sqrt3 -1760*w0^9*a^4*c^4*d*sqrt3 -281*w0^8*c^8"</span></span>
+<span id="cb7-4"><span class="co">## </span></span>
+<span id="cb7-5"><span class="co">## $`xyz(0, 0, 1): `</span></span>
+<span id="cb7-6"><span class="co">## [1] "-20384*w0^7*a*b^7 -672*w0^9*a*b^7*c^2 -672*w0^9*a*b^3*c^6 -408874.6666667*w0^6*a^3*b*d^3*sqrt3 -25685.3333333*w0^6*a^2*b^2*c^3*sqrt3 -15680*w0^7*a*b*c^6 +5280*w0^8*a^4*b^2*c*d^2*sqrt3 -84672*w0^7*a^3*b*c^2*d^2 -2235744*w0^5*a^3*b^3 +85066.6666667*w0^4*c^5*sqrt3 -1760*w0^8*a^4*b^2*c^3*sqrt3 -408874.6666667*w0^6*a*b*d^5*sqrt3 -672*w0^9*a*b*c^2*d^6 +5280*w0^8*b^2*c*d^6*sqrt3 -1008*w0^9*a^5*b*c^4 -168*w0^9*a^9*b -881440*w0^6*a^4*c*d^2*sqrt3 +14200977.7777778*w0^4*a^2*c^3*sqrt3 +198725185.185185*w0^2*c*d^2*sqrt3 -2016*w0^9*a^5*b^3*c^2 -672*w0^9*a^3*b*d^6 +5280*w0^8*b^4*c*d^4*sqrt3 -672*w0^9*a*b^7*d^2 +129696*w0^5*a*b*c^2*d^2 -1403248*w0^5*a*b^5 -51744*w0^7*a*b^3*d^4 -672*w0^9*a*b^3*d^6 +1226624*w0^6*a*b*c^4*d*sqrt3 -56448*w0^7*a*b^5*d^2 -4032*w0^9*a^3*b^3*c^2*d^2 +953216*w0^6*b^2*c*d^4*sqrt3 -170133.3333333*w0^4*c^3*d^2*sqrt3 -94080*w0^7*a^3*b^3*c^2 +958496*w0^6*b^4*c*d^2*sqrt3 -2016*w0^9*a^3*b^3*c^4 -162976*w0^5*a*b^3*c^2 -672*w0^9*a^7*b*d^2 -2016*w0^9*a^5*b^3*d^2 -42336*w0^7*a^5*b^3 +1760*w0^8*a^2*c^5*d^2*sqrt3 +293813.3333333*w0^6*a^4*c^3*sqrt3 +5280*w0^8*a^4*c*d^4*sqrt3 +4693.3333333*w0^8*c^3*d^6*sqrt3 +5280*w0^8*a^2*c*d^6*sqrt3 -672*w0^9*a^7*b*c^2 -2016*w0^9*a^3*b*c^4*d^2 +1226624*w0^6*a^3*b*c^2*d*sqrt3 -672*w0^9*a^3*b^7 -8800*w0^6*c^3*d^4*sqrt3 -37632*w0^7*a^5*b*d^2 -1760*w0^8*a^4*c^5*sqrt3 +635477.3333333*w0^6*b^2*c^3*d^2*sqrt3 -672*w0^9*a^7*b^3 -586.6666667*w0^8*a^6*c^3*sqrt3 +1760*w0^8*a^6*c*d^2*sqrt3 -586.6666667*w0^8*c^9*sqrt3 -42602933.3333333*w0^4*a^2*c*d^2*sqrt3 +1760*w0^8*b^6*c*d^2*sqrt3 -168*w0^9*a*b*c^8 -15680*w0^7*a*b*d^6 +64848*w0^5*a*b*d^4 +8644778.6666667*w0^5*c^5*d -255200*w0^4*c*d^4*sqrt3 -42336*w0^7*a^3*b*d^4 -47040*w0^7*a*b*c^2*d^4 -5280*w0^6*c*d^6*sqrt3 -3520*w0^8*a^2*b^2*c^5*sqrt3 -19762275.5555556*w0^4*a*b*d^3*sqrt3 -37632*w0^7*a^5*b*c^2 -408874.6666667*w0^6*a*b^3*d^3*sqrt3 -1008*w0^9*a*b*c^4*d^4 -964208*w0^5*a^5*b -672*w0^9*a*b*c^6*d^2 -47040*w0^7*a*b*c^4*d^2 +1158840636.44444*w0^3*a^3*b -15442435.5555556*w0^4*b^2*c^3*sqrt3 -886720*w0^6*a^2*c*d^4*sqrt3 -1008*w0^9*a^5*b*d^4 -1008*w0^9*a*b^5*c^4 -2016*w0^9*a^3*b*c^2*d^4 +77056*w0^6*a^2*b^2*c*d^2*sqrt3 -2016*w0^9*a*b^5*c^2*d^2 +8800*w0^8*b^2*c^3*d^4*sqrt3 +8800*w0^8*a^2*c^3*d^4*sqrt3 -36630222.2222222*w0^3*a*b*c^2 +295573.3333333*w0^6*a^2*c^5*sqrt3 -56448*w0^7*a*b^5*c^2 +3520*w0^8*b^4*c^3*d^2*sqrt3 +1760*w0^8*c*d^8*sqrt3 -103488*w0^7*a*b^3*c^2*d^2 -1760*w0^8*a^2*c^7*sqrt3 -2016*w0^9*a^3*b^5*d^2 -2016*w0^9*a*b^3*c^2*d^4 -586.6666667*w0^8*b^6*c^3*sqrt3 -162976*w0^5*a*b^3*d^2 +1760*w0^6*c^7*sqrt3 -319498.6666667*w0^6*b^4*c^3*sqrt3 -66241728.3950617*w0^2*c^3*sqrt3 +817749.3333333*w0^6*a*b*c^2*d^3*sqrt3 -168*w0^9*a*b^9 -28815928.8888889*w0^5*c^3*d^3 -1008*w0^9*a*b^5*d^4 -51744*w0^7*a^3*b^5 +59286826.6666667*w0^4*a*b*c^2*d*sqrt3 -672*w0^9*a^3*b*c^6 -1008*w0^9*a^5*b^5 -2030880*w0^5*a^3*b*c^2 -591146.6666667*w0^6*a^2*c^3*d^2*sqrt3 -1232101080.88889*w0^3*a*b^3 -2016*w0^9*a^3*b^3*d^4 +1760*w0^8*b^2*c^5*d^2*sqrt3 +3520*w0^8*a^4*c^3*d^2*sqrt3 +64848*w0^5*a*b*c^4 -916845740.740741*w0*a*b +1226624*w0^6*a*b^3*c^2*d*sqrt3 -2016*w0^9*a*b^3*c^4*d^2 -2016*w0^9*a^3*b^5*c^2 -317738.6666667*w0^6*b^2*c^5*sqrt3 -168*w0^9*a*b*d^8 +7040*w0^8*a^2*b^2*c^3*d^2*sqrt3 -36630222.2222222*w0^3*a*b*d^2 +3520*w0^8*c^5*d^4*sqrt3 -1760*w0^8*b^2*c^7*sqrt3 +5280*w0^8*a^2*b^4*c*d^2*sqrt3 -1760*w0^8*a^2*b^4*c^3*sqrt3 +46327306.6666667*w0^4*b^2*c*d^2*sqrt3 -51744*w0^7*a*b^3*c^4 +8644778.6666667*w0^5*c*d^5 -10976*w0^7*a^7*b -94080*w0^7*a^3*b^3*d^2 -2030880*w0^5*a^3*b*d^2 -2016*w0^9*a^5*b*c^2*d^2 +10560*w0^8*a^2*b^2*c*d^4*sqrt3 -1760*w0^8*b^4*c^5*sqrt3 -42336*w0^7*a^3*b*c^4 -1760*w0^6*c^5*d^2*sqrt3"</span></span></code></pre>
+      </div>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Tue, 04 Jul 2023 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/expandPolynomialWithSpray.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>3D alpha wrapping with R</title>
       <link>https://laustep.github.io/stlahblog/posts/alphaWrapping.html</link>
@@ -796,164 +954,6 @@
 ]]></description>
       <pubDate>Sat, 29 Apr 2023 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/fisheye.html</guid>
-      <dc:creator>Stéphane Laurent</dc:creator>
-      <category>R</category>
-    </item>
-    <item>
-      <title>Fast expansion of a polynomial with R</title>
-      <link>https://laustep.github.io/stlahblog/posts/expandPolynomialWithSpray.html</link>
-      <description><![CDATA[<div class="container-fluid">
-  <div class="main col-sm-12">
-    <div class="content">
-      <p>
-        In
-        <a href="https://laustep.github.io/stlahblog/posts/caracas01.html"
-          >this previous post</a
-        >,
-        <a href="https://laustep.github.io/stlahblog/posts/caracas02.html"
-          >this previous post</a
-        >, and
-        <a
-          href="https://laustep.github.io/stlahblog/posts/juliaPolynomialExpansion.html"
-          >this previous post</a
-        >, I showed how to expand a polynomial with symbolic parameters. In the
-        first two posts, I used the R package <strong>caracas</strong>, a
-        wrapper of <strong>SymPy</strong>, and in the third post I used Julia.
-      </p>
-      <p>
-        Now I’ve found a pure R solution, with the help of the
-        <strong>spray</strong> package, and it is very fast. That’s what I’m
-        going to demonstrate here, with the same example I treated with Julia.
-      </p>
-      <p>
-        We will lost something as compared to Julia: the
-        <strong>spray</strong> package does not handle rational numbers, so we
-        will replace them by their double approximation. We could use the
-        <strong>qspray</strong> package instead, to deal with the rational
-        numbers.
-      </p>
-      <p>Here is the starting polynomial expression:</p>
-      <div class="sourceCode" id="cb1">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb1-1"><span class="co"># define the polynomial expression as a function</span></span>
-<span id="cb1-2">f &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, z, w, sqrt3) {</span>
-<span id="cb1-3">  ((x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span><span class="op">+</span>z<span class="op">^</span><span class="dv">2</span><span class="op">+</span>w<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">145</span><span class="op">/</span><span class="dv">3</span>)<span class="op">^</span><span class="dv">2-4</span><span class="op">*</span>(<span class="dv">9</span><span class="op">*</span>z<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">16</span><span class="op">*</span>w<span class="op">^</span><span class="dv">2</span>))<span class="op">^</span><span class="dv">2</span> <span class="op">*</span><span class="st"> </span></span>
-<span id="cb1-4"><span class="st">    </span>((x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span><span class="op">+</span>z<span class="op">^</span><span class="dv">2</span><span class="op">+</span>w<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">145</span><span class="op">/</span><span class="dv">3</span>)<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">296</span><span class="op">*</span>(x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span>)<span class="op">-</span><span class="dv">4</span><span class="op">*</span>(<span class="dv">9</span><span class="op">*</span>z<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">16</span><span class="op">*</span>w<span class="op">^</span><span class="dv">2</span>)) <span class="op">-</span><span class="st"> </span></span>
-<span id="cb1-5"><span class="st">    </span><span class="dv">16</span><span class="op">*</span>(x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span>)<span class="op">*</span>(x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span><span class="op">+</span>z<span class="op">^</span><span class="dv">2</span><span class="op">+</span>w<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">145</span><span class="op">/</span><span class="dv">3</span>)<span class="op">^</span><span class="dv">2</span> <span class="op">*</span><span class="st"> </span></span>
-<span id="cb1-6"><span class="st">    </span>(<span class="dv">37</span><span class="op">*</span>(x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span><span class="op">+</span>z<span class="op">^</span><span class="dv">2</span><span class="op">+</span>w<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">145</span><span class="op">/</span><span class="dv">3</span>)<span class="op">^</span><span class="dv">2-1369</span><span class="op">*</span>(x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span>)<span class="op">-</span><span class="dv">7</span><span class="op">*</span>(<span class="dv">225</span><span class="op">*</span>z<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">448</span><span class="op">*</span>w<span class="op">^</span><span class="dv">2</span>)) <span class="op">-</span><span class="st"> </span></span>
-<span id="cb1-7"><span class="st">    </span>sqrt3<span class="op">*</span><span class="dv">16</span><span class="op">/</span><span class="dv">9</span><span class="op">*</span>(x<span class="op">^</span><span class="dv">3-3</span><span class="op">*</span>x<span class="op">*</span>y<span class="op">^</span><span class="dv">2</span>) <span class="op">*</span><span class="st"> </span></span>
-<span id="cb1-8"><span class="st">    </span>(<span class="dv">110</span><span class="op">*</span>(x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span><span class="op">+</span>z<span class="op">^</span><span class="dv">2</span><span class="op">+</span>w<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">145</span><span class="op">/</span><span class="dv">3</span>)<span class="op">^</span><span class="dv">3-148</span><span class="op">*</span>(x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span><span class="op">+</span>z<span class="op">^</span><span class="dv">2</span><span class="op">+</span>w<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">145</span><span class="op">/</span><span class="dv">3</span>) <span class="op">*</span><span class="st"> </span></span>
-<span id="cb1-9"><span class="st">       </span>(<span class="dv">110</span><span class="op">*</span>x<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">110</span><span class="op">*</span>y<span class="op">^</span><span class="dv">2-297</span><span class="op">*</span>z<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">480</span><span class="op">*</span>w<span class="op">^</span><span class="dv">2</span>)) <span class="op">-</span><span class="st"> </span></span>
-<span id="cb1-10"><span class="st">    </span><span class="dv">64</span><span class="op">*</span>(x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span>)<span class="op">*</span>(<span class="dv">3</span><span class="op">*</span>(<span class="dv">729</span><span class="op">*</span>z<span class="op">^</span><span class="dv">4</span><span class="op">+</span><span class="dv">4096</span><span class="op">*</span>w<span class="op">^</span><span class="dv">4</span>)<span class="op">+</span><span class="dv">168</span><span class="op">*</span>(x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span>)<span class="op">*</span>(<span class="dv">15</span><span class="op">*</span>z<span class="op">^</span><span class="dv">2-22</span><span class="op">*</span>w<span class="op">^</span><span class="dv">2</span>)) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb1-11"><span class="st">    </span><span class="dv">64</span><span class="op">*</span>(<span class="dv">12100</span><span class="op">/</span><span class="dv">27</span><span class="op">*</span>(x<span class="op">^</span><span class="dv">3-3</span><span class="op">*</span>x<span class="op">*</span>y<span class="op">^</span><span class="dv">2</span>)<span class="op">^</span><span class="dv">2-7056</span><span class="op">*</span>(<span class="dv">3</span><span class="op">*</span>x<span class="op">^</span><span class="dv">2</span><span class="op">*</span>y<span class="op">-</span>y<span class="op">^</span><span class="dv">3</span>)<span class="op">^</span><span class="dv">2</span>)<span class="op">-</span><span class="dv">592240896</span><span class="op">*</span>z<span class="op">^</span><span class="dv">2</span><span class="op">*</span>w<span class="op">^</span><span class="dv">2</span></span>
-<span id="cb1-12">}</span></code></pre>
-      </div>
-      <p>We transform it to the polynomial of interest:</p>
-      <div class="sourceCode" id="cb2">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb2-1"><span class="co"># there are 3 variables (x,y,z) and 6 parameters (w0,a,b,c,d,sqrt3)</span></span>
-<span id="cb2-2"><span class="kw">library</span>(spray)</span>
-<span id="cb2-3">x     &lt;-<span class="st"> </span><span class="kw">lone</span>(<span class="dv">1</span>, <span class="dv">9</span>)</span>
-<span id="cb2-4">y     &lt;-<span class="st"> </span><span class="kw">lone</span>(<span class="dv">2</span>, <span class="dv">9</span>)</span>
-<span id="cb2-5">z     &lt;-<span class="st"> </span><span class="kw">lone</span>(<span class="dv">3</span>, <span class="dv">9</span>)</span>
-<span id="cb2-6">w0    &lt;-<span class="st"> </span><span class="kw">lone</span>(<span class="dv">4</span>, <span class="dv">9</span>)</span>
-<span id="cb2-7">a     &lt;-<span class="st"> </span><span class="kw">lone</span>(<span class="dv">5</span>, <span class="dv">9</span>)</span>
-<span id="cb2-8">b     &lt;-<span class="st"> </span><span class="kw">lone</span>(<span class="dv">6</span>, <span class="dv">9</span>)</span>
-<span id="cb2-9">c     &lt;-<span class="st"> </span><span class="kw">lone</span>(<span class="dv">7</span>, <span class="dv">9</span>)</span>
-<span id="cb2-10">d     &lt;-<span class="st"> </span><span class="kw">lone</span>(<span class="dv">8</span>, <span class="dv">9</span>)</span>
-<span id="cb2-11">sqrt3 &lt;-<span class="st"> </span><span class="kw">lone</span>(<span class="dv">9</span>, <span class="dv">9</span>)</span>
-<span id="cb2-12"></span>
-<span id="cb2-13"><span class="co"># define the substitutions</span></span>
-<span id="cb2-14">X &lt;-<span class="st"> </span>a<span class="op">*</span>x  <span class="op">-</span><span class="st"> </span>b<span class="op">*</span>y  <span class="op">-</span><span class="st"> </span>c<span class="op">*</span>z  <span class="op">-</span><span class="st"> </span>d<span class="op">*</span>w0</span>
-<span id="cb2-15">Y &lt;-<span class="st"> </span>a<span class="op">*</span>y  <span class="op">+</span><span class="st"> </span>b<span class="op">*</span>x  <span class="op">+</span><span class="st"> </span>c<span class="op">*</span>w0 <span class="op">-</span><span class="st"> </span>d<span class="op">*</span>z</span>
-<span id="cb2-16">Z &lt;-<span class="st"> </span>a<span class="op">*</span>z  <span class="op">-</span><span class="st"> </span>b<span class="op">*</span>w0 <span class="op">+</span><span class="st"> </span>c<span class="op">*</span>x  <span class="op">+</span><span class="st"> </span>d<span class="op">*</span>y</span>
-<span id="cb2-17">W &lt;-<span class="st"> </span>a<span class="op">*</span>w0 <span class="op">+</span><span class="st"> </span>b<span class="op">*</span>z  <span class="op">-</span><span class="st"> </span>c<span class="op">*</span>y  <span class="op">+</span><span class="st"> </span>d<span class="op">*</span>x</span>
-<span id="cb2-18"></span>
-<span id="cb2-19"><span class="co"># here is the polynomial of interest</span></span>
-<span id="cb2-20">P &lt;-<span class="st"> </span><span class="kw">f</span>(X, Y, Z, W, sqrt3)</span></code></pre>
-      </div>
-      <p>Now we take the “xyz” part of each term:</p>
-      <div class="sourceCode" id="cb3">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb3-1"><span class="co"># the exponents of x, y, z</span></span>
-<span id="cb3-2">xyz_powers &lt;-<span class="st"> </span>P[[<span class="st">"index"</span>]][, <span class="kw">c</span>(1L, 2L, 3L)]</span>
-<span id="cb3-3"></span>
-<span id="cb3-4"><span class="co"># the "keys" xyz(i,j,k) for POV-Ray</span></span>
-<span id="cb3-5">xyz_povray &lt;-<span class="st"> </span><span class="kw">apply</span>(xyz_powers, 1L, <span class="cf">function</span>(comp) {</span>
-<span id="cb3-6">  <span class="kw">sprintf</span>(<span class="st">"xyz(%s): "</span>, <span class="kw">toString</span>(comp))</span>
-<span id="cb3-7">})</span></code></pre>
-      </div>
-      <p>Now we take the remaining part of each term:</p>
-      <div class="sourceCode" id="cb4">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb4-1"><span class="co"># the other exponents, those of w0, a, b, c, d, sqrt3</span></span>
-<span id="cb4-2">other_powers &lt;-<span class="st"> </span>P[[<span class="st">"index"</span>]][, <span class="kw">c</span>(4L, 5L, 6L, 7L, 8L, 9L)]</span>
-<span id="cb4-3"></span>
-<span id="cb4-4"><span class="co"># the polynomials in w0, a, b, c, d, sqrt3</span></span>
-<span id="cb4-5">nterms &lt;-<span class="st"> </span><span class="kw">length</span>(P)</span>
-<span id="cb4-6">coeffs &lt;-<span class="st"> </span>P[[<span class="st">"value"</span>]]</span>
-<span id="cb4-7">polynomials &lt;-<span class="st"> </span><span class="kw">lapply</span>(1L<span class="op">:</span>nterms, <span class="cf">function</span>(i) {</span>
-<span id="cb4-8">  <span class="kw">spray</span>(other_powers[i, ], coeffs[i])</span>
-<span id="cb4-9">})</span></code></pre>
-      </div>
-      <p>
-        And we group these polynomials, putting together those which share the
-        same “xyz” part:
-      </p>
-      <div class="sourceCode" id="cb5">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb5-1"><span class="co"># group the polynomials which have the same x,y,z exponents</span></span>
-<span id="cb5-2">polynomials_groups &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="kw">split</span>(polynomials, xyz_povray), <span class="cf">function</span>(polys) {</span>
-<span id="cb5-3">  polysum &lt;-<span class="st"> </span>polys[[<span class="dv">1</span>]]</span>
-<span id="cb5-4">  <span class="cf">for</span>(poly <span class="cf">in</span> polys[<span class="op">-</span><span class="dv">1</span>]) {</span>
-<span id="cb5-5">    polysum &lt;-<span class="st"> </span><span class="kw">spray_add</span>(</span>
-<span id="cb5-6">      polysum<span class="op">$</span>index, polysum<span class="op">$</span>value, poly<span class="op">$</span>index, poly<span class="op">$</span>value</span>
-<span id="cb5-7">    )</span>
-<span id="cb5-8">  }</span>
-<span id="cb5-9">  <span class="kw">as.spray</span>(polysum)</span>
-<span id="cb5-10">}, <span class="dt">simplify =</span> <span class="ot">FALSE</span>)</span>
-<span id="cb5-11"><span class="co"># remove the empty polynomials, if there are some</span></span>
-<span id="cb5-12">polynomials_groups &lt;-<span class="st"> </span><span class="kw">Filter</span>(<span class="kw">Negate</span>(is.empty), polynomials_groups)</span></code></pre>
-      </div>
-      <p>We want these polynomials as character strings:</p>
-      <div class="sourceCode" id="cb6">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb6-1"><span class="co"># there's no as.character function for sprays (polynomials), so we make one</span></span>
-<span id="cb6-2">asCharacter &lt;-<span class="st"> </span><span class="cf">function</span>(poly) {</span>
-<span id="cb6-3">  op &lt;-<span class="st"> </span><span class="kw">options</span>(<span class="dt">sprayvars =</span> <span class="kw">c</span>(<span class="st">"w0"</span>, <span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>, <span class="st">"d"</span>, <span class="st">"sqrt3"</span>))</span>
-<span id="cb6-4">  x &lt;-<span class="st"> </span><span class="kw">capture.output</span>(<span class="kw">print_spray_polyform</span>(poly))</span>
-<span id="cb6-5">  <span class="kw">options</span>(op)</span>
-<span id="cb6-6">  <span class="kw">paste0</span>(x, <span class="dt">collapse =</span> <span class="st">" "</span>)</span>
-<span id="cb6-7">}</span>
-<span id="cb6-8"></span>
-<span id="cb6-9">polynomials_strings &lt;-<span class="st"> </span></span>
-<span id="cb6-10"><span class="st">  </span><span class="kw">sapply</span>(polynomials_groups, asCharacter, <span class="dt">simplify =</span> <span class="ot">FALSE</span>)</span></code></pre>
-      </div>
-      <p>
-        And that’s it. We have everything needed to construct the POV-Ray code:
-      </p>
-      <div class="sourceCode" id="cb7">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb7-1"><span class="kw">head</span>(polynomials_strings, 2L)</span>
-<span id="cb7-2"><span class="co">## $`xyz(0, 0, 0): `</span></span>
-<span id="cb7-3"><span class="co">## [1] "12749128107.8532 +1760*w0^7*c^6*d*sqrt3 -6*w0^10*d^10 +w0^12*b^12 +60*w0^12*b^2*c^4*d^6 +180*w0^12*a^4*b^2*c^2*d^4 +9498*w0^8*b^4*c^4 +44148*w0^8*a^4*b^2*d^2 +180*w0^12*a^4*b^2*c^4*d^2 +1068*w0^10*a^4*c^4*d^2 +30*w0^12*a^2*c^8*d^2 +2196*w0^10*a^4*b^2*d^4 +2519250.2222222*w0^6*a^2*b^4 +10209.6666667*w0^8*a^8 +6*w0^12*a^10*d^2 -12537.3333333*w0^8*a^2*d^6 +31964*w0^8*b^6*d^2 +2076*w0^10*b^4*c^4*d^2 +182*w0^10*b^10 +296*w0^10*a^2*c^6*d^2 +w0^12*a^12 +593516.8888889*w0^6*b^4*d^2 +2076*w0^10*b^4*c^2*d^4 -2933.3333333*w0^9*a^2*c^4*d^3*sqrt3 -1345147.5555556*w0^6*a^2*c^2*d^2 -1760*w0^9*a^2*c^6*d*sqrt3 -4697.3333333*w0^8*b^2*c^6 +18996*w0^8*b^4*c^2*d^2 -14022*w0^8*a^4*c^4 +386*w0^10*a^8*d^2 +6*w0^12*a^10*c^2 -317738.6666667*w0^7*b^2*c^4*d*sqrt3 -60*w0^10*c^6*d^4 +15*w0^12*a^4*c^8 +2136*w0^10*b^6*c^2*d^2 +180*w0^12*a^2*b^4*c^4*d^2 +60*w0^12*a^6*b^2*c^4 -6876*w0^8*a^2*b^2*c^4 +67668*w0^8*a^2*b^4*d^2 +60*w0^12*b^4*c^6*d^2 +15*w0^12*a^8*b^4 +30*w0^12*a^8*c^2*d^2 +20*w0^12*a^6*c^6 +632*w0^10*b^2*c^2*d^6 +722*w0^10*b^8*c^2 +67668*w0^8*a^2*b^4*c^2 +120*w0^12*a^6*b^2*c^2*d^2 -28355.5555556*w0^5*d^5*sqrt3 -37612*w0^8*a^2*c^2*d^4 +6*w0^12*a^2*d^10 -1124*w0^8*c^6*d^2 +1105545.7777778*w0^6*a^2*b^2*c^2 +722*w0^10*b^8*d^2 -586.6666667*w0^9*a^6*c^2*d*sqrt3 +6*w0^12*a^10*b^2 +2933.3333333*w0^7*c^4*d^3*sqrt3 -1173.3333333*w0^9*c^4*d^5*sqrt3 -1760*w0^9*a^2*b^4*c^2*d*sqrt3 +6*w0^12*a^2*b^10 +60*w0^12*a^2*b^4*d^6 +3144*w0^10*a^2*b^2*c^2*d^4 +30*w0^12*a^8*b^2*d^2 +30*w0^12*a^2*b^2*d^8 +356*w0^10*a^4*c^6 +1484*w0^10*a^4*b^6 +56711.1111111*w0^5*c^2*d^3*sqrt3 +44148*w0^8*a^4*b^2*c^2 +90*w0^12*a^4*c^4*d^4 +6*w0^12*a^2*c^10 -1124*w0^8*c^2*d^6 -37612*w0^8*a^2*c^4*d^2 +564*w0^10*a^6*c^4 -4733659.2592593*w0^5*a^2*d^3*sqrt3 +2552*w0^10*a^2*b^6*c^2 +15*w0^12*b^8*c^4 +85066.6666667*w0^5*c^4*d*sqrt3 +60*w0^12*a^2*b^6*c^4 +60*w0^12*b^6*c^2*d^4 -3520*w0^9*a^2*b^2*c^4*d*sqrt3 +1173.3333333*w0^9*a^2*b^2*d^5*sqrt3 +15*w0^12*a^4*d^8 +30*w0^12*a^8*b^2*c^2 +18049.6666667*w0^8*b^8 -1409995.5555556*w0^6*b^2*c^2*d^2 +w0^12*c^12 +60*w0^12*b^6*c^4*d^2 -14022*w0^8*a^4*d^4 +w0^12*d^12 +98*w0^10*a^10 +1048*w0^10*a^2*b^2*c^6 +90*w0^12*a^4*b^4*d^4 +60*w0^12*a^6*b^2*d^4 +5147478.5185185*w0^5*b^2*d^3*sqrt3 +31964*w0^8*b^6*c^2 +993249552.469136*w0^2*b^2 -281*w0^8*d^8 +30*w0^12*a^2*b^2*c^8 +90*w0^12*a^4*b^4*c^4 -656447.2222222*w0^4*d^4 +8444*w0^8*a^6*c^2 -211825.7777778*w0^7*b^2*c^2*d^3*sqrt3 +586.6666667*w0^7*c^2*d^5*sqrt3 +15*w0^12*b^4*d^8 +1073624.7407407*w0^6*b^6 -1760*w0^9*a^4*b^2*c^2*d*sqrt3 -66241728.3950617*w0^3*c^2*d*sqrt3 -1760*w0^9*b^2*c^6*d*sqrt3 +20*w0^12*a^6*b^6 -586.6666667*w0^9*b^6*c^2*d*sqrt3 +60*w0^12*b^2*c^6*d^4 +106499.5555556*w0^7*b^4*d^3*sqrt3 -656447.2222222*w0^4*c^4 -586.6666667*w0^9*b^2*c^2*d^5*sqrt3 +30*w0^12*a^2*b^8*c^2 +60*w0^12*a^4*b^6*d^2 -9660598.1481482*w0^4*b^2*d^2 -12537.3333333*w0^8*a^2*c^6 -97937.7777778*w0^7*a^4*d^3*sqrt3 -672573.7777778*w0^6*a^2*c^4 +586.6666667*w0^9*a^4*b^2*d^3*sqrt3 -1312894.4444444*w0^4*c^2*d^2 +3324*w0^10*a^4*b^4*d^2 +60*w0^12*a^4*b^6*c^2 +1880*w0^10*a^6*b^2*d^2 +586.6666667*w0^9*a^2*b^4*d^3*sqrt3 +5400*w0^10*a^2*b^4*c^2*d^2 +1048*w0^10*a^2*b^2*d^6 +23850915.7407407*w0^4*a^4 +60*w0^12*a^2*b^6*d^4 +60*w0^12*a^4*b^2*c^6 +586.6666667*w0^9*a^4*d^5*sqrt3 -27975709.2592593*w0^4*a^2*d^2 -30*w0^10*c^2*d^8 +60*w0^12*a^2*c^6*d^4 -30*w0^10*c^8*d^2 -704997.7777778*w0^6*b^2*d^4 +30*w0^12*a^2*b^8*d^2 +120*w0^12*a^2*b^2*c^6*d^2 +46326.6666667*w0^8*a^6*b^2 +255375.5555556*w0^6*d^6 +1068*w0^10*b^6*d^4 +20*w0^12*c^6*d^6 +60*w0^12*a^6*b^4*d^2 -224889.9259259*w0^6*c^6 +120*w0^12*a^2*b^2*c^2*d^6 +60*w0^12*a^6*b^4*c^2 +62006.6666667*w0^8*a^2*b^6 +8561.7777778*w0^7*a^2*b^2*d^3*sqrt3 +492736.7407407*w0^6*a^6 +60*w0^12*a^2*c^4*d^6 +3647719.5555556*w0^6*c^4*d^2 +60*w0^12*a^4*c^2*d^6 +20*w0^12*b^6*c^6 +15*w0^12*c^4*d^8 +15*w0^12*b^8*d^4 +6*w0^12*c^2*d^10 -14092*w0^8*b^2*c^2*d^4 +586.6666667*w0^9*b^2*d^7*sqrt3 +158*w0^10*b^2*d^8 +2700*w0^10*a^2*b^4*d^4 -32744490.7407408*w0^2*c^2 +586.6666667*w0^9*a^2*d^7*sqrt3 +692*w0^10*b^4*c^6 +90*w0^12*b^4*c^4*d^4 -704997.7777778*w0^6*b^2*c^4 +593516.8888889*w0^6*b^4*c^2 +195.5555556*w0^9*d^9*sqrt3 -25685.3333333*w0^7*a^2*b^2*c^2*d*sqrt3 +45052.8888889*w0^6*a^4*c^2 -6*w0^10*c^10 -319498.6666667*w0^7*b^4*c^2*d*sqrt3 +42166026.8518519*w0^4*b^4 +195.5555556*w0^9*b^6*d^3*sqrt3 +1105545.7777778*w0^6*a^2*b^2*d^2 +293813.3333333*w0^7*a^4*c^2*d*sqrt3 -586.6666667*w0^9*c^8*d*sqrt3 -531718486.740741*w0^4*a^2*b^2 +120*w0^12*a^2*b^6*c^2*d^2 -2933.3333333*w0^9*b^2*c^4*d^3*sqrt3 +2552*w0^10*a^2*b^6*d^2 +296*w0^10*a^2*c^2*d^6 +2700*w0^10*a^2*b^4*c^4 -32744490.7407408*w0^2*d^2 +6*w0^12*b^2*d^10 +444*w0^10*a^2*c^4*d^4 +3144*w0^10*a^2*b^2*c^4*d^2 +105912.8888889*w0^7*b^2*d^5*sqrt3 +195.5555556*w0^9*a^6*d^3*sqrt3 -3556262.6666667*w0^6*c^2*d^4 +180*w0^12*a^4*b^4*c^2*d^2 -4697.3333333*w0^8*b^2*d^6 +2196*w0^10*a^4*b^2*c^4 -15442435.5555556*w0^5*b^2*c^2*d*sqrt3 +6*w0^12*b^2*c^10 -60*w0^10*c^4*d^6 +158*w0^10*b^2*c^8 -1564.4444444*w0^9*c^6*d^3*sqrt3 +1880*w0^10*a^6*b^2*c^2 +295573.3333333*w0^7*a^2*c^4*d*sqrt3 +632*w0^10*b^2*c^6*d^2 +6*w0^12*b^10*d^2 +6*w0^12*b^10*c^2 +1068*w0^10*b^6*c^4 +60*w0^12*b^4*c^2*d^6 -1173.3333333*w0^9*a^4*c^2*d^3*sqrt3 +14200977.7777778*w0^5*a^2*c^2*d*sqrt3 +8444*w0^8*a^6*d^2 +564*w0^10*a^6*d^4 +15*w0^12*c^8*d^4 +9498*w0^8*b^4*d^4 +15*w0^12*a^8*d^4 +574*w0^10*a^8*b^2 -27975709.2592593*w0^4*a^2*c^2 +15*w0^12*b^4*c^8 +15*w0^12*a^4*b^8 -9660598.1481482*w0^4*b^2*c^2 +534826682.098766*w0^2*a^2 +60*w0^12*a^2*b^4*c^6 +180*w0^12*a^2*b^2*c^4*d^4 -98524.4444444*w0^7*a^2*d^5*sqrt3 +60*w0^12*a^6*c^2*d^4 +20*w0^12*b^6*d^6 +1960314.2222222*w0^6*a^4*b^2 +586.6666667*w0^9*b^4*d^5*sqrt3 +1068*w0^10*a^4*c^2*d^4 -1173.3333333*w0^9*b^4*c^2*d^3*sqrt3 +80074*w0^8*a^4*b^4 +20*w0^12*a^6*d^6 +74*w0^10*a^2*c^8 -14092*w0^8*b^2*c^4*d^2 +948*w0^10*b^2*c^4*d^4 +3324*w0^10*a^4*b^4*c^2 +30*w0^12*b^2*c^8*d^2 -586.6666667*w0^7*d^7*sqrt3 -1760*w0^9*b^4*c^4*d*sqrt3 +30*w0^12*b^2*c^2*d^8 +30*w0^12*a^2*c^2*d^8 -1686*w0^8*c^4*d^4 +15*w0^12*a^8*c^4 +180*w0^12*a^2*b^4*c^2*d^4 +356*w0^10*a^4*d^6 +692*w0^10*b^4*d^6 -6876*w0^8*a^2*b^2*d^4 +74*w0^10*a^2*d^8 -28044*w0^8*a^4*c^2*d^2 +826*w0^10*a^2*b^8 +1316*w0^10*a^6*b^4 +60*w0^12*a^4*b^2*d^6 +30*w0^12*b^8*c^2*d^2 -2346.6666667*w0^9*a^2*b^2*c^2*d^3*sqrt3 +6*w0^12*c^10*d^2 +1128*w0^10*a^6*c^2*d^2 +197048.8888889*w0^7*a^2*c^2*d^3*sqrt3 +60*w0^12*a^4*c^6*d^2 +60*w0^12*a^6*c^4*d^2 -672573.7777778*w0^6*a^2*d^4 +386*w0^10*a^8*c^2 +45052.8888889*w0^6*a^4*d^2 -13752*w0^8*a^2*b^2*c^2*d^2 +4392*w0^10*a^4*b^2*c^2*d^2 +22080576.1316872*w0^3*d^3*sqrt3 -586.6666667*w0^9*a^2*c^2*d^5*sqrt3 -1760*w0^9*a^4*c^4*d*sqrt3 -281*w0^8*c^8"</span></span>
-<span id="cb7-4"><span class="co">## </span></span>
-<span id="cb7-5"><span class="co">## $`xyz(0, 0, 1): `</span></span>
-<span id="cb7-6"><span class="co">## [1] "-20384*w0^7*a*b^7 -672*w0^9*a*b^7*c^2 -672*w0^9*a*b^3*c^6 -408874.6666667*w0^6*a^3*b*d^3*sqrt3 -25685.3333333*w0^6*a^2*b^2*c^3*sqrt3 -15680*w0^7*a*b*c^6 +5280*w0^8*a^4*b^2*c*d^2*sqrt3 -84672*w0^7*a^3*b*c^2*d^2 -2235744*w0^5*a^3*b^3 +85066.6666667*w0^4*c^5*sqrt3 -1760*w0^8*a^4*b^2*c^3*sqrt3 -408874.6666667*w0^6*a*b*d^5*sqrt3 -672*w0^9*a*b*c^2*d^6 +5280*w0^8*b^2*c*d^6*sqrt3 -1008*w0^9*a^5*b*c^4 -168*w0^9*a^9*b -881440*w0^6*a^4*c*d^2*sqrt3 +14200977.7777778*w0^4*a^2*c^3*sqrt3 +198725185.185185*w0^2*c*d^2*sqrt3 -2016*w0^9*a^5*b^3*c^2 -672*w0^9*a^3*b*d^6 +5280*w0^8*b^4*c*d^4*sqrt3 -672*w0^9*a*b^7*d^2 +129696*w0^5*a*b*c^2*d^2 -1403248*w0^5*a*b^5 -51744*w0^7*a*b^3*d^4 -672*w0^9*a*b^3*d^6 +1226624*w0^6*a*b*c^4*d*sqrt3 -56448*w0^7*a*b^5*d^2 -4032*w0^9*a^3*b^3*c^2*d^2 +953216*w0^6*b^2*c*d^4*sqrt3 -170133.3333333*w0^4*c^3*d^2*sqrt3 -94080*w0^7*a^3*b^3*c^2 +958496*w0^6*b^4*c*d^2*sqrt3 -2016*w0^9*a^3*b^3*c^4 -162976*w0^5*a*b^3*c^2 -672*w0^9*a^7*b*d^2 -2016*w0^9*a^5*b^3*d^2 -42336*w0^7*a^5*b^3 +1760*w0^8*a^2*c^5*d^2*sqrt3 +293813.3333333*w0^6*a^4*c^3*sqrt3 +5280*w0^8*a^4*c*d^4*sqrt3 +4693.3333333*w0^8*c^3*d^6*sqrt3 +5280*w0^8*a^2*c*d^6*sqrt3 -672*w0^9*a^7*b*c^2 -2016*w0^9*a^3*b*c^4*d^2 +1226624*w0^6*a^3*b*c^2*d*sqrt3 -672*w0^9*a^3*b^7 -8800*w0^6*c^3*d^4*sqrt3 -37632*w0^7*a^5*b*d^2 -1760*w0^8*a^4*c^5*sqrt3 +635477.3333333*w0^6*b^2*c^3*d^2*sqrt3 -672*w0^9*a^7*b^3 -586.6666667*w0^8*a^6*c^3*sqrt3 +1760*w0^8*a^6*c*d^2*sqrt3 -586.6666667*w0^8*c^9*sqrt3 -42602933.3333333*w0^4*a^2*c*d^2*sqrt3 +1760*w0^8*b^6*c*d^2*sqrt3 -168*w0^9*a*b*c^8 -15680*w0^7*a*b*d^6 +64848*w0^5*a*b*d^4 +8644778.6666667*w0^5*c^5*d -255200*w0^4*c*d^4*sqrt3 -42336*w0^7*a^3*b*d^4 -47040*w0^7*a*b*c^2*d^4 -5280*w0^6*c*d^6*sqrt3 -3520*w0^8*a^2*b^2*c^5*sqrt3 -19762275.5555556*w0^4*a*b*d^3*sqrt3 -37632*w0^7*a^5*b*c^2 -408874.6666667*w0^6*a*b^3*d^3*sqrt3 -1008*w0^9*a*b*c^4*d^4 -964208*w0^5*a^5*b -672*w0^9*a*b*c^6*d^2 -47040*w0^7*a*b*c^4*d^2 +1158840636.44444*w0^3*a^3*b -15442435.5555556*w0^4*b^2*c^3*sqrt3 -886720*w0^6*a^2*c*d^4*sqrt3 -1008*w0^9*a^5*b*d^4 -1008*w0^9*a*b^5*c^4 -2016*w0^9*a^3*b*c^2*d^4 +77056*w0^6*a^2*b^2*c*d^2*sqrt3 -2016*w0^9*a*b^5*c^2*d^2 +8800*w0^8*b^2*c^3*d^4*sqrt3 +8800*w0^8*a^2*c^3*d^4*sqrt3 -36630222.2222222*w0^3*a*b*c^2 +295573.3333333*w0^6*a^2*c^5*sqrt3 -56448*w0^7*a*b^5*c^2 +3520*w0^8*b^4*c^3*d^2*sqrt3 +1760*w0^8*c*d^8*sqrt3 -103488*w0^7*a*b^3*c^2*d^2 -1760*w0^8*a^2*c^7*sqrt3 -2016*w0^9*a^3*b^5*d^2 -2016*w0^9*a*b^3*c^2*d^4 -586.6666667*w0^8*b^6*c^3*sqrt3 -162976*w0^5*a*b^3*d^2 +1760*w0^6*c^7*sqrt3 -319498.6666667*w0^6*b^4*c^3*sqrt3 -66241728.3950617*w0^2*c^3*sqrt3 +817749.3333333*w0^6*a*b*c^2*d^3*sqrt3 -168*w0^9*a*b^9 -28815928.8888889*w0^5*c^3*d^3 -1008*w0^9*a*b^5*d^4 -51744*w0^7*a^3*b^5 +59286826.6666667*w0^4*a*b*c^2*d*sqrt3 -672*w0^9*a^3*b*c^6 -1008*w0^9*a^5*b^5 -2030880*w0^5*a^3*b*c^2 -591146.6666667*w0^6*a^2*c^3*d^2*sqrt3 -1232101080.88889*w0^3*a*b^3 -2016*w0^9*a^3*b^3*d^4 +1760*w0^8*b^2*c^5*d^2*sqrt3 +3520*w0^8*a^4*c^3*d^2*sqrt3 +64848*w0^5*a*b*c^4 -916845740.740741*w0*a*b +1226624*w0^6*a*b^3*c^2*d*sqrt3 -2016*w0^9*a*b^3*c^4*d^2 -2016*w0^9*a^3*b^5*c^2 -317738.6666667*w0^6*b^2*c^5*sqrt3 -168*w0^9*a*b*d^8 +7040*w0^8*a^2*b^2*c^3*d^2*sqrt3 -36630222.2222222*w0^3*a*b*d^2 +3520*w0^8*c^5*d^4*sqrt3 -1760*w0^8*b^2*c^7*sqrt3 +5280*w0^8*a^2*b^4*c*d^2*sqrt3 -1760*w0^8*a^2*b^4*c^3*sqrt3 +46327306.6666667*w0^4*b^2*c*d^2*sqrt3 -51744*w0^7*a*b^3*c^4 +8644778.6666667*w0^5*c*d^5 -10976*w0^7*a^7*b -94080*w0^7*a^3*b^3*d^2 -2030880*w0^5*a^3*b*d^2 -2016*w0^9*a^5*b*c^2*d^2 +10560*w0^8*a^2*b^2*c*d^4*sqrt3 -1760*w0^8*b^4*c^5*sqrt3 -42336*w0^7*a^3*b*c^4 -1760*w0^6*c^5*d^2*sqrt3"</span></span></code></pre>
-      </div>
-    </div>
-  </div>
-</div>
-]]></description>
-      <pubDate>Sat, 29 Apr 2023 00:00:00 UT</pubDate>
-      <guid>https://laustep.github.io/stlahblog/posts/expandPolynomialWithSpray.html</guid>
       <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
