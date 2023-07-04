@@ -5,7 +5,195 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Tue, 04 Jul 2023 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Wed, 05 Jul 2023 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>Fast expansion of a polynomial with R - part 2</title>
+      <link>https://laustep.github.io/stlahblog/posts/expandPolynomialWithRyacasSpray.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        In
+        <a
+          href="https://laustep.github.io/stlahblog/posts/expandPolynomialWithSpray.html"
+          >the previous post</a
+        >, I showed how to expand a polynomial with symbolic parameters with the
+        help of the <strong>spray</strong> package. As I said, it has one
+        problem: it doesn’t preserve the rational numbers in the polynomial
+        expression.
+      </p>
+      <p>
+        I’m going to provide a solution here which overcomes this problem, with
+        the help of the <strong>Ryacas</strong> package. In fact I provide a
+        solution with the packages <strong>Ryacas</strong> and
+        <strong>partitions</strong>, and then I improve it with the help of the
+        <strong>spray</strong> package.
+      </p>
+      <p>Here is the polynomial expression I use for the illustration:</p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1">expr &lt;-<span class="st"> "((x*x+y*y+1)*(a*x*x+b*y*y)+z*z*(b*x*x+a*y*y)-2*(a-b)*x*y*z-a*b*(x*x+y*y))^2-4*(x*x+y*y)*(a*x*x+b*y*y-x*y*z*(a-b))^2"</span></span></code></pre>
+      </div>
+      <p>
+        In fact, the equation <code>expr(x,y,z) = 0</code> defines a solid
+        Möbius strip. That is why I was interested in this expression, because I
+        wanted to draw the solid Möbius strip with POV-Ray. It is nice, in spite
+        of a sad artifact (please leave a comment if you know how to get rid of
+        it):
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/SolidMobiusStrip_POV.gif"
+        />
+      </p>
+      <p>
+        Let’s assign this expression to Yacas and let’s have a look at the
+        degrees of the three variables <code>x</code>, <code>y</code> and
+        <code>z</code>:
+      </p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1"><span class="kw">library</span>(Ryacas)</span>
+<span id="cb2-2"><span class="kw">yac_assign</span>(expr, <span class="st">"POLY"</span>)</span>
+<span id="cb2-3"><span class="kw">yac_str</span>(<span class="st">"Degree(POLY, x)"</span>)</span>
+<span id="cb2-4"><span class="co">## [1] "8"</span></span>
+<span id="cb2-5"><span class="kw">yac_str</span>(<span class="st">"Degree(POLY, y)"</span>)</span>
+<span id="cb2-6"><span class="co">## [1] "8"</span></span>
+<span id="cb2-7"><span class="kw">yac_str</span>(<span class="st">"Degree(POLY, z)"</span>)</span>
+<span id="cb2-8"><span class="co">## [1] "4"</span></span></code></pre>
+      </div>
+      <p>
+        The degrees are 8, 8 and 4 respectively. So we can get all possible
+        combinations <span class="math inline">\((i,j,k)\)</span> of
+        <span class="math inline">\(x^iy^jz^k\)</span> with the
+        <code>blockparts</code> function of the <code>partitions</code> package:
+      </p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb3-1"><span class="kw">library</span>(partitions)</span>
+<span id="cb3-2">combins &lt;-<span class="st"> </span><span class="kw">blockparts</span>(<span class="kw">c</span>(8L, 8L, 4L))</span>
+<span id="cb3-3"><span class="kw">dim</span>(combins)</span>
+<span id="cb3-4"><span class="co">## [1]   3 405</span></span></code></pre>
+      </div>
+      <p>
+        There are <span class="math inline">\(405\)</span> such combinations. Of
+        course they don’t all appear in the polynomial, and that is the point we
+        will improve later. For the moment we will iterate over all these
+        combinations. Here is the function which takes one combination and
+        returns the corresponding coefficient of
+        <span class="math inline">\(x^iy^jz^k\)</span> in terms of
+        <span class="math inline">\(a\)</span> and
+        <span class="math inline">\(b\)</span>, written in POV-Ray syntax:
+      </p>
+      <div class="sourceCode" id="cb4">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb4-1">f &lt;-<span class="st"> </span><span class="cf">function</span>(combin) {</span>
+<span id="cb4-2">  xyz &lt;-<span class="st"> </span><span class="kw">sprintf</span>(<span class="st">"xyz(%s): "</span>, <span class="kw">toString</span>(combin))</span>
+<span id="cb4-3">  coef &lt;-<span class="st"> </span><span class="kw">yac_str</span>(<span class="kw">sprintf</span>(</span>
+<span id="cb4-4">    <span class="st">"ExpandBrackets(Coef(Coef(Coef(POLY, x, %d), y, %d), z, %d))"</span>,</span>
+<span id="cb4-5">    combin[1L], combin[2L], combin[3L]</span>
+<span id="cb4-6">  ))</span>
+<span id="cb4-7">  <span class="cf">if</span>(coef <span class="op">==</span><span class="st"> "0"</span>) <span class="kw">return</span>(<span class="ot">NULL</span>)</span>
+<span id="cb4-8">  coef &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">"([ab])</span><span class="ch">\\</span><span class="st">^(</span><span class="ch">\\</span><span class="st">d+)"</span>, <span class="st">"pow(</span><span class="ch">\\</span><span class="st">1,</span><span class="ch">\\</span><span class="st">2)"</span>, <span class="dt">x =</span> coef)</span>
+<span id="cb4-9">  <span class="kw">paste0</span>(xyz, coef, <span class="st">","</span>)</span>
+<span id="cb4-10">}</span>
+<span id="cb4-11"><span class="co"># for example:</span></span>
+<span id="cb4-12"><span class="kw">f</span>(<span class="kw">c</span>(2L, 6L, 0L))</span>
+<span id="cb4-13"><span class="co">## [1] "xyz(2, 6, 0): 2*pow(b,2)+2*b*a,"</span></span></code></pre>
+      </div>
+      <p>Then we get the POV-Ray code as follows:</p>
+      <div class="sourceCode" id="cb5">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb5-1">povray &lt;-<span class="st"> </span><span class="kw">apply</span>(combins, 2L, f)</span>
+<span id="cb5-2"><span class="kw">cat</span>(povray, <span class="dt">sep =</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>, <span class="dt">file =</span> <span class="st">"SolidMobiusStrip.pov"</span>)</span></code></pre>
+      </div>
+      <p>
+        The file <strong><em>SolidMobiusStrip.pov</em></strong
+        >:
+      </p>
+      <div class="sourceCode" id="cb6">
+        <pre
+          class="sourceCode numberSource povray numberLines"
+        ><code class="sourceCode povray"><span id="cb6-1">xyz(<span class="fl">4</span>, <span class="fl">0</span>, <span class="fl">0</span>): <span class="kw">pow</span>(a,<span class="fl">2</span>)*<span class="kw">pow</span>(b,<span class="fl">2</span>)-<span class="fl">2</span>*<span class="kw">pow</span>(a,<span class="fl">2</span>)*b+<span class="kw">pow</span>(a,<span class="fl">2</span>),</span>
+<span id="cb6-2">xyz(<span class="fl">6</span>, <span class="fl">0</span>, <span class="fl">0</span>): (-<span class="fl">2</span>)*<span class="kw">pow</span>(a,<span class="fl">2</span>)*b<span class="fl">-2</span>*<span class="kw">pow</span>(a,<span class="fl">2</span>),</span>
+<span id="cb6-3">xyz(<span class="fl">8</span>, <span class="fl">0</span>, <span class="fl">0</span>): <span class="kw">pow</span>(a,<span class="fl">2</span>),</span>
+<span id="cb6-4">xyz(<span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">0</span>): <span class="fl">2</span>*<span class="kw">pow</span>(b,<span class="fl">2</span>)*<span class="kw">pow</span>(a,<span class="fl">2</span>)-<span class="fl">2</span>*<span class="kw">pow</span>(b,<span class="fl">2</span>)*a+(-<span class="fl">2</span>)*b*<span class="kw">pow</span>(a,<span class="fl">2</span>)+<span class="fl">2</span>*b*a,</span>
+<span id="cb6-5">xyz(<span class="fl">4</span>, <span class="fl">2</span>, <span class="fl">0</span>): (-<span class="fl">2</span>)*<span class="kw">pow</span>(b,<span class="fl">2</span>)*a+(-<span class="fl">4</span>)*b*<span class="kw">pow</span>(a,<span class="fl">2</span>)-<span class="fl">4</span>*b*a<span class="fl">-2</span>*<span class="kw">pow</span>(a,<span class="fl">2</span>),</span>
+<span id="cb6-6">xyz(<span class="fl">6</span>, <span class="fl">2</span>, <span class="fl">0</span>): <span class="fl">2</span>*<span class="kw">pow</span>(a,<span class="fl">2</span>)+<span class="fl">2</span>*a*b,</span>
+<span id="cb6-7">xyz(<span class="fl">0</span>, <span class="fl">4</span>, <span class="fl">0</span>): <span class="kw">pow</span>(b,<span class="fl">2</span>)*<span class="kw">pow</span>(a,<span class="fl">2</span>)-<span class="fl">2</span>*<span class="kw">pow</span>(b,<span class="fl">2</span>)*a+<span class="kw">pow</span>(b,<span class="fl">2</span>),</span>
+<span id="cb6-8">xyz(<span class="fl">2</span>, <span class="fl">4</span>, <span class="fl">0</span>): (-<span class="fl">4</span>)*<span class="kw">pow</span>(b,<span class="fl">2</span>)*a<span class="fl">-2</span>*<span class="kw">pow</span>(b,<span class="fl">2</span>)+(-<span class="fl">2</span>)*b*<span class="kw">pow</span>(a,<span class="fl">2</span>)-<span class="fl">4</span>*b*a,</span>
+<span id="cb6-9">xyz(<span class="fl">4</span>, <span class="fl">4</span>, <span class="fl">0</span>): <span class="kw">pow</span>(b,<span class="fl">2</span>)+<span class="fl">4</span>*b*a+<span class="kw">pow</span>(a,<span class="fl">2</span>),</span>
+<span id="cb6-10">xyz(<span class="fl">0</span>, <span class="fl">6</span>, <span class="fl">0</span>): (-<span class="fl">2</span>)*<span class="kw">pow</span>(b,<span class="fl">2</span>)*a<span class="fl">-2</span>*<span class="kw">pow</span>(b,<span class="fl">2</span>),</span>
+<span id="cb6-11">xyz(<span class="fl">2</span>, <span class="fl">6</span>, <span class="fl">0</span>): <span class="fl">2</span>*<span class="kw">pow</span>(b,<span class="fl">2</span>)+<span class="fl">2</span>*b*a,</span>
+<span id="cb6-12">xyz(<span class="fl">0</span>, <span class="fl">8</span>, <span class="fl">0</span>): <span class="kw">pow</span>(b,<span class="fl">2</span>),</span>
+<span id="cb6-13">xyz(<span class="fl">3</span>, <span class="fl">1</span>, <span class="fl">1</span>): <span class="fl">4</span>*<span class="kw">pow</span>(a,<span class="fl">2</span>)*b<span class="fl">-4</span>*<span class="kw">pow</span>(a,<span class="fl">2</span>)+(-<span class="fl">4</span>)*a*<span class="kw">pow</span>(b,<span class="fl">2</span>)+<span class="fl">4</span>*a*b,</span>
+<span id="cb6-14">xyz(<span class="fl">5</span>, <span class="fl">1</span>, <span class="fl">1</span>): <span class="fl">4</span>*<span class="kw">pow</span>(a,<span class="fl">2</span>)-<span class="fl">4</span>*a*b,</span>
+<span id="cb6-15">xyz(<span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">1</span>): <span class="fl">4</span>*<span class="kw">pow</span>(a,<span class="fl">2</span>)*b+(-<span class="fl">4</span>)*a*<span class="kw">pow</span>(b,<span class="fl">2</span>)-<span class="fl">4</span>*a*b+<span class="fl">4</span>*<span class="kw">pow</span>(b,<span class="fl">2</span>),</span>
+<span id="cb6-16">xyz(<span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">1</span>): <span class="fl">4</span>*<span class="kw">pow</span>(a,<span class="fl">2</span>)-<span class="fl">4</span>*<span class="kw">pow</span>(b,<span class="fl">2</span>),</span>
+<span id="cb6-17">xyz(<span class="fl">1</span>, <span class="fl">5</span>, <span class="fl">1</span>): <span class="fl">4</span>*a*b<span class="fl">-4</span>*<span class="kw">pow</span>(b,<span class="fl">2</span>),</span>
+<span id="cb6-18">xyz(<span class="fl">4</span>, <span class="fl">0</span>, <span class="fl">2</span>): (-<span class="fl">2</span>)*a*<span class="kw">pow</span>(b,<span class="fl">2</span>)+<span class="fl">2</span>*a*b,</span>
+<span id="cb6-19">xyz(<span class="fl">6</span>, <span class="fl">0</span>, <span class="fl">2</span>): <span class="fl">2</span>*b*a,</span>
+<span id="cb6-20">xyz(<span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">2</span>): (-<span class="fl">2</span>)*<span class="kw">pow</span>(b,<span class="fl">2</span>)*a+<span class="fl">6</span>*<span class="kw">pow</span>(b,<span class="fl">2</span>)+(-<span class="fl">2</span>)*b*<span class="kw">pow</span>(a,<span class="fl">2</span>)-<span class="fl">8</span>*b*a+<span class="fl">6</span>*<span class="kw">pow</span>(a,<span class="fl">2</span>),</span>
+<span id="cb6-21">xyz(<span class="fl">4</span>, <span class="fl">2</span>, <span class="fl">2</span>): (-<span class="fl">2</span>)*<span class="kw">pow</span>(a,<span class="fl">2</span>)+<span class="fl">10</span>*a*b<span class="fl">-2</span>*<span class="kw">pow</span>(b,<span class="fl">2</span>),</span>
+<span id="cb6-22">xyz(<span class="fl">0</span>, <span class="fl">4</span>, <span class="fl">2</span>): (-<span class="fl">2</span>)*b*<span class="kw">pow</span>(a,<span class="fl">2</span>)+<span class="fl">2</span>*b*a,</span>
+<span id="cb6-23">xyz(<span class="fl">2</span>, <span class="fl">4</span>, <span class="fl">2</span>): (-<span class="fl">2</span>)*<span class="kw">pow</span>(a,<span class="fl">2</span>)+<span class="fl">10</span>*a*b<span class="fl">-2</span>*<span class="kw">pow</span>(b,<span class="fl">2</span>),</span>
+<span id="cb6-24">xyz(<span class="fl">0</span>, <span class="fl">6</span>, <span class="fl">2</span>): <span class="fl">2</span>*a*b,</span>
+<span id="cb6-25">xyz(<span class="fl">3</span>, <span class="fl">1</span>, <span class="fl">3</span>): <span class="fl">4</span>*<span class="kw">pow</span>(b,<span class="fl">2</span>)-<span class="fl">4</span>*b*a,</span>
+<span id="cb6-26">xyz(<span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">3</span>): (-<span class="fl">4</span>)*<span class="kw">pow</span>(a,<span class="fl">2</span>)+<span class="fl">4</span>*a*b,</span>
+<span id="cb6-27">xyz(<span class="fl">4</span>, <span class="fl">0</span>, <span class="fl">4</span>): <span class="kw">pow</span>(b,<span class="fl">2</span>),</span>
+<span id="cb6-28">xyz(<span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">4</span>): <span class="fl">2</span>*a*b,</span>
+<span id="cb6-29">xyz(<span class="fl">0</span>, <span class="fl">4</span>, <span class="fl">4</span>): <span class="kw">pow</span>(a,<span class="fl">2</span>)</span></code></pre>
+      </div>
+      <p>
+        Now we will restrict the
+        <span class="math inline">\(405\)</span> combinations. There are only
+        <span class="math inline">\(29\)</span> combinations of exponents in the
+        polynomial expansion. How to get them? With <strong>spray</strong>. We
+        don’t care if there are rational numbers in the polynomial because we
+        will take the exponents only.
+      </p>
+      <div class="sourceCode" id="cb7">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb7-1"><span class="kw">library</span>(spray)</span>
+<span id="cb7-2">x &lt;-<span class="st"> </span><span class="kw">lone</span>(1L, 5L)</span>
+<span id="cb7-3">y &lt;-<span class="st"> </span><span class="kw">lone</span>(2L, 5L)</span>
+<span id="cb7-4">z &lt;-<span class="st"> </span><span class="kw">lone</span>(3L, 5L)</span>
+<span id="cb7-5">a &lt;-<span class="st"> </span><span class="kw">lone</span>(4L, 5L)</span>
+<span id="cb7-6">b &lt;-<span class="st"> </span><span class="kw">lone</span>(5L, 5L)</span>
+<span id="cb7-7">P &lt;-<span class="st"> </span>((x<span class="op">*</span>x<span class="op">+</span>y<span class="op">*</span>y<span class="op">+</span><span class="dv">1</span>)<span class="op">*</span>(a<span class="op">*</span>x<span class="op">*</span>x<span class="op">+</span>b<span class="op">*</span>y<span class="op">*</span>y) <span class="op">+</span><span class="st"> </span>z<span class="op">*</span>z<span class="op">*</span>(b<span class="op">*</span>x<span class="op">*</span>x<span class="op">+</span>a<span class="op">*</span>y<span class="op">*</span>y) <span class="op">-</span><span class="st"> </span></span>
+<span id="cb7-8"><span class="st">        </span><span class="dv">2</span><span class="op">*</span>(a<span class="op">-</span>b)<span class="op">*</span>x<span class="op">*</span>y<span class="op">*</span>z <span class="op">-</span><span class="st"> </span>a<span class="op">*</span>b<span class="op">*</span>(x<span class="op">*</span>x<span class="op">+</span>y<span class="op">*</span>y))<span class="op">^</span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span></span>
+<span id="cb7-9"><span class="st">  </span><span class="dv">4</span><span class="op">*</span>(x<span class="op">*</span>x<span class="op">+</span>y<span class="op">*</span>y)<span class="op">*</span>(a<span class="op">*</span>x<span class="op">*</span>x<span class="op">+</span>b<span class="op">*</span>y<span class="op">*</span>y<span class="op">-</span>x<span class="op">*</span>y<span class="op">*</span>z<span class="op">*</span>(a<span class="op">-</span>b))<span class="op">^</span><span class="dv">2</span></span>
+<span id="cb7-10">exponents &lt;-<span class="st"> </span><span class="kw">index</span>(P)</span>
+<span id="cb7-11">exponents_xyz &lt;-<span class="st"> </span><span class="kw">unique</span>(exponents[, <span class="kw">c</span>(1L, 2L, 3L)])</span>
+<span id="cb7-12"><span class="kw">dim</span>(exponents_xyz)</span>
+<span id="cb7-13"><span class="co">## [1] 29  3</span></span></code></pre>
+      </div>
+      <p>
+        Indeed, there are <span class="math inline">\(29\)</span> combinations.
+        Now we can proceed as before and get the POV-Ray within a couple of
+        seconds:
+      </p>
+      <div class="sourceCode" id="cb8">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb8-1">povray &lt;-<span class="st"> </span><span class="kw">apply</span>(exponents_xyz, 1L, f)</span>
+<span id="cb8-2"><span class="kw">cat</span>(povray, <span class="dt">sep =</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>, <span class="dt">file =</span> <span class="st">"SolidMobiusStrip.pov"</span>)</span></code></pre>
+      </div>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Wed, 05 Jul 2023 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/expandPolynomialWithRyacasSpray.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>Fast expansion of a polynomial with R</title>
       <link>https://laustep.github.io/stlahblog/posts/expandPolynomialWithSpray.html</link>
