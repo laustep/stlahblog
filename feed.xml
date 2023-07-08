@@ -5,7 +5,207 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Wed, 05 Jul 2023 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Sat, 08 Jul 2023 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>The Doyle spiral with R</title>
+      <link>https://laustep.github.io/stlahblog/posts/DoyleSpiral.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        I translated to R the JavaScipt code for the Doyle spiral written by
+        Robin Houston and kindly provided in
+        <a href="https://gist.github.com/robinhouston/6096562">this gist</a>.
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode numberSource r numberLines"
+        ><code class="sourceCode r"><span id="cb1-1"><span class="kw">library</span>(rootSolve) <span class="co"># for the function multiroot</span></span>
+<span id="cb1-2"><span class="kw">library</span>(plotrix)   <span class="co"># for the function draw.circle</span></span>
+<span id="cb1-3"></span>
+<span id="cb1-4">d_ &lt;-<span class="st"> </span><span class="cf">function</span>(z, t, p, q) {</span>
+<span id="cb1-5">  w &lt;-<span class="st"> </span>z<span class="op">^</span>(p<span class="op">/</span>q)</span>
+<span id="cb1-6">  s &lt;-<span class="st"> </span>(p<span class="op">*</span>t <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>pi)<span class="op">/</span>q</span>
+<span id="cb1-7">  (z<span class="op">*</span><span class="kw">cos</span>(t) <span class="op">-</span><span class="st"> </span>w<span class="op">*</span><span class="kw">cos</span>(s))<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>(z<span class="op">*</span><span class="kw">sin</span>(t) <span class="op">-</span><span class="st"> </span>w<span class="op">*</span><span class="kw">sin</span>(s))<span class="op">^</span><span class="dv">2</span></span>
+<span id="cb1-8">}</span>
+<span id="cb1-9"></span>
+<span id="cb1-10">s_ &lt;-<span class="st"> </span><span class="cf">function</span>(z, p, q) {</span>
+<span id="cb1-11">  (z <span class="op">+</span><span class="st"> </span>z<span class="op">^</span>(p<span class="op">/</span>q))<span class="op">^</span><span class="dv">2</span></span>
+<span id="cb1-12">}</span>
+<span id="cb1-13"></span>
+<span id="cb1-14">r_ &lt;-<span class="st"> </span><span class="cf">function</span>(z, t, p, q) {</span>
+<span id="cb1-15"> <span class="kw">d_</span>(z, t, p, q) <span class="op">/</span><span class="st"> </span><span class="kw">s_</span>(z, p, q) </span>
+<span id="cb1-16">}</span>
+<span id="cb1-17"></span>
+<span id="cb1-18">Doyle &lt;-<span class="st"> </span><span class="cf">function</span>(p, q) {</span>
+<span id="cb1-19">  f_ &lt;-<span class="st"> </span><span class="cf">function</span>(z, t) {</span>
+<span id="cb1-20">    <span class="kw">r_</span>(z, t, <span class="dv">0</span>, <span class="dv">1</span>) <span class="op">-</span><span class="st"> </span><span class="kw">r_</span>(z, t, p, q)</span>
+<span id="cb1-21">  }</span>
+<span id="cb1-22">  g_ &lt;-<span class="st"> </span><span class="cf">function</span>(z, t) {</span>
+<span id="cb1-23">    <span class="kw">r_</span>(z, t, <span class="dv">0</span>, <span class="dv">1</span>) <span class="op">-</span><span class="st"> </span><span class="kw">r_</span>(z<span class="op">^</span>(p<span class="op">/</span>q), (p<span class="op">*</span>t <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>pi)<span class="op">/</span>q, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb1-24">  }</span>
+<span id="cb1-25">  model &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="kw">c</span>(<span class="dt">F =</span> <span class="kw">f_</span>(x[<span class="dv">1</span>], x[<span class="dv">2</span>]), </span>
+<span id="cb1-26">                         <span class="dt">G =</span> <span class="kw">g_</span>(x[<span class="dv">1</span>], x[<span class="dv">2</span>]))</span>
+<span id="cb1-27">  ss &lt;-<span class="st"> </span><span class="kw">multiroot</span>(<span class="dt">f =</span> model, <span class="dt">start =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">0</span>), </span>
+<span id="cb1-28">                  <span class="dt">maxiter =</span> <span class="dv">1000</span>, <span class="dt">atol =</span> <span class="fl">1e-6</span>, <span class="dt">rtol =</span> <span class="fl">1e-6</span>)</span>
+<span id="cb1-29">  z &lt;-<span class="st"> </span>ss<span class="op">$</span>root[1L]</span>
+<span id="cb1-30">  t &lt;-<span class="st"> </span>ss<span class="op">$</span>root[2L]</span>
+<span id="cb1-31">  r &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">r_</span>(z, t, <span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb1-32">  a &lt;-<span class="st"> </span><span class="kw">complex</span>(<span class="dt">real =</span> z <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(t), <span class="dt">imaginary =</span> z <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(t))</span>
+<span id="cb1-33">  coroot &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"z"</span> =<span class="st"> </span>z<span class="op">^</span>(p<span class="op">/</span>q), <span class="st">"t"</span> =<span class="st"> </span>(p<span class="op">*</span>t <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>pi)<span class="op">/</span>q)</span>
+<span id="cb1-34">  b &lt;-<span class="st"> </span><span class="kw">complex</span>(</span>
+<span id="cb1-35">    <span class="dt">real      =</span> coroot[<span class="st">"z"</span>] <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(coroot[<span class="st">"t"</span>]), </span>
+<span id="cb1-36">    <span class="dt">imaginary =</span> coroot[<span class="st">"z"</span>] <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(coroot[<span class="st">"t"</span>])</span>
+<span id="cb1-37">  )</span>
+<span id="cb1-38">  <span class="kw">list</span>(<span class="st">"a"</span> =<span class="st"> </span>a, <span class="st">"b"</span> =<span class="st"> </span>b, <span class="st">"r"</span> =<span class="st"> </span>r, <span class="st">"mod_a"</span> =<span class="st"> </span>z, <span class="st">"arg_a"</span> =<span class="st"> </span>t, <span class="st">"q"</span> =<span class="st"> </span>q)</span>
+<span id="cb1-39">}</span>
+<span id="cb1-40"></span>
+<span id="cb1-41">spiral &lt;-<span class="st"> </span><span class="cf">function</span>(r, start_point, delta, opts, alpha, scale) {</span>
+<span id="cb1-42">  mod_delta &lt;-<span class="st"> </span><span class="kw">Mod</span>(delta)</span>
+<span id="cb1-43">  colors &lt;-<span class="st"> </span>opts[[<span class="st">"fill"</span>]]</span>
+<span id="cb1-44">  min_d  &lt;-<span class="st"> </span>opts[[<span class="st">"min_d"</span>]]</span>
+<span id="cb1-45">  max_d  &lt;-<span class="st"> </span>opts[[<span class="st">"max_d"</span>]]</span>
+<span id="cb1-46">  w &lt;-<span class="st"> </span><span class="kw">exp</span>(1i <span class="op">*</span><span class="st"> </span>alpha)</span>
+<span id="cb1-47">  </span>
+<span id="cb1-48">  out &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="dt">nrow =</span> 0L, <span class="dt">ncol =</span> 4L)</span>
+<span id="cb1-49">  </span>
+<span id="cb1-50">  <span class="co"># spiral outwards</span></span>
+<span id="cb1-51">  color_index &lt;-<span class="st"> </span>opts[[<span class="st">"i"</span>]]</span>
+<span id="cb1-52">  q &lt;-<span class="st"> </span>start_point</span>
+<span id="cb1-53">  mod_q &lt;-<span class="st"> </span><span class="kw">Mod</span>(q)</span>
+<span id="cb1-54">  <span class="cf">while</span>(mod_q <span class="op">&lt;</span><span class="st"> </span>max_d) {</span>
+<span id="cb1-55">    col &lt;-<span class="st"> </span>colors[color_index]</span>
+<span id="cb1-56">    center &lt;-<span class="st"> </span>scale <span class="op">*</span><span class="st"> </span>q <span class="op">*</span><span class="st"> </span>w</span>
+<span id="cb1-57">    out &lt;-<span class="st"> </span><span class="kw">rbind</span>(</span>
+<span id="cb1-58">      out,</span>
+<span id="cb1-59">      <span class="kw">c</span>(<span class="kw">Re</span>(center), <span class="kw">Im</span>(center), r <span class="op">*</span><span class="st"> </span>scale <span class="op">*</span><span class="st"> </span>mod_q, color_index)</span>
+<span id="cb1-60">    )</span>
+<span id="cb1-61">    <span class="kw">draw.circle</span>(</span>
+<span id="cb1-62">      <span class="kw">Re</span>(center), <span class="kw">Im</span>(center), r <span class="op">*</span><span class="st"> </span>scale <span class="op">*</span><span class="st"> </span>mod_q, <span class="dt">col =</span> col, <span class="dt">border =</span> col</span>
+<span id="cb1-63">    )</span>
+<span id="cb1-64">    color_index &lt;-<span class="st"> </span><span class="kw">ifelse</span>(color_index <span class="op">&lt;</span><span class="st"> </span><span class="kw">length</span>(colors), color_index <span class="op">+</span><span class="st"> </span><span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb1-65">    q &lt;-<span class="st"> </span>q <span class="op">*</span><span class="st"> </span>delta</span>
+<span id="cb1-66">    mod_q &lt;-<span class="st"> </span>mod_q <span class="op">*</span><span class="st"> </span>mod_delta</span>
+<span id="cb1-67">  }</span>
+<span id="cb1-68">  </span>
+<span id="cb1-69">  <span class="co"># spiral inwards</span></span>
+<span id="cb1-70">  i &lt;-<span class="st"> </span>opts[[<span class="st">"i"</span>]]</span>
+<span id="cb1-71">  color_index &lt;-<span class="st"> </span><span class="kw">ifelse</span>(i <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span>, i<span class="dv">-1</span>, <span class="kw">length</span>(colors))</span>
+<span id="cb1-72">  q &lt;-<span class="st"> </span>start_point<span class="op">/</span>delta</span>
+<span id="cb1-73">  mod_q &lt;-<span class="st"> </span><span class="kw">Mod</span>(q)</span>
+<span id="cb1-74">  <span class="cf">while</span>(mod_q <span class="op">&gt;</span><span class="st"> </span>min_d) {</span>
+<span id="cb1-75">    col &lt;-<span class="st"> </span>colors[color_index]</span>
+<span id="cb1-76">    center &lt;-<span class="st"> </span>scale <span class="op">*</span><span class="st"> </span>q <span class="op">*</span><span class="st"> </span>w</span>
+<span id="cb1-77">    out &lt;-<span class="st"> </span><span class="kw">rbind</span>(</span>
+<span id="cb1-78">      out,</span>
+<span id="cb1-79">      <span class="kw">c</span>(<span class="kw">Re</span>(center), <span class="kw">Im</span>(center), r <span class="op">*</span><span class="st"> </span>scale <span class="op">*</span><span class="st"> </span>mod_q, color_index)</span>
+<span id="cb1-80">    )</span>
+<span id="cb1-81">    <span class="kw">draw.circle</span>(</span>
+<span id="cb1-82">      <span class="kw">Re</span>(center), <span class="kw">Im</span>(center), r <span class="op">*</span><span class="st"> </span>scale <span class="op">*</span><span class="st"> </span>mod_q, <span class="dt">col =</span> col, <span class="dt">border =</span> col</span>
+<span id="cb1-83">    )</span>
+<span id="cb1-84">    color_index &lt;-<span class="st"> </span><span class="kw">ifelse</span>(color_index <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span>, color_index<span class="dv">-1</span>, <span class="kw">length</span>(colors))</span>
+<span id="cb1-85">    q &lt;-<span class="st"> </span>q <span class="op">/</span><span class="st"> </span>delta</span>
+<span id="cb1-86">    mod_q &lt;-<span class="st"> </span>mod_q <span class="op">/</span><span class="st"> </span>mod_delta</span>
+<span id="cb1-87">  }</span>
+<span id="cb1-88">  </span>
+<span id="cb1-89">  out</span>
+<span id="cb1-90">}</span>
+<span id="cb1-91"></span>
+<span id="cb1-92">frame &lt;-<span class="st"> </span><span class="cf">function</span>(t, root, max_d, <span class="dt">limits =</span> <span class="kw">c</span>(<span class="op">-</span>max_d, max_d)) {</span>
+<span id="cb1-93">  scale &lt;-<span class="st"> </span>root<span class="op">$</span>mod_a<span class="op">^</span>t</span>
+<span id="cb1-94">  alpha &lt;-<span class="st"> </span>root<span class="op">$</span>arg_a <span class="op">*</span><span class="st"> </span>t</span>
+<span id="cb1-95">  start &lt;-<span class="st"> </span>root<span class="op">$</span>a</span>
+<span id="cb1-96">  min_d &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">/</span>scale</span>
+<span id="cb1-97">  out &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="dt">nrow =</span> 0L, <span class="dt">ncol =</span> 4L)</span>
+<span id="cb1-98">  <span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>))</span>
+<span id="cb1-99">  <span class="kw">plot</span>(<span class="ot">NULL</span>, <span class="dt">asp =</span> <span class="dv">1</span>, <span class="dt">xlim =</span> limits, <span class="dt">ylim =</span> limits,</span>
+<span id="cb1-100">       <span class="dt">xlab =</span> <span class="ot">NA</span>, <span class="dt">ylab =</span> <span class="ot">NA</span>, <span class="dt">axes =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb1-101">  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>root<span class="op">$</span>q) {</span>
+<span id="cb1-102">    cc &lt;-<span class="st"> </span><span class="kw">spiral</span>(root<span class="op">$</span>r, start, root<span class="op">$</span>a, </span>
+<span id="cb1-103">           <span class="kw">list</span>(</span>
+<span id="cb1-104">             <span class="dt">fill =</span> <span class="kw">c</span>(<span class="st">"#49B49B"</span>, <span class="st">"#483352"</span>),</span>
+<span id="cb1-105">             <span class="dt">i =</span> <span class="dv">1</span> <span class="op">+</span><span class="st"> </span>i <span class="op">%%</span><span class="st"> </span><span class="dv">2</span>,</span>
+<span id="cb1-106">             <span class="dt">min_d =</span> min_d,</span>
+<span id="cb1-107">             <span class="dt">max_d =</span> max_d</span>
+<span id="cb1-108">           ), alpha, scale)</span>
+<span id="cb1-109">    start &lt;-<span class="st"> </span>start <span class="op">*</span><span class="st"> </span>root<span class="op">$</span>b</span>
+<span id="cb1-110">    out &lt;-<span class="st"> </span><span class="kw">rbind</span>(out, cc)</span>
+<span id="cb1-111">  }</span>
+<span id="cb1-112">  <span class="kw">colnames</span>(out) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"x"</span>, <span class="st">"y"</span>, <span class="st">"r"</span>, <span class="st">"colIndex"</span>)</span>
+<span id="cb1-113">  out</span>
+<span id="cb1-114">}</span>
+<span id="cb1-115"></span>
+<span id="cb1-116"><span class="co"># plot a Doyle spiral ####</span></span>
+<span id="cb1-117">root &lt;-<span class="st"> </span><span class="kw">Doyle</span>(<span class="dt">p =</span> <span class="dv">8</span>, <span class="dt">q =</span> <span class="dv">16</span>)</span>
+<span id="cb1-118">M &lt;-<span class="st"> </span><span class="kw">frame</span>(<span class="dv">0</span>, root, <span class="dv">600</span>)</span></code></pre>
+      </div>
+      <p>The <code>frame</code> function generates a plot of a Doyle spiral:</p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/Doyle_8-16.png"
+        />
+      </p>
+      <p>
+        It also returns a matrix providing the centers and the radii of the
+        circles, and the color index of each circle. This allowed me to plot the
+        Doyle spiral in 3D with <strong>rgl</strong>:
+      </p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1"><span class="kw">library</span>(rgl)</span>
+<span id="cb2-2"><span class="kw">library</span>(Rvcg)</span>
+<span id="cb2-3"></span>
+<span id="cb2-4">unitSphere &lt;-<span class="st"> </span><span class="kw">vcgSphere</span>(<span class="dv">4</span>)</span>
+<span id="cb2-5">cols &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"#49B49B"</span>, <span class="st">"#483352"</span>)</span>
+<span id="cb2-6"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>))</span>
+<span id="cb2-7"><span class="kw">view3d</span>(<span class="dv">0</span>, <span class="dv">-55</span>, <span class="dt">zoom =</span> <span class="fl">0.85</span>)</span>
+<span id="cb2-8"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(M)) {</span>
+<span id="cb2-9">  sph &lt;-<span class="st"> </span><span class="kw">translate3d</span>(</span>
+<span id="cb2-10">    <span class="kw">scale3d</span>(unitSphere, M[i,<span class="st">"r"</span>], M[i,<span class="st">"r"</span>], M[i,<span class="st">"r"</span>]),</span>
+<span id="cb2-11">    M[i, <span class="st">"x"</span>], M[i,<span class="st">"y"</span>], <span class="dv">0</span></span>
+<span id="cb2-12">  )</span>
+<span id="cb2-13">  <span class="kw">shade3d</span>(sph, <span class="dt">color =</span> cols[M[i, <span class="st">"colIndex"</span>]])</span>
+<span id="cb2-14">}</span>
+<span id="cb2-15"></span>
+<span id="cb2-16"><span class="co"># animation ####</span></span>
+<span id="cb2-17"><span class="kw">movie3d</span>(<span class="kw">spin3d</span>(<span class="dt">axis =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>), <span class="dt">rpm =</span> <span class="dv">10</span>),</span>
+<span id="cb2-18">        <span class="dt">duration =</span> <span class="dv">6</span>, <span class="dt">fps =</span> <span class="dv">10</span>,</span>
+<span id="cb2-19">        <span class="dt">movie =</span> <span class="st">"zzpic"</span>, <span class="dt">dir =</span> <span class="st">"."</span>,</span>
+<span id="cb2-20">        <span class="dt">convert =</span> <span class="ot">FALSE</span>, <span class="dt">webshot =</span> <span class="ot">FALSE</span>,</span>
+<span id="cb2-21">        <span class="dt">startTime =</span> <span class="dv">1</span><span class="op">/</span><span class="dv">10</span>)</span>
+<span id="cb2-22"></span>
+<span id="cb2-23"><span class="kw">library</span>(gifski)</span>
+<span id="cb2-24">pngs &lt;-<span class="st"> </span><span class="kw">Sys.glob</span>(<span class="st">"zzpic*.png"</span>)</span>
+<span id="cb2-25"><span class="kw">gifski</span>(</span>
+<span id="cb2-26">  <span class="dt">png_files =</span> pngs,</span>
+<span id="cb2-27">  <span class="dt">gif_file =</span> <span class="st">"Doyle_8-16.gif"</span>,</span>
+<span id="cb2-28">  <span class="dt">width =</span> <span class="dv">512</span>,</span>
+<span id="cb2-29">  <span class="dt">height =</span> <span class="dv">512</span>,</span>
+<span id="cb2-30">  <span class="dt">delay =</span> <span class="dv">1</span><span class="op">/</span><span class="dv">8</span></span>
+<span id="cb2-31">)</span>
+<span id="cb2-32"><span class="kw">file.remove</span>(pngs)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/Doyle_8-16.gif"
+        />
+      </p>
+      <p>And also with POV-Ray:</p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/Doyle_8-16_POVRay.gif"
+        />
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Sat, 08 Jul 2023 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/DoyleSpiral.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>Fast expansion of a polynomial with R - part 2</title>
       <link>https://laustep.github.io/stlahblog/posts/expandPolynomialWithRyacasSpray.html</link>
