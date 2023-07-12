@@ -5,7 +5,208 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Sat, 08 Jul 2023 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Wed, 12 Jul 2023 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>Another Hopf torus</title>
+      <link>https://laustep.github.io/stlahblog/posts/HopfTorusCubicalCone.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        Recall that a Hopf torus is a two-dimensional object in the 4D space
+        defined by a <em>profile curve</em>: a closed curve on the unit sphere.
+        When mapping it to the 3D space with the stereographic projection, we
+        can obtain a beautiful object, or an ugly one, depending on the choice
+        of the profile curve.
+      </p>
+      <p>Here, we will see the Hopf torus defined by this profile curve:</p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/IntersectionSphereCubicalCone.png"
+        />
+      </p>
+      <p>
+        This is the intersection of the unit sphere with a cubical cone, the
+        isosurface of equation
+        <span class="math inline">\(x^2 + y^2 + z^2 = 0\)</span>. First, I
+        obtained a mesh of this surface thanks to the
+        <strong>rmarchingcubes</strong> package:
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1"><span class="kw">library</span>(rgl)</span>
+<span id="cb1-2"><span class="kw">library</span>(rmarchingcubes)</span>
+<span id="cb1-3"></span>
+<span id="cb1-4"><span class="co"># cubical cone ####</span></span>
+<span id="cb1-5">f &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, z) {</span>
+<span id="cb1-6">  x<span class="op">^</span><span class="dv">3</span> <span class="op">+</span><span class="st"> </span>y<span class="op">^</span><span class="dv">3</span> <span class="op">+</span><span class="st"> </span>z<span class="op">^</span><span class="dv">3</span></span>
+<span id="cb1-7">}</span>
+<span id="cb1-8">x_ &lt;-<span class="st"> </span>y_ &lt;-<span class="st"> </span>z_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="fl">1.05</span>, <span class="fl">1.05</span>, <span class="dt">length.out =</span> 150L)</span>
+<span id="cb1-9">Grid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">X =</span> x_, <span class="dt">Y =</span> y_, <span class="dt">Z =</span> z_)</span>
+<span id="cb1-10">voxel &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="kw">with</span>(Grid, <span class="kw">f</span>(X, Y, Z)), <span class="dt">dim =</span> <span class="kw">c</span>(150L, 150L, 150L))</span>
+<span id="cb1-11">surf &lt;-<span class="st"> </span><span class="kw">contour3d</span>(voxel, <span class="dt">level =</span> <span class="dv">0</span>, x_, y_, z_)</span>
+<span id="cb1-12">coneMesh &lt;-<span class="st"> </span><span class="kw">tmesh3d</span>(</span>
+<span id="cb1-13">  <span class="dt">vertices =</span> <span class="kw">t</span>(surf[[<span class="st">"vertices"</span>]]),</span>
+<span id="cb1-14">  <span class="dt">indices  =</span> <span class="kw">t</span>(surf[[<span class="st">"triangles"</span>]]),</span>
+<span id="cb1-15">  <span class="dt">normals  =</span> surf[[<span class="st">"normals"</span>]] </span>
+<span id="cb1-16">)</span></code></pre>
+      </div>
+      <p>
+        Then I obtained the intersection with the unit sphere thanks to the
+        <code>clipMesh3d</code> and <code>getBoundary3d</code> functions of the
+        <strong>rgl</strong> package:
+      </p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1"><span class="co"># intersection with unit sphere ####</span></span>
+<span id="cb2-2">sphereMesh &lt;-<span class="st"> </span>Rvcg<span class="op">::</span><span class="kw">vcgSphere</span>(<span class="dt">subdivision =</span> 5L)</span>
+<span id="cb2-3">mesh &lt;-<span class="st"> </span><span class="kw">clipMesh3d</span>(</span>
+<span id="cb2-4">  sphereMesh, <span class="dt">fn =</span> f, <span class="dt">minVertices =</span> 20000L</span>
+<span id="cb2-5">)</span>
+<span id="cb2-6">boundary &lt;-<span class="st"> </span></span>
+<span id="cb2-7"><span class="st">  </span><span class="kw">getBoundary3d</span>(mesh, <span class="dt">sorted =</span> <span class="ot">TRUE</span>, <span class="dt">color =</span> <span class="st">"black"</span>, <span class="dt">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb2-8"><span class="co"># plot ####</span></span>
+<span id="cb2-9"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>), <span class="dt">zoom =</span> <span class="fl">0.9</span>)</span>
+<span id="cb2-10"><span class="kw">shade3d</span>(coneMesh, <span class="dt">color =</span> <span class="st">"red"</span>, <span class="dt">alpha =</span> <span class="fl">0.5</span>, <span class="dt">polygon_offset =</span> <span class="dv">1</span>)</span>
+<span id="cb2-11"><span class="kw">shade3d</span>(sphereMesh, <span class="dt">color =</span> <span class="st">"blue"</span>, <span class="dt">alpha =</span> <span class="fl">0.5</span>, <span class="dt">polygon_offset =</span> <span class="dv">1</span>)</span>
+<span id="cb2-12"><span class="kw">shade3d</span>(boundary)</span></code></pre>
+      </div>
+      <p>
+        The curve has not the required orientation of a nice profile curve. Its
+        axis of symmetry is directed by
+        <span class="math inline">\((1,1,1)\)</span>, and we need
+        <span class="math inline">\((0,0,1)\)</span> instead. So one has to
+        rotate the curve. To do so, I use an exported function from the
+        <strong>cgalMeshes</strong> package, namely
+        <code>quaternionFromTo</code>. It will return a unit quaternion
+        corresponding to the desired rotation. I already talked about this way
+        to obtain a rotation sending a given vector to another given vector,
+        <a
+          href="https://laustep.github.io/stlahblog/posts/ReorientTransformation2.html"
+          >here</a
+        >.
+      </p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb3-1"><span class="co"># get points at the intersection and rotate them ####</span></span>
+<span id="cb3-2">pts &lt;-<span class="st"> </span>boundary[[<span class="st">"vb"</span>]][<span class="op">-</span>4L, boundary[[<span class="st">"is"</span>]][1L, ]]</span>
+<span id="cb3-3">q &lt;-<span class="st"> </span>cgalMeshes<span class="op">:::</span><span class="kw">quaternionFromTo</span>(<span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>)<span class="op">/</span><span class="kw">sqrt</span>(<span class="dv">3</span>), <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb3-4">R &lt;-<span class="st"> </span>onion<span class="op">::</span><span class="kw">as.orthogonal</span>(q)</span>
+<span id="cb3-5">gamma0 &lt;-<span class="st"> </span><span class="kw">t</span>(R <span class="op">%*%</span><span class="st"> </span>pts)[, <span class="kw">c</span>(3L, 2L, 1L)]</span></code></pre>
+      </div>
+      <p>
+        Now let’s introduce a function which creates a mesh of the Hopf torus
+        defined by a discretized curve, such as our matrix of points
+        <code>gamma0</code>. Again, I use an exported function from
+        <strong>cgalMeshes</strong>, namely <code>meshTopology</code>, which
+        returns the incidences between the vertices of the mesh.
+      </p>
+      <pre><code># Hopf torus mesh from a discrete curve `gamma` ####
+hMesh &lt;- function(gamma, m) {
+  nu &lt;- nrow(gamma)
+  uperiodic &lt;- TRUE
+  u_ &lt;- 1L:nu
+  vperiodic &lt;- TRUE
+  nv &lt;- as.integer(m) 
+  v_ &lt;- 1L:nv
+  R &lt;- array(NA_real_, dim = c(3L, nv, nu))
+  for(k in 1L:nv) {
+    K &lt;- k - 1L
+    cosphi &lt;- cospi(2*K/m)
+    sinphi &lt;- sinpi(2*K/m)
+    for(j in 1L:nu) {
+      p1 &lt;- gamma[j, 1L]
+      p2 &lt;- gamma[j, 2L]
+      p3 &lt;- gamma[j, 3L]
+      yden &lt;- sqrt(2 * (1 + p1))
+      y1 &lt;- (1 + p1) / yden
+      y2 &lt;- p2 / yden
+      y3 &lt;- p3 / yden
+      x1 &lt;- cosphi * y3 + sinphi * y2
+      x2 &lt;- cosphi * y2 - sinphi * y3
+      x3 &lt;- sinphi * y1
+      x4 &lt;- cosphi * y1
+      R[, k, j] &lt;- c(x1, x2, x3)/(1 - x4)
+    }
+  }
+  vs &lt;- matrix(R, nrow = 3L, ncol = nu*nv)
+  tris &lt;- cgalMeshes:::meshTopology(nu, nv, uperiodic, vperiodic)
+  tmesh3d(
+    vertices    = vs,
+    indices     = tris,
+    homogeneous = FALSE
+  )
+}</code></pre>
+      <p>
+        If you run <code>hMesh(gamma0, m)</code> with <code>m</code> large
+        enough, here is the mesh you will obtain (actually you have to close
+        <code>gamma0</code>, that is to say you have to use
+        <code>rbind(gamma0, gamma0[1L, ])</code>):
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/HopfTorusCubicalCone.gif"
+        />
+      </p>
+      <p>
+        Finally I did another animation. The Hopf torus whose profile curve is
+        the equator of the unit sphere is nothing but an ordinary torus after
+        the stereographic projection. Then, I scaled the
+        <span class="math inline">\(x\)</span>-coordinates of
+        <code>gamma0</code> continuously from a factor zero to a positive factor
+        and I plotted the (stereographic projection of the) Hopf torus
+        corresponding to each scaling. In this way the ordinary torus is
+        smoothly transformed to the previous Hopf torus:
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/HopfTorusCubicalConeToTorus.gif"
+        />
+      </p>
+      <p>The code:</p>
+      <div class="sourceCode" id="cb5">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb5-1">h_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span>, <span class="dt">length.out =</span> 60L) <span class="co"># scaling factors</span></span>
+<span id="cb5-2"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>))</span>
+<span id="cb5-3"><span class="kw">bg3d</span>(<span class="kw">rgb</span>(<span class="dv">54</span>, <span class="dv">57</span>, <span class="dv">64</span>, <span class="dt">maxColorValue =</span> <span class="dv">255</span>))</span>
+<span id="cb5-4"><span class="kw">view3d</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dt">zoom =</span> <span class="fl">0.75</span>)</span>
+<span id="cb5-5"><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_along</span>(h_)) {</span>
+<span id="cb5-6">  gamma &lt;-<span class="st"> </span>gamma0</span>
+<span id="cb5-7">  gamma[, 1L] &lt;-<span class="st"> </span>h_[i] <span class="op">*</span><span class="st"> </span>gamma[, 1L]</span>
+<span id="cb5-8">  <span class="co"># normalize so that the points are on the sphere</span></span>
+<span id="cb5-9">  gamma &lt;-<span class="st"> </span>gamma <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">apply</span>(gamma, 1L, crossprod))</span>
+<span id="cb5-10">  gamma &lt;-<span class="st"> </span><span class="kw">rbind</span>(gamma, gamma[1L, ])</span>
+<span id="cb5-11">  mesh &lt;-<span class="st"> </span><span class="kw">hMesh</span>(gamma, 500L)</span>
+<span id="cb5-12">  mesh &lt;-<span class="st"> </span><span class="kw">addNormals</span>(mesh, <span class="dt">angleWeighted =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb5-13">  <span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">"firebrick4"</span>)</span>
+<span id="cb5-14">  <span class="kw">snapshot3d</span>(<span class="kw">sprintf</span>(<span class="st">"zzpic%03d.png"</span>, i), <span class="dt">webshot =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb5-15">  <span class="kw">clear3d</span>()</span>
+<span id="cb5-16">}</span>
+<span id="cb5-17"><span class="co"># mount the animation ####</span></span>
+<span id="cb5-18"><span class="kw">library</span>(gifski)</span>
+<span id="cb5-19">pngFiles &lt;-<span class="st"> </span><span class="kw">Sys.glob</span>(<span class="st">"zzpic*.png"</span>)</span>
+<span id="cb5-20"><span class="kw">gifski</span>(</span>
+<span id="cb5-21">  <span class="dt">png_files =</span> pngFiles,</span>
+<span id="cb5-22">  <span class="dt">gif_file =</span> <span class="st">"HopfTorusCubicalConeToTorus.gif"</span>,</span>
+<span id="cb5-23">  <span class="dt">width  =</span> <span class="dv">512</span>,</span>
+<span id="cb5-24">  <span class="dt">height =</span> <span class="dv">512</span>,</span>
+<span id="cb5-25">  <span class="dt">delay =</span> <span class="dv">1</span><span class="op">/</span><span class="dv">15</span></span>
+<span id="cb5-26">)</span>
+<span id="cb5-27"><span class="kw">file.remove</span>(pngFiles)</span></code></pre>
+      </div>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Wed, 12 Jul 2023 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/HopfTorusCubicalCone.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>The Doyle spiral with R</title>
       <link>https://laustep.github.io/stlahblog/posts/DoyleSpiral.html</link>
@@ -12723,189 +12924,6 @@ Options:
 ]]></description>
       <pubDate>Sun, 08 Nov 2020 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/gfi_vs_rstanarm.html</guid>
-      <dc:creator>Stéphane Laurent</dc:creator>
-      <category>R</category>
-    </item>
-    <item>
-      <title>Haskell is fast</title>
-      <link>https://laustep.github.io/stlahblog/posts/HaskellIsFast.html</link>
-      <description><![CDATA[<div class="container-fluid">
-  <div class="main col-sm-12">
-    <div class="content">
-      <p>
-        <em>Updated title:</em>
-        <strong>Haskell is fast, but Julia is faster</strong> (see updates at
-        the end).
-      </p>
-      <p>
-        My R package ‘HypergeoMat’ provides a Rcpp implementation of Koev &amp;
-        Edelman’s algorithm for the evaluation of the hypergeometric function of
-        a matrix argument.
-      </p>
-      <p>
-        I also implemented this algorithm in
-        <a
-          href="https://gist.github.com/stla/e85e2de1ad9aeeebc01583f1d0b8e1d0#file-hypergeompq9-jl"
-          >Julia</a
-        >
-        and in <a href="https://github.com/stla/hypergeomPFQ">Haskell</a>.
-      </p>
-      <p>So let us benchmark now.</p>
-      <p>Here is the hypergeometric function of a matrix argument:</p>
-      <p>
-        <span class="math display"
-          >\[ {}_pF_q^{(\alpha)} \left(\begin{matrix} a_1, \ldots, a_p \\ b_1,
-          \ldots, b_q\end{matrix}; X\right) = \sum_{k=0}^\infty\sum_{\kappa
-          \vdash k} \frac{{(a_1)}_\kappa^{(\alpha)} \cdots
-          {(a_p)}_\kappa^{(\alpha)}} {{(b_1)}_\kappa^{(\alpha)} \cdots
-          {(b_q)}_\kappa^{(\alpha)}} \frac{C_\kappa^{(\alpha)}(X)}{k!}. \]</span
-        >
-      </p>
-      <p>
-        Well, I will not explain this expression. But observe that this is a sum
-        from <span class="math inline">\(k=0\)</span> to
-        <span class="math inline">\(\infty\)</span>. The algorithm evaluates the
-        partial sums of this series, that is, the sum from
-        <span class="math inline">\(k=0\)</span> to an integer
-        <span class="math inline">\(m\)</span>.
-      </p>
-      <p>
-        My Haskell library generates a shared library (a DLL) which can be
-        called from R. And one can call Julia from R with the help of the
-        ‘XRJulia’ package. So we will benchmark the three implementations from
-        R.
-      </p>
-      <p>Firstly, let’s check that they return the same value:</p>
-      <div class="sourceCode" id="cb1">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb1-1"><span class="kw">library</span>(HypergeoMat)</span>
-<span id="cb1-2"><span class="kw">library</span>(XRJulia)</span>
-<span id="cb1-3"><span class="co"># source the Julia code</span></span>
-<span id="cb1-4"><span class="kw">juliaSource</span>(<span class="st">"HypergeomPQ09.jl"</span>)</span>
-<span id="cb1-5"><span class="co"># load the Haskell DLL</span></span>
-<span id="cb1-6">dll &lt;-<span class="st"> "libHypergeom.so"</span></span>
-<span id="cb1-7"><span class="kw">dyn.load</span>(dll)</span>
-<span id="cb1-8"><span class="kw">.C</span>(<span class="st">"HsStart"</span>)</span>
-<span id="cb1-9"></span>
-<span id="cb1-10">a &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">8</span>, <span class="dv">7</span>, <span class="dv">3</span>)</span>
-<span id="cb1-11">b &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">9</span>, <span class="dv">16</span>)</span>
-<span id="cb1-12">x &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.3</span>)</span>
-<span id="cb1-13">alpha &lt;-<span class="st"> </span><span class="dv">2</span></span>
-<span id="cb1-14">m &lt;-<span class="st"> </span>5L <span class="co"># `m` is the truncation order</span></span>
-<span id="cb1-15"></span>
-<span id="cb1-16"><span class="kw">hypergeomPFQ</span>(m, a, b, x, alpha)</span>
-<span id="cb1-17"><span class="co"># 2.116251</span></span>
-<span id="cb1-18"><span class="kw">juliaEval</span>(<span class="st">"hypergeom(5, [8.0, 7.0, 3.0], [9.0, 16.0], [0.1, 0.2, 0.3], 2.0)"</span>)</span>
-<span id="cb1-19"><span class="co"># 2.116251</span></span>
-<span id="cb1-20"><span class="kw">.Call</span>(<span class="st">"hypergeomR"</span>, m, a, b, x, alpha)</span>
-<span id="cb1-21"><span class="co"># 2.116251</span></span></code></pre>
-      </div>
-      <p>
-        Well, the same results. Now, let’s run a first series of benchmarks, for
-        <span class="math inline">\(m=5\)</span>.
-      </p>
-      <div class="sourceCode" id="cb2">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb2-1"><span class="kw">library</span>(microbenchmark)</span>
-<span id="cb2-2"><span class="kw">microbenchmark</span>(</span>
-<span id="cb2-3">  <span class="dt">Rcpp =</span></span>
-<span id="cb2-4">    <span class="kw">hypergeomPFQ</span>(m, a, b, x, alpha),</span>
-<span id="cb2-5">  <span class="dt">Julia =</span></span>
-<span id="cb2-6">    <span class="kw">juliaEval</span>(<span class="st">"hypergeom(5, [8.0, 7.0, 3.0], [9.0, 16.0], [0.1, 0.2, 0.3], 2.0)"</span>),</span>
-<span id="cb2-7">  <span class="dt">Haskell =</span></span>
-<span id="cb2-8">    <span class="kw">.Call</span>(<span class="st">"hypergeomR"</span>, m, a, b, x, alpha),</span>
-<span id="cb2-9">  <span class="dt">times =</span> <span class="dv">10</span></span>
-<span id="cb2-10">)</span></code></pre>
-      </div>
-      <pre><code>Unit: microseconds
-    expr      min        lq       mean    median        uq       max neval cld
-    Rcpp  356.682   623.807   837.7237   827.402  1084.191  1382.500    10  a 
-   Julia 4052.000 47767.565 44725.3895 48845.156 50597.779 51308.089    10   b
- Haskell  610.852  1136.963  1343.7442  1289.435  1504.323  2650.976    10  a </code></pre>
-      <p>
-        Should we conclude that Rcpp is the winner, and that Julia is slow?
-        That’s not sure. Observe that the unit of these durations is the
-        microsecond. Perhaps the call to Julia via <code>juliaEval</code> is
-        time-consuming, as well as the call to the Haskell DLL via
-        <code>.Call</code>.
-      </p>
-      <p>So let us try with <span class="math inline">\(m=40\)</span> now.</p>
-      <div class="sourceCode" id="cb4">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb4-1">m &lt;-<span class="st"> </span>40L</span>
-<span id="cb4-2"><span class="kw">microbenchmark</span>(</span>
-<span id="cb4-3">  <span class="dt">Rcpp =</span></span>
-<span id="cb4-4">    <span class="kw">hypergeomPFQ</span>(m, a, b, x, alpha),</span>
-<span id="cb4-5">  <span class="dt">Julia =</span></span>
-<span id="cb4-6">    <span class="kw">juliaEval</span>(<span class="st">"hypergeom(40, [8.0, 7.0, 3.0], [9.0, 16.0], [0.1, 0.2, 0.3], 2.0)"</span>),</span>
-<span id="cb4-7">  <span class="dt">Haskell =</span></span>
-<span id="cb4-8">    <span class="kw">.Call</span>(<span class="st">"hypergeomR"</span>, m, a, b, x, alpha),</span>
-<span id="cb4-9">  <span class="dt">times =</span> <span class="dv">10</span></span>
-<span id="cb4-10">)</span></code></pre>
-      </div>
-      <pre><code>Unit: seconds
-    expr       min        lq      mean    median        uq      max neval cld
-    Rcpp 25.547556 25.924749 26.130888 26.185776 26.354177 26.47846    10   c
-   Julia 18.959032 19.088749 19.191394 19.173662 19.291175 19.62415    10  b 
- Haskell  6.642601  6.653627  6.736082  6.735448  6.760926  6.94283    10 a </code></pre>
-      <p>
-        This time, the unit is the second. Haskell is clearly the winner,
-        followed by Julia.
-      </p>
-      <p>
-        I’m using Julia 1.2.0, and I have been told that there is a great
-        improvement of performance in Julia 1.5.0, the latest version. I’ll try
-        with Julia 1.5.0 and then I will update this post to show whether there
-        is a gain of speed.
-      </p>
-      <p>
-        One should not conclude from this experiment that Haskell
-        <em>always</em> beats C++. That depends on the algorithm we benchmark.
-        This one intensively uses recursion, and perhaps Haskell is strong when
-        dealing with recursion.
-      </p>
-      <p>Don’t forget:</p>
-      <div class="sourceCode" id="cb6">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb6-1"><span class="kw">dyn.unload</span>(dll)</span></code></pre>
-      </div>
-      <h1 id="update-julia-1.5-is-amazing">Update: Julia 1.5 is amazing</h1>
-      <p>
-        Now I upgraded Julia to the latest version, 1.5.2. The results are
-        amazing:
-      </p>
-      <pre><code>Unit: seconds
-    expr       min        lq      mean    median        uq       max neval cld
-    Rcpp 23.464676 24.392115 24.860484 24.823062 25.013047 27.437176    10   c
-   Julia  2.806364  2.852674  3.101521  2.973963  3.363618  3.897855    10 a
- Haskell  6.912441  7.459939  7.648012  7.674404  7.798719  8.322777    10  b</code></pre>
-      <p>
-        19 seconds for Julia 1.2.0 and 3 seconds for Julia 1.5.2! It beats
-        Haskell.
-      </p>
-      <h1 id="update-even-better">Update: even better</h1>
-      <p>
-        Thanks to some advice I got on
-        <a href="https://discourse.julialang.org/">discourse.julialang.org</a>,
-        I improved my
-        <a
-          href="https://gist.github.com/stla/e85e2de1ad9aeeebc01583f1d0b8e1d0#file-hypergeompq10-jl"
-          >Julia code</a
-        >, and it is faster now:
-      </p>
-      <pre><code>Unit: seconds
-  expr      min       lq     mean   median       uq      max neval
- Julia 1.499753 1.549549 1.750907 1.658282 1.915167 2.428611    10</code></pre>
-    </div>
-  </div>
-</div>
-]]></description>
-      <pubDate>Thu, 22 Oct 2020 00:00:00 UT</pubDate>
-      <guid>https://laustep.github.io/stlahblog/posts/HaskellIsFast.html</guid>
       <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
