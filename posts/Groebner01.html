@@ -1,0 +1,218 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Gröbner bases are in 'qspray'</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Gröbner bases are in 'qspray'</h1> 
+          <div class="info">
+    Posted on July 14, 2023
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>
+    
+</div>
+
+<p>There is something new in the <strong>qspray</strong> package: <em>Gröbner bases</em>. Gröbner bases have many applications, and we will see one of them now. My package <strong>qspray</strong> deals with multivariate polynomials with rational coefficients.</p>
+<p>Consider the following system of three polynomial equations:</p>
+<p><span class="math display">\[\begin{align} x^2 + y + z &amp; = 1 \\ x + y^2 + z &amp; = 1 \\ x + y + z^2 &amp; = 1 \end{align}\]</span></p>
+<p>The goal is to find all solutions of this system, that is to say, the simultaneous roots of the three polynomials <span class="math inline">\(x^2 + y + z - 1\)</span>, <span class="math inline">\(x + y^2 + z - 1\)</span>, <span class="math inline">\(x + y + z^2 - 1\)</span>. Not easy, is it?</p>
+<p><em>Fact:</em> a Gröbner basis of (the ideal generated by) a list of polynomials is a list of polynomials with the same simultaneous roots.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">library</span>(qspray)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="kw">qlone</span>(<span class="dv">1</span>); y &lt;-<span class="st"> </span><span class="kw">qlone</span>(<span class="dv">2</span>); z &lt;-<span class="st"> </span><span class="kw">qlone</span>(<span class="dv">3</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>f1 &lt;-<span class="st"> </span>x<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>y <span class="op">+</span><span class="st"> </span>z <span class="op">-</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>f2 &lt;-<span class="st"> </span>x <span class="op">+</span><span class="st"> </span>y<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>z <span class="op">-</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>f3 &lt;-<span class="st"> </span>x <span class="op">+</span><span class="st"> </span>y <span class="op">+</span><span class="st"> </span>z<span class="op">^</span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>gb &lt;-<span class="st"> </span><span class="kw">groebner</span>(<span class="kw">list</span>(f1, f2, f3)) <span class="co"># Gröbner basis of f1, f2, f3</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>( gbstrings &lt;-<span class="st"> </span><span class="kw">lapply</span>(gb, prettyQspray, <span class="dt">vars =</span> <span class="kw">c</span>(<span class="st">&quot;x&quot;</span>, <span class="st">&quot;y&quot;</span>, <span class="st">&quot;z&quot;</span>)) )</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="co">## [[1]]</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="co">## [1] &quot;y + x + z^2 - 1&quot;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a><span class="co">## </span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a><span class="co">## [[2]]</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a><span class="co">## [1] &quot;((-9)*z^3)/2 - 2*z^5 - z^6 + 6*z^4 - y + z + z^7/2 + y^2&quot;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a><span class="co">## </span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a><span class="co">## [[3]]</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a><span class="co">## [1] &quot;y*z^2 - z^2/2 + z^4/2&quot;</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a><span class="co">## </span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a><span class="co">## [[4]]</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a><span class="co">## [1] &quot;z^6 - z^2 + 4*z^3 - 4*z^4&quot;</span></span></code></pre></div>
+<p>Do you see something nice? The fourth polynomial, <span class="math inline">\(z^6 - z^2 + 4z^3 - 4z^4\)</span>, is univariate: it depends only on the variable <span class="math inline">\(z\)</span>. We could numerically solve it with the R function <code>polyroot</code>, but we want exact roots. It is easy to see that <span class="math inline">\(0\)</span> and <span class="math inline">\(1\)</span> are two roots of this polynomial. So we can divide this polynomial by <span class="math inline">\(z(z-1)\)</span>, and it will remain a factor of degree <span class="math inline">\(4\)</span>. But I know, you are lazy. Me too. That’s why I prefer to use the <strong>Ryacas</strong> package to perform this task:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">library</span>(Ryacas)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="kw">yac_str</span>(<span class="st">&quot;Factor(z^6 - z^2 + 4*z^3 - 4*z^4)&quot;</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="co">## [1] &quot;(2*z+z^2-1)*(z-1)^2*z^2&quot;</span></span></code></pre></div>
+<p>So it remains to find the roots of <span class="math inline">\(2z + z^2 - 1\)</span>. We use <strong>Ryacas</strong> again, as we’re lazy:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">yac_str</span>(<span class="st">&quot;PSolve(2*z + z^2 - 1, z)&quot;</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="co">## [1] &quot;{(Sqrt(8)-2)/2,(-(Sqrt(8)+2))/2}&quot;</span></span></code></pre></div>
+<p>There are two roots: <span class="math inline">\(\sqrt{2} - 1\)</span> and <span class="math inline">\(-\sqrt{2} - 1\)</span>.</p>
+<p>But let’s consider the two friendly roots first: <span class="math inline">\(0\)</span> and <span class="math inline">\(1\)</span>. If you plug <span class="math inline">\(z=0\)</span> and <span class="math inline">\(z=1\)</span> in the three other polynomials of the Gröbner basis, you easily find three simultaneous roots: <span class="math inline">\((1, 0, 0)\)</span>, <span class="math inline">\((0, 1, 0)\)</span> and <span class="math inline">\((0, 0, 1)\)</span>.</p>
+<p>You should do this exercise, because now we will plug <span class="math inline">\(z=\sqrt{2}-1\)</span> and <span class="math inline">\(z=-\sqrt{2}-1\)</span>, and this will be less easy. In fact I will only treat <span class="math inline">\(z=\sqrt{2}-1\)</span>, and leave the other root as another exercise for you.</p>
+<p>Let’s go. We plug <span class="math inline">\(z=\sqrt{2}-1\)</span> in the third polynomial. Clearly, we will obtain an univariate polynomial in <span class="math inline">\(y\)</span>, and we will solve it. Or rather, <strong>Ryacas</strong> will solve it:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">yac_str</span>(<span class="kw">sprintf</span>(<span class="st">&quot;p3 := %s&quot;</span>, gbstrings[[3L]]))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="co">## [1] &quot;y*z^2-z^2/2+z^4/2&quot;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="kw">yac_str</span>(<span class="st">&quot;PSolve(Eliminate(z, Sqrt(2)-1, p3), y)&quot;</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a><span class="co">## [1] &quot;-((Sqrt(2)-1)^4/2-(Sqrt(2)-1)^2/2)/(Sqrt(2)-1)^2&quot;</span></span></code></pre></div>
+<p>Yacas is not always nice. It does not simplify this expression. So let’s look at its numerical approximation:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="kw">yac_str</span>(<span class="st">&quot;N(PSolve(Eliminate(z, Sqrt(2)-1, p3), y))&quot;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="co">## [1] &quot;0.4142135623&quot;</span></span></code></pre></div>
+<p>We recognize <span class="math inline">\(\sqrt{2}-1\)</span>. Now we plug <span class="math inline">\(z=\sqrt{2}-1\)</span> into the second polynomial and we solve the resulting polynomial of degree <span class="math inline">\(2\)</span> in <span class="math inline">\(y\)</span>:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">yac_str</span>(<span class="kw">sprintf</span>(<span class="st">&quot;p2 := %s&quot;</span>, gbstrings[[2L]]))</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="co">## [1] &quot;((-9)*z^3)/2-2*z^5-z^6+6*z^4-y+z+z^7/2+y^2&quot;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="kw">yac_str</span>(<span class="st">&quot;N(PSolve(Eliminate(z, Sqrt(2)-1, p2), y))&quot;</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a><span class="co">## [1] &quot;{0.5857864376,0.4142135623}&quot;</span></span></code></pre></div>
+<p>There are two roots: <span class="math inline">\(y=\sqrt{2}-1\)</span> and the other one has no importance, since we didn’t find it before.</p>
+<p>So finally we just have to plug <span class="math inline">\(y=\sqrt{2}-1\)</span> and <span class="math inline">\(z=\sqrt{2}-1\)</span> into the first polynomial and we solve the resulting univariate polynomial in <span class="math inline">\(x\)</span>:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="kw">yac_str</span>(<span class="kw">sprintf</span>(<span class="st">&quot;p1 := %s&quot;</span>, gbstrings[[1L]]))</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="co">## [1] &quot;y+x+z^2-1&quot;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a><span class="kw">yac_str</span>(</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>  <span class="st">&quot;N(PSolve(Eliminate(y, Sqrt(2)-1, Eliminate(z, Sqrt(2)-1, p1)), x))&quot;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a><span class="co">## [1] &quot;0.4142135623&quot;</span></span></code></pre></div>
+<p>Again? Well, we find <span class="math inline">\(x = \sqrt{2}-1\)</span>. Finally we found one simultaneous root: <span class="math display">\[(x, y, z) = (\sqrt{2}-1, \sqrt{2}-1, \sqrt{2}-1).\]</span> Now I leave you with the promised exercise: treat the case <span class="math inline">\(z=-\sqrt{2}-1\)</span>. I give you the solution, you will find: <span class="math display">\[(x, y, z) = (-\sqrt{2}-1, -\sqrt{2}-1, -\sqrt{2}-1).\]</span></p>
+<p>Isn’t it impressive? I started to learn about Gröbner bases only a few days ago, and I still have to learn. I hope some applications will be implemented in <strong>qspray</strong> in the future, and/or exposed on this blog.</p>
+<p>The new version of <strong>qspray</strong> is not on CRAN yet. If you are in a hurry, you can install the development version hosted <a href="https://github.com/stla/qspray">on Github</a>.</p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
