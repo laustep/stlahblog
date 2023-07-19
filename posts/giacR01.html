@@ -1,0 +1,199 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Gröbner implicitization and the 'giacR' package</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Gröbner implicitization and the 'giacR' package</h1> 
+          <div class="info">
+    Posted on July 19, 2023
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>
+    
+</div>
+
+<p>I considerably improved the computation of the Gröbner bases in the <a href="https://laustep.github.io/stlahblog/posts/Groebner01.html"><strong>qspray</strong></a> package, and I implemented something new: <em>Gröbner implicitization</em>. The Gröbner implicitization is able to transform a system of parametric equations to an implicit equation. Let’s see the example of the ellipse:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">library</span>(qspray)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="co"># variables </span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>cost &lt;-<span class="st"> </span><span class="kw">qlone</span>(<span class="dv">1</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>sint &lt;-<span class="st"> </span><span class="kw">qlone</span>(<span class="dv">2</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="co"># parameters</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>a &lt;-<span class="st"> </span><span class="kw">qlone</span>(<span class="dv">3</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>b &lt;-<span class="st"> </span><span class="kw">qlone</span>(<span class="dv">4</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="co">#</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>nvariables &lt;-<span class="st"> </span><span class="dv">2</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>parameters &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>equations &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>  <span class="st">&quot;x&quot;</span> =<span class="st"> </span>a <span class="op">*</span><span class="st"> </span>cost,</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>  <span class="st">&quot;y&quot;</span> =<span class="st"> </span>b <span class="op">*</span><span class="st"> </span>sint</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a>relations &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>  cost<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>sint<span class="op">^</span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span><span class="dv">1</span> <span class="co"># = 0</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a><span class="co"># </span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a>eqs &lt;-<span class="st"> </span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a><span class="st">  </span><span class="kw">implicitization</span>(nvariables, parameters, equations, relations)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a><span class="co">## a^2*b^2 - b^2*x^2 - a^2*y^2</span></span></code></pre></div>
+<p>You see, <code>a^2*b^2 - b^2*x^2 - a^2*y^2 = 0</code> is the implicit equation of the ellipse.</p>
+<p>Gröbner implicitization is based on Gröbner bases. Unfortunately, while I considerably improved it, my implementation of the Gröbner bases can be slow, very slow. For the ellipse above, it is fast. But I tried for example to implicitize the parametric equations of the Enneper surface, and the computation was not terminated after 24 hours.</p>
+<p>No worries. I have a new package coming to the rescue: <a href="https://github.com/stla/giacR"><strong>giacR</strong></a>. This is an interface to the <em>Giac</em> computer algebra system, which powers the graphical interface <em>Xcas</em>. It is extremely efficient, and it is able to compute Gröbner bases.</p>
+<p>Gröbner implicitization is not implemented in Giac. So I implemented it myself. Here is the implicit equation of the Enneper surface:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">library</span>(giacR)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>giac &lt;-<span class="st"> </span>Giac<span class="op">$</span><span class="kw">new</span>()</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>equations &lt;-</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="st">  &quot;x = 3*u + 3*u*v^2 - u^3, y = 3*v + 3*u^2*v - v^3, z = 3*u^2 - 3*v^2&quot;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>variables &lt;-<span class="st"> &quot;u, v&quot;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>giac<span class="op">$</span><span class="kw">implicitization</span>(<span class="dt">equations =</span> equations, <span class="dt">variables =</span> variables)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a><span class="co">## [1] &quot;-19683*x^6+59049*x^4*y^2-10935*x^4*z^3-118098*x^4*z^2+59049*x^4*z-59049*x^2*y^4-56862*x^2*y^2*z^3-118098*x^2*y^2*z-1296*x^2*z^6-34992*x^2*z^5-174960*x^2*z^4+314928*x^2*z^3+19683*y^6-10935*y^4*z^3+118098*y^4*z^2+59049*y^4*z+1296*y^2*z^6-34992*y^2*z^5+174960*y^2*z^4+314928*y^2*z^3+64*z^9-10368*z^7+419904*z^5&quot;</span></span></code></pre></div>
+<p>Finally we close the Giac session:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>giac<span class="op">$</span><span class="kw">close</span>()</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="co">## [1] TRUE</span></span></code></pre></div>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
