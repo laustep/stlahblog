@@ -1,0 +1,237 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Using implicitization to split a ball</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Using implicitization to split a ball</h1> 
+          <div class="info">
+    Posted on July 20, 2023
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'rgl'." href="../tags/rgl.html">rgl</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>, <a title="All pages tagged 'geometry'." href="../tags/geometry.html">geometry</a>
+    
+</div>
+
+<p>I introduced the Gröbner implicitization and the <strong>giacR</strong> package in the <a href="https://laustep.github.io/stlahblog/posts/giacR01.html">previous post</a>. We will see an application here.</p>
+<p>Consider this <a href="https://mathcurve.com/courbes3d.gb/satellite/satellite.shtml"><em>satellite curve</em></a>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>satelliteCurve &lt;-<span class="st"> </span><span class="cf">function</span>(t, <span class="dt">rho =</span> <span class="dv">3</span><span class="op">/</span><span class="dv">4</span>) {</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>  A &lt;-<span class="st"> </span><span class="kw">cospi</span>(rho)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>  B &lt;-<span class="st"> </span><span class="kw">sinpi</span>(rho)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>  cost  &lt;-<span class="st"> </span><span class="kw">cos</span>(t)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>  cos2t &lt;-<span class="st"> </span><span class="kw">cos</span>(<span class="dv">2</span><span class="op">*</span>t)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>  sint  &lt;-<span class="st"> </span><span class="kw">sin</span>(t)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>  sin2t &lt;-<span class="st"> </span><span class="kw">sin</span>(<span class="dv">2</span><span class="op">*</span>t)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>  <span class="kw">cbind</span>(</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>    A<span class="op">*</span>cost<span class="op">*</span>cos2t <span class="op">-</span><span class="st"> </span>sint<span class="op">*</span>sin2t, </span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>    A<span class="op">*</span>sint<span class="op">*</span>cos2t <span class="op">+</span><span class="st"> </span>cost<span class="op">*</span>sin2t, </span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>    B<span class="op">*</span>cos2t</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>  )</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>}</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a><span class="kw">library</span>(rgl)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>t_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> 200L)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a>scurve &lt;-<span class="st"> </span><span class="kw">satelliteCurve</span>(t_)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a>sphmesh &lt;-<span class="st"> </span>Rvcg<span class="op">::</span><span class="kw">vcgSphere</span>(<span class="dt">subdivision =</span> <span class="dv">5</span>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a><span class="kw">shade3d</span>(smesh, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>, <span class="dt">polygon_offset =</span> <span class="dv">1</span>)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a><span class="kw">lines3d</span>(scurve, <span class="dt">color =</span> <span class="st">&quot;deeppink&quot;</span>, <span class="dt">lwd =</span> <span class="dv">3</span>)</span></code></pre></div>
+<p><img src="./figures/satelliteCurve.gif" /></p>
+<p>We would like to assign two different colors to the two parts of the sphere separated by the satellite curve.</p>
+<p>I know only one solution: find a surface whose intersection with the sphere is this satellite curve, then use <code>rgl::clipMesh3d</code>. It is possible to find such a surface with the Gröbner implicitization. Here is how:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">library</span>(giacR)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>giac &lt;-<span class="st"> </span>Giac<span class="op">$</span><span class="kw">new</span>()</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>equations &lt;-</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="st">  &quot;x = A*cost*cos2t - sint*sin2t, y = A*sint*cos2t + cost*sin2t, z = B*cos2t&quot;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>relations &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>  <span class="st">&quot;A^2 + B^2 = 1, cost^2 + sint^2 = 1, &quot;</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>  <span class="st">&quot;cos2t = cost^2 - sint^2, sin2t = 2*sint*cost&quot;</span> </span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>variables &lt;-<span class="st"> &quot;cost, sint, cos2t, sin2t&quot;</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>constants &lt;-<span class="st"> &quot;A, B&quot;</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a>giac<span class="op">$</span><span class="kw">implicitization</span>(equations, relations, variables, constants)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a><span class="co">## [1] &quot;z^3*A-2*y^2*A*B-z^2*A*B+z^3+2*y^2*B+z^2*B-2*z*B^2-z*A+A*B+z-B&quot;</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a><span class="co">## [2] &quot;x^2+y^2+z^2-1&quot;                                                </span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a><span class="co">## [3] &quot;A^2+B^2-1&quot;</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a>giac<span class="op">$</span><span class="kw">close</span>()</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true"></a><span class="co">## [1] TRUE</span></span></code></pre></div>
+<p>First, we entered the system of three parametric equations. Giac is not aware that <code>cost</code> is <span class="math inline">\(\cos t\)</span> and <code>sint</code> is <span class="math inline">\(\sin t\)</span>. So we enter the relation <code>cost^2 + sint^2 = 1</code>. We also enter the expression of <span class="math inline">\(\cos 2t\)</span> in function of <span class="math inline">\(\cos t\)</span> and <span class="math inline">\(\sin t\)</span>, and the same for <span class="math inline">\(\sin 2t\)</span>.</p>
+<p>As you can see, the Gröbner implicitization returned three polynomials. The third one is the relation <span class="math inline">\(A^2 + B^2 = 1\)</span> that we provided. The second one is <span class="math inline">\(x^2 + y^2 + z^2 = 1\)</span>. It means that <span class="math inline">\((x, y, z)\)</span> is on the unit sphere. The first one is what we were looking for! Let’s call it <span class="math inline">\(f\)</span>, and let’s plot the implicit surface <span class="math inline">\(f(x,y,z) = 0\)</span>:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>A &lt;-<span class="st"> </span><span class="kw">cospi</span>(<span class="dv">3</span><span class="op">/</span><span class="dv">4</span>); B &lt;-<span class="st"> </span><span class="kw">sinpi</span>(<span class="dv">3</span><span class="op">/</span><span class="dv">4</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>f &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, z) {</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>  z<span class="op">^</span><span class="dv">3</span><span class="op">*</span>A <span class="op">-</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>y<span class="op">^</span><span class="dv">2</span><span class="op">*</span>A<span class="op">*</span>B <span class="op">-</span><span class="st"> </span>z<span class="op">^</span><span class="dv">2</span><span class="op">*</span>A<span class="op">*</span>B <span class="op">+</span><span class="st"> </span>z<span class="op">^</span><span class="dv">3</span> <span class="op">+</span><span class="st"> </span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="st">    </span><span class="dv">2</span><span class="op">*</span>y<span class="op">^</span><span class="dv">2</span><span class="op">*</span>B <span class="op">+</span><span class="st"> </span>z<span class="op">^</span><span class="dv">2</span><span class="op">*</span>B <span class="op">-</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>z<span class="op">*</span>B<span class="op">^</span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span>z<span class="op">*</span>A <span class="op">+</span><span class="st"> </span>A<span class="op">*</span>B <span class="op">+</span><span class="st"> </span>z <span class="op">-</span><span class="st"> </span>B</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>}</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a><span class="kw">library</span>(rmarchingcubes)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a><span class="kw">library</span>(rgl)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a>n &lt;-<span class="st"> </span>100L</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a>x_ &lt;-<span class="st"> </span>y_ &lt;-<span class="st"> </span>z_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="fl">1.05</span>, <span class="fl">1.05</span>, <span class="dt">length.out =</span> n)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a>Grid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">X =</span> x_, <span class="dt">Y =</span> y_, <span class="dt">Z =</span> z_)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a>voxel &lt;-<span class="st"> </span><span class="kw">with</span>(Grid, <span class="kw">array</span>(<span class="kw">f</span>(X, Y, Z), <span class="dt">dim =</span> <span class="kw">c</span>(n, n, n)))</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a>surf &lt;-<span class="st"> </span><span class="kw">contour3d</span>(voxel, <span class="dt">level =</span> <span class="dv">0</span>, x_, y_, z_)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a>mesh &lt;-<span class="st"> </span><span class="kw">tmesh3d</span>(</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a>  <span class="dt">vertices =</span> <span class="kw">t</span>(surf<span class="op">$</span>vertices),</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a>  <span class="dt">indices  =</span> <span class="kw">t</span>(surf<span class="op">$</span>triangles),</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a>  <span class="dt">normals  =</span> surf<span class="op">$</span>normals</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a>)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true"></a>sphmesh &lt;-<span class="st"> </span>Rvcg<span class="op">::</span><span class="kw">vcgSphere</span>(<span class="dt">subdivision =</span> <span class="dv">5</span>)</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true"></a><span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">&quot;deeppink&quot;</span>)</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true"></a><span class="kw">shade3d</span>(sphmesh, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>)</span></code></pre></div>
+<p><img src="./figures/satelliteSurface.gif" /></p>
+<p>You see, the intersection of the surface with the sphere is the satellite curve.</p>
+<p>Remember we wanted to play with colors. So let’s clip now. We clip the sphere mesh to the volumes defined by <span class="math inline">\(f &gt; 0\)</span> and <span class="math inline">\(f &lt; 0\)</span>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>mesh1 &lt;-<span class="st"> </span><span class="kw">clipMesh3d</span>(sphmesh, f, <span class="dt">greater =</span> <span class="ot">TRUE</span>, <span class="dt">minVertices =</span> 20000L)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>mesh2 &lt;-<span class="st"> </span><span class="kw">clipMesh3d</span>(sphmesh, f, <span class="dt">greater =</span> <span class="ot">FALSE</span>, <span class="dt">minVertices =</span> 20000L)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="kw">shade3d</span>(mesh1, <span class="dt">color =</span> <span class="st">&quot;magenta4&quot;</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a><span class="kw">shade3d</span>(mesh2, <span class="dt">color =</span> <span class="st">&quot;yellow&quot;</span>)</span></code></pre></div>
+<p><img src="./figures/satelliteBall.gif" /></p>
+<p>Of course, our construction was possible because we had polynomial expressions. Otherwise we cannot use this method.</p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
