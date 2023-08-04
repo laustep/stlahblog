@@ -1,0 +1,357 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Drawing a tubular path with Julia</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Drawing a tubular path with Julia</h1> 
+          <div class="info">
+    Posted on August  4, 2023
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'julia'." href="../tags/julia.html">julia</a>, <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'rgl'." href="../tags/rgl.html">rgl</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>, <a title="All pages tagged 'geometry'." href="../tags/geometry.html">geometry</a>
+    
+</div>
+
+<p>I implemented the framed closed curves exposed in <a href="http://wordpress.discretization.de/ddg2016/2016/05/10/tutorial-3-framed-closed-curves/">this blog post</a>, in Julia and R. In fact it is useless with R, because the <strong>rgl</strong> function <code>cylinder3d</code> is faster and better.</p>
+<p>Here is the Julia implementation:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">using</span> LinearAlgebra</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="kw">using</span> Quaternions</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="kw">using</span> Meshes</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="co"># quaternion corresponding to &quot;the&quot; rotation mapping u to v</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="kw">function</span> quaternionFromTo(u<span class="op">,</span> v)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>  re <span class="op">=</span> √((<span class="fl">1.0</span> <span class="op">+</span> u ⋅ v) <span class="op">/</span> <span class="fl">2.0</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>  w <span class="op">=</span> (u × v) <span class="op">/</span> <span class="fl">2.0</span> <span class="op">/</span> re</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>  <span class="kw">return</span> QuaternionF64(re<span class="op">,</span> w<span class="op">...</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a><span class="kw">end</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a><span class="co"># pts: points forming the path</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a><span class="co"># sides: number of sides of the tube</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a><span class="co"># radius: tube radius</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a><span class="co"># twists: number of twists</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a><span class="kw">function</span> closedTube(pts<span class="op">,</span> sides<span class="op">,</span> radius<span class="op">,</span> twists)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a>  n<span class="op">,</span> _ <span class="op">=</span> size(pts)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a>  <span class="cn">e</span> <span class="op">=</span> [pts[i<span class="op">+</span><span class="fl">1</span><span class="op">,</span> <span class="op">:</span>] <span class="op">-</span> pts[i<span class="op">,</span> <span class="op">:</span>] <span class="kw">for</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>(n<span class="op">-</span><span class="fl">1</span>)]</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a>  push<span class="op">!</span>(<span class="cn">e</span><span class="op">,</span> pts[<span class="fl">1</span><span class="op">,</span> <span class="op">:</span>] <span class="op">-</span> pts[n<span class="op">,</span> <span class="op">:</span>])</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a>  tangents <span class="op">=</span> map(normalize<span class="op">,</span> <span class="cn">e</span>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a>  qtangents <span class="op">=</span> map(tgt <span class="op">-&gt;</span> QuaternionF64(<span class="fl">0.0</span><span class="op">,</span> tgt<span class="op">...</span>)<span class="op">,</span> tangents)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a>  dotproducts <span class="op">=</span> [tangents[i<span class="op">+</span><span class="fl">1</span><span class="op">,</span> <span class="op">:</span>] ⋅ tangents[i<span class="op">,</span> <span class="op">:</span>] <span class="kw">for</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>(n<span class="op">-</span><span class="fl">1</span>)]</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a>  a <span class="op">=</span> sqrt.((<span class="fl">1</span> .<span class="op">+</span> dotproducts) <span class="op">/</span> <span class="fl">2.0</span>)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a>  V <span class="op">=</span> <span class="dt">Vector</span>{<span class="dt">Vector</span>{<span class="dt">Float64</span>}}(<span class="cn">undef</span><span class="op">,</span> n<span class="op">-</span><span class="fl">1</span>)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true"></a>  <span class="kw">for</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>(n<span class="op">-</span><span class="fl">1</span>)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true"></a>    V[i] <span class="op">=</span> <span class="op">-</span> [imag_part(qtangents[i<span class="op">+</span><span class="fl">1</span>] <span class="op">*</span> qtangents[i])<span class="op">...</span>] <span class="op">/</span> </span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true"></a>      sqrt(<span class="fl">2.0</span> <span class="op">+</span> <span class="fl">2.0</span><span class="op">*</span>dotproducts[i])</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true"></a>  <span class="kw">end</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true"></a>  Qs <span class="op">=</span> [QuaternionF64(a[i]<span class="op">,</span> V[i]<span class="op">...</span>) <span class="kw">for</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>(n<span class="op">-</span><span class="fl">1</span>)]</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true"></a>  <span class="co"># the quaternions psi_k</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true"></a>  Qprodcuts <span class="op">=</span> <span class="dt">Vector</span>{QuaternionF64}(<span class="cn">undef</span><span class="op">,</span> n<span class="op">-</span><span class="fl">1</span>)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true"></a>  Qprodcuts[<span class="fl">1</span>] <span class="op">=</span> Qs[<span class="fl">1</span>]</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true"></a>  <span class="kw">for</span> i <span class="kw">in</span> <span class="fl">2</span><span class="op">:</span>(n<span class="op">-</span><span class="fl">1</span>)</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true"></a>    Qprodcuts[i] <span class="op">=</span> Qs[i] <span class="op">*</span> Qprodcuts[i<span class="op">-</span><span class="fl">1</span>]</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true"></a>  <span class="kw">end</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true"></a>  Psi <span class="op">=</span> <span class="dt">Vector</span>{QuaternionF64}(<span class="cn">undef</span><span class="op">,</span> n)</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true"></a>  psi0 <span class="op">=</span> quaternionFromTo([<span class="fl">1</span><span class="op">;</span> <span class="fl">0</span><span class="op">;</span> <span class="fl">0</span>]<span class="op">,</span> tangents[<span class="fl">1</span>])</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true"></a>  Psi[<span class="fl">1</span>] <span class="op">=</span> psi0</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true"></a>  <span class="kw">for</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>(n<span class="op">-</span><span class="fl">1</span>)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true"></a>    Psi[i<span class="op">+</span><span class="fl">1</span>] <span class="op">=</span> Qs[i] <span class="op">*</span> Psi[i]</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true"></a>  <span class="kw">end</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true"></a>  <span class="co"># angle defect omega </span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true"></a>  init <span class="op">=</span> zeros(<span class="dt">Float64</span><span class="op">,</span> <span class="fl">3</span>)</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true"></a>  init[argmin(tangents[<span class="fl">1</span>])] <span class="op">=</span> <span class="fl">1</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true"></a>  N0 <span class="op">=</span> normalize(tangents[<span class="fl">1</span>] × init)</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true"></a>  qN0 <span class="op">=</span> QuaternionF64(<span class="fl">0.0</span><span class="op">,</span> N0<span class="op">...</span>)</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true"></a>  qlast <span class="op">=</span> Qprodcuts[n<span class="op">-</span><span class="fl">1</span>]</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true"></a>  qNN <span class="op">=</span> qlast <span class="op">*</span> qN0 <span class="op">*</span> conj(qlast)</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true"></a>  NN <span class="op">=</span> [imag_part(qNN)<span class="op">...</span>]</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true"></a>  x <span class="op">=</span> NN ⋅ N0</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true"></a>  T0 <span class="op">=</span> normalize(NN × N0)</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true"></a>  B0 <span class="op">=</span> T0 × N0</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true"></a>  y <span class="op">=</span> NN ⋅ B0</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true"></a>  omega <span class="op">=</span> atan(y<span class="op">,</span> x) <span class="op">+</span> twists <span class="op">*</span> <span class="fl">2.0</span> <span class="op">*</span> <span class="cn">pi</span></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true"></a>  <span class="co"># the quaternions psiTilde_k</span></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true"></a>  norms <span class="op">=</span> map(v <span class="op">-&gt;</span> sqrt(v ⋅ v)<span class="op">,</span> <span class="cn">e</span>[<span class="fl">1</span><span class="op">:</span>(n<span class="op">-</span><span class="fl">1</span>)])</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true"></a>  s <span class="op">=</span> cumsum([<span class="fl">0.0</span><span class="op">,</span> norms<span class="op">...</span>])</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true"></a>  angles <span class="op">=</span> <span class="op">-</span>omega <span class="op">*</span> s <span class="op">/</span> (<span class="fl">2</span><span class="op">*</span>s[n])</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true"></a>  PsiTilde <span class="op">=</span> <span class="dt">Vector</span>{QuaternionF64}(<span class="cn">undef</span><span class="op">,</span> n)</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true"></a>  PsiTilde[<span class="fl">1</span>] <span class="op">=</span> Psi[<span class="fl">1</span>]</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true"></a>  <span class="kw">for</span> i <span class="kw">in</span> <span class="fl">2</span><span class="op">:</span>n</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true"></a>    angle <span class="op">=</span> angles[i]</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true"></a>    PsiTilde[i] <span class="op">=</span> Psi[i] <span class="op">*</span> </span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true"></a>      QuaternionF64(cos(angle)<span class="op">,</span> sin(angle)<span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span>)</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true"></a>  <span class="kw">end</span></span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true"></a>  <span class="co"># mesh </span></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true"></a>  R <span class="op">=</span> zeros(<span class="dt">Float64</span><span class="op">,</span> <span class="fl">3</span><span class="op">,</span> sides<span class="op">,</span> n<span class="op">-</span><span class="fl">1</span>)</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true"></a>  Hj <span class="op">=</span> QuaternionF64(<span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.0</span>)</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true"></a>  <span class="kw">for</span> k <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>sides</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true"></a>    α <span class="op">=</span> (k <span class="op">-</span> <span class="fl">1.0</span>) <span class="op">/</span> sides</span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true"></a>    r0 <span class="op">=</span> QuaternionF64(cospi(α)<span class="op">,</span> sinpi(α)<span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span>)</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true"></a>    r1 <span class="op">=</span> r0 <span class="op">*</span> Hj <span class="op">*</span> conj(r0)</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true"></a>    <span class="kw">for</span> j <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>(n<span class="op">-</span><span class="fl">1</span>)</span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true"></a>      psi <span class="op">=</span> PsiTilde[j]</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true"></a>      R[<span class="op">:,</span> k<span class="op">,</span> j] <span class="op">=</span> pts[j<span class="op">,</span> <span class="op">:</span>] <span class="op">+</span> </span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true"></a>        radius <span class="op">*</span> [imag_part(psi <span class="op">*</span> r1 <span class="op">*</span> conj(psi))<span class="op">...</span>]</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true"></a>    <span class="kw">end</span></span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true"></a>  <span class="kw">end</span></span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true"></a>  verts <span class="op">=</span> hcat([R[<span class="op">:,</span> <span class="op">:,</span> i] <span class="kw">for</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>(n<span class="op">-</span><span class="fl">1</span>)]<span class="op">...</span>)</span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true"></a>  points <span class="op">=</span> [verts[<span class="op">:,</span> i] <span class="kw">for</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>((n<span class="op">-</span><span class="fl">1</span>)<span class="op">*</span>sides)] </span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true"></a>  quads <span class="op">=</span> GridTopology((sides<span class="op">,</span> n<span class="op">-</span><span class="fl">1</span>)<span class="op">,</span> (<span class="ex">true</span><span class="op">,</span> <span class="ex">true</span>))</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true"></a>  <span class="kw">return</span> SimpleMesh([Meshes.Point(pt<span class="op">...</span>) <span class="kw">for</span> pt <span class="kw">in</span> points]<span class="op">,</span> quads)</span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true"></a><span class="kw">end</span></span></code></pre></div>
+<p>Here is an example, a knot:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">using</span> MeshViz</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="kw">using</span> GLMakie</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>theta <span class="op">=</span> collect(<span class="dt">LinRange</span>(<span class="fl">0</span><span class="op">,</span> <span class="fl">2</span><span class="op">*</span><span class="cn">pi</span><span class="op">,</span> <span class="fl">151</span>)[<span class="fl">1</span><span class="op">:</span><span class="fl">150</span>])</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>knot <span class="op">=</span> </span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>  [</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>      [sin.(theta) <span class="op">+</span> <span class="fl">2</span><span class="op">*</span>sin.(<span class="fl">2</span><span class="op">*</span>theta)]</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>    <span class="op">,</span> [<span class="fl">2</span><span class="op">*</span>sin.(<span class="fl">3</span><span class="op">*</span>theta)]</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>    <span class="op">,</span> [cos.(theta) <span class="op">-</span> <span class="fl">2</span><span class="op">*</span>cos.(<span class="fl">2</span><span class="op">*</span>theta)]</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>  ]</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>mesh <span class="op">=</span> closedTube(knot<span class="op">,</span> <span class="fl">60</span><span class="op">,</span> <span class="fl">0.35</span><span class="op">,</span> <span class="fl">0</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a>viz(mesh)</span></code></pre></div>
+<p><img src="./figures/juliaKnot.png" /></p>
+<p>The current version of <strong>MeshViz</strong> always adds normals to the meshes, so we can’t correctly see what happens if we only set a couple of sides and if we use some twists. So let’s see what this gives with the R version, with four sides and two twists:</p>
+<p><img src="./figures/RtwistedKnot.gif" /></p>
+<p>Below is the R code. But again, don’t use it, use <code>rgl::cylinder3d</code> instead.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">library</span>(onion)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="kw">library</span>(rgl)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>closedTubeMesh &lt;-<span class="st"> </span><span class="cf">function</span>(pts, nsides, epsilon, <span class="dt">twist =</span> <span class="dv">0</span>) {</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>  n &lt;-<span class="st"> </span><span class="kw">nrow</span>(pts)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>  <span class="co"># tangents</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>  e &lt;-<span class="st"> </span><span class="kw">rbind</span>(</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>    <span class="kw">t</span>(<span class="kw">vapply</span>(1L<span class="op">:</span>(n<span class="op">-</span>1L), <span class="cf">function</span>(i) pts[i<span class="op">+</span>1L, ]<span class="op">-</span>pts[i, ], <span class="kw">numeric</span>(3L))),</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a>    pts[1L, ]<span class="op">-</span>pts[n, ]</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a>  )</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a>  nrms &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">apply</span>(e, 1L, crossprod))</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a>  Tgs &lt;-<span class="st"> </span>e <span class="op">/</span><span class="st"> </span>nrms</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a>  Tgs_quat &lt;-<span class="st"> </span><span class="kw">as.quaternion</span>(<span class="kw">rbind</span>(<span class="dv">0</span>, <span class="kw">t</span>(Tgs)))</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a>  <span class="co"># the quaternions q</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a>  sprods &lt;-<span class="st"> </span><span class="kw">vapply</span>(</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a>    1L<span class="op">:</span>(n<span class="op">-</span>1L), <span class="cf">function</span>(i) <span class="kw">c</span>(<span class="kw">crossprod</span>(Tgs[i<span class="op">+</span>1L, ], Tgs[i, ])), <span class="kw">numeric</span>(1L)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a>  )</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a>  a &lt;-<span class="st"> </span><span class="kw">sqrt</span>((<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>sprods) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true"></a>  v &lt;-<span class="st"> </span><span class="kw">quaternion</span>(<span class="dt">length.out =</span> n<span class="op">-</span>1L)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true"></a>  <span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span>(n<span class="op">-</span>1L)) {</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true"></a>    v[i] &lt;-<span class="st"> </span><span class="dv">-1</span> <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>sprods[i]) <span class="op">*</span><span class="st"> </span><span class="kw">Im</span>(Tgs_quat[i<span class="op">+</span>1L] <span class="op">*</span><span class="st"> </span>Tgs_quat[i])</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true"></a>  }</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true"></a>  q &lt;-<span class="st"> </span>a <span class="op">+</span><span class="st"> </span>v</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true"></a>  <span class="co"># the psi_k</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true"></a>  qpr &lt;-<span class="st"> </span><span class="kw">Conj</span>(<span class="kw">onion_cumprod</span>(<span class="kw">Conj</span>(q))) </span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true"></a>  Psi &lt;-<span class="st"> </span><span class="kw">quaternion</span>(<span class="dt">length.out =</span> n)</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true"></a>  psi0 &lt;-<span class="st"> </span>cgalMeshes<span class="op">:::</span><span class="kw">quaternionFromTo</span>(<span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>), Tgs[1L, ])</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true"></a>  Psi[1L] &lt;-<span class="st"> </span>psi0</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true"></a>  <span class="cf">for</span>(i <span class="cf">in</span> 1L<span class="op">:</span>(n<span class="op">-</span>1L)) {</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true"></a>    Psi[i<span class="op">+</span>1L] &lt;-<span class="st"> </span>qpr[i] <span class="op">*</span><span class="st"> </span>psi0</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true"></a>  }</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true"></a>  <span class="co"># omega (angle defect)</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true"></a>  init &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>)</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true"></a>  init[<span class="kw">which.min</span>(<span class="kw">abs</span>(Tgs[1L, ]))] &lt;-<span class="st"> </span><span class="dv">1</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true"></a>  N0 &lt;-<span class="st"> </span>cgalMeshes<span class="op">::</span><span class="kw">crossProduct</span>(Tgs[1L, ], init)</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true"></a>  N0 &lt;-<span class="st"> </span>N0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(N0)))</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true"></a>  N0_quat &lt;-<span class="st"> </span><span class="kw">as.quaternion</span>(<span class="kw">c</span>(<span class="dv">0</span>, N0), <span class="dt">single =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true"></a>  qN &lt;-<span class="st"> </span>qpr[n<span class="op">-</span>1L]</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true"></a>  NN_quat &lt;-<span class="st"> </span>qN <span class="op">*</span><span class="st"> </span>N0_quat <span class="op">*</span><span class="st"> </span><span class="kw">Conj</span>(qN)</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true"></a>  NN &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(NN_quat)[<span class="op">-</span>1L]</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true"></a>  x &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">crossprod</span>(NN, N0))</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true"></a>  T0 &lt;-<span class="st"> </span>cgalMeshes<span class="op">::</span><span class="kw">crossProduct</span>(NN, N0)</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true"></a>  T0 &lt;-<span class="st"> </span>T0 <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">c</span>(<span class="kw">crossprod</span>(T0)))</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true"></a>  B0 &lt;-<span class="st"> </span>cgalMeshes<span class="op">::</span><span class="kw">crossProduct</span>(T0, N0) </span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true"></a>  y &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">crossprod</span>(NN, B0)) <span class="co"># x^2+y^2=1</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true"></a>  omega &lt;-<span class="st"> </span><span class="kw">atan2</span>(y, x) <span class="op">+</span><span class="st"> </span>twist<span class="op">*</span><span class="dv">2</span><span class="op">*</span>pi</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true"></a>  <span class="co"># the quaternions psiTilde_k</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true"></a>  s &lt;-<span class="st"> </span><span class="kw">cumsum</span>(<span class="kw">c</span>(<span class="dv">0</span>, <span class="kw">apply</span>(e[<span class="op">-</span>n, ], 1L, crossprod)))</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true"></a>  L &lt;-<span class="st"> </span>s[n]</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true"></a>  angles &lt;-<span class="st"> </span><span class="op">-</span>omega <span class="op">*</span><span class="st"> </span>s <span class="op">/</span><span class="st"> </span>(<span class="dv">2</span><span class="op">*</span>L)</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true"></a>  PsiTilde &lt;-<span class="st"> </span><span class="kw">quaternion</span>(<span class="dt">length.out =</span> n)</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true"></a>  PsiTilde[1L] &lt;-<span class="st"> </span>Psi[1L]</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true"></a>  <span class="cf">for</span>(i <span class="cf">in</span> 2L<span class="op">:</span>n) {</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true"></a>    a &lt;-<span class="st"> </span>angles[i]</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true"></a>    PsiTilde[i] &lt;-<span class="st"> </span></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true"></a><span class="st">      </span>Psi[i] <span class="op">*</span><span class="st"> </span><span class="kw">as.quaternion</span>(<span class="kw">c</span>(<span class="kw">cos</span>(a), <span class="kw">sin</span>(a), <span class="dv">0</span>, <span class="dv">0</span>), <span class="dt">single =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true"></a>  }</span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true"></a>  <span class="co"># the mesh</span></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true"></a>  nu &lt;-<span class="st"> </span>n</span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true"></a>  uperiodic &lt;-<span class="st"> </span><span class="ot">TRUE</span></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true"></a>  u_ &lt;-<span class="st"> </span>1L<span class="op">:</span>nu</span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true"></a>  vperiodic &lt;-<span class="st"> </span><span class="ot">TRUE</span></span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true"></a>  nv &lt;-<span class="st"> </span><span class="kw">as.integer</span>(nsides)</span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true"></a>  v_ &lt;-<span class="st"> </span>1L<span class="op">:</span>nv</span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true"></a>  R &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="ot">NA_real_</span>, <span class="dt">dim =</span> <span class="kw">c</span>(3L, nv, nu))</span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true"></a>  <span class="cf">for</span>(k <span class="cf">in</span> 1L<span class="op">:</span>nv) {</span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true"></a>    a &lt;-<span class="st"> </span>(k <span class="op">-</span><span class="st"> </span>1L) <span class="op">/</span><span class="st"> </span>nv</span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true"></a>    r0 &lt;-<span class="st"> </span><span class="kw">as.quaternion</span>(<span class="kw">c</span>(<span class="kw">cospi</span>(a), <span class="kw">sinpi</span>(a), <span class="dv">0</span>, <span class="dv">0</span>), <span class="dt">single =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true"></a>    r1 &lt;-<span class="st"> </span>r0 <span class="op">*</span><span class="st"> </span>Hj <span class="op">*</span><span class="st"> </span><span class="kw">Conj</span>(r0)</span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true"></a>    <span class="cf">for</span>(j <span class="cf">in</span> 1L<span class="op">:</span>nu) {</span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true"></a>      psi &lt;-<span class="st"> </span>PsiTilde[j]</span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true"></a>      R[, k, j] &lt;-<span class="st"> </span></span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true"></a><span class="st">        </span>pts[j, ] <span class="op">+</span><span class="st"> </span>epsilon <span class="op">*</span><span class="st"> </span><span class="kw">as.numeric</span>(psi <span class="op">*</span><span class="st"> </span>r1 <span class="op">*</span><span class="st"> </span><span class="kw">Conj</span>(psi))[<span class="op">-</span>1L]</span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true"></a>    }</span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true"></a>  }</span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true"></a>  vs &lt;-<span class="st"> </span><span class="kw">matrix</span>(R, <span class="dt">nrow =</span> 3L, <span class="dt">ncol =</span> nu<span class="op">*</span>nv)</span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true"></a>  tris &lt;-<span class="st"> </span>cgalMeshes<span class="op">:::</span><span class="kw">meshTopology</span>(nu, nv, uperiodic, vperiodic)</span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true"></a>  <span class="kw">tmesh3d</span>(</span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true"></a>    <span class="dt">vertices    =</span> vs,</span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true"></a>    <span class="dt">indices     =</span> tris,</span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true"></a>    <span class="dt">homogeneous =</span> <span class="ot">FALSE</span></span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true"></a>  )</span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true"></a>}</span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true"></a></span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true"></a><span class="co">################################################################################</span></span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true"></a>theta &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> 751L)[<span class="op">-</span>1L]</span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true"></a>knot &lt;-<span class="st"> </span><span class="kw">cbind</span>(</span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true"></a>  <span class="kw">sin</span>(theta) <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span><span class="kw">sin</span>(<span class="dv">2</span><span class="op">*</span>theta), </span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true"></a>  <span class="dv">2</span><span class="op">*</span><span class="kw">sin</span>(<span class="dv">3</span><span class="op">*</span>theta), </span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true"></a>  <span class="kw">cos</span>(theta) <span class="op">-</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span><span class="kw">cos</span>(<span class="dv">2</span><span class="op">*</span>theta)</span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true"></a>)</span>
+<span id="cb3-92"><a href="#cb3-92" aria-hidden="true"></a>mesh &lt;-<span class="st"> </span><span class="kw">closedTubeMesh</span>(knot, <span class="dt">nsides =</span> <span class="dv">4</span>, <span class="dt">epsilon =</span> <span class="fl">0.55</span>, <span class="dt">twist =</span> <span class="dv">2</span>)</span>
+<span id="cb3-93"><a href="#cb3-93" aria-hidden="true"></a><span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">&quot;green&quot;</span>)</span></code></pre></div>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
