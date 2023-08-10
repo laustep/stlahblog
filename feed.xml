@@ -5,7 +5,59 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Fri, 04 Aug 2023 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Thu, 10 Aug 2023 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>Drawing a tennis ball</title>
+      <link>https://laustep.github.io/stlahblog/posts/TennisBall.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        Short post today. Did you know that the intersection of the Enneper
+        surface with a sphere looks like the seam of a tennis ball? That’s what
+        we shall see.
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1">f &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, z) { <span class="co"># Enneper surface: f=0</span></span>
+<span id="cb1-2">  <span class="dv">64</span><span class="op">*</span>z<span class="op">^</span><span class="dv">9</span> <span class="op">-</span><span class="st"> </span><span class="dv">128</span><span class="op">*</span>z<span class="op">^</span><span class="dv">7</span> <span class="op">+</span><span class="st"> </span><span class="dv">64</span><span class="op">*</span>z<span class="op">^</span><span class="dv">5</span> <span class="op">-</span><span class="st"> </span><span class="dv">702</span><span class="op">*</span>x<span class="op">^</span><span class="dv">2</span><span class="op">*</span>y<span class="op">^</span><span class="dv">2</span><span class="op">*</span>z<span class="op">^</span><span class="dv">3</span> <span class="op">-</span><span class="st"> </span><span class="dv">18</span><span class="op">*</span>x<span class="op">^</span><span class="dv">2</span><span class="op">*</span>y<span class="op">^</span><span class="dv">2</span><span class="op">*</span>z <span class="op">+</span><span class="st"> </span></span>
+<span id="cb1-3"><span class="st">    </span><span class="dv">144</span><span class="op">*</span>(y<span class="op">^</span><span class="dv">2</span><span class="op">*</span>z<span class="op">^</span><span class="dv">6</span><span class="op">-</span>x<span class="op">^</span><span class="dv">2</span><span class="op">*</span>z<span class="op">^</span><span class="dv">6</span>) <span class="op">+</span><span class="st"> </span><span class="dv">162</span><span class="op">*</span>(y<span class="op">^</span><span class="dv">4</span><span class="op">*</span>z<span class="op">^</span><span class="dv">2</span><span class="op">-</span>x<span class="op">^</span><span class="dv">4</span><span class="op">*</span>z<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="dv">27</span><span class="op">*</span>(y<span class="op">^</span><span class="dv">6</span><span class="op">-</span>x<span class="op">^</span><span class="dv">6</span>) <span class="op">+</span></span>
+<span id="cb1-4"><span class="st">    </span><span class="dv">9</span><span class="op">*</span>(x<span class="op">^</span><span class="dv">4</span><span class="op">*</span>z<span class="op">+</span>y<span class="op">^</span><span class="dv">4</span><span class="op">*</span>z) <span class="op">+</span><span class="st"> </span><span class="dv">48</span><span class="op">*</span>(x<span class="op">^</span><span class="dv">2</span><span class="op">*</span>z<span class="op">^</span><span class="dv">3</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span><span class="op">*</span>z<span class="op">^</span><span class="dv">3</span>) <span class="op">-</span><span class="st"> </span><span class="dv">432</span><span class="op">*</span>(x<span class="op">^</span><span class="dv">2</span><span class="op">*</span>z<span class="op">^</span><span class="dv">5</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span><span class="op">*</span>z<span class="op">^</span><span class="dv">5</span>) <span class="op">+</span></span>
+<span id="cb1-5"><span class="st">    </span><span class="dv">81</span><span class="op">*</span>(x<span class="op">^</span><span class="dv">4</span><span class="op">*</span>y<span class="op">^</span><span class="dv">2</span><span class="op">-</span>x<span class="op">^</span><span class="dv">2</span><span class="op">*</span>y<span class="op">^</span><span class="dv">4</span>) <span class="op">+</span><span class="st"> </span><span class="dv">240</span><span class="op">*</span>(y<span class="op">^</span><span class="dv">2</span><span class="op">*</span>z<span class="op">^</span><span class="dv">4</span><span class="op">-</span>x<span class="op">^</span><span class="dv">2</span><span class="op">*</span>z<span class="op">^</span><span class="dv">4</span>) <span class="op">-</span><span class="st"> </span><span class="dv">135</span><span class="op">*</span>(x<span class="op">^</span><span class="dv">4</span><span class="op">*</span>z<span class="op">^</span><span class="dv">3</span><span class="op">+</span>y<span class="op">^</span><span class="dv">4</span><span class="op">*</span>z<span class="op">^</span><span class="dv">3</span>)</span>
+<span id="cb1-6">}</span></code></pre>
+      </div>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1"><span class="kw">library</span>(rgl)</span>
+<span id="cb2-2">smesh &lt;-<span class="st"> </span>cgalMeshes<span class="op">::</span><span class="kw">sphereMesh</span>(<span class="dt">r =</span> <span class="fl">0.5</span>, <span class="dt">iterations =</span> 5L)</span>
+<span id="cb2-3">mesh1 &lt;-<span class="st"> </span><span class="kw">clipMesh3d</span>(smesh, f, <span class="dt">greater =</span> <span class="ot">TRUE</span>, <span class="dt">minVertices =</span> 20000L)</span>
+<span id="cb2-4">mesh2 &lt;-<span class="st"> </span><span class="kw">clipMesh3d</span>(smesh, f, <span class="dt">greater =</span> <span class="ot">FALSE</span>, <span class="dt">minVertices =</span> 20000L)</span></code></pre>
+      </div>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb3-1"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>), <span class="dt">zoom =</span> <span class="fl">0.7</span>)</span>
+<span id="cb3-2"><span class="kw">shade3d</span>(mesh1, <span class="dt">col =</span> <span class="st">"yellow"</span>, <span class="dt">polygon_offset =</span> <span class="dv">1</span>)</span>
+<span id="cb3-3"><span class="kw">shade3d</span>(mesh2, <span class="dt">col =</span> <span class="st">"orangered"</span>, <span class="dt">polygon_offset =</span> <span class="dv">1</span>)</span>
+<span id="cb3-4">b &lt;-<span class="st"> </span><span class="kw">getBoundary3d</span>(mesh1, <span class="dt">sorted =</span> <span class="ot">TRUE</span>, <span class="dt">col =</span> <span class="st">"lightgray"</span>, <span class="dt">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb3-5"><span class="kw">shade3d</span>(b)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/TennisBall.gif"
+        />
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Thu, 10 Aug 2023 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/TennisBall.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>Drawing a tubular path with Julia</title>
       <link>https://laustep.github.io/stlahblog/posts/juliaTube.html</link>
@@ -12517,288 +12569,6 @@ Options:
 ]]></description>
       <pubDate>Sat, 15 Jan 2022 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/SurfaceReconstruction.html</guid>
-      <dc:creator>Stéphane Laurent</dc:creator>
-      <category>R</category>
-    </item>
-    <item>
-      <title>Clipping an isosurface to a ball, and more</title>
-      <link>https://laustep.github.io/stlahblog/posts/MeshClipping.html</link>
-      <description><![CDATA[<div class="container-fluid">
-  <div class="main col-sm-12">
-    <div class="content">
-      <p>
-        We will firstly show how to clip an isosurface to a ball with R, and
-        then, more generally, how to clip a surface to an arbitrary region. In
-        the last part we show how to achieve the same with Python.
-      </p>
-      <h1 id="using-r">Using R</h1>
-      <h2 id="the-togliatti-isosurface-clipped-to-a-box">
-        The Togliatti isosurface, clipped to a box
-      </h2>
-      <p>
-        The Togliatti surface is the isosurface
-        <span class="math inline">\(f(x, y, z) = 0\)</span>, where the function
-        <span class="math inline">\(f\)</span> is defined as follows in R:
-      </p>
-      <div class="sourceCode" id="cb1">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb1-1">f &lt;-<span class="st"> </span><span class="cf">function</span>(x,y,z){</span>
-<span id="cb1-2">  <span class="dv">64</span><span class="op">*</span>(x<span class="dv">-1</span>)<span class="op">*</span></span>
-<span id="cb1-3"><span class="st">    </span>(x<span class="op">^</span><span class="dv">4-4</span><span class="op">*</span>x<span class="op">^</span><span class="dv">3-10</span><span class="op">*</span>x<span class="op">^</span><span class="dv">2</span><span class="op">*</span>y<span class="op">^</span><span class="dv">2-4</span><span class="op">*</span>x<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">16</span><span class="op">*</span>x<span class="dv">-20</span><span class="op">*</span>x<span class="op">*</span>y<span class="op">^</span><span class="dv">2</span><span class="op">+</span><span class="dv">5</span><span class="op">*</span>y<span class="op">^</span><span class="dv">4</span><span class="op">+</span><span class="dv">16-20</span><span class="op">*</span>y<span class="op">^</span><span class="dv">2</span>) <span class="op">-</span><span class="st"> </span></span>
-<span id="cb1-4"><span class="st">    </span><span class="dv">5</span><span class="op">*</span><span class="kw">sqrt</span>(<span class="dv">5</span><span class="op">-</span><span class="kw">sqrt</span>(<span class="dv">5</span>))<span class="op">*</span>(<span class="dv">2</span><span class="op">*</span>z<span class="op">-</span><span class="kw">sqrt</span>(<span class="dv">5</span><span class="op">-</span><span class="kw">sqrt</span>(<span class="dv">5</span>)))<span class="op">*</span>(<span class="dv">4</span><span class="op">*</span>(x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span><span class="op">-</span>z<span class="op">^</span><span class="dv">2</span>)<span class="op">+</span>(<span class="dv">1</span><span class="op">+</span><span class="dv">3</span><span class="op">*</span><span class="kw">sqrt</span>(<span class="dv">5</span>)))<span class="op">^</span><span class="dv">2</span></span>
-<span id="cb1-5">}</span></code></pre>
-      </div>
-      <p>
-        To plot an isosurface in R, there is the
-        <strong>misc3d</strong> package. Below we plot the Togliatti surface
-        clipped to the box
-        <span class="math inline">\([-5,5] \times [-5,5] \times [-4,4]\)</span>.
-      </p>
-      <div class="sourceCode" id="cb2">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb2-1"><span class="kw">library</span>(misc3d)</span>
-<span id="cb2-2"><span class="co"># make grid</span></span>
-<span id="cb2-3">nx &lt;-<span class="st"> </span>220L; ny &lt;-<span class="st"> </span>220L; nz &lt;-<span class="st"> </span>220L</span>
-<span id="cb2-4">x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">5</span>, <span class="dv">5</span>, <span class="dt">length.out =</span> nx) </span>
-<span id="cb2-5">y &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">5</span>, <span class="dv">5</span>, <span class="dt">length.out =</span> ny)</span>
-<span id="cb2-6">z &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">4</span>, <span class="dv">4</span>, <span class="dt">length.out =</span> nz) </span>
-<span id="cb2-7">G &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">z =</span> z)</span>
-<span id="cb2-8"><span class="co"># calculate voxel</span></span>
-<span id="cb2-9">voxel &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="kw">with</span>(G, <span class="kw">f</span>(x, y, z)), <span class="dt">dim =</span> <span class="kw">c</span>(nx, ny, nz))</span>
-<span id="cb2-10"><span class="co"># compute isosurface</span></span>
-<span id="cb2-11">surf1 &lt;-<span class="st"> </span></span>
-<span id="cb2-12"><span class="st">  </span><span class="kw">computeContour3d</span>(voxel, <span class="dt">maxvol =</span> <span class="kw">max</span>(voxel), <span class="dt">level =</span> <span class="dv">0</span>, <span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">z =</span> z)</span>
-<span id="cb2-13"><span class="co"># make triangles</span></span>
-<span id="cb2-14">triangles &lt;-<span class="st"> </span><span class="kw">makeTriangles</span>(surf1, <span class="dt">smooth =</span> <span class="ot">TRUE</span>)</span></code></pre>
-      </div>
-      <div class="sourceCode" id="cb3">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb3-1"><span class="kw">drawScene.rgl</span>(triangles, <span class="dt">color =</span> <span class="st">"yellowgreen"</span>)</span></code></pre>
-      </div>
-      <p>
-        <img
-          src="https://laustep.github.io/stlahblog/posts/figures/Togliatti_box.gif"
-        />
-      </p>
-      <p>
-        It is fun, but you will see later that it is prettier when clipped to a
-        ball. And it is desirable to get rid of the isolated components at the
-        top.
-      </p>
-      <p>
-        The simplest way to clip the surface to a ball consists in using the
-        <code>mask</code> argument of the function
-        <code>computeContour3d</code>. We use
-        <span class="math inline">\(4.8\)</span> as the radius.
-      </p>
-      <div class="sourceCode" id="cb4">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb4-1">mask &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="kw">with</span>(G, x<span class="op">^</span><span class="dv">2</span><span class="op">+</span>y<span class="op">^</span><span class="dv">2</span><span class="op">+</span>z<span class="op">^</span><span class="dv">2</span> <span class="op">&lt;</span><span class="st"> </span><span class="fl">4.8</span><span class="op">^</span><span class="dv">2</span>), <span class="dt">dim =</span> <span class="kw">c</span>(nx, ny, nz))</span>
-<span id="cb4-2">surf2 &lt;-<span class="st"> </span><span class="kw">computeContour3d</span>(</span>
-<span id="cb4-3">  voxel, <span class="dt">maxvol =</span> <span class="kw">max</span>(voxel), <span class="dt">level =</span> <span class="dv">0</span>, <span class="dt">mask =</span> mask, <span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">z =</span> z</span>
-<span id="cb4-4">)</span>
-<span id="cb4-5">triangles &lt;-<span class="st"> </span><span class="kw">makeTriangles</span>(surf2, <span class="dt">smooth =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb4-6"><span class="kw">drawScene.rgl</span>(triangles, <span class="dt">color =</span> <span class="st">"orange"</span>)</span></code></pre>
-      </div>
-      <p>
-        <img
-          src="https://laustep.github.io/stlahblog/posts/figures/Togliatti_mask.gif"
-        />
-      </p>
-      <p>
-        That’s not bad, but you see the problem: the borders are not smooth.
-      </p>
-      <h2 id="resorting-to-spherical-coordinates">
-        Resorting to spherical coordinates
-      </h2>
-      <p>
-        Using spherical coordinates will allow us to get the surface clipped to
-        the ball with smooth borders. Here is the method:
-      </p>
-      <div class="sourceCode" id="cb5">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb5-1"><span class="co"># Togliatti surface equation with spherical coordinates</span></span>
-<span id="cb5-2">h &lt;-<span class="st"> </span><span class="cf">function</span>(ρ, θ, ϕ){</span>
-<span id="cb5-3">  x &lt;-<span class="st"> </span>ρ <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(θ) <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(ϕ)</span>
-<span id="cb5-4">  y &lt;-<span class="st"> </span>ρ <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(θ) <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(ϕ)</span>
-<span id="cb5-5">  z &lt;-<span class="st"> </span>ρ <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(ϕ)</span>
-<span id="cb5-6">  <span class="kw">f</span>(x, y, z)</span>
-<span id="cb5-7">}</span>
-<span id="cb5-8"><span class="co"># make grid</span></span>
-<span id="cb5-9">nρ &lt;-<span class="st"> </span>300L; nθ &lt;-<span class="st"> </span>300L; nϕ &lt;-<span class="st"> </span>300L</span>
-<span id="cb5-10">ρ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="fl">4.8</span>, <span class="dt">length.out =</span> nρ) <span class="co"># ρ runs from 0 to the desired radius</span></span>
-<span id="cb5-11">θ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> nθ)</span>
-<span id="cb5-12">ϕ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, pi, <span class="dt">length.out =</span> nϕ) </span>
-<span id="cb5-13">G &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(ρ=ρ, θ=θ, ϕ=ϕ)</span>
-<span id="cb5-14"><span class="co"># calculate voxel</span></span>
-<span id="cb5-15">voxel &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="kw">with</span>(G, <span class="kw">h</span>(ρ, θ, ϕ)), <span class="dt">dim =</span> <span class="kw">c</span>(nρ, nθ, nϕ))</span>
-<span id="cb5-16"><span class="co"># calculate isosurface</span></span>
-<span id="cb5-17">surf3 &lt;-<span class="st"> </span></span>
-<span id="cb5-18"><span class="st">  </span><span class="kw">computeContour3d</span>(voxel, <span class="dt">maxvol =</span> <span class="kw">max</span>(voxel), <span class="dt">level =</span> <span class="dv">0</span>, <span class="dt">x =</span> ρ, <span class="dt">y =</span> θ, <span class="dt">z =</span> ϕ)</span>
-<span id="cb5-19"><span class="co"># transform to Cartesian coordinates</span></span>
-<span id="cb5-20">surf3 &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">apply</span>(surf3, 1L, <span class="cf">function</span>(ρθϕ){</span>
-<span id="cb5-21">  ρ &lt;-<span class="st"> </span>ρθϕ[1L]; θ &lt;-<span class="st"> </span>ρθϕ[2L]; ϕ &lt;-<span class="st"> </span>ρθϕ[3L] </span>
-<span id="cb5-22">  <span class="kw">c</span>(</span>
-<span id="cb5-23">    ρ <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(θ) <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(ϕ),</span>
-<span id="cb5-24">    ρ <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(θ) <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(ϕ),</span>
-<span id="cb5-25">    ρ <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(ϕ)</span>
-<span id="cb5-26">  )</span>
-<span id="cb5-27">}))</span>
-<span id="cb5-28"><span class="co"># draw isosurface</span></span>
-<span id="cb5-29"><span class="kw">drawScene.rgl</span>(<span class="kw">makeTriangles</span>(surf3, <span class="dt">smooth=</span><span class="ot">TRUE</span>), <span class="dt">color =</span> <span class="st">"violetred"</span>)</span></code></pre>
-      </div>
-      <p>
-        <img
-          src="https://laustep.github.io/stlahblog/posts/figures/Togliatti_spherical.gif"
-        />
-      </p>
-      <p>Now the surface is pretty nice. The borders are smooth.</p>
-      <h2 id="another-way-using-the-rgl-package">
-        Another way: using the rgl package
-      </h2>
-      <p>
-        Nowadays, in the <strong>rgl</strong> package, there is the function
-        <code>clipMesh3d</code> which allows to
-        <em>clip a mesh to a general region</em>. In order to use it, we need a
-        <code>mesh3d</code> object. There is an unexported function in
-        <strong>misc3d</strong> which allows to easily get a
-        <code>mesh3d</code> object; it is called <code>t2ve</code>.
-      </p>
-      <p>We start with the isosurface clipped to the box:</p>
-      <div class="sourceCode" id="cb6">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb6-1">triangles &lt;-<span class="st"> </span><span class="kw">makeTriangles</span>(surf1)</span>
-<span id="cb6-2"><span class="co"># convert to rgl `mesh3d`</span></span>
-<span id="cb6-3">mesh &lt;-<span class="st"> </span>misc3d<span class="op">:::</span><span class="kw">t2ve</span>(triangles)</span>
-<span id="cb6-4">rglmesh &lt;-<span class="st"> </span><span class="kw">tmesh3d</span>(mesh<span class="op">$</span>vb, mesh<span class="op">$</span>ib)</span></code></pre>
-      </div>
-      <p>
-        To define the region to which we want to clip the mesh, one has to
-        introduce a function and to give a bound for this function. Here the
-        region is
-        <span class="math inline">\(x^2 + y^2 + z^2 &lt; 4.8^2\)</span>, so we
-        proceed as follows:
-      </p>
-      <div class="sourceCode" id="cb7">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb7-1">fn &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, z) x<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>y<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>z<span class="op">^</span><span class="dv">2</span> <span class="co"># or function(xyz) rowSums(xyz^2)</span></span>
-<span id="cb7-2">clippedmesh &lt;-<span class="st"> </span><span class="kw">addNormals</span>(<span class="kw">clipMesh3d</span>(</span>
-<span id="cb7-3">  rglmesh, fn, <span class="dt">bound =</span> <span class="fl">4.8</span><span class="op">^</span><span class="dv">2</span>, <span class="dt">greater =</span> <span class="ot">FALSE</span></span>
-<span id="cb7-4">))</span></code></pre>
-      </div>
-      <p>
-        It is a bit slow. Probably the algorithm is not very easy. But we get
-        our desired result:
-      </p>
-      <div class="sourceCode" id="cb8">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb8-1"><span class="kw">shade3d</span>(clippedmesh, <span class="dt">color =</span> <span class="st">"magenta"</span>)</span></code></pre>
-      </div>
-      <p>
-        <img
-          src="https://laustep.github.io/stlahblog/posts/figures/Togliatti_clipped.gif"
-        />
-      </p>
-      <h1 id="using-python">Using Python</h1>
-      <p>
-        With the wonderful Python library <strong>PyVista</strong>, we proceed
-        as follows to create the mesh of the Togliatti isosurface:
-      </p>
-      <div class="sourceCode" id="cb9">
-        <pre
-          class="sourceCode python"
-        ><code class="sourceCode python"><span id="cb9-1"><span class="im">from</span> math <span class="im">import</span> sqrt</span>
-<span id="cb9-2"><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb9-3"><span class="im">import</span> pyvista <span class="im">as</span> pv</span>
-<span id="cb9-4"></span>
-<span id="cb9-5"><span class="kw">def</span> f(x, y, z):</span>
-<span id="cb9-6">    <span class="cf">return</span> (</span>
-<span id="cb9-7">        <span class="dv">64</span></span>
-<span id="cb9-8">        <span class="op">*</span> (x <span class="op">-</span> <span class="dv">1</span>)</span>
-<span id="cb9-9">        <span class="op">*</span> (</span>
-<span id="cb9-10">            x <span class="op">**</span> <span class="dv">4</span></span>
-<span id="cb9-11">            <span class="op">-</span> <span class="dv">4</span> <span class="op">*</span> x <span class="op">**</span> <span class="dv">3</span></span>
-<span id="cb9-12">            <span class="op">-</span> <span class="dv">10</span> <span class="op">*</span> x <span class="op">**</span> <span class="dv">2</span> <span class="op">*</span> y <span class="op">**</span> <span class="dv">2</span></span>
-<span id="cb9-13">            <span class="op">-</span> <span class="dv">4</span> <span class="op">*</span> x <span class="op">**</span> <span class="dv">2</span></span>
-<span id="cb9-14">            <span class="op">+</span> <span class="dv">16</span> <span class="op">*</span> x</span>
-<span id="cb9-15">            <span class="op">-</span> <span class="dv">20</span> <span class="op">*</span> x <span class="op">*</span> y <span class="op">**</span> <span class="dv">2</span></span>
-<span id="cb9-16">            <span class="op">+</span> <span class="dv">5</span> <span class="op">*</span> y <span class="op">**</span> <span class="dv">4</span></span>
-<span id="cb9-17">            <span class="op">+</span> <span class="dv">16</span></span>
-<span id="cb9-18">            <span class="op">-</span> <span class="dv">20</span> <span class="op">*</span> y <span class="op">**</span> <span class="dv">2</span></span>
-<span id="cb9-19">        )</span>
-<span id="cb9-20">        <span class="op">-</span> <span class="dv">5</span></span>
-<span id="cb9-21">        <span class="op">*</span> sqrt(<span class="dv">5</span> <span class="op">-</span> sqrt(<span class="dv">5</span>))</span>
-<span id="cb9-22">        <span class="op">*</span> (<span class="dv">2</span> <span class="op">*</span> z <span class="op">-</span> sqrt(<span class="dv">5</span> <span class="op">-</span> sqrt(<span class="dv">5</span>)))</span>
-<span id="cb9-23">        <span class="op">*</span> (<span class="dv">4</span> <span class="op">*</span> (x <span class="op">**</span> <span class="dv">2</span> <span class="op">+</span> y <span class="op">**</span> <span class="dv">2</span> <span class="op">-</span> z <span class="op">**</span> <span class="dv">2</span>) <span class="op">+</span> (<span class="dv">1</span> <span class="op">+</span> <span class="dv">3</span> <span class="op">*</span> sqrt(<span class="dv">5</span>))) <span class="op">**</span> <span class="dv">2</span></span>
-<span id="cb9-24">    )</span>
-<span id="cb9-25"></span>
-<span id="cb9-26"><span class="co"># generate data grid for computing the values</span></span>
-<span id="cb9-27">X, Y, Z <span class="op">=</span> np.mgrid[(<span class="op">-</span><span class="dv">5</span>):<span class="dv">5</span>:<span class="ot">250j</span>, (<span class="op">-</span><span class="dv">5</span>):<span class="dv">5</span>:<span class="ot">250j</span>, (<span class="op">-</span><span class="dv">4</span>):<span class="dv">4</span>:<span class="ot">250j</span>]</span>
-<span id="cb9-28"><span class="co"># create a structured grid</span></span>
-<span id="cb9-29">grid <span class="op">=</span> pv.StructuredGrid(X, Y, Z)</span>
-<span id="cb9-30"><span class="co"># compute and assign the values</span></span>
-<span id="cb9-31">values <span class="op">=</span> f(X, Y, Z)</span>
-<span id="cb9-32">grid.point_data[<span class="st">"values"</span>] <span class="op">=</span> values.ravel(order<span class="op">=</span><span class="st">"F"</span>)</span>
-<span id="cb9-33"><span class="co"># compute the isosurface f(x, y, z) = 0</span></span>
-<span id="cb9-34">isosurf <span class="op">=</span> grid.contour(isosurfaces<span class="op">=</span>[<span class="dv">0</span>])</span>
-<span id="cb9-35">mesh <span class="op">=</span> isosurf.extract_geometry()</span></code></pre>
-      </div>
-      <p>To plot the mesh clipped to the box:</p>
-      <div class="sourceCode" id="cb10">
-        <pre
-          class="sourceCode python"
-        ><code class="sourceCode python"><span id="cb10-1"><span class="co"># surface clipped to the box:</span></span>
-<span id="cb10-2">mesh.plot(smooth_shading<span class="op">=</span><span class="va">True</span>, color<span class="op">=</span><span class="st">"yellowgreen"</span>, specular<span class="op">=</span><span class="dv">15</span>)</span></code></pre>
-      </div>
-      <p>
-        The <code>remove_points</code> method is similar to the
-        <code>mask</code> approach with <strong>misc3d</strong> (it produces
-        non-smooth borders):
-      </p>
-      <div class="sourceCode" id="cb11">
-        <pre
-          class="sourceCode python"
-        ><code class="sourceCode python"><span id="cb11-1"><span class="co"># surface clipped to the ball of radius 4.8, with the help of `remove_points`:</span></span>
-<span id="cb11-2">lengths <span class="op">=</span> np.linalg.norm(mesh.points, axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb11-3">toremove <span class="op">=</span> lengths <span class="op">&gt;=</span> <span class="fl">4.8</span></span>
-<span id="cb11-4">masked_mesh, idx <span class="op">=</span> mesh.remove_points(toremove)</span>
-<span id="cb11-5">masked_mesh.plot(smooth_shading<span class="op">=</span><span class="va">True</span>, color<span class="op">=</span><span class="st">"orange"</span>, specular<span class="op">=</span><span class="dv">15</span>)</span></code></pre>
-      </div>
-      <p>
-        To get smooth borders, you have to use the
-        <code>clip_scalar</code> method:
-      </p>
-      <div class="sourceCode" id="cb12">
-        <pre
-          class="sourceCode python"
-        ><code class="sourceCode python"><span id="cb12-1"><span class="co"># surface clipped to the ball of radius 4.8, with the help of `clip_scalar`:</span></span>
-<span id="cb12-2">mesh[<span class="st">"dist"</span>] <span class="op">=</span> lengths</span>
-<span id="cb12-3">clipped_mesh <span class="op">=</span> mesh.clip_scalar(<span class="st">"dist"</span>, value<span class="op">=</span><span class="fl">4.8</span>)</span>
-<span id="cb12-4">clipped_mesh.plot(</span>
-<span id="cb12-5">    smooth_shading<span class="op">=</span><span class="va">True</span>, cmap<span class="op">=</span><span class="st">"inferno"</span>, window_size<span class="op">=</span>[<span class="dv">512</span>, <span class="dv">512</span>],</span>
-<span id="cb12-6">    show_scalar_bar<span class="op">=</span><span class="va">False</span>, specular<span class="op">=</span><span class="dv">15</span>, show_axes<span class="op">=</span><span class="va">False</span>, zoom<span class="op">=</span><span class="fl">1.2</span>,</span>
-<span id="cb12-7">    background<span class="op">=</span><span class="st">"#363940"</span></span>
-<span id="cb12-8">)</span></code></pre>
-      </div>
-      <p>
-        <img
-          src="https://laustep.github.io/stlahblog/posts/figures/Togliatti_python.png"
-        />
-      </p>
-    </div>
-  </div>
-</div>
-]]></description>
-      <pubDate>Fri, 14 Jan 2022 00:00:00 UT</pubDate>
-      <guid>https://laustep.github.io/stlahblog/posts/MeshClipping.html</guid>
       <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>
