@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <script src="../libraries/hamster.min.js"></script>
+  <title>Rainbow spiral</title>
+  <style>
+    html, body { 
+      margin: 0; 
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<script src="../libraries/pixi.min.js"></script>
+
+<body>
+
+  <script type="text/javascript">
+    let type = "WebGL";
+    if (!PIXI.utils.isWebGLSupported()) {
+      type = "canvas";
+    }
+    PIXI.utils.sayHello(type);
+  </script>
+
+  <div id="container"></div>
+
+  <script id="fragmentShader" type="x-shader/x-fragment">
+    precision mediump float;
+    uniform vec2 iResolution;
+    uniform float iTime;
+
+
+    void main(void){
+      
+      vec4 O;
+      vec2 F;
+      vec2 r = iResolution.xy;
+      float i = .3, l = length(F+=F-r)/r.y + i, t = iTime;
+    
+      for (O *= vec4(0.0); i < 12.0; 
+           O += length(min(r.y/abs(F),r))/4e2*(cos(++t+i+vec4(0,2,4,0))*l+l)) { 
+         F *= mat2(cos(l*.2-i++*--t/1e2+vec4(0,33,11,0)));
+        }
+     }
+  </script>
+
+  <script>
+    var app = new PIXI.Application({ width: window.innerWidth, height: window.innerHeight });
+    app.resizeTo = window;
+
+    let fragmentShader = document.getElementById('fragmentShader').textContent;
+
+
+
+    let filter = new PIXI.Filter(null, fragmentShader);
+    filter.uniforms.iResolution = {x: app.screen.width, y: app.screen.height};
+    filter.uniforms.iTime = 0;
+
+    document.onmousemove = function(evt){
+      filter.uniforms.mouse = { x: evt.clientX, y: evt.clientY };
+    };
+
+    let factor0 = 1.001;
+    let hamster = Hamster(document.body);
+    hamster.wheel(function (event, delta, deltaX, deltaY) {
+      let factor = Math.max(0.1, Math.pow(factor0, deltaY));
+      filter.uniforms.s /= factor;
+    });
+
+    let container = new PIXI.Container();
+    container.filterArea = app.screen;
+    container.filters = [filter];
+
+    app.stage.addChild(container);
+    document.getElementById('container').appendChild(app.view);
+
+    function onresize(event){
+      if(app.resize)
+        app.resize();
+      container.filterArea = app.screen;
+      filter.uniforms.iResolution = {x: app.screen.width, y: app.screen.height};
+    }
+    window.addEventListener('resize', onresize, false);
+
+    let startTime = Date.now();
+    app.ticker.add(function (delta) {
+      var currentTime = Date.now();
+      filter.uniforms.iTime = (currentTime - startTime) * 0.00025;
+    });
+
+  </script>
+</body>
+
+</html>
