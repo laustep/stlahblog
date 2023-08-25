@@ -11,10 +11,8 @@
   <link rel="stylesheet" href="../css/post.css" />
   <link rel="stylesheet" href="../css/misc.css" /> 
   
-    <link rel="stylesheet" href="../css/kate.css" /> 
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
    
-  
-    <link href="../libraries/highlighters/prettify/css/twitter-bootstrap.css" rel="stylesheet"> 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
@@ -109,7 +107,7 @@
 <p>Then I did my own functions to generate some color palettes. I took the palettes provided by the <code>viridisLite</code> R package and I did a function similar to the R function <code>colorRampPalette</code>, which interpolates colors.</p>
 <h2 id="the-viridis-color-maps-and-the-colorramppalette-function">The <code>viridis</code> color maps and the <code>colorRampPalette</code> function</h2>
 <p>Five color scales (palettes) are defined in the R package <strong>viridisLite</strong>:</p>
-<p><img src="figures/viridis-scales.png" style="width:50.0%" /></p>
+<p><img src="figures/viridis-scales.png" style="width:65.0%" /></p>
 <p>See the <a href="https://www.rdocumentation.org/packages/viridisLite/versions/0.1.3/topics/viridis">documentation</a> for more information about these colors.</p>
 <p>The RGB values of these colors are given in the Haskell lists (of type <code>Palette = [[Double]]</code>) at the end of this post.</p>
 <p>Furthermore, the R function <code>colorRampPalette</code> allows to interpolate a set of given colors to create a new color palette.</p>
