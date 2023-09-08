@@ -5,7 +5,7 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Thu, 10 Aug 2023 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Fri, 08 Sep 2023 00:00:00 UT</lastBuildDate>
     <item>
       <title>A dull and shadowed 'rgl' mesh</title>
       <link>https://laustep.github.io/stlahblog/posts/dull-rgl-mesh.html</link>
@@ -88,7 +88,7 @@
   </div>
 </div>
 ]]></description>
-      <pubDate>Thu, 10 Aug 2023 00:00:00 UT</pubDate>
+      <pubDate>Fri, 08 Sep 2023 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/dull-rgl-mesh.html</guid>
       <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
