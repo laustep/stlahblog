@@ -5,7 +5,200 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Fri, 08 Sep 2023 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Mon, 11 Sep 2023 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>Enneper surface with rotating checkerboard</title>
+      <link>https://laustep.github.io/stlahblog/posts/Enneper-checkerboard.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        The <strong>github</strong> branch of my Github repository
+        <a href="https://github.com/stla/cgalMeshes">cgalMeshes</a> has a
+        vignette explaining how to use <em>parameterizations</em> of surface
+        meshes. A parameterization allows to map a texture on a mesh. Some of
+        them are <em>conformal</em>, meaning that they preserve the angles (the
+        best they can). To install this branch with the vignette, run
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1">remotes<span class="op">::</span><span class="kw">install_github</span>(</span>
+<span id="cb1-2">  <span class="st">"stla/cgalMeshes@github"</span>, <span class="dt">dependencies =</span> <span class="ot">TRUE</span>, <span class="dt">build_vignettes =</span> <span class="ot">TRUE</span></span>
+<span id="cb1-3">)</span></code></pre>
+      </div>
+      <p>
+        This may take a while. And if that doesn’t work and you use Windows, you
+        can try to install the binary zip file located at
+        <a
+          href="https://github.com/stla/cgalMeshes/releases/tag/Github_v3.1.0"
+          class="uri"
+          >https://github.com/stla/cgalMeshes/releases/tag/Github_v3.1.0</a
+        >.
+      </p>
+      <p>
+        The vignette shows a couple of examples of parametrizations. Among them,
+        there is the Enneper surface with a radial checkberboard:
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/Enneper_checkerboard.png"
+        />
+      </p>
+      <p>Here I will show how one can rotate the radial checkerboard.</p>
+      <p>Let’s start by the beginning. We make the Enneper mesh.</p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1"><span class="kw">library</span>(cgalMeshes)</span>
+<span id="cb2-2"><span class="kw">library</span>(rgl)</span>
+<span id="cb2-3"></span>
+<span id="cb2-4"><span class="co"># Enneper surface parameteritazion ####</span></span>
+<span id="cb2-5">n &lt;-<span class="st"> </span><span class="dv">3</span></span>
+<span id="cb2-6">Enneper &lt;-<span class="st"> </span><span class="cf">function</span>(phi, r) {</span>
+<span id="cb2-7">  <span class="kw">rbind</span>(</span>
+<span id="cb2-8">    r<span class="op">*</span><span class="kw">cos</span>(phi) <span class="op">-</span><span class="st"> </span>r<span class="op">^</span>(<span class="dv">2</span><span class="op">*</span>n<span class="dv">-1</span>)<span class="op">*</span><span class="kw">cos</span>((<span class="dv">2</span><span class="op">*</span>n<span class="dv">-1</span>)<span class="op">*</span>phi)<span class="op">/</span>(<span class="dv">2</span><span class="op">*</span>n<span class="dv">-1</span>),</span>
+<span id="cb2-9">    r<span class="op">*</span><span class="kw">sin</span>(phi) <span class="op">+</span><span class="st"> </span>r<span class="op">^</span>(<span class="dv">2</span><span class="op">*</span>n<span class="dv">-1</span>)<span class="op">*</span><span class="kw">sin</span>((<span class="dv">2</span><span class="op">*</span>n<span class="dv">-1</span>)<span class="op">*</span>phi)<span class="op">/</span>(<span class="dv">2</span><span class="op">*</span>n<span class="dv">-1</span>),</span>
+<span id="cb2-10">    <span class="dv">2</span><span class="op">*</span>r<span class="op">^</span>n<span class="op">*</span><span class="kw">cos</span>(n<span class="op">*</span>phi)<span class="op">/</span>n</span>
+<span id="cb2-11">  )</span>
+<span id="cb2-12">}</span>
+<span id="cb2-13"></span>
+<span id="cb2-14"><span class="co"># do the mesh ####</span></span>
+<span id="cb2-15">rmesh &lt;-<span class="st"> </span><span class="kw">parametricMesh</span>(</span>
+<span id="cb2-16">  Enneper, <span class="dt">urange =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi), <span class="dt">vrange =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">1.3</span>),</span>
+<span id="cb2-17">  <span class="dt">periodic =</span> <span class="kw">c</span>(<span class="ot">TRUE</span>, <span class="ot">FALSE</span>), <span class="dt">nu =</span> <span class="dv">512</span>, <span class="dt">nv =</span> <span class="dv">512</span>, <span class="dt">clean =</span> <span class="ot">TRUE</span></span>
+<span id="cb2-18">)</span></code></pre>
+      </div>
+      <p>Now we convert it to a CGAL mesh:</p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb3-1"><span class="co"># convert to CGAL mesh ####</span></span>
+<span id="cb3-2">mesh &lt;-<span class="st"> </span>cgalMesh<span class="op">$</span><span class="kw">new</span>(rmesh)</span></code></pre>
+      </div>
+      <p>
+        There’s not enough vertices in this mesh; if we use this one, the
+        checkerboard will not have regular lines. So we perform an isotropic
+        remeshing to add some vertices:
+      </p>
+      <div class="sourceCode" id="cb4">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb4-1"><span class="co"># add vertices in order that the checkerboard has regular lines ####</span></span>
+<span id="cb4-2">mesh<span class="op">$</span><span class="kw">isotropicRemeshing</span>(<span class="fl">0.01</span>, <span class="dt">iterations =</span> <span class="dv">3</span>, <span class="dt">relaxSteps =</span> <span class="dv">2</span>)</span></code></pre>
+      </div>
+      <p>Now we compute the mesh parameterization:</p>
+      <div class="sourceCode" id="cb5">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb5-1"><span class="co"># compute mesh parameterization ####</span></span>
+<span id="cb5-2">UV &lt;-<span class="st"> </span>mesh<span class="op">$</span><span class="kw">parameterization</span>(<span class="dt">method =</span> <span class="st">"DCP"</span>, <span class="dt">UVborder =</span> <span class="st">"circle"</span>)</span></code></pre>
+      </div>
+      <p>And here is the code to do the radial checkerboard:</p>
+      <div class="sourceCode" id="cb6">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb6-1"><span class="co"># radial checkerboard ####</span></span>
+<span id="cb6-2">UV0 &lt;-<span class="st"> </span>UV</span>
+<span id="cb6-3">UV &lt;-<span class="st"> </span><span class="dv">10</span> <span class="op">*</span><span class="st"> </span>(UV0 <span class="op">-</span><span class="st"> </span><span class="fl">0.5</span>)</span>
+<span id="cb6-4">radii &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">apply</span>(UV, 1L, crossprod))</span>
+<span id="cb6-5">angles &lt;-<span class="st"> </span><span class="dv">10</span> <span class="op">*</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">atan2</span>(UV[, 2L], UV[, 1L])<span class="op">/</span>pi)</span>
+<span id="cb6-6">clrs &lt;-<span class="st"> </span><span class="kw">ifelse</span>(</span>
+<span id="cb6-7">  <span class="kw">floor</span>(radii) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span> <span class="op">==</span><span class="st"> </span><span class="dv">0</span>,</span>
+<span id="cb6-8">  <span class="kw">ifelse</span>(</span>
+<span id="cb6-9">    <span class="kw">floor</span>(angles) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span> <span class="op">==</span><span class="st"> </span><span class="dv">0</span>, <span class="st">"navy"</span>, <span class="st">"yellow"</span></span>
+<span id="cb6-10">  ),</span>
+<span id="cb6-11">  <span class="kw">ifelse</span>(</span>
+<span id="cb6-12">    <span class="kw">floor</span>(angles) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span> <span class="op">==</span><span class="st"> </span><span class="dv">0</span>, <span class="st">"yellow"</span>, <span class="st">"navy"</span></span>
+<span id="cb6-13">  )</span>
+<span id="cb6-14">)</span>
+<span id="cb6-15"></span>
+<span id="cb6-16"><span class="co"># check the checkerboard is correct ####</span></span>
+<span id="cb6-17"><span class="kw">plot</span>(</span>
+<span id="cb6-18">  UV0, <span class="dt">type =</span> <span class="st">"p"</span>, <span class="dt">asp =</span> <span class="dv">1</span>, <span class="dt">pch =</span> <span class="st">"."</span>, <span class="dt">col =</span> clrs, </span>
+<span id="cb6-19">  <span class="dt">xlab =</span> <span class="st">"u"</span>, <span class="dt">ylab =</span> <span class="st">"v"</span>, <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb6-20">)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/Enneper_checkerboard_flat.png"
+        />
+      </p>
+      <p>
+        We compute the normals, we convert the mesh to a
+        <strong>rgl</strong> mesh, and we assign the checkerboard colors:
+      </p>
+      <div class="sourceCode" id="cb7">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb7-1"><span class="co"># compute normals, convert to 'rgl' mesh, and add colors ####</span></span>
+<span id="cb7-2">mesh<span class="op">$</span><span class="kw">computeNormals</span>()</span>
+<span id="cb7-3">rmesh &lt;-<span class="st"> </span>mesh<span class="op">$</span><span class="kw">getMesh</span>()</span>
+<span id="cb7-4">rmesh<span class="op">$</span>material &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">color =</span> clrs)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/Enneper_checkerboard.png"
+        />
+      </p>
+      <p>Now we make the animation, by rotating the checkerboard:</p>
+      <div class="sourceCode" id="cb8">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb8-1"><span class="co"># animation rotating checkboard ####</span></span>
+<span id="cb8-2">fclrs &lt;-<span class="st"> </span><span class="cf">function</span>(alpha) {</span>
+<span id="cb8-3">  tests &lt;-<span class="st"> </span><span class="kw">floor</span>(angles <span class="op">+</span><span class="st"> </span>alpha) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span> <span class="op">==</span><span class="st"> </span><span class="dv">0</span></span>
+<span id="cb8-4">  <span class="kw">ifelse</span>(</span>
+<span id="cb8-5">    <span class="kw">floor</span>(radii) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span> <span class="op">==</span><span class="st"> </span><span class="dv">0</span>,</span>
+<span id="cb8-6">    <span class="kw">ifelse</span>(</span>
+<span id="cb8-7">      tests, <span class="st">"navy"</span>, <span class="st">"yellow"</span></span>
+<span id="cb8-8">    ),</span>
+<span id="cb8-9">    <span class="kw">ifelse</span>(</span>
+<span id="cb8-10">      tests, <span class="st">"yellow"</span>, <span class="st">"navy"</span></span>
+<span id="cb8-11">    )</span>
+<span id="cb8-12">  )</span>
+<span id="cb8-13">}</span>
+<span id="cb8-14"></span>
+<span id="cb8-15"><span class="co"># make animation frames ####</span></span>
+<span id="cb8-16">alpha_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span>, <span class="dt">length.out =</span> 19L)[<span class="op">-</span>1L]</span>
+<span id="cb8-17"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>))</span>
+<span id="cb8-18"><span class="kw">view3d</span>(<span class="dv">0</span>, <span class="dv">-20</span>, <span class="dt">zoom =</span> <span class="fl">0.7</span>)</span>
+<span id="cb8-19"><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_along</span>(alpha_)) {</span>
+<span id="cb8-20">  clrs &lt;-<span class="st"> </span><span class="kw">fclrs</span>(alpha_[i])</span>
+<span id="cb8-21">  rmesh<span class="op">$</span>material &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">color =</span> clrs)</span>
+<span id="cb8-22">  <span class="kw">shade3d</span>(rmesh, <span class="dt">meshColor =</span> <span class="st">"vertices"</span>)</span>
+<span id="cb8-23">  <span class="kw">snapshot3d</span>(<span class="kw">sprintf</span>(<span class="st">"zzpic%03d.png"</span>, i), <span class="dt">webshot =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb8-24">  <span class="kw">clear3d</span>()</span>
+<span id="cb8-25">}</span></code></pre>
+      </div>
+      <p>It remains to mount the animation with <strong>gifski</strong>:</p>
+      <div class="sourceCode" id="cb9">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb9-1"><span class="co"># mount animation ####</span></span>
+<span id="cb9-2"><span class="kw">library</span>(gifski)</span>
+<span id="cb9-3"><span class="kw">gifski</span>(</span>
+<span id="cb9-4">  <span class="dt">png_files =</span> <span class="kw">Sys.glob</span>(<span class="st">"zzpic*.png"</span>),</span>
+<span id="cb9-5">  <span class="dt">gif_file =</span> <span class="st">"Enneper-radialCheckerboard-rotating.gif"</span>,</span>
+<span id="cb9-6">  <span class="dt">width =</span> <span class="dv">512</span>,</span>
+<span id="cb9-7">  <span class="dt">height =</span> <span class="dv">512</span>,</span>
+<span id="cb9-8">  <span class="dt">delay =</span> <span class="dv">1</span><span class="op">/</span><span class="dv">8</span></span>
+<span id="cb9-9">)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/Enneper-radialCheckerboard-rotating.gif"
+        />
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Mon, 11 Sep 2023 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/Enneper-checkerboard.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>A dull and shadowed 'rgl' mesh</title>
       <link>https://laustep.github.io/stlahblog/posts/dull-rgl-mesh.html</link>

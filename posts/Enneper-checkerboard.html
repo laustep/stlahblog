@@ -1,0 +1,262 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Enneper surface with rotating checkerboard</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Enneper surface with rotating checkerboard</h1> 
+          <div class="info">
+    Posted on September 11, 2023
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'rgl'." href="../tags/rgl.html">rgl</a>, <a title="All pages tagged 'graphics'." href="../tags/graphics.html">graphics</a>, <a title="All pages tagged 'geometry'." href="../tags/geometry.html">geometry</a>
+    
+</div>
+
+<p>The <strong>github</strong> branch of my Github repository <a href="https://github.com/stla/cgalMeshes">cgalMeshes</a> has a vignette explaining how to use <em>parameterizations</em> of surface meshes. A parameterization allows to map a texture on a mesh. Some of them are <em>conformal</em>, meaning that they preserve the angles (the best they can). To install this branch with the vignette, run</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>  <span class="st">&quot;stla/cgalMeshes@github&quot;</span>, <span class="dt">dependencies =</span> <span class="ot">TRUE</span>, <span class="dt">build_vignettes =</span> <span class="ot">TRUE</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>)</span></code></pre></div>
+<p>This may take a while. And if that doesn’t work and you use Windows, you can try to install the binary zip file located at <a href="https://github.com/stla/cgalMeshes/releases/tag/Github_v3.1.0" class="uri">https://github.com/stla/cgalMeshes/releases/tag/Github_v3.1.0</a>.</p>
+<p>The vignette shows a couple of examples of parametrizations. Among them, there is the Enneper surface with a radial checkberboard:</p>
+<p><img src="./figures/Enneper_checkerboard.png" /></p>
+<p>Here I will show how one can rotate the radial checkerboard.</p>
+<p>Let’s start by the beginning. We make the Enneper mesh.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">library</span>(cgalMeshes)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="kw">library</span>(rgl)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="co"># Enneper surface parameteritazion ####</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>n &lt;-<span class="st"> </span><span class="dv">3</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>Enneper &lt;-<span class="st"> </span><span class="cf">function</span>(phi, r) {</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>  <span class="kw">rbind</span>(</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>    r<span class="op">*</span><span class="kw">cos</span>(phi) <span class="op">-</span><span class="st"> </span>r<span class="op">^</span>(<span class="dv">2</span><span class="op">*</span>n<span class="dv">-1</span>)<span class="op">*</span><span class="kw">cos</span>((<span class="dv">2</span><span class="op">*</span>n<span class="dv">-1</span>)<span class="op">*</span>phi)<span class="op">/</span>(<span class="dv">2</span><span class="op">*</span>n<span class="dv">-1</span>),</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>    r<span class="op">*</span><span class="kw">sin</span>(phi) <span class="op">+</span><span class="st"> </span>r<span class="op">^</span>(<span class="dv">2</span><span class="op">*</span>n<span class="dv">-1</span>)<span class="op">*</span><span class="kw">sin</span>((<span class="dv">2</span><span class="op">*</span>n<span class="dv">-1</span>)<span class="op">*</span>phi)<span class="op">/</span>(<span class="dv">2</span><span class="op">*</span>n<span class="dv">-1</span>),</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>    <span class="dv">2</span><span class="op">*</span>r<span class="op">^</span>n<span class="op">*</span><span class="kw">cos</span>(n<span class="op">*</span>phi)<span class="op">/</span>n</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>  )</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>}</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a><span class="co"># do the mesh ####</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a>rmesh &lt;-<span class="st"> </span><span class="kw">parametricMesh</span>(</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a>  Enneper, <span class="dt">urange =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi), <span class="dt">vrange =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">1.3</span>),</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a>  <span class="dt">periodic =</span> <span class="kw">c</span>(<span class="ot">TRUE</span>, <span class="ot">FALSE</span>), <span class="dt">nu =</span> <span class="dv">512</span>, <span class="dt">nv =</span> <span class="dv">512</span>, <span class="dt">clean =</span> <span class="ot">TRUE</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true"></a>)</span></code></pre></div>
+<p>Now we convert it to a CGAL mesh:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="co"># convert to CGAL mesh ####</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>mesh &lt;-<span class="st"> </span>cgalMesh<span class="op">$</span><span class="kw">new</span>(rmesh)</span></code></pre></div>
+<p>There’s not enough vertices in this mesh; if we use this one, the checkerboard will not have regular lines. So we perform an isotropic remeshing to add some vertices:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="co"># add vertices in order that the checkerboard has regular lines ####</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>mesh<span class="op">$</span><span class="kw">isotropicRemeshing</span>(<span class="fl">0.01</span>, <span class="dt">iterations =</span> <span class="dv">3</span>, <span class="dt">relaxSteps =</span> <span class="dv">2</span>)</span></code></pre></div>
+<p>Now we compute the mesh parameterization:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="co"># compute mesh parameterization ####</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>UV &lt;-<span class="st"> </span>mesh<span class="op">$</span><span class="kw">parameterization</span>(<span class="dt">method =</span> <span class="st">&quot;DCP&quot;</span>, <span class="dt">UVborder =</span> <span class="st">&quot;circle&quot;</span>)</span></code></pre></div>
+<p>And here is the code to do the radial checkerboard:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="co"># radial checkerboard ####</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>UV0 &lt;-<span class="st"> </span>UV</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>UV &lt;-<span class="st"> </span><span class="dv">10</span> <span class="op">*</span><span class="st"> </span>(UV0 <span class="op">-</span><span class="st"> </span><span class="fl">0.5</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>radii &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">apply</span>(UV, 1L, crossprod))</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>angles &lt;-<span class="st"> </span><span class="dv">10</span> <span class="op">*</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">atan2</span>(UV[, 2L], UV[, 1L])<span class="op">/</span>pi)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>clrs &lt;-<span class="st"> </span><span class="kw">ifelse</span>(</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a>  <span class="kw">floor</span>(radii) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span> <span class="op">==</span><span class="st"> </span><span class="dv">0</span>,</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a>  <span class="kw">ifelse</span>(</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a>    <span class="kw">floor</span>(angles) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span> <span class="op">==</span><span class="st"> </span><span class="dv">0</span>, <span class="st">&quot;navy&quot;</span>, <span class="st">&quot;yellow&quot;</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a>  ),</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a>  <span class="kw">ifelse</span>(</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a>    <span class="kw">floor</span>(angles) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span> <span class="op">==</span><span class="st"> </span><span class="dv">0</span>, <span class="st">&quot;yellow&quot;</span>, <span class="st">&quot;navy&quot;</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a>  )</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a>)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true"></a><span class="co"># check the checkerboard is correct ####</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true"></a><span class="kw">plot</span>(</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true"></a>  UV0, <span class="dt">type =</span> <span class="st">&quot;p&quot;</span>, <span class="dt">asp =</span> <span class="dv">1</span>, <span class="dt">pch =</span> <span class="st">&quot;.&quot;</span>, <span class="dt">col =</span> clrs, </span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true"></a>  <span class="dt">xlab =</span> <span class="st">&quot;u&quot;</span>, <span class="dt">ylab =</span> <span class="st">&quot;v&quot;</span>, <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true"></a>)</span></code></pre></div>
+<p><img src="./figures/Enneper_checkerboard_flat.png" /></p>
+<p>We compute the normals, we convert the mesh to a <strong>rgl</strong> mesh, and we assign the checkerboard colors:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="co"># compute normals, convert to 'rgl' mesh, and add colors ####</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>mesh<span class="op">$</span><span class="kw">computeNormals</span>()</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>rmesh &lt;-<span class="st"> </span>mesh<span class="op">$</span><span class="kw">getMesh</span>()</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>rmesh<span class="op">$</span>material &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">color =</span> clrs)</span></code></pre></div>
+<p><img src="./figures/Enneper_checkerboard.png" /></p>
+<p>Now we make the animation, by rotating the checkerboard:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="co"># animation rotating checkboard ####</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a>fclrs &lt;-<span class="st"> </span><span class="cf">function</span>(alpha) {</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a>  tests &lt;-<span class="st"> </span><span class="kw">floor</span>(angles <span class="op">+</span><span class="st"> </span>alpha) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span> <span class="op">==</span><span class="st"> </span><span class="dv">0</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a>  <span class="kw">ifelse</span>(</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a>    <span class="kw">floor</span>(radii) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span> <span class="op">==</span><span class="st"> </span><span class="dv">0</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true"></a>    <span class="kw">ifelse</span>(</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true"></a>      tests, <span class="st">&quot;navy&quot;</span>, <span class="st">&quot;yellow&quot;</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true"></a>    ),</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true"></a>    <span class="kw">ifelse</span>(</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true"></a>      tests, <span class="st">&quot;yellow&quot;</span>, <span class="st">&quot;navy&quot;</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true"></a>    )</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true"></a>  )</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true"></a>}</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true"></a></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true"></a><span class="co"># make animation frames ####</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true"></a>alpha_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span>, <span class="dt">length.out =</span> 19L)[<span class="op">-</span>1L]</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>))</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true"></a><span class="kw">view3d</span>(<span class="dv">0</span>, <span class="dv">-20</span>, <span class="dt">zoom =</span> <span class="fl">0.7</span>)</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_along</span>(alpha_)) {</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true"></a>  clrs &lt;-<span class="st"> </span><span class="kw">fclrs</span>(alpha_[i])</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true"></a>  rmesh<span class="op">$</span>material &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">color =</span> clrs)</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true"></a>  <span class="kw">shade3d</span>(rmesh, <span class="dt">meshColor =</span> <span class="st">&quot;vertices&quot;</span>)</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true"></a>  <span class="kw">snapshot3d</span>(<span class="kw">sprintf</span>(<span class="st">&quot;zzpic%03d.png&quot;</span>, i), <span class="dt">webshot =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true"></a>  <span class="kw">clear3d</span>()</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true"></a>}</span></code></pre></div>
+<p>It remains to mount the animation with <strong>gifski</strong>:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="co"># mount animation ####</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="kw">library</span>(gifski)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="kw">gifski</span>(</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a>  <span class="dt">png_files =</span> <span class="kw">Sys.glob</span>(<span class="st">&quot;zzpic*.png&quot;</span>),</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a>  <span class="dt">gif_file =</span> <span class="st">&quot;Enneper-radialCheckerboard-rotating.gif&quot;</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a>  <span class="dt">width =</span> <span class="dv">512</span>,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a>  <span class="dt">height =</span> <span class="dv">512</span>,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true"></a>  <span class="dt">delay =</span> <span class="dv">1</span><span class="op">/</span><span class="dv">8</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true"></a>)</span></code></pre></div>
+<p><img src="./figures/Enneper-radialCheckerboard-rotating.gif" /></p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
