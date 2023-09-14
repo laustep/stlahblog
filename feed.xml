@@ -5,7 +5,299 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Mon, 11 Sep 2023 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Thu, 14 Sep 2023 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>The pretty Klein j-invariant function</title>
+      <link>https://laustep.github.io/stlahblog/posts/KleinJinvariant.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        Here are four representations of the
+        <a href="https://en.wikipedia.org/wiki/J-invariant"
+          >Klein j-invariant function</a
+        >:
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/KleinFibo_5-6-7-9.png"
+        />
+      </p>
+      <p>
+        The Klein j-invariant function is a complex function defined on the
+        upper half-plane of the complex numbers. On the above pictures, we
+        mapped it to a circle with the inverse modified Cayley transformation,
+        which is defined by
+        <span class="math display">\[ \Psi(z) = i + 2iz / (i - z) \]</span> and
+        which maps the unit circle to the upper half-plane. Then I use some
+        <a href="https://en.wikipedia.org/wiki/Domain_coloring">color maps</a>
+        to do these pictures. These color maps are available in the
+        <a href="https://github.com/stla/RcppColors"
+          ><strong>RcppColors</strong></a
+        >
+        package.
+      </p>
+      <p>
+        I particularly like the first picture and I did an animation of it. The
+        purpose of this blog post is to explain how I did.
+      </p>
+      <p>
+        The animation is made with the help of a modular Möbius transformation
+        <span class="math display">\[ R(z) = - \frac{1}{z+1} \]</span> and its
+        generalized powers
+        <span class="math display"
+          >\[ R^t(z) = \frac{\Bigl(\sqrt{3}\cos\bigl(\frac{\pi t}{3}\bigr) -
+          \sin\bigl(\frac{\pi t}{3}\bigr)\Bigr) z - 2\sin\bigl(\frac{\pi
+          t}{3}\bigr)} {2\sin\bigl(\frac{\pi t}{3}\bigr) z +
+          \sqrt{3}\cos\bigl(\frac{\pi t}{3}\bigr) + \sin\bigl(\frac{\pi
+          t}{3}\bigr)} \]</span
+        >
+        This transformation is of order three, i.e. <span class="math inline"
+          >\(R^3(z)=z\)</span
+        >. I found it in
+        <a
+          href="https://www3.risc.jku.at/publications/download/risc_5011/DiplomaThesisPonweiser.pdf"
+          >this paper</a
+        >.
+      </p>
+      <p>Let’s define it in R:</p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1">R &lt;-<span class="st"> </span><span class="cf">function</span>(z, t) {</span>
+<span id="cb1-2">  a &lt;-<span class="st"> </span>pi<span class="op">*</span>t<span class="op">/</span><span class="dv">3</span></span>
+<span id="cb1-3">  ((<span class="kw">sqrt</span>(<span class="dv">3</span>)<span class="op">*</span><span class="kw">cos</span>(a) <span class="op">-</span><span class="st"> </span><span class="kw">sin</span>(a)) <span class="op">*</span><span class="st"> </span>z <span class="op">-</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span><span class="kw">sin</span>(a))<span class="op">/</span></span>
+<span id="cb1-4"><span class="st">    </span>(<span class="dv">2</span><span class="op">*</span><span class="kw">sin</span>(a) <span class="op">*</span><span class="st"> </span>z <span class="op">+</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="dv">3</span>)<span class="op">*</span><span class="kw">cos</span>(a) <span class="op">+</span><span class="st"> </span><span class="kw">sin</span>(a))</span>
+<span id="cb1-5">}</span></code></pre>
+      </div>
+      <p>
+        as well as the inverse modified Cayley transformation (also found in the
+        above paper):
+      </p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1">Psi &lt;-<span class="st"> </span><span class="cf">function</span>(z) {</span>
+<span id="cb2-2">  1i <span class="op">+</span><span class="st"> </span>(2i<span class="op">*</span>z) <span class="op">/</span><span class="st"> </span>(1i <span class="op">-</span><span class="st"> </span>z)</span>
+<span id="cb2-3">}</span></code></pre>
+      </div>
+      <p>
+        This function <span class="math inline">\(\Psi\)</span> is the one we
+        will use to represent the Klein j-invariant function on a circle.
+      </p>
+      <p>
+        Now, I made a grid of the unit circle. Well, not really. The Klein
+        j-invariant function is available in the <strong>jacobi</strong> package
+        under the name <code>kleinj</code>. But when a complex number
+        <code>tau</code> in the upper half-plane (i.e. with positive imaginary
+        part) is too close to the real line, the <code>kleinj</code> function
+        fails. The inverse modified Cayley transform
+        <span class="math inline">\(\Psi\)</span> maps the boundary of the unit
+        circle to the real line. So I take the centered circle of radius
+        <span class="math inline">\(0.96\)</span> instead of the unit circle. I
+        apply <span class="math inline">\(\Psi\)</span> to each point
+        <span class="math inline">\(z\)</span> in this circle, and I return
+        <span class="math inline">\(\Psi(z)\)</span> or
+        <span class="math inline">\(-1/\Psi(z)\)</span>. Later I will apply
+        <span class="math inline">\(j\)</span> (the Klein j-invariant function)
+        to the results. The reason for which I return
+        <span class="math inline">\(-1/\Psi(z)\)</span> sometimes (when
+        <span class="math inline">\(\Im(z)&lt;0\)</span>) is that
+        <span class="math inline">\(j(\tau) = j(-1/\tau)\)</span> and I found
+        that applying this transformation avoids some failures of
+        <code>kleinj</code>.
+      </p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb3-1"><span class="kw">library</span>(jacobi)</span>
+<span id="cb3-2">f &lt;-<span class="st"> </span><span class="cf">function</span>(x, y) {</span>
+<span id="cb3-3">  z &lt;-<span class="st"> </span><span class="kw">complex</span>(<span class="dt">real =</span> x, <span class="dt">imaginary =</span> y)</span>
+<span id="cb3-4">  w &lt;-<span class="st"> </span><span class="kw">Psi</span>(z)</span>
+<span id="cb3-5">  <span class="kw">ifelse</span>(</span>
+<span id="cb3-6">    <span class="kw">Mod</span>(z) <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.96</span>, </span>
+<span id="cb3-7">    <span class="ot">NA_complex_</span>,</span>
+<span id="cb3-8">    <span class="kw">ifelse</span>(</span>
+<span id="cb3-9">      y <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>, <span class="dv">-1</span><span class="op">/</span>w, w</span>
+<span id="cb3-10">    )</span>
+<span id="cb3-11">  )</span>
+<span id="cb3-12">}</span>
+<span id="cb3-13">x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="dt">length.out =</span> 2048L)</span>
+<span id="cb3-14">y &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="dt">length.out =</span> 2048L)</span>
+<span id="cb3-15">Z &lt;-<span class="st"> </span><span class="kw">outer</span>(x, y, f)</span>
+<span id="cb3-16">K &lt;-<span class="st"> </span><span class="kw">kleinj</span>(Z) <span class="op">/</span><span class="st"> </span><span class="dv">1728</span></span></code></pre>
+      </div>
+      <p>
+        In fact, there are two Klein j-invariant functions, differing by a
+        factor of <span class="math inline">\(1728\)</span>. That’s why I divide
+        by <span class="math inline">\(1728\)</span>: I take the other Klein
+        function.
+      </p>
+      <p>
+        We’re almost ready. But there’s an issue and we will have to overcome
+        it. Let’s load the <strong>RcppColors</strong> package, and we will use
+        the <code>colorMap5</code> color map. Observe the “first” picture, the
+        one obtained without applying <span class="math inline">\(R^t\)</span>:
+      </p>
+      <div class="sourceCode" id="cb4">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb4-1">image &lt;-<span class="st"> </span><span class="kw">colorMap5</span>(K), bkgcolor =<span class="st"> "white"</span><span class="er">)</span></span>
+<span id="cb4-2"><span class="kw">svg</span>(<span class="st">"x.svg"</span>)</span>
+<span id="cb4-3">opar &lt;-<span class="st"> </span><span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>))</span>
+<span id="cb4-4"><span class="kw">plot</span>(</span>
+<span id="cb4-5">  <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), <span class="dt">type =</span> <span class="st">"n"</span>, <span class="dt">xaxs =</span> <span class="st">"i"</span>, <span class="dt">yaxs =</span> <span class="st">"i"</span>, </span>
+<span id="cb4-6">  <span class="dt">xlab =</span> <span class="ot">NA</span>, <span class="dt">ylab =</span> <span class="ot">NA</span>, <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">asp =</span> <span class="dv">1</span></span>
+<span id="cb4-7">)</span>
+<span id="cb4-8"><span class="kw">rasterImage</span>(image, <span class="dv">-1</span>, <span class="dv">-1</span>, <span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb4-9"><span class="kw">par</span>(opar)</span>
+<span id="cb4-10"><span class="kw">dev.off</span>()</span>
+<span id="cb4-11">rsvg<span class="op">::</span><span class="kw">rsvg_png</span>(</span>
+<span id="cb4-12">  <span class="st">"x.svg"</span>, <span class="st">"Klein_t0.png"</span>, <span class="dt">width =</span> <span class="dv">512</span>, <span class="dt">height =</span> <span class="dv">512</span></span>
+<span id="cb4-13">)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/Klein_t0.png"
+        />
+      </p>
+      <p>
+        And now, observe the picture obtained by applying
+        <span class="math inline">\(R^{0.01}\)</span>;
+      </p>
+      <div class="sourceCode" id="cb5">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb5-1">image &lt;-<span class="st"> </span><span class="kw">colorMap5</span>(<span class="kw">R</span>(K, <span class="fl">0.01</span>), <span class="dt">bkgcolor =</span> <span class="st">"white"</span>)</span>
+<span id="cb5-2"><span class="kw">svg</span>(<span class="st">"x.svg"</span>)</span>
+<span id="cb5-3">opar &lt;-<span class="st"> </span><span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>))</span>
+<span id="cb5-4"><span class="kw">plot</span>(</span>
+<span id="cb5-5">  <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), <span class="dt">type =</span> <span class="st">"n"</span>, <span class="dt">xaxs =</span> <span class="st">"i"</span>, <span class="dt">yaxs =</span> <span class="st">"i"</span>, </span>
+<span id="cb5-6">  <span class="dt">xlab =</span> <span class="ot">NA</span>, <span class="dt">ylab =</span> <span class="ot">NA</span>, <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">asp =</span> <span class="dv">1</span></span>
+<span id="cb5-7">)</span>
+<span id="cb5-8"><span class="kw">rasterImage</span>(image, <span class="dv">-1</span>, <span class="dv">-1</span>, <span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb5-9"><span class="kw">par</span>(opar)</span>
+<span id="cb5-10"><span class="kw">dev.off</span>()</span>
+<span id="cb5-11">rsvg<span class="op">::</span><span class="kw">rsvg_png</span>(</span>
+<span id="cb5-12">  <span class="st">"x.svg"</span>, <span class="st">"Klein_t001.png"</span>, <span class="dt">width =</span> <span class="dv">512</span>, <span class="dt">height =</span> <span class="dv">512</span></span>
+<span id="cb5-13">)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/Klein_t001.png"
+        />
+      </p>
+      <p>
+        There’s a “jump”: the transition from the first picture to the second
+        one is too fast. So, since we want to make the pictures with
+        <span class="math inline">\(t\)</span> running from
+        <span class="math inline">\(0\)</span> to
+        <span class="math inline">\(3\)</span>, we need to slow down the
+        transition when there’s such a jump. We will use a “smooth staircase
+        function” for that. A nice one is
+        <span class="math inline">\(x - \sin(x)\)</span>:
+      </p>
+      <div class="sourceCode" id="cb6">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb6-1">xmsinx &lt;-<span class="st"> </span><span class="cf">function</span>(x) x <span class="op">-</span><span class="st"> </span><span class="kw">sin</span>(x)</span>
+<span id="cb6-2"><span class="kw">curve</span>(xmsinx, <span class="dt">from =</span> <span class="dv">-2</span><span class="op">*</span>pi, <span class="dt">to =</span> <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">lwd =</span> <span class="dv">2</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/kleinj-xminsinx-1.png"
+          style="display: block; margin: auto"
+        />
+      </p>
+      <p>
+        I firstly tried to use this function but this is not enough: the
+        transitions are still too fast. We can iterate this function to get more
+        slowness:
+      </p>
+      <div class="sourceCode" id="cb7">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb7-1"><span class="kw">curve</span>(<span class="kw">xmsinx</span>(<span class="kw">xmsinx</span>(x)), <span class="dt">from =</span> <span class="dv">-2</span><span class="op">*</span>pi, <span class="dt">to =</span> <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">lwd =</span> <span class="dv">2</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/kleinj-xminsinxitr-1.png"
+          style="display: block; margin: auto"
+        />
+      </p>
+      <p>
+        This one is good. We need to modify it in order that the “stairs” fit
+        the “jumps”. We will range <span class="math inline">\(t\)</span> from
+        <span class="math inline">\(-2\pi\)</span> to
+        <span class="math inline">\(\pi\)</span> and we will apply the modified
+        smooth stair case function
+        <span class="math inline">\(s\)</span> defined by
+      </p>
+      <div class="sourceCode" id="cb8">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb8-1">s &lt;-<span class="st"> </span><span class="cf">function</span>(x) {</span>
+<span id="cb8-2">  (<span class="kw">xmsinx</span>(<span class="kw">xmsinx</span>(<span class="dv">2</span><span class="op">*</span>x)) <span class="op">+</span><span class="st"> </span><span class="dv">4</span><span class="op">*</span>pi) <span class="op">/</span><span class="st"> </span>(<span class="dv">2</span><span class="op">*</span>pi)  </span>
+<span id="cb8-3">}</span></code></pre>
+      </div>
+      <p>
+        Applied to <span class="math inline">\(t\)</span> will give a range from
+        <span class="math inline">\(0\)</span> to
+        <span class="math inline">\(3\)</span>.
+      </p>
+      <p>We’re ready! Let’s make the animation frames:</p>
+      <div class="sourceCode" id="cb9">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb9-1">t_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">2</span><span class="op">*</span>pi, pi, <span class="dt">length.out=</span> 91L)[<span class="op">-</span>1L]</span>
+<span id="cb9-2"><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_along</span>(t_)) {</span>
+<span id="cb9-3">  KRt &lt;-<span class="st"> </span><span class="kw">R</span>(K, <span class="kw">s</span>(t_[i]))</span>
+<span id="cb9-4">  image &lt;-<span class="st"> </span><span class="kw">colorMap5</span>(KRt, <span class="dt">bkgcolor =</span> bkgcol)</span>
+<span id="cb9-5">  <span class="kw">svg</span>(<span class="st">"x.svg"</span>)</span>
+<span id="cb9-6">  opar &lt;-<span class="st"> </span><span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>))</span>
+<span id="cb9-7">  <span class="kw">plot</span>(</span>
+<span id="cb9-8">    <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), <span class="dt">type =</span> <span class="st">"n"</span>, <span class="dt">xaxs =</span> <span class="st">"i"</span>, <span class="dt">yaxs =</span> <span class="st">"i"</span>, </span>
+<span id="cb9-9">    <span class="dt">xlab =</span> <span class="ot">NA</span>, <span class="dt">ylab =</span> <span class="ot">NA</span>, <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">asp =</span> <span class="dv">1</span></span>
+<span id="cb9-10">  )</span>
+<span id="cb9-11">  <span class="kw">rasterImage</span>(image, <span class="dv">-1</span>, <span class="dv">-1</span>, <span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb9-12">  <span class="kw">par</span>(opar)</span>
+<span id="cb9-13">  <span class="kw">dev.off</span>()</span>
+<span id="cb9-14">  rsvg<span class="op">::</span><span class="kw">rsvg_png</span>(</span>
+<span id="cb9-15">    <span class="st">"x.svg"</span>, <span class="kw">sprintf</span>(<span class="st">"frame%03d.png"</span>, i), <span class="dt">width =</span> <span class="dv">512</span>, <span class="dt">height =</span> <span class="dv">512</span></span>
+<span id="cb9-16">  )</span>
+<span id="cb9-17">}</span></code></pre>
+      </div>
+      <p>
+        The frames are done. It remains to mount them to a GIF with
+        <strong>gifski</strong>.
+      </p>
+      <div class="sourceCode" id="cb10">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb10-1"><span class="kw">library</span>(gifski)</span>
+<span id="cb10-2">pngFrames &lt;-<span class="st"> </span><span class="kw">Sys.glob</span>(<span class="st">"frame*.png"</span>)</span>
+<span id="cb10-3"><span class="kw">gifski</span>(</span>
+<span id="cb10-4">  pngFrames,</span>
+<span id="cb10-5">  <span class="st">"Kleinj.gif"</span>,</span>
+<span id="cb10-6">  <span class="dt">width =</span> <span class="dv">512</span>, <span class="dt">height =</span> <span class="dv">512</span>,</span>
+<span id="cb10-7">  <span class="dt">delay =</span> <span class="dv">1</span><span class="op">/</span><span class="dv">10</span></span>
+<span id="cb10-8">)</span>
+<span id="cb10-9"><span class="kw">file.remove</span>(pngFrames)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/Kleinj.gif"
+        />
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Thu, 14 Sep 2023 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/KleinJinvariant.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>Enneper surface with rotating checkerboard</title>
       <link>https://laustep.github.io/stlahblog/posts/Enneper-checkerboard.html</link>
