@@ -5,7 +5,199 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Thu, 14 Sep 2023 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Fri, 15 Sep 2023 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>The Cantor expansion revisited</title>
+      <link>https://laustep.github.io/stlahblog/posts/CantorExpansionRevisited.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        On my former blog, I wrote
+        <a href="https://stla.github.io/stlapblog/posts/Greedy.html">a post</a>
+        about the <em>Cantor expansion</em> of a natural integer. This is a
+        generalization of the well-known binary expansion. For example, the
+        Cantor <span class="math inline">\((3,4,5)\)</span>-expansion of a
+        natural integer <span class="math inline">\(N\)</span> is a triplet
+        <span class="math display"
+          >\[ (\epsilon_0, \epsilon_1, \epsilon_2) \in \{0,1,2\} \times
+          \{0,1,2,3\} \times \{0,1,2,3,4\} \]</span
+        >
+        such that
+        <span class="math display"
+          >\[ N = \epsilon_0 + \epsilon_1 \times 3 + \epsilon_2 \times (3\times
+          4). \]</span
+        >
+        It exists for every natural number
+        <span class="math inline">\(N\)</span> lower than or equal to
+        <span class="math inline">\(3 \times 4 \times 5 - 1 = 59\)</span>.
+      </p>
+      <p>
+        A binary expansion is a Cantor
+        <span class="math inline">\((2, 2, \ldots, 2)\)</span>-expansion.
+      </p>
+      <p>
+        In the article of my former blog, I explain how that can be used to
+        transform a nested loop to a single loop.
+      </p>
+      <p>
+        To get a Cantor expansion, I described the <em>greedy algorithm</em> on
+        my former blog. It is implemented as follows:
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1">Cantor_greedy &lt;-<span class="st"> </span><span class="cf">function</span>(n, sizes) {</span>
+<span id="cb1-2">  l &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="kw">cumprod</span>(sizes))</span>
+<span id="cb1-3">  epsilon &lt;-<span class="st"> </span><span class="kw">numeric</span>(<span class="kw">length</span>(sizes))</span>
+<span id="cb1-4">  <span class="cf">while</span>(n <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>){</span>
+<span id="cb1-5">    k &lt;-<span class="st"> </span><span class="kw">which.min</span>(l <span class="op">&lt;=</span><span class="st"> </span>n)</span>
+<span id="cb1-6">    e &lt;-<span class="st"> </span><span class="kw">floor</span>(n <span class="op">/</span><span class="st"> </span>l[k<span class="dv">-1</span>])</span>
+<span id="cb1-7">    epsilon[k<span class="dv">-1</span>] &lt;-<span class="st"> </span>e</span>
+<span id="cb1-8">    n &lt;-<span class="st"> </span>n <span class="op">-</span><span class="st"> </span>e <span class="op">*</span><span class="st"> </span>l[k<span class="dv">-1</span>]</span>
+<span id="cb1-9">  }</span>
+<span id="cb1-10">  epsilon</span>
+<span id="cb1-11">}</span></code></pre>
+      </div>
+      <p>
+        Later, on StackOverflow, a user opened a
+        <a href="https://stackoverflow.com/q/74563284/1100107">question</a>
+        entitled
+        <em
+          >Efficiently create random sample from <code>expand.grid</code> output
+          without using <code>expand.grid</code></em
+        >. I immediately replied and suggested to use a Cantor expansion.
+      </p>
+      <p>
+        But another user, Robert Hacken, replied too, and he gave an answer
+        seemingly different of mine at first glance, but in fact
+        <em>it was the same</em>. Actually this user provided another way to
+        derive a Cantor expansion of an integer:
+      </p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1">mod2 &lt;-<span class="st"> </span><span class="cf">function</span>(x, y) {</span>
+<span id="cb2-2">  (x<span class="dv">-1</span>) <span class="op">%%</span><span class="st"> </span>y</span>
+<span id="cb2-3">}</span>
+<span id="cb2-4">Cantor_Hacken &lt;-<span class="st"> </span><span class="cf">function</span>(n, sizes) {</span>
+<span id="cb2-5">  p &lt;-<span class="st"> </span><span class="kw">cumprod</span>(<span class="kw">c</span>(<span class="dv">1</span>, <span class="kw">head</span>(sizes, <span class="dv">-1</span>)))</span>
+<span id="cb2-6">  <span class="kw">mod2</span>(<span class="kw">ceiling</span>((n <span class="op">+</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span>p), sizes)</span>
+<span id="cb2-7">}</span></code></pre>
+      </div>
+      <p>We can check these two ways give the same result:</p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb3-1"><span class="kw">Cantor_greedy</span>(<span class="dt">n =</span> <span class="dv">29</span>, <span class="dt">sizes =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>))</span>
+<span id="cb3-2"><span class="co">## [1] 2 1 2</span></span>
+<span id="cb3-3"><span class="kw">Cantor_Hacken</span>(<span class="dt">n =</span> <span class="dv">29</span>, <span class="dt">sizes =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>))</span>
+<span id="cb3-4"><span class="co">## [1] 2 1 2</span></span></code></pre>
+      </div>
+      <p>
+        On StackOverflow, I compared the speed of the two R functions, and
+        Hacken’s one is faster. I also compared the speed of Hacken’s R function
+        and the Rcpp implementation of the greedy algorithm given in my former
+        blog, and this one is faster. It is now time to compare two Rcpp
+        implementations.
+      </p>
+      <div class="sourceCode" id="cb4">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb4-1"><span class="kw">library</span>(inline)</span>
+<span id="cb4-2"></span>
+<span id="cb4-3"><span class="co"># greedy </span></span>
+<span id="cb4-4">src &lt;-<span class="st"> 'int n = as&lt;int&gt;(N);</span></span>
+<span id="cb4-5"><span class="st">std::vector&lt;int&gt; s = as&lt;std::vector&lt;int&gt;&gt;(sizes);</span></span>
+<span id="cb4-6"><span class="st">std::vector&lt;int&gt; epsilon(s.size());</span></span>
+<span id="cb4-7"><span class="st">std::vector&lt;int&gt;::iterator it;</span></span>
+<span id="cb4-8"><span class="st">it = s.begin();</span></span>
+<span id="cb4-9"><span class="st">it = s.insert(it, 1);</span></span>
+<span id="cb4-10"><span class="st">int G[s.size()];</span></span>
+<span id="cb4-11"><span class="st">std::partial_sum(s.begin(), s.end(), G, std::multiplies&lt;int&gt;());</span></span>
+<span id="cb4-12"><span class="st">int k;</span></span>
+<span id="cb4-13"><span class="st">while(n &gt; 0) {</span></span>
+<span id="cb4-14"><span class="st">  k = 1;</span></span>
+<span id="cb4-15"><span class="st">  while(G[k] &lt;= n) {</span></span>
+<span id="cb4-16"><span class="st">    k++;</span></span>
+<span id="cb4-17"><span class="st">  }</span></span>
+<span id="cb4-18"><span class="st">  epsilon[k-1] = (int)n / G[k-1];</span></span>
+<span id="cb4-19"><span class="st">  n = n % G[k-1];</span></span>
+<span id="cb4-20"><span class="st">}</span></span>
+<span id="cb4-21"><span class="st">return wrap(epsilon);'</span></span>
+<span id="cb4-22"></span>
+<span id="cb4-23">greedy_Rcpp &lt;-<span class="st"> </span><span class="kw">cxxfunction</span>(</span>
+<span id="cb4-24">  <span class="kw">signature</span>(<span class="dt">N =</span> <span class="st">"integer"</span>, <span class="dt">sizes =</span> <span class="st">"integer"</span>), <span class="dt">body =</span> src, <span class="dt">plugin =</span> <span class="st">"Rcpp"</span></span>
+<span id="cb4-25">)</span>
+<span id="cb4-26"></span>
+<span id="cb4-27"><span class="co"># Hacken </span></span>
+<span id="cb4-28">src &lt;-<span class="st"> 'int n = as&lt;int&gt;(N);</span></span>
+<span id="cb4-29"><span class="st">std::vector&lt;int&gt; s = as&lt;std::vector&lt;int&gt;&gt;(sizes);</span></span>
+<span id="cb4-30"><span class="st">int l = s.size();</span></span>
+<span id="cb4-31"><span class="st">std::vector&lt;int&gt; epsilon(l);</span></span>
+<span id="cb4-32"><span class="st">int p = 1;</span></span>
+<span id="cb4-33"><span class="st">double t = n + 1;</span></span>
+<span id="cb4-34"><span class="st">for(int i = 0; i &lt; l; i++) {</span></span>
+<span id="cb4-35"><span class="st">  epsilon[i] = ((int)ceil(t / p) - 1) % s[i];</span></span>
+<span id="cb4-36"><span class="st">  p *= s[i];</span></span>
+<span id="cb4-37"><span class="st">}</span></span>
+<span id="cb4-38"><span class="st">return wrap(epsilon);'</span></span>
+<span id="cb4-39"></span>
+<span id="cb4-40">Hacken_Rcpp &lt;-<span class="st"> </span><span class="kw">cxxfunction</span>(</span>
+<span id="cb4-41">  <span class="kw">signature</span>(<span class="dt">N =</span> <span class="st">"integer"</span>, <span class="dt">sizes =</span> <span class="st">"integer"</span>), <span class="dt">body =</span> src, <span class="dt">plugin =</span> <span class="st">"Rcpp"</span></span>
+<span id="cb4-42">)</span>
+<span id="cb4-43"></span>
+<span id="cb4-44"><span class="co"># check</span></span>
+<span id="cb4-45"><span class="kw">greedy_Rcpp</span>(<span class="dt">N =</span> 29L, <span class="dt">sizes =</span> <span class="kw">c</span>(3L, 4L, 5L))</span>
+<span id="cb4-46"><span class="co">## [1] 2 1 2</span></span>
+<span id="cb4-47"><span class="kw">Hacken_Rcpp</span>(<span class="dt">N =</span> 29L, <span class="dt">sizes =</span> <span class="kw">c</span>(3L, 4L, 5L))</span>
+<span id="cb4-48"><span class="co">## [1] 2 1 2</span></span>
+<span id="cb4-49"></span>
+<span id="cb4-50"><span class="co"># benchmark</span></span>
+<span id="cb4-51"><span class="kw">library</span>(microbenchmark)</span>
+<span id="cb4-52"></span>
+<span id="cb4-53">sizes &lt;-<span class="st"> </span>2L<span class="op">:</span>10L</span>
+<span id="cb4-54"></span>
+<span id="cb4-55">greedy &lt;-<span class="st"> </span><span class="cf">function</span>() {</span>
+<span id="cb4-56">  L &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">"list"</span>, <span class="dt">length =</span> <span class="kw">prod</span>(sizes))</span>
+<span id="cb4-57">  <span class="cf">for</span>(n <span class="cf">in</span> <span class="kw">seq_len</span>(<span class="kw">prod</span>(sizes))) {</span>
+<span id="cb4-58">    L[[n]] &lt;-<span class="st"> </span><span class="kw">greedy_Rcpp</span>(n, sizes)</span>
+<span id="cb4-59">  }</span>
+<span id="cb4-60">}</span>
+<span id="cb4-61"></span>
+<span id="cb4-62">Hacken &lt;-<span class="st"> </span><span class="cf">function</span>() {</span>
+<span id="cb4-63">  L &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">"list"</span>, <span class="dt">length =</span> <span class="kw">prod</span>(sizes))</span>
+<span id="cb4-64">  <span class="cf">for</span>(n <span class="cf">in</span> <span class="kw">seq_len</span>(<span class="kw">prod</span>(sizes))) {</span>
+<span id="cb4-65">    L[[n]] &lt;-<span class="st"> </span><span class="kw">Hacken_Rcpp</span>(n, sizes)</span>
+<span id="cb4-66">  }</span>
+<span id="cb4-67">}</span>
+<span id="cb4-68"></span>
+<span id="cb4-69"><span class="kw">print</span>(</span>
+<span id="cb4-70">  <span class="kw">microbenchmark</span>(</span>
+<span id="cb4-71">    <span class="dt">greedy =</span> <span class="kw">greedy</span>(),</span>
+<span id="cb4-72">    <span class="dt">Hacken =</span> <span class="kw">Hacken</span>(),</span>
+<span id="cb4-73">    <span class="dt">times =</span> 20L</span>
+<span id="cb4-74">  ),</span>
+<span id="cb4-75">  <span class="dt">signif =</span> <span class="dv">5</span></span>
+<span id="cb4-76">)</span>
+<span id="cb4-77"><span class="co">## Unit: seconds</span></span>
+<span id="cb4-78"><span class="co">##    expr    min     lq   mean median     uq    max neval</span></span>
+<span id="cb4-79"><span class="co">##  greedy 7.4789 8.8480 10.022  9.784 10.478 16.557    20</span></span>
+<span id="cb4-80"><span class="co">##  Hacken 7.5696 8.8942 10.689 10.011 12.404 15.998    20</span></span></code></pre>
+      </div>
+      <p>
+        Well, the speeds are rather similar. But that could depend on the values
+        of <code>sizes</code>; we could perform finer comparisons.
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Fri, 15 Sep 2023 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/CantorExpansionRevisited.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>The pretty Klein j-invariant function</title>
       <link>https://laustep.github.io/stlahblog/posts/KleinJinvariant.html</link>
@@ -206,6 +398,7 @@
       <p>
         <img
           src="https://laustep.github.io/stlahblog/posts/figures/kleinj-xminsinx-1.png"
+          width="512"
           style="display: block; margin: auto"
         />
       </p>
@@ -222,6 +415,7 @@
       <p>
         <img
           src="https://laustep.github.io/stlahblog/posts/figures/kleinj-xminsinxitr-1.png"
+          width="512"
           style="display: block; margin: auto"
         />
       </p>

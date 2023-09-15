@@ -1,0 +1,277 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - The Cantor expansion revisited</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>The Cantor expansion revisited</h1> 
+          <div class="info">
+    Posted on September 15, 2023
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'Rcpp'." href="../tags/Rcpp.html">Rcpp</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>
+    
+</div>
+
+<p>On my former blog, I wrote <a href="https://stla.github.io/stlapblog/posts/Greedy.html">a post</a> about the <em>Cantor expansion</em> of a natural integer. This is a generalization of the well-known binary expansion. For example, the Cantor <span class="math inline">\((3,4,5)\)</span>-expansion of a natural integer <span class="math inline">\(N\)</span> is a triplet <span class="math display">\[
+(\epsilon_0, \epsilon_1, \epsilon_2) \in 
+\{0,1,2\} \times \{0,1,2,3\} \times \{0,1,2,3,4\}
+\]</span> such that <span class="math display">\[
+N = \epsilon_0 + \epsilon_1 \times 3 + \epsilon_2 \times (3\times 4).
+\]</span> It exists for every natural number <span class="math inline">\(N\)</span> lower than or equal to <span class="math inline">\(3 \times 4 \times 5 - 1 = 59\)</span>.</p>
+<p>A binary expansion is a Cantor <span class="math inline">\((2, 2, \ldots, 2)\)</span>-expansion.</p>
+<p>In the article of my former blog, I explain how that can be used to transform a nested loop to a single loop.</p>
+<p>To get a Cantor expansion, I described the <em>greedy algorithm</em> on my former blog. It is implemented as follows:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>Cantor_greedy &lt;-<span class="st"> </span><span class="cf">function</span>(n, sizes) {</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>  l &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="kw">cumprod</span>(sizes))</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>  epsilon &lt;-<span class="st"> </span><span class="kw">numeric</span>(<span class="kw">length</span>(sizes))</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>  <span class="cf">while</span>(n <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>){</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>    k &lt;-<span class="st"> </span><span class="kw">which.min</span>(l <span class="op">&lt;=</span><span class="st"> </span>n)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>    e &lt;-<span class="st"> </span><span class="kw">floor</span>(n <span class="op">/</span><span class="st"> </span>l[k<span class="dv">-1</span>])</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>    epsilon[k<span class="dv">-1</span>] &lt;-<span class="st"> </span>e</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>    n &lt;-<span class="st"> </span>n <span class="op">-</span><span class="st"> </span>e <span class="op">*</span><span class="st"> </span>l[k<span class="dv">-1</span>]</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>  }</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>  epsilon</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>}</span></code></pre></div>
+<p>Later, on StackOverflow, a user opened a <a href="https://stackoverflow.com/q/74563284/1100107">question</a> entitled <em>Efficiently create random sample from <code>expand.grid</code> output without using <code>expand.grid</code></em>. I immediately replied and suggested to use a Cantor expansion.</p>
+<p>But another user, Robert Hacken, replied too, and he gave an answer seemingly different of mine at first glance, but in fact <em>it was the same</em>. Actually this user provided another way to derive a Cantor expansion of an integer:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>mod2 &lt;-<span class="st"> </span><span class="cf">function</span>(x, y) {</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>  (x<span class="dv">-1</span>) <span class="op">%%</span><span class="st"> </span>y</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>}</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>Cantor_Hacken &lt;-<span class="st"> </span><span class="cf">function</span>(n, sizes) {</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>  p &lt;-<span class="st"> </span><span class="kw">cumprod</span>(<span class="kw">c</span>(<span class="dv">1</span>, <span class="kw">head</span>(sizes, <span class="dv">-1</span>)))</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>  <span class="kw">mod2</span>(<span class="kw">ceiling</span>((n <span class="op">+</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span>p), sizes)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>}</span></code></pre></div>
+<p>We can check these two ways give the same result:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">Cantor_greedy</span>(<span class="dt">n =</span> <span class="dv">29</span>, <span class="dt">sizes =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="co">## [1] 2 1 2</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="kw">Cantor_Hacken</span>(<span class="dt">n =</span> <span class="dv">29</span>, <span class="dt">sizes =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>))</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="co">## [1] 2 1 2</span></span></code></pre></div>
+<p>On StackOverflow, I compared the speed of the two R functions, and Hacken’s one is faster. I also compared the speed of Hacken’s R function and the Rcpp implementation of the greedy algorithm given in my former blog, and this one is faster. It is now time to compare two Rcpp implementations.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">library</span>(inline)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="co"># greedy </span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>src &lt;-<span class="st"> 'int n = as&lt;int&gt;(N);</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a><span class="st">std::vector&lt;int&gt; s = as&lt;std::vector&lt;int&gt;&gt;(sizes);</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a><span class="st">std::vector&lt;int&gt; epsilon(s.size());</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a><span class="st">std::vector&lt;int&gt;::iterator it;</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a><span class="st">it = s.begin();</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a><span class="st">it = s.insert(it, 1);</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a><span class="st">int G[s.size()];</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a><span class="st">std::partial_sum(s.begin(), s.end(), G, std::multiplies&lt;int&gt;());</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a><span class="st">int k;</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a><span class="st">while(n &gt; 0) {</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a><span class="st">  k = 1;</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a><span class="st">  while(G[k] &lt;= n) {</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true"></a><span class="st">    k++;</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true"></a><span class="st">  }</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true"></a><span class="st">  epsilon[k-1] = (int)n / G[k-1];</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true"></a><span class="st">  n = n % G[k-1];</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true"></a><span class="st">}</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true"></a><span class="st">return wrap(epsilon);'</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true"></a></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true"></a>greedy_Rcpp &lt;-<span class="st"> </span><span class="kw">cxxfunction</span>(</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true"></a>  <span class="kw">signature</span>(<span class="dt">N =</span> <span class="st">&quot;integer&quot;</span>, <span class="dt">sizes =</span> <span class="st">&quot;integer&quot;</span>), <span class="dt">body =</span> src, <span class="dt">plugin =</span> <span class="st">&quot;Rcpp&quot;</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true"></a>)</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true"></a></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true"></a><span class="co"># Hacken </span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true"></a>src &lt;-<span class="st"> 'int n = as&lt;int&gt;(N);</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true"></a><span class="st">std::vector&lt;int&gt; s = as&lt;std::vector&lt;int&gt;&gt;(sizes);</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true"></a><span class="st">int l = s.size();</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true"></a><span class="st">std::vector&lt;int&gt; epsilon(l);</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true"></a><span class="st">int p = 1;</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true"></a><span class="st">double t = n + 1;</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true"></a><span class="st">for(int i = 0; i &lt; l; i++) {</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true"></a><span class="st">  epsilon[i] = ((int)ceil(t / p) - 1) % s[i];</span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true"></a><span class="st">  p *= s[i];</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true"></a><span class="st">}</span></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true"></a><span class="st">return wrap(epsilon);'</span></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true"></a></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true"></a>Hacken_Rcpp &lt;-<span class="st"> </span><span class="kw">cxxfunction</span>(</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true"></a>  <span class="kw">signature</span>(<span class="dt">N =</span> <span class="st">&quot;integer&quot;</span>, <span class="dt">sizes =</span> <span class="st">&quot;integer&quot;</span>), <span class="dt">body =</span> src, <span class="dt">plugin =</span> <span class="st">&quot;Rcpp&quot;</span></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true"></a>)</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true"></a></span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true"></a><span class="co"># check</span></span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true"></a><span class="kw">greedy_Rcpp</span>(<span class="dt">N =</span> 29L, <span class="dt">sizes =</span> <span class="kw">c</span>(3L, 4L, 5L))</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true"></a><span class="co">## [1] 2 1 2</span></span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true"></a><span class="kw">Hacken_Rcpp</span>(<span class="dt">N =</span> 29L, <span class="dt">sizes =</span> <span class="kw">c</span>(3L, 4L, 5L))</span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true"></a><span class="co">## [1] 2 1 2</span></span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true"></a></span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true"></a><span class="co"># benchmark</span></span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true"></a><span class="kw">library</span>(microbenchmark)</span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true"></a></span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true"></a>sizes &lt;-<span class="st"> </span>2L<span class="op">:</span>10L</span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true"></a></span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true"></a>greedy &lt;-<span class="st"> </span><span class="cf">function</span>() {</span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true"></a>  L &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;list&quot;</span>, <span class="dt">length =</span> <span class="kw">prod</span>(sizes))</span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true"></a>  <span class="cf">for</span>(n <span class="cf">in</span> <span class="kw">seq_len</span>(<span class="kw">prod</span>(sizes))) {</span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true"></a>    L[[n]] &lt;-<span class="st"> </span><span class="kw">greedy_Rcpp</span>(n, sizes)</span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true"></a>  }</span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true"></a>}</span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true"></a></span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true"></a>Hacken &lt;-<span class="st"> </span><span class="cf">function</span>() {</span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true"></a>  L &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;list&quot;</span>, <span class="dt">length =</span> <span class="kw">prod</span>(sizes))</span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true"></a>  <span class="cf">for</span>(n <span class="cf">in</span> <span class="kw">seq_len</span>(<span class="kw">prod</span>(sizes))) {</span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true"></a>    L[[n]] &lt;-<span class="st"> </span><span class="kw">Hacken_Rcpp</span>(n, sizes)</span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true"></a>  }</span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true"></a>}</span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true"></a></span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true"></a><span class="kw">print</span>(</span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true"></a>  <span class="kw">microbenchmark</span>(</span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true"></a>    <span class="dt">greedy =</span> <span class="kw">greedy</span>(),</span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true"></a>    <span class="dt">Hacken =</span> <span class="kw">Hacken</span>(),</span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true"></a>    <span class="dt">times =</span> 20L</span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true"></a>  ),</span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true"></a>  <span class="dt">signif =</span> <span class="dv">5</span></span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true"></a>)</span>
+<span id="cb4-77"><a href="#cb4-77" aria-hidden="true"></a><span class="co">## Unit: seconds</span></span>
+<span id="cb4-78"><a href="#cb4-78" aria-hidden="true"></a><span class="co">##    expr    min     lq   mean median     uq    max neval</span></span>
+<span id="cb4-79"><a href="#cb4-79" aria-hidden="true"></a><span class="co">##  greedy 7.4789 8.8480 10.022  9.784 10.478 16.557    20</span></span>
+<span id="cb4-80"><a href="#cb4-80" aria-hidden="true"></a><span class="co">##  Hacken 7.5696 8.8942 10.689 10.011 12.404 15.998    20</span></span></code></pre></div>
+<p>Well, the speeds are rather similar. But that could depend on the values of <code>sizes</code>; we could perform finer comparisons.</p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
