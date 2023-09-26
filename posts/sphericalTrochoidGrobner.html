@@ -1,0 +1,268 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Implicitization for the spherical trochoid</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Implicitization for the spherical trochoid</h1> 
+          <div class="info">
+    Posted on September 26, 2023
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'rgl'." href="../tags/rgl.html">rgl</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>, <a title="All pages tagged 'geometry'." href="../tags/geometry.html">geometry</a>
+    
+</div>
+
+<p>If you didn’t read or if you don’t remember my post <a href="https://laustep.github.io/stlahblog/posts/giacR02.html">Using implicitization to split a ball</a>, take a look at it before reading this one. To sum up, I took a spherical curve, namely a <em>satellite curve</em>, and I derived a surface whose intersection with the sphere is the satellite curve. I did that thanks to the so-called implicitization process, based on Gröbner bases, and which can be performed with the <strong>giacR</strong> package.</p>
+<p>What I like with this process is that it’s almost impossible to guess the shape of the derived surface when a spherical curve is given. For example, I still played with the satellite curves and using this process for different values of the parameters, I obtained this funny animated surface:</p>
+<p><img src="./figures/doubleTrumpet.gif" /></p>
+<p>You can find the code which generates this animation in <a href="https://gist.github.com/stla/c48977956eea1cf1cd581c6a5eab7686">this gist</a>.</p>
+<p>Now we will see what happens when applying this process to a <em>spherical trochoid</em>, a very interesting curve.</p>
+<p>The parametric equations of the spherical trochoid are <span class="math display">\[
+\left\{\begin{aligned}
+x(t) &amp; = \bigl(qb-b\cos(\omega)+d\cos(\omega)\cos(qt)\bigr)\cos(t)+d\sin(t)\sin(qt) \\
+y(t) &amp; = \bigl(qb-b\cos(\omega)+d\cos(\omega)\cos(qt)\bigr)\sin(t)-d\cos(t)\sin(qt) \\
+z(t) &amp; = \sin(\omega)\bigl(b-d\cos(qt)\bigr)
+\end{aligned}\right..
+\]</span></p>
+<p>As suggested by its name, the spherical trochoid is a spherical curve. Namely, it is a curve lying on the sphere with center <span class="math inline">\((0, 0, h)\)</span> and radius <span class="math inline">\(R\)</span> given by <span class="math display">\[
+h = \frac{b-a\cos(\omega)}{\sin(\omega)}
+\qquad \textrm{and} \qquad
+R = \sqrt{a^2+h^2+d^2-b^2}
+\]</span> where <span class="math inline">\(a = qb\)</span>.</p>
+<p>Type <em>“spherical trochoid”</em> on Google or another web search engine, you will find some valuable information, including some animations showing the geometric construction of the spherical trochoid.</p>
+<p>Let’s write these equations in R with <span class="math inline">\(q = 3\)</span> as a function of <span class="math inline">\(t\)</span>, and let’s do a plot:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>sphericalTrochoid &lt;-<span class="st"> </span><span class="cf">function</span>(t) {</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>  A &lt;-<span class="st"> </span><span class="kw">cos</span>(omega)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>  B &lt;-<span class="st"> </span><span class="kw">sin</span>(omega)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>  f &lt;-<span class="st"> </span><span class="dv">3</span><span class="op">*</span>b <span class="op">-</span><span class="st"> </span>b<span class="op">*</span>A <span class="op">+</span><span class="st"> </span>d<span class="op">*</span>A<span class="op">*</span><span class="kw">cos</span>(<span class="dv">3</span><span class="op">*</span>t)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>  <span class="kw">cbind</span>(</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>    f <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(t) <span class="op">+</span><span class="st"> </span>d <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(t)<span class="op">*</span><span class="kw">sin</span>(<span class="dv">3</span><span class="op">*</span>t),</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>    f <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(t) <span class="op">-</span><span class="st"> </span>d <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(t)<span class="op">*</span><span class="kw">sin</span>(<span class="dv">3</span><span class="op">*</span>t),</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>    B <span class="op">*</span><span class="st"> </span>(b <span class="op">-</span><span class="st"> </span>d<span class="op">*</span><span class="kw">cos</span>(<span class="dv">3</span><span class="op">*</span>t))</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>  )</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>}</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a><span class="co"># parameters</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>omega &lt;-<span class="st"> </span><span class="fl">1.4</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>b &lt;-<span class="st"> </span><span class="dv">5</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>d &lt;-<span class="st"> </span><span class="dv">10</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a><span class="co"># sampling</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>t_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> 360L)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a>stSample &lt;-<span class="st"> </span><span class="kw">sphericalTrochoid</span>(t_)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a><span class="co"># we will plot the supporting sphere as well</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a>a &lt;-<span class="st"> </span><span class="dv">3</span><span class="op">*</span>b</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a>h &lt;-<span class="st"> </span>(b <span class="op">-</span><span class="st"> </span>a<span class="op">*</span><span class="kw">cos</span>(omega)) <span class="op">/</span><span class="st"> </span><span class="kw">sin</span>(omega) <span class="co"># altitude of center </span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a>R &lt;-<span class="st"> </span><span class="kw">sqrt</span>(a<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>h<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>d<span class="op">^</span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span>b<span class="op">^</span><span class="dv">2</span>)     <span class="co"># radius</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">library</span>(rgl)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>sphereMesh &lt;-<span class="st"> </span>cgalMeshes<span class="op">::</span><span class="kw">sphereMesh</span>(<span class="dt">z =</span> h, <span class="dt">r =</span> R, <span class="dt">iterations =</span> 5L)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>), <span class="dt">zoom =</span> <span class="fl">0.7</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="kw">shade3d</span>(sphereMesh, <span class="dt">color =</span> <span class="st">&quot;yellow&quot;</span>, <span class="dt">alpha =</span> <span class="fl">0.2</span>, <span class="dt">polygon_offset =</span> <span class="dv">1</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="kw">lines3d</span>(stSample, <span class="dt">lwd =</span> <span class="dv">3</span>)</span></code></pre></div>
+<p><img src="./figures/sphericalTrochoid.gif" /></p>
+<p>Note that <span class="math inline">\(q=3\)</span> corresponds to the number of loops.</p>
+<p>Now, let’s proceed as in the post <a href="https://laustep.github.io/stlahblog/posts/giacR02.html">Using implicitization to split a ball</a>: using the Gröbner implicitization implemented in the <strong>giacR</strong> package, we shall derive an equation of an implicit surface whose intersection with the sphere is the spherical trochoid. We provide the polynomial expressions of <span class="math inline">\(\cos(3t)\)</span> and <span class="math inline">\(\sin(3t)\)</span> in function of <span class="math inline">\(\cos(t)\)</span> and <span class="math inline">\(\sin(t)\)</span>, which can be obtained with <strong>giacR</strong> as well.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">library</span>(giacR)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>equations &lt;-<span class="st"> </span><span class="kw">paste</span>(</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>  <span class="st">&quot;x = (3*b - b*A + d*A*cos3t)*cost + d*sint*sin3t&quot;</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>  <span class="st">&quot;y = (3*b - b*A + d*A*cos3t)*sint - d*cost*sin3t&quot;</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>  <span class="st">&quot;z = B*(b - d*cos3t)&quot;</span>, </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>  <span class="dt">sep =</span> <span class="st">&quot;, &quot;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a>relations &lt;-<span class="st"> </span><span class="kw">paste</span>(</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a>  <span class="st">&quot;A^2 + B^2 = 1&quot;</span>, </span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a>  <span class="st">&quot;cost^2 + sint^2 = 1&quot;</span>,</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a>  <span class="st">&quot;cos3t = 4*cost^3 - 3*cost&quot;</span>, </span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a>  <span class="st">&quot;sin3t = (4*cost^2 - 1)*sint&quot;</span>, </span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a>  <span class="dt">sep =</span> <span class="st">&quot;, &quot;</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a>)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a>variables &lt;-<span class="st"> &quot;cost, sint, cos3t, sin3t&quot;</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a>constants &lt;-<span class="st"> &quot;A, B, b, d&quot;</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true"></a>giac &lt;-<span class="st"> </span>Giac<span class="op">$</span><span class="kw">new</span>()</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true"></a>results &lt;-<span class="st"> </span>giac<span class="op">$</span><span class="kw">implicitization</span>(equations, relations, variables, constants)</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true"></a>giac<span class="op">$</span><span class="kw">close</span>()</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true"></a><span class="co">## [1] TRUE</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true"></a><span class="kw">length</span>(results)</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true"></a><span class="co">## [1] 24</span></span></code></pre></div>
+<p>Thus, <strong>giacR</strong> provides <span class="math inline">\(24\)</span> polynomial expressions, each equal to <span class="math inline">\(0\)</span>. I don’t know what are all these expressions. The last one is nothing but <code>"A^2+B^2-1"</code>. I tried a couple of them, I found that the eleventh one provides what we’re looking for, and then I retained this one. It is a long expression:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>( fxyz &lt;-<span class="st"> </span>results[11L] )</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="co">## [1] &quot;12*x^6*A*z-36*x^2*A*d^4*z+24*A*d^6*z+36*x^4*A*y^2*z-36*A*d^4*y^2*z+36*x^2*A*y^4*z+12*A*y^6*z+45*x^4*A*z^3-18*x^2*A*d^2*z^3-27*A*d^4*z^3+90*x^2*A*y^2*z^3-18*A*d^2*y^2*z^3+45*A*y^4*z^3+54*x^2*A*z^5-18*A*d^2*z^5+54*A*y^2*z^5+21*A*z^7+16*x^6*b*B-96*x^4*b^3*B+2176*x^2*b^5*B-7168*b^7*B+48*x^5*b*d*B-1920*x^3*b^3*d*B+120*x^4*b*d^2*B+768*x^2*b^3*d^2*B+13184*b^5*d^2*B-48*x^3*b*d^3*B-240*x^2*b*d^4*B-2592*b^3*d^4*B+104*b*d^6*B+48*x^4*b*y^2*B-192*x^2*b^3*y^2*B+2176*b^5*y^2*B-96*x^3*b*d*y^2*B+5760*x*b^3*d*y^2*B+240*x^2*b*d^2*y^2*B+768*b^3*d^2*y^2*B+144*x*b*d^3*y^2*B-240*b*d^4*y^2*B+48*x^2*b*y^4*B-96*b^3*y^4*B-144*x*b*d*y^4*B+120*b*d^2*y^4*B+16*b*y^6*B-40*x^4*b*z^2*B+192*x^2*b^3*z^2*B-4480*b^5*z^2*B+48*x^3*b*d*z^2*B+344*x^2*b*d^2*z^2*B+3264*b^3*d^2*z^2*B-256*b*d^4*z^2*B-80*x^2*b*y^2*z^2*B+192*b^3*y^2*z^2*B-144*x*b*d*y^2*z^2*B+344*b*d^2*y^2*z^2*B-40*b*y^4*z^2*B-182*x^2*b*z^4*B-1008*b^3*z^4*B+278*b*d^2*z^4*B-182*b*y^2*z^4*B-126*b*z^6*B-12*x^6*z+64*x^4*b^2*z+1280*x^2*b^4*z-7168*b^6*z-384*x^3*b^2*d*z+72*x^4*d^2*z+64*x^2*b^2*d^2*z+1792*b^4*d^2*z-108*x^2*d^4*z-512*b^2*d^4*z+48*d^6*z-36*x^4*y^2*z+128*x^2*b^2*y^2*z+1280*b^4*y^2*z+1152*x*b^2*d*y^2*z+144*x^2*d^2*y^2*z+64*b^2*d^2*y^2*z-108*d^4*y^2*z-36*x^2*y^4*z+64*b^2*y^4*z+72*d^2*y^4*z-12*y^6*z-45*x^4*z^3-128*x^2*b^2*z^3-2688*b^4*z^3+162*x^2*d^2*z^3+896*b^2*d^2*z^3-117*d^4*z^3-90*x^2*y^2*z^3-128*b^2*y^2*z^3+162*d^2*y^2*z^3-45*y^4*z^3-54*x^2*z^5-336*b^2*z^5+90*d^2*z^5-54*y^2*z^5-21*z^7&quot;</span></span></code></pre></div>
+<p>This expression is equal to <span class="math inline">\(0\)</span>, and this provides an isosurface whose intersection with the above sphere is the spherical trochoid. Let’s plot it.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="kw">library</span>(rmarchingcubes)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>A &lt;-<span class="st"> </span><span class="kw">cos</span>(omega)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>B &lt;-<span class="st"> </span><span class="kw">sin</span>(omega)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>f &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, z) {</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>  <span class="kw">eval</span>(<span class="kw">parse</span>(<span class="dt">text =</span> fxyz))</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>}</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a>n &lt;-<span class="st"> </span>300L</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a>x_ &lt;-<span class="st"> </span>y_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span>R<span class="op">*</span><span class="fl">1.1</span>, R<span class="op">*</span><span class="fl">1.1</span>, <span class="dt">length.out =</span> n)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a>z_ &lt;-<span class="st"> </span><span class="kw">seq</span>(h <span class="op">-</span><span class="st"> </span>R <span class="op">-</span><span class="st"> </span><span class="fl">0.1</span>, h <span class="op">+</span><span class="st"> </span>R <span class="op">+</span><span class="st"> </span><span class="fl">0.1</span>, <span class="dt">length.out =</span> n)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a>Grid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">X =</span> x_, <span class="dt">Y =</span> y_, <span class="dt">Z =</span> z_)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true"></a>voxel &lt;-<span class="st"> </span><span class="kw">with</span>(Grid, <span class="kw">array</span>(<span class="kw">f</span>(X, Y, Z), <span class="dt">dim =</span> <span class="kw">c</span>(n, n, n)))</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true"></a>surf &lt;-<span class="st"> </span><span class="kw">contour3d</span>(voxel, <span class="dt">level =</span> <span class="dv">0</span>, x_, y_, z_)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true"></a>mesh &lt;-<span class="st"> </span><span class="kw">tmesh3d</span>(</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true"></a>  <span class="dt">vertices =</span> <span class="kw">t</span>(surf<span class="op">$</span>vertices),</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true"></a>  <span class="dt">indices  =</span> <span class="kw">t</span>(surf<span class="op">$</span>triangles),</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true"></a>  <span class="dt">normals  =</span> surf<span class="op">$</span>normals</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true"></a>)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true"></a><span class="co"># plot</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>))</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true"></a><span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">&quot;darkviolet&quot;</span>)</span></code></pre></div>
+<p><img src="./figures/sphericalTrochoid_mesh.gif" /></p>
+<p>We get our surface! We will plot it along with the sphere and the curve. But I prefer to round its corners before, by clipping it to a horizontal cylinder.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="co"># clip the mesh to a cylinder</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>fn &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, z) x<span class="op">*</span>x <span class="op">+</span><span class="st"> </span>y<span class="op">*</span>y</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>cmesh &lt;-<span class="st"> </span><span class="kw">clipMesh3d</span>(mesh, fn, <span class="dt">bound =</span> (R<span class="op">*</span><span class="fl">1.1</span>)<span class="op">^</span><span class="dv">2</span>, <span class="dt">greater =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a><span class="co"># plot everything</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>), <span class="dt">zoom =</span> <span class="fl">0.75</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a><span class="kw">shade3d</span>(sphereMesh, <span class="dt">color =</span> <span class="st">&quot;orange&quot;</span>, <span class="dt">alpha =</span> <span class="fl">0.4</span>, <span class="dt">polygon_offset =</span> <span class="dv">1</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a><span class="kw">shade3d</span>(cmesh, <span class="dt">color =</span> <span class="st">&quot;darkviolet&quot;</span>, <span class="dt">polygon_offset =</span> <span class="dv">1</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a><span class="kw">lines3d</span>(stSample, <span class="dt">lwd =</span> <span class="dv">3</span>, <span class="dt">color =</span> <span class="st">&quot;chartreuse&quot;</span>)</span></code></pre></div>
+<p><img src="./figures/sphericalTrochoid_plotall.gif" /></p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
