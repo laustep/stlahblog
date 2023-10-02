@@ -1,0 +1,192 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - The torus and the elliptic cyclide</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>The torus and the elliptic cyclide</h1> 
+          <div class="info">
+    Posted on October  2, 2023
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'rgl'." href="../tags/rgl.html">rgl</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>, <a title="All pages tagged 'geometry'." href="../tags/geometry.html">geometry</a>
+    
+</div>
+
+<p>The most used parameterization of the ordinary torus (the donut) is: <span class="math display">\[
+\textrm{torus}_{R,r}(u, v) = 
+\begin{pmatrix}
+(R + r \cos v) \cos u \\
+(R + r \cos v) \sin u \\
+r \sin v
+\end{pmatrix}.
+\]</span></p>
+<p>The <a href="https://en.wikipedia.org/wiki/Dupin_cyclide">elliptic Dupin cyclide</a> is a generalization of the torus. It has three nonnegative parameters <span class="math inline">\(c &lt; \mu &lt; a\)</span>, and its usual parameterization is, letting <span class="math inline">\(b = \sqrt{a^2 - c^2}\)</span>: <span class="math display">\[
+\textrm{cyclide}_{a, c, \mu}(u, v) = 
+\begin{pmatrix}
+\dfrac{\mu  (c - a \cos u \cos v) + b^2 \cos v}{a - c \cos u \cos v} \\
+\dfrac{b (a - \mu \cos u) \sin v}{a - c \cos u \cos v} \\
+\dfrac{b (c \cos v - \mu) \sin u}{a - c \cos u \cos v}
+\end{pmatrix}.
+\]</span> The picture below shows such a cyclide in its symmetry plane <span class="math inline">\(\{z = 0\}\)</span>:</p>
+<p><img src="./figures/cyclide_parameters.png" /></p>
+<p>For <span class="math inline">\(c=0\)</span>, this is the torus.</p>
+<p>Here is a cyclide in 3D (image taken from <a href="https://laustep.github.io/stlahblog/posts/plotly_trisurf.html">this post</a>):</p>
+<p><img src="./figures/cyclide_parametric_colored.png" /></p>
+<p>I think almost everything you can do with a torus, you can do it with a cyclide. For example, a parameterization of the <span class="math inline">\((p,q)\)</span>-torus knot is <span class="math display">\[
+\textrm{torus}_{R, r}(pt, qt), \qquad 0 \leqslant t &lt; 2\pi.
+\]</span> Then, the <em><span class="math inline">\((p,q)\)</span>-cyclide knot</em> is parameterized by <span class="math display">\[
+\textrm{cyclide}_{a, c, \mu}(pt, qt), \qquad 0 \leqslant t &lt; 2\pi.
+\]</span> <img src="./figures/cyclideKnot.gif" /></p>
+<p>Here is a <em>cyclidoidal helix</em>:</p>
+<p><img src="./figures/cyclidoidalHelix.gif" /></p>
+<p>And here is a rotoid dancing around a cyclide:</p>
+<p><img src="./figures/cyclidoidalRotoid.gif" /></p>
+<p>I found the way to do this animation for the torus on <a href="https://www.frassek.org/">this website</a>, and then I adapted it to the cyclide.</p>
+<p>The R code used to generate these animations is available in <a href="https://gist.github.com/stla/836d149189db9cea3d683868c1520776">this gist</a>.</p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
