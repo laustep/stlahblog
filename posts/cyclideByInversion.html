@@ -1,0 +1,179 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Elliptic cyclide by inversion of a torus</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Elliptic cyclide by inversion of a torus</h1> 
+          <div class="info">
+    Posted on October  3, 2023
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'rgl'." href="../tags/rgl.html">rgl</a>, <a title="All pages tagged 'povray'." href="../tags/povray.html">povray</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>, <a title="All pages tagged 'geometry'." href="../tags/geometry.html">geometry</a>
+    
+</div>
+
+<p>An <a href="https://laustep.github.io/stlahblog/posts/torusAndCyclide.html">elliptic Dupin cyclide</a> can be obtained by <a href="https://en.wikipedia.org/wiki/Inversive_geometry">inversion</a> of a torus with respect to a sphere. In the <a href="https://laustep.github.io/stlahblog/posts/torusAndCyclide.html">previous post</a>, I showed a rotoid (an helix) dancing around a cyclide:</p>
+<p><img src="./figures/cyclidoidalRotoid.gif" /></p>
+<p>I constructed this dancing rotoid in the same way as the dancing rotoid around a torus:</p>
+<p><img src="./figures/rotoidAroundTorus.gif" /></p>
+<p>Click <a href="https://gist.github.com/stla/46ae563ebe53123cc8cb36590f82bded">here</a> if you want the POV-Ray code for this animation.</p>
+<p>Now, what happens if one inverts these two geometrical objects, the torus and the rotoid, with respect to a sphere? The torus will become a cyclide, as previously said, and what will happen for the rotoid? Here is the answer:</p>
+<p><img src="./figures/cyclidoidalRotoidByInversion.gif" /></p>
+<p>The R code for this animation is provided in <a href="https://gist.github.com/stla/836d149189db9cea3d683868c1520776">this gist</a> (if it looks complicated, that’s because I start with the cyclide, and I derive the torus and the inversion which yield this cyclide).</p>
+<p>Another nice application of this mathematical fact is the construction of <em>Steiner chains</em>:</p>
+<p><img src="./figures/SteinerChain2D.gif" /></p>
+<p>(code available in this <a href="https://gist.github.com/stla/e93995905bb70c54c6bd49acfa9eb635">gist</a>).</p>
+<p>The point <span class="math inline">\(I\)</span> is the center of the circle of inversion. The above animation shows a 2D Steiner chain but we can do the same in 3D. When there are six spheres, this is called a <em>Soddy hexlet</em>. Here is a Soddy hexlet with the <em>Villarceau circles</em> of the cyclide:</p>
+<p><img src="./figures/SoddyHexletVillarceau.gif" /></p>
+<p>The R code which produces this animation is provided in <a href="https://gist.github.com/stla/1665769586127f95547cd32a969d1352">this gist</a>.</p>
+<p>I did the same picture with POV-Ray:</p>
+<p><img src="./figures/SteinerChainVillarceau.gif" /></p>
+<p>Go to <a href="https://gist.github.com/stla/4a1816abb5de4a5f1c121869a5ec0aaa">this gist</a> if you want the code.</p>
+<p>And maybe you remember <a href="https://laustep.github.io/stlahblog/posts/SteinerChains.html">this previous post</a>, where I show how one can construct <em>nested</em> 3D Steiner chains.</p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
