@@ -5,7 +5,319 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Tue, 03 Oct 2023 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Sat, 07 Oct 2023 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>Enneper surface with square checkerboard</title>
+      <link>https://laustep.github.io/stlahblog/posts/Enneper-checkerboard2.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        In a
+        <a
+          href="https://laustep.github.io/stlahblog/posts/Enneper-checkerboard.html"
+          >previous post</a
+        >, I showed how to use the <strong>CGAL</strong> parameterizations
+        ported to my package <strong>cgalMeshes</strong> to decorate the Enneper
+        surface of order three with a radial checkerboard.
+      </p>
+      <p>
+        Here I will show how to map an ordinary, square checkeboard on the
+        Enneper surface of order two.
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1"><span class="kw">library</span>(cgalMeshes)</span>
+<span id="cb1-2"><span class="kw">library</span>(rgl)</span>
+<span id="cb1-3"></span>
+<span id="cb1-4"><span class="co"># Enneper parameterization</span></span>
+<span id="cb1-5">n &lt;-<span class="st"> </span><span class="dv">2</span></span>
+<span id="cb1-6">Enneper &lt;-<span class="st"> </span><span class="cf">function</span>(phi, r) {</span>
+<span id="cb1-7">  <span class="kw">rbind</span>(</span>
+<span id="cb1-8">    r<span class="op">*</span><span class="kw">cos</span>(phi) <span class="op">-</span><span class="st"> </span>r<span class="op">^</span>(<span class="dv">2</span><span class="op">*</span>n<span class="dv">-1</span>) <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>((<span class="dv">2</span><span class="op">*</span>n<span class="dv">-1</span>)<span class="op">*</span>phi) <span class="op">/</span><span class="st"> </span>(<span class="dv">2</span><span class="op">*</span>n<span class="dv">-1</span>),</span>
+<span id="cb1-9">    r<span class="op">*</span><span class="kw">sin</span>(phi) <span class="op">+</span><span class="st"> </span>r<span class="op">^</span>(<span class="dv">2</span><span class="op">*</span>n<span class="dv">-1</span>)<span class="op">*</span><span class="kw">sin</span>((<span class="dv">2</span><span class="op">*</span>n<span class="dv">-1</span>)<span class="op">*</span>phi) <span class="op">/</span><span class="st"> </span>(<span class="dv">2</span><span class="op">*</span>n<span class="dv">-1</span>),</span>
+<span id="cb1-10">    <span class="dv">2</span><span class="op">*</span>r<span class="op">^</span>n <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(n<span class="op">*</span>phi) <span class="op">/</span><span class="st"> </span>n</span>
+<span id="cb1-11">  )</span>
+<span id="cb1-12">}</span>
+<span id="cb1-13"><span class="co"># make mesh</span></span>
+<span id="cb1-14">rmesh &lt;-<span class="st"> </span><span class="kw">parametricMesh</span>(</span>
+<span id="cb1-15">  Enneper, <span class="dt">urange =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi), <span class="dt">vrange =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">1.2</span>),</span>
+<span id="cb1-16">  <span class="dt">periodic =</span> <span class="kw">c</span>(<span class="ot">TRUE</span>, <span class="ot">FALSE</span>), <span class="dt">nu =</span> 512L, <span class="dt">nv =</span> 128L, <span class="dt">clean =</span> <span class="ot">TRUE</span></span>
+<span id="cb1-17">)</span>
+<span id="cb1-18"><span class="co"># we extract the boundary; we will plot it multiple times</span></span>
+<span id="cb1-19">bndry &lt;-<span class="st"> </span><span class="kw">getBoundary3d</span>(rmesh, <span class="dt">sorted =</span> <span class="ot">TRUE</span>, <span class="dt">color =</span> <span class="st">"black"</span>)</span></code></pre>
+      </div>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1"><span class="co"># plot the mesh</span></span>
+<span id="cb2-2"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>), <span class="dt">zoom =</span> <span class="fl">0.8</span>)</span>
+<span id="cb2-3"><span class="kw">shade3d</span>(rmesh, <span class="dt">col =</span> <span class="st">"deeppink4"</span>)</span>
+<span id="cb2-4"><span class="kw">shade3d</span>(bndry, <span class="dt">lwd =</span> <span class="dv">4</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/EnneperOrderTwo.png"
+        />
+      </p>
+      <p>
+        Now we add some vertices to the mesh in order that the lines of the
+        checkerboard that we will make later will be straight enough. We use the
+        isotropic remeshing to do so, which does not change the shape of the
+        mesh.
+      </p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb3-1"><span class="co"># convert to CGAL mesh ####</span></span>
+<span id="cb3-2">mesh &lt;-<span class="st"> </span>cgalMesh<span class="op">$</span><span class="kw">new</span>(rmesh)</span>
+<span id="cb3-3"><span class="co"># take a look at the edge lengths</span></span>
+<span id="cb3-4">edges &lt;-<span class="st"> </span>mesh<span class="op">$</span><span class="kw">getEdges</span>()</span>
+<span id="cb3-5"><span class="kw">summary</span>(edges[[<span class="st">"length"</span>]])</span>
+<span id="cb3-6"><span class="co">##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
+<span id="cb3-7"><span class="co">## 0.000116 0.009775 0.013299 0.015449 0.020167 0.042375</span></span>
+<span id="cb3-8"><span class="co"># add vertices in order that the checkeboard will have smooth lines ####</span></span>
+<span id="cb3-9">mesh<span class="op">$</span><span class="kw">isotropicRemeshing</span>(<span class="fl">0.008</span>, <span class="dt">iterations =</span> <span class="dv">3</span>, <span class="dt">relaxSteps =</span> <span class="dv">2</span>)</span></code></pre>
+      </div>
+      <p>We first compute a DCP parameterization to make a checkerboard.</p>
+      <div class="sourceCode" id="cb4">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb4-1"><span class="co"># compute mesh DCP parameterization ####</span></span>
+<span id="cb4-2">UV &lt;-<span class="st"> </span>mesh<span class="op">$</span><span class="kw">parameterization</span>(<span class="dt">method =</span> <span class="st">"DCP"</span>)</span>
+<span id="cb4-3"><span class="co"># the UV-space is the square [0,1]x[0,1]</span></span>
+<span id="cb4-4"><span class="co"># make square checkerboard with 5 squares x 5 squares ####</span></span>
+<span id="cb4-5">checkerboard &lt;-<span class="st"> </span><span class="kw">ifelse</span>(</span>
+<span id="cb4-6">  (<span class="kw">floor</span>(<span class="dv">5</span> <span class="op">*</span><span class="st"> </span>UV[, 1L]) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span>) <span class="op">==</span><span class="st"> </span>(<span class="kw">floor</span>(<span class="dv">5</span> <span class="op">*</span><span class="st"> </span>UV[, 2L]) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span>), </span>
+<span id="cb4-7">  <span class="st">"gold"</span>, <span class="st">"magenta4"</span></span>
+<span id="cb4-8">)</span>
+<span id="cb4-9"><span class="co"># add normals, convert to 'rgl' mesh, and add colors ####</span></span>
+<span id="cb4-10">mesh<span class="op">$</span><span class="kw">computeNormals</span>()</span>
+<span id="cb4-11">rmesh &lt;-<span class="st"> </span>mesh<span class="op">$</span><span class="kw">getMesh</span>()</span>
+<span id="cb4-12">rmesh[[<span class="st">"material"</span>]] &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="st">"color"</span> =<span class="st"> </span>checkerboard)</span></code></pre>
+      </div>
+      <div class="sourceCode" id="cb5">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb5-1"><span class="co"># plot ####</span></span>
+<span id="cb5-2"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>), <span class="dt">zoom =</span> <span class="fl">0.8</span>)</span>
+<span id="cb5-3"><span class="kw">bg3d</span>(<span class="st">"#363940"</span>)</span>
+<span id="cb5-4"><span class="kw">shade3d</span>(rmesh, <span class="dt">meshColor =</span> <span class="st">"vertices"</span>, <span class="dt">polygon_offset =</span> <span class="dv">1</span>)</span>
+<span id="cb5-5"><span class="kw">shade3d</span>(bndry, <span class="dt">lwd =</span> <span class="dv">4</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/EnneperCheckerboard_NoCorners.png"
+        />
+      </p>
+      <p>
+        This mapped checkerboard is not very nice: the squares are not “aligned”
+        with the mesh. The goal of the rest of this article is to construct a
+        mapped checkerboard “aligned” with the mesh.
+      </p>
+      <h3 id="first-method-dcp-with-four-fixed-corners">
+        First method: DCP with four fixed corners
+      </h3>
+      <p>
+        The DCP parameterization allows to choose four vertices of the mesh
+        which will be the four corners of the square space of the
+        parameterization (the “UV-space”). We choose the four vertices which
+        attain the extreme values of the
+        <span class="math inline">\(x\)</span> coordinate:
+      </p>
+      <div class="sourceCode" id="cb6">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb6-1">vs &lt;-<span class="st"> </span>mesh<span class="op">$</span><span class="kw">getVertices</span>()</span>
+<span id="cb6-2">vsx &lt;-<span class="st"> </span>vs[, 1L]</span>
+<span id="cb6-3">oinc &lt;-<span class="st"> </span><span class="kw">order</span>(vsx)</span>
+<span id="cb6-4">odec &lt;-<span class="st"> </span><span class="kw">order</span>(vsx, <span class="dt">decreasing =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb6-5">vx1 &lt;-<span class="st"> </span>oinc[1L]; vx2 &lt;-<span class="st"> </span>oinc[2L]</span>
+<span id="cb6-6">vx3 &lt;-<span class="st"> </span>odec[2L]; vx4 &lt;-<span class="st"> </span>odec[1L]</span>
+<span id="cb6-7"><span class="co"># let's visualize these four vertices on the mesh</span></span>
+<span id="cb6-8"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>))</span>
+<span id="cb6-9"><span class="kw">view3d</span>(<span class="dv">0</span>, <span class="dv">-25</span>, <span class="dt">zoom =</span> <span class="fl">0.8</span>)</span>
+<span id="cb6-10"><span class="kw">shade3d</span>(rmesh, <span class="dt">color =</span> <span class="st">"deeppink4"</span>, <span class="dt">polygon_offset =</span> <span class="dv">1</span>)</span>
+<span id="cb6-11"><span class="kw">shade3d</span>(bndry, <span class="dt">lwd =</span> <span class="dv">3</span>)</span>
+<span id="cb6-12"><span class="kw">points3d</span>(<span class="kw">rbind</span>(vs[vx1, ]), <span class="dt">col =</span> <span class="st">"red"</span>,    <span class="dt">size =</span> <span class="dv">12</span>)</span>
+<span id="cb6-13"><span class="kw">points3d</span>(<span class="kw">rbind</span>(vs[vx2, ]), <span class="dt">col =</span> <span class="st">"green"</span>,  <span class="dt">size =</span> <span class="dv">12</span>)</span>
+<span id="cb6-14"><span class="kw">points3d</span>(<span class="kw">rbind</span>(vs[vx3, ]), <span class="dt">col =</span> <span class="st">"blue"</span>,   <span class="dt">size =</span> <span class="dv">12</span>)</span>
+<span id="cb6-15"><span class="kw">points3d</span>(<span class="kw">rbind</span>(vs[vx4, ]), <span class="dt">col =</span> <span class="st">"yellow"</span>, <span class="dt">size =</span> <span class="dv">12</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/Enneper_fourCorners.png"
+        />
+      </p>
+      <p>
+        Now let’s compute the DCP parameterization with these given corners,
+        let’s make the checkerboard and let’s plot the result:
+      </p>
+      <div class="sourceCode" id="cb7">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb7-1"><span class="co"># compute the DCP parameterization with the four given corners ####</span></span>
+<span id="cb7-2">UV &lt;-<span class="st"> </span>mesh<span class="op">$</span><span class="kw">parameterization</span>(<span class="dt">method =</span> <span class="st">"DCP"</span>, <span class="dt">corners =</span> <span class="kw">c</span>(vx1, vx2, vx3, vx4))</span>
+<span id="cb7-3"><span class="co"># make square checkerboard with 5 squares x 5 squares ####</span></span>
+<span id="cb7-4">checkerboard &lt;-<span class="st"> </span><span class="kw">ifelse</span>(</span>
+<span id="cb7-5">  (<span class="kw">floor</span>(<span class="dv">5</span> <span class="op">*</span><span class="st"> </span>UV[, 1L]) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span>) <span class="op">==</span><span class="st"> </span>(<span class="kw">floor</span>(<span class="dv">5</span> <span class="op">*</span><span class="st"> </span>UV[, 2L]) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span>), </span>
+<span id="cb7-6">  <span class="st">"gold"</span>, <span class="st">"magenta4"</span></span>
+<span id="cb7-7">)</span>
+<span id="cb7-8"><span class="co"># add checkerboard colors to the 'rgl' mesh ####</span></span>
+<span id="cb7-9">rmesh[[<span class="st">"material"</span>]] &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="st">"color"</span> =<span class="st"> </span>checkerboard)</span>
+<span id="cb7-10"><span class="co"># plot ####</span></span>
+<span id="cb7-11"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>), <span class="dt">zoom =</span> <span class="fl">0.8</span>)</span>
+<span id="cb7-12"><span class="kw">bg3d</span>(<span class="st">"#363940"</span>)</span>
+<span id="cb7-13"><span class="kw">shade3d</span>(rmesh, <span class="dt">meshColor =</span> <span class="st">"vertices"</span>, <span class="dt">polygon_offset =</span> <span class="dv">1</span>)</span>
+<span id="cb7-14"><span class="kw">shade3d</span>(bndry, <span class="dt">lwd =</span> <span class="dv">4</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/EnneperCheckerboard_FourCorners.gif"
+        />
+      </p>
+      <p>Now you see what I mean by “aligned”. It is quite better, no?</p>
+      <h3 id="second-method-arap-parameterization">
+        Second method: ARAP parameterization
+      </h3>
+      <p>
+        The UV-space of the ARAP (As Rigid As Possible) parameterization is not
+        a square nor a circle in general. It looks like a “flattening” of the
+        mesh. For example, I tried to apply it to the
+        <a href="https://laustep.github.io/stlahblog/posts/TennisBall.html"
+          >half of the tennis ball</a
+        >
+        and the shape of the UV-space looked like a eight.
+      </p>
+      <p>Let’s try it.</p>
+      <div class="sourceCode" id="cb8">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb8-1"><span class="co"># compute ARAP mesh parameterization ####</span></span>
+<span id="cb8-2"><span class="co"># a large value of lambda for a high rigidity</span></span>
+<span id="cb8-3">UV &lt;-<span class="st"> </span>mesh<span class="op">$</span><span class="kw">parameterization</span>(<span class="dt">method =</span> <span class="st">"ARAP"</span>, <span class="dt">lambda =</span> <span class="dv">1000</span>)</span></code></pre>
+      </div>
+      <p>No luck, the UV-space is a circle:</p>
+      <div class="sourceCode" id="cb9">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb9-1"><span class="kw">plot</span>(UV, <span class="dt">asp =</span> <span class="dv">1</span>, <span class="dt">pch =</span> <span class="st">"."</span>, <span class="dt">xlab =</span> <span class="st">"u"</span>, <span class="dt">ylab =</span> <span class="st">"v"</span>, <span class="dt">axes =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb9-2"><span class="kw">axis</span>(<span class="dv">1</span>, <span class="dt">at =</span> <span class="kw">seq</span>(<span class="op">-</span><span class="fl">3.5</span>, <span class="fl">1.5</span>, <span class="dt">by =</span> <span class="fl">0.5</span>))</span>
+<span id="cb9-3"><span class="kw">axis</span>(<span class="dv">2</span>, <span class="dt">at =</span> <span class="kw">seq</span>(<span class="op">-</span><span class="fl">1.5</span>, <span class="fl">2.5</span>, <span class="dt">by =</span> <span class="fl">0.5</span>))</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/EnneperARAP_UVspace.png"
+        />
+      </p>
+      <p>
+        If we draw a checkerboard on this circle with horizontal and vertical
+        lines, then, the checkerboard mapped on the Enneper surface will not be
+        “aligned”. So we need to draw a rotated checkerboard.
+      </p>
+      <p>
+        We take the two vertices at the “top” of the Ennerper surface: the ones
+        having the highest value of the
+        <span class="math inline">\(z\)</span> coordinate.
+      </p>
+      <div class="sourceCode" id="cb10">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb10-1">vs &lt;-<span class="st"> </span>mesh<span class="op">$</span><span class="kw">getVertices</span>()</span>
+<span id="cb10-2">vsz &lt;-<span class="st"> </span>vs[, 3L]</span>
+<span id="cb10-3">odec &lt;-<span class="st"> </span><span class="kw">order</span>(vsz, <span class="dt">decreasing =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb10-4">vz1 &lt;-<span class="st"> </span>odec[1L]; vz2 &lt;-<span class="st"> </span>odec[2L]</span></code></pre>
+      </div>
+      <p>
+        These two vertices are on the border of the mesh, therefore their
+        corresponding uv-points are on the border of the UV-space, and they are
+        diametrically opposite on the circle:
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/EnneperARAP_UVspaceWithTheTwoExtremeZPoints.png"
+        />
+      </p>
+      <p>
+        We rotate the circle in order to bring these two points to the north and
+        south poles:
+      </p>
+      <div class="sourceCode" id="cb11">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb11-1">uv1 &lt;-<span class="st"> </span>UV[vz1, ]</span>
+<span id="cb11-2">uv2 &lt;-<span class="st"> </span>UV[vz2, ]</span>
+<span id="cb11-3">alpha &lt;-<span class="st"> </span><span class="kw">atan2</span>(uv2[1L]<span class="op">-</span>uv1[1L], uv2[2L]<span class="op">-</span>uv1[2L])</span>
+<span id="cb11-4"><span class="co">#</span></span>
+<span id="cb11-5">rotation &lt;-<span class="st"> </span><span class="cf">function</span>(alpha, uv) {</span>
+<span id="cb11-6">  <span class="kw">t</span>(<span class="kw">rbind</span>(</span>
+<span id="cb11-7">    <span class="kw">c</span>(<span class="kw">cos</span>(alpha), <span class="op">-</span><span class="kw">sin</span>(alpha)),</span>
+<span id="cb11-8">    <span class="kw">c</span>(<span class="kw">sin</span>(alpha),  <span class="kw">cos</span>(alpha))</span>
+<span id="cb11-9">  ) <span class="op">%*%</span><span class="st"> </span><span class="kw">t</span>(uv))</span>
+<span id="cb11-10">}</span>
+<span id="cb11-11"><span class="co">#</span></span>
+<span id="cb11-12">UVrot &lt;-<span class="st"> </span><span class="kw">rotation</span>(alpha, UV)</span>
+<span id="cb11-13">Urot &lt;-<span class="st"> </span>UVrot[, 1L]</span>
+<span id="cb11-14">Vrot &lt;-<span class="st"> </span>UVrot[, 2L]</span></code></pre>
+      </div>
+      <p>Now we can do the rotated checkerboard:</p>
+      <div class="sourceCode" id="cb12">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb12-1">Un &lt;-<span class="st"> </span>(Urot <span class="op">-</span><span class="st"> </span><span class="kw">min</span>(Urot)) <span class="op">/</span><span class="st"> </span>(<span class="kw">max</span>(Urot) <span class="op">-</span><span class="st"> </span><span class="kw">min</span>(Urot))</span>
+<span id="cb12-2">Vn &lt;-<span class="st"> </span>(Vrot <span class="op">-</span><span class="st"> </span><span class="kw">min</span>(Vrot)) <span class="op">/</span><span class="st"> </span>(<span class="kw">max</span>(Vrot) <span class="op">-</span><span class="st"> </span><span class="kw">min</span>(Vrot))</span>
+<span id="cb12-3">checkerboard &lt;-<span class="st"> </span><span class="kw">ifelse</span>( </span>
+<span id="cb12-4">  (<span class="kw">floor</span>(<span class="dv">5</span> <span class="op">*</span><span class="st"> </span>Un) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span>) <span class="op">==</span><span class="st"> </span>(<span class="kw">floor</span>(<span class="dv">5</span> <span class="op">*</span><span class="st"> </span>Vn) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span>), </span>
+<span id="cb12-5">  <span class="st">"yellow"</span>, <span class="st">"navy"</span></span>
+<span id="cb12-6">)</span></code></pre>
+      </div>
+      <p>Here is the rotated checkerboard:</p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/Enneper_UVcheckerboard_ARAP.png"
+        />
+      </p>
+      <p>
+        So now it remains to do the plot of the mesh with the mapped
+        checkerboard:
+      </p>
+      <div class="sourceCode" id="cb13">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb13-1">rmesh[[<span class="st">"material"</span>]] &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="st">"color"</span> =<span class="st"> </span>checkerboard)</span>
+<span id="cb13-2"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>), <span class="dt">zoom =</span> <span class="fl">0.8</span>)</span>
+<span id="cb13-3"><span class="kw">bg3d</span>(<span class="st">"#363940"</span>)</span>
+<span id="cb13-4"><span class="kw">shade3d</span>(rmesh, <span class="dt">meshColor =</span> <span class="st">"vertices"</span>, <span class="dt">polygon_offset =</span> <span class="dv">1</span>)</span>
+<span id="cb13-5"><span class="kw">shade3d</span>(bndry, <span class="dt">lwd =</span> <span class="dv">4</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/EnneperCheckerboard_ARAP.gif"
+        />
+      </p>
+      <p>Perfectly “aligned” and symmetric.</p>
+      <p>
+        It’s not easy to decide which one is better on this example, the DCP
+        with the four fixed corners or the ARAP?
+      </p>
+      <p>
+        I applied the same steps for the two halves of the
+        <a href="https://laustep.github.io/stlahblog/posts/TennisBall.html"
+          >tennis ball</a
+        >, and the decision was clear for this example: ARAP is better, because
+        it minimizes the distortion the squares whereas DCP distorts them into
+        elongated rectangles.
+      </p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Sat, 07 Oct 2023 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/Enneper-checkerboard2.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>Elliptic cyclide by inversion of a torus</title>
       <link>https://laustep.github.io/stlahblog/posts/cyclideByInversion.html</link>
@@ -12664,147 +12976,6 @@ PKG_CXXFLAGS = -I$(BH_PATH)</code></pre>
 ]]></description>
       <pubDate>Fri, 11 Feb 2022 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/DTselect2Filters.html</guid>
-      <dc:creator>Stéphane Laurent</dc:creator>
-      <category>R</category>
-    </item>
-    <item>
-      <title>Gyrotriangle (aka hyperbolic triangle) with moving colors</title>
-      <link>https://laustep.github.io/stlahblog/posts/gyrotriangle.html</link>
-      <description><![CDATA[<div class="container-fluid">
-  <div class="main col-sm-12">
-    <div class="content">
-      <p>
-        My package <a href="https://github.com/stla/gyro">gyro</a> has been
-        freshly released on CRAN. I implemented the ideas given in
-        <a
-          href="https://laustep.github.io/stlahblog/posts/hyperbolicPolyhedra.html"
-          >this blog post</a
-        >
-        in this package. It has a short
-        <a
-          href="https://cran.r-project.org/web/packages/gyro/vignettes/getstarted.html"
-          >vignette</a
-        >.
-      </p>
-      <p>
-        The <code>gyrodemos</code> function provides some examples. But none of
-        them explains how I did the moving colors on this polyhedra that you can
-        see on the Github repo:
-      </p>
-      <p>
-        <img
-          src="https://raw.githubusercontent.com/stla/gyro/main/inst/images/icosahedron_dynamic_colors.gif"
-        />
-      </p>
-      <p>
-        So I will explain here. In fact, this is similar to the method I
-        presented
-        <a
-          href="https://laustep.github.io/stlahblog/posts/PyVistaDynamicCmap.html"
-          >here</a
-        >
-        for <strong>PyVista</strong> and
-        <a
-          href="https://laustep.github.io/stlahblog/posts/HopfTorusDynamicColors.html"
-          >here</a
-        >
-        for <strong>rgl</strong>.
-      </p>
-      <p>
-        The <code>gyrotriangle</code> function of the
-        <strong>gyro</strong> package has a <code>palette</code> argument, in
-        which the user provides a vector of colors. Here is an example:
-      </p>
-      <div class="sourceCode" id="cb1">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb1-1"><span class="kw">library</span>(gyro)</span>
-<span id="cb1-2"><span class="kw">library</span>(rgl)</span>
-<span id="cb1-3"></span>
-<span id="cb1-4">s &lt;-<span class="st"> </span><span class="fl">0.6</span> <span class="co"># hyperbolic curvature</span></span>
-<span id="cb1-5">A &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>); B &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>); C &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>)</span>
-<span id="cb1-6">ABC &lt;-<span class="st"> </span><span class="kw">gyrotriangle</span>(</span>
-<span id="cb1-7">  A, B, C, <span class="dt">s =</span> s,</span>
-<span id="cb1-8">  <span class="dt">palette =</span> <span class="kw">hcl.colors</span>(<span class="dt">n =</span> <span class="dv">256</span>, <span class="dt">palette =</span> <span class="st">"Berlin"</span>)</span>
-<span id="cb1-9">)</span>
-<span id="cb1-10"></span>
-<span id="cb1-11"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
-<span id="cb1-12"><span class="kw">material3d</span>(<span class="dt">lit =</span> <span class="ot">FALSE</span>)</span>
-<span id="cb1-13"><span class="kw">view3d</span>(<span class="dv">10</span>, <span class="dv">40</span>, <span class="dt">zoom =</span> <span class="fl">0.8</span>)</span>
-<span id="cb1-14"><span class="kw">shade3d</span>(ABC)</span></code></pre>
-      </div>
-      <p>
-        <img
-          src="https://laustep.github.io/stlahblog/posts/figures/gyrotriangle.png"
-        />
-      </p>
-      <p>
-        Under the hood, the <code>gyrotriangle</code> function uses the
-        <a
-          href="https://www.rdocumentation.org/packages/grDevices/versions/3.6.2/topics/colorRamp"
-          >colorRamp</a
-        >
-        with the vector of colors passed to the <code>palette</code> argument.
-        This creates a function, let’s call it <code>fpalette</code>, that
-        assigns a color to each number in the interval
-        <span class="math inline">\([0, 1]\)</span>. Then,
-        <code>gyrotriangle</code> calculates all the distances from the points
-        in the mesh forming the triangle to the gyrocentroid of the triangle.
-        Finally, it linearly normalizes these distances to the interval
-        <span class="math inline">\([0, 1]\)</span>, and it applies the
-        <code>fpalette</code> function to the normalized distances.
-      </p>
-      <p>
-        Now, the <code>gyrotriangle</code> function has a
-        <code>g</code> argument. This is the key to make the moving colors. This
-        argument <code>g</code> must be a function from
-        <span class="math inline">\([0, 1]\)</span> to
-        <span class="math inline">\([0, 1]\)</span>, by default it is the
-        <code>identity</code> function, and <code>fpalette</code> is actually
-        applied to the normalized distances transformed by <code>g</code>.
-      </p>
-      <p>So, here is how we can do to get some moving colors:</p>
-      <div class="sourceCode" id="cb2">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb2-1">shift_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">length.out =</span> <span class="dv">61</span>)[<span class="op">-</span><span class="dv">1</span>]</span>
-<span id="cb2-2"><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_along</span>(shift_)){</span>
-<span id="cb2-3">  ABC &lt;-<span class="st"> </span><span class="kw">gyrotriangle</span>(</span>
-<span id="cb2-4">    A, B, C, s,</span>
-<span id="cb2-5">    <span class="dt">palette =</span> <span class="kw">hcl.colors</span>(<span class="dt">n =</span> <span class="dv">256</span>, <span class="dt">palette =</span> <span class="st">"Berlin"</span>), </span>
-<span id="cb2-6">    <span class="dt">g =</span> <span class="cf">function</span>(u) (<span class="kw">sin</span>(<span class="dv">2</span><span class="op">*</span>pi<span class="op">*</span>(u <span class="op">-</span><span class="st"> </span>shift_[i])) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span></span>
-<span id="cb2-7">  )</span>
-<span id="cb2-8">  <span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>))</span>
-<span id="cb2-9">  <span class="kw">material3d</span>(<span class="dt">lit =</span> <span class="ot">FALSE</span>)</span>
-<span id="cb2-10">  <span class="kw">view3d</span>(<span class="dv">10</span>, <span class="dv">40</span>, <span class="dt">zoom =</span> <span class="fl">0.8</span>)</span>
-<span id="cb2-11">  <span class="kw">shade3d</span>(ABC)</span>
-<span id="cb2-12">  <span class="kw">rgl.snapshot</span>(<span class="kw">sprintf</span>(<span class="st">"snapshot%03d"</span>, i))</span>
-<span id="cb2-13">  <span class="kw">close3d</span>()</span>
-<span id="cb2-14">}</span>
-<span id="cb2-15"></span>
-<span id="cb2-16"><span class="kw">library</span>(gifski)</span>
-<span id="cb2-17">pngs &lt;-<span class="st"> </span><span class="kw">list.files</span>(<span class="dt">pattern =</span> <span class="st">"^snapshot"</span>)</span>
-<span id="cb2-18"><span class="kw">gifski</span>(</span>
-<span id="cb2-19">  pngs,</span>
-<span id="cb2-20">  <span class="dt">gif_file =</span> <span class="st">"gyrotriangle.gif"</span>,</span>
-<span id="cb2-21">  <span class="dt">width =</span> <span class="dv">512</span>,</span>
-<span id="cb2-22">  <span class="dt">height =</span> <span class="dv">512</span>,</span>
-<span id="cb2-23">  <span class="dt">delay =</span> <span class="dv">1</span><span class="op">/</span><span class="dv">8</span></span>
-<span id="cb2-24">)</span>
-<span id="cb2-25"></span>
-<span id="cb2-26"><span class="kw">file.remove</span>(pngs)</span></code></pre>
-      </div>
-      <p>
-        <img
-          src="https://laustep.github.io/stlahblog/posts/figures/gyrotriangle.gif"
-        />
-      </p>
-    </div>
-  </div>
-</div>
-]]></description>
-      <pubDate>Sat, 05 Feb 2022 00:00:00 UT</pubDate>
-      <guid>https://laustep.github.io/stlahblog/posts/gyrotriangle.html</guid>
       <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>

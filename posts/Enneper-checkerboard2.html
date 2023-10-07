@@ -1,0 +1,305 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Enneper surface with square checkerboard</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Enneper surface with square checkerboard</h1> 
+          <div class="info">
+    Posted on October  7, 2023
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'rgl'." href="../tags/rgl.html">rgl</a>, <a title="All pages tagged 'graphics'." href="../tags/graphics.html">graphics</a>, <a title="All pages tagged 'geometry'." href="../tags/geometry.html">geometry</a>
+    
+</div>
+
+<p>In a <a href="https://laustep.github.io/stlahblog/posts/Enneper-checkerboard.html">previous post</a>, I showed how to use the <strong>CGAL</strong> parameterizations ported to my package <strong>cgalMeshes</strong> to decorate the Enneper surface of order three with a radial checkerboard.</p>
+<p>Here I will show how to map an ordinary, square checkeboard on the Enneper surface of order two.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">library</span>(cgalMeshes)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="kw">library</span>(rgl)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="co"># Enneper parameterization</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>n &lt;-<span class="st"> </span><span class="dv">2</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>Enneper &lt;-<span class="st"> </span><span class="cf">function</span>(phi, r) {</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>  <span class="kw">rbind</span>(</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>    r<span class="op">*</span><span class="kw">cos</span>(phi) <span class="op">-</span><span class="st"> </span>r<span class="op">^</span>(<span class="dv">2</span><span class="op">*</span>n<span class="dv">-1</span>) <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>((<span class="dv">2</span><span class="op">*</span>n<span class="dv">-1</span>)<span class="op">*</span>phi) <span class="op">/</span><span class="st"> </span>(<span class="dv">2</span><span class="op">*</span>n<span class="dv">-1</span>),</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>    r<span class="op">*</span><span class="kw">sin</span>(phi) <span class="op">+</span><span class="st"> </span>r<span class="op">^</span>(<span class="dv">2</span><span class="op">*</span>n<span class="dv">-1</span>)<span class="op">*</span><span class="kw">sin</span>((<span class="dv">2</span><span class="op">*</span>n<span class="dv">-1</span>)<span class="op">*</span>phi) <span class="op">/</span><span class="st"> </span>(<span class="dv">2</span><span class="op">*</span>n<span class="dv">-1</span>),</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>    <span class="dv">2</span><span class="op">*</span>r<span class="op">^</span>n <span class="op">*</span><span class="st"> </span><span class="kw">cos</span>(n<span class="op">*</span>phi) <span class="op">/</span><span class="st"> </span>n</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>  )</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>}</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a><span class="co"># make mesh</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>rmesh &lt;-<span class="st"> </span><span class="kw">parametricMesh</span>(</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a>  Enneper, <span class="dt">urange =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi), <span class="dt">vrange =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">1.2</span>),</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>  <span class="dt">periodic =</span> <span class="kw">c</span>(<span class="ot">TRUE</span>, <span class="ot">FALSE</span>), <span class="dt">nu =</span> 512L, <span class="dt">nv =</span> 128L, <span class="dt">clean =</span> <span class="ot">TRUE</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a><span class="co"># we extract the boundary; we will plot it multiple times</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a>bndry &lt;-<span class="st"> </span><span class="kw">getBoundary3d</span>(rmesh, <span class="dt">sorted =</span> <span class="ot">TRUE</span>, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="co"># plot the mesh</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>), <span class="dt">zoom =</span> <span class="fl">0.8</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="kw">shade3d</span>(rmesh, <span class="dt">col =</span> <span class="st">&quot;deeppink4&quot;</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="kw">shade3d</span>(bndry, <span class="dt">lwd =</span> <span class="dv">4</span>)</span></code></pre></div>
+<p><img src="./figures/EnneperOrderTwo.png" /></p>
+<p>Now we add some vertices to the mesh in order that the lines of the checkerboard that we will make later will be straight enough. We use the isotropic remeshing to do so, which does not change the shape of the mesh.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="co"># convert to CGAL mesh ####</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>mesh &lt;-<span class="st"> </span>cgalMesh<span class="op">$</span><span class="kw">new</span>(rmesh)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="co"># take a look at the edge lengths</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>edges &lt;-<span class="st"> </span>mesh<span class="op">$</span><span class="kw">getEdges</span>()</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a><span class="kw">summary</span>(edges[[<span class="st">&quot;length&quot;</span>]])</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a><span class="co">##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a><span class="co">## 0.000116 0.009775 0.013299 0.015449 0.020167 0.042375</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a><span class="co"># add vertices in order that the checkeboard will have smooth lines ####</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a>mesh<span class="op">$</span><span class="kw">isotropicRemeshing</span>(<span class="fl">0.008</span>, <span class="dt">iterations =</span> <span class="dv">3</span>, <span class="dt">relaxSteps =</span> <span class="dv">2</span>)</span></code></pre></div>
+<p>We first compute a DCP parameterization to make a checkerboard.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="co"># compute mesh DCP parameterization ####</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>UV &lt;-<span class="st"> </span>mesh<span class="op">$</span><span class="kw">parameterization</span>(<span class="dt">method =</span> <span class="st">&quot;DCP&quot;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="co"># the UV-space is the square [0,1]x[0,1]</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a><span class="co"># make square checkerboard with 5 squares x 5 squares ####</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>checkerboard &lt;-<span class="st"> </span><span class="kw">ifelse</span>(</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>  (<span class="kw">floor</span>(<span class="dv">5</span> <span class="op">*</span><span class="st"> </span>UV[, 1L]) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span>) <span class="op">==</span><span class="st"> </span>(<span class="kw">floor</span>(<span class="dv">5</span> <span class="op">*</span><span class="st"> </span>UV[, 2L]) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span>), </span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>  <span class="st">&quot;gold&quot;</span>, <span class="st">&quot;magenta4&quot;</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a><span class="co"># add normals, convert to 'rgl' mesh, and add colors ####</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a>mesh<span class="op">$</span><span class="kw">computeNormals</span>()</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a>rmesh &lt;-<span class="st"> </span>mesh<span class="op">$</span><span class="kw">getMesh</span>()</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a>rmesh[[<span class="st">&quot;material&quot;</span>]] &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="st">&quot;color&quot;</span> =<span class="st"> </span>checkerboard)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="co"># plot ####</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>), <span class="dt">zoom =</span> <span class="fl">0.8</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="kw">bg3d</span>(<span class="st">&quot;#363940&quot;</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="kw">shade3d</span>(rmesh, <span class="dt">meshColor =</span> <span class="st">&quot;vertices&quot;</span>, <span class="dt">polygon_offset =</span> <span class="dv">1</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="kw">shade3d</span>(bndry, <span class="dt">lwd =</span> <span class="dv">4</span>)</span></code></pre></div>
+<p><img src="./figures/EnneperCheckerboard_NoCorners.png" /></p>
+<p>This mapped checkerboard is not very nice: the squares are not “aligned” with the mesh. The goal of the rest of this article is to construct a mapped checkerboard “aligned” with the mesh.</p>
+<h3 id="first-method-dcp-with-four-fixed-corners">First method: DCP with four fixed corners</h3>
+<p>The DCP parameterization allows to choose four vertices of the mesh which will be the four corners of the square space of the parameterization (the “UV-space”). We choose the four vertices which attain the extreme values of the <span class="math inline">\(x\)</span> coordinate:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>vs &lt;-<span class="st"> </span>mesh<span class="op">$</span><span class="kw">getVertices</span>()</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>vsx &lt;-<span class="st"> </span>vs[, 1L]</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>oinc &lt;-<span class="st"> </span><span class="kw">order</span>(vsx)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>odec &lt;-<span class="st"> </span><span class="kw">order</span>(vsx, <span class="dt">decreasing =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>vx1 &lt;-<span class="st"> </span>oinc[1L]; vx2 &lt;-<span class="st"> </span>oinc[2L]</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>vx3 &lt;-<span class="st"> </span>odec[2L]; vx4 &lt;-<span class="st"> </span>odec[1L]</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a><span class="co"># let's visualize these four vertices on the mesh</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>))</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a><span class="kw">view3d</span>(<span class="dv">0</span>, <span class="dv">-25</span>, <span class="dt">zoom =</span> <span class="fl">0.8</span>)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a><span class="kw">shade3d</span>(rmesh, <span class="dt">color =</span> <span class="st">&quot;deeppink4&quot;</span>, <span class="dt">polygon_offset =</span> <span class="dv">1</span>)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a><span class="kw">shade3d</span>(bndry, <span class="dt">lwd =</span> <span class="dv">3</span>)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a><span class="kw">points3d</span>(<span class="kw">rbind</span>(vs[vx1, ]), <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>,    <span class="dt">size =</span> <span class="dv">12</span>)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a><span class="kw">points3d</span>(<span class="kw">rbind</span>(vs[vx2, ]), <span class="dt">col =</span> <span class="st">&quot;green&quot;</span>,  <span class="dt">size =</span> <span class="dv">12</span>)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a><span class="kw">points3d</span>(<span class="kw">rbind</span>(vs[vx3, ]), <span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>,   <span class="dt">size =</span> <span class="dv">12</span>)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true"></a><span class="kw">points3d</span>(<span class="kw">rbind</span>(vs[vx4, ]), <span class="dt">col =</span> <span class="st">&quot;yellow&quot;</span>, <span class="dt">size =</span> <span class="dv">12</span>)</span></code></pre></div>
+<p><img src="./figures/Enneper_fourCorners.png" /></p>
+<p>Now let’s compute the DCP parameterization with these given corners, let’s make the checkerboard and let’s plot the result:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="co"># compute the DCP parameterization with the four given corners ####</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>UV &lt;-<span class="st"> </span>mesh<span class="op">$</span><span class="kw">parameterization</span>(<span class="dt">method =</span> <span class="st">&quot;DCP&quot;</span>, <span class="dt">corners =</span> <span class="kw">c</span>(vx1, vx2, vx3, vx4))</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a><span class="co"># make square checkerboard with 5 squares x 5 squares ####</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>checkerboard &lt;-<span class="st"> </span><span class="kw">ifelse</span>(</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a>  (<span class="kw">floor</span>(<span class="dv">5</span> <span class="op">*</span><span class="st"> </span>UV[, 1L]) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span>) <span class="op">==</span><span class="st"> </span>(<span class="kw">floor</span>(<span class="dv">5</span> <span class="op">*</span><span class="st"> </span>UV[, 2L]) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span>), </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a>  <span class="st">&quot;gold&quot;</span>, <span class="st">&quot;magenta4&quot;</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a><span class="co"># add checkerboard colors to the 'rgl' mesh ####</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true"></a>rmesh[[<span class="st">&quot;material&quot;</span>]] &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="st">&quot;color&quot;</span> =<span class="st"> </span>checkerboard)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true"></a><span class="co"># plot ####</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>), <span class="dt">zoom =</span> <span class="fl">0.8</span>)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true"></a><span class="kw">bg3d</span>(<span class="st">&quot;#363940&quot;</span>)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true"></a><span class="kw">shade3d</span>(rmesh, <span class="dt">meshColor =</span> <span class="st">&quot;vertices&quot;</span>, <span class="dt">polygon_offset =</span> <span class="dv">1</span>)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true"></a><span class="kw">shade3d</span>(bndry, <span class="dt">lwd =</span> <span class="dv">4</span>)</span></code></pre></div>
+<p><img src="./figures/EnneperCheckerboard_FourCorners.gif" /></p>
+<p>Now you see what I mean by “aligned”. It is quite better, no?</p>
+<h3 id="second-method-arap-parameterization">Second method: ARAP parameterization</h3>
+<p>The UV-space of the ARAP (As Rigid As Possible) parameterization is not a square nor a circle in general. It looks like a “flattening” of the mesh. For example, I tried to apply it to the <a href="https://laustep.github.io/stlahblog/posts/TennisBall.html">half of the tennis ball</a> and the shape of the UV-space looked like a eight.</p>
+<p>Let’s try it.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="co"># compute ARAP mesh parameterization ####</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a><span class="co"># a large value of lambda for a high rigidity</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a>UV &lt;-<span class="st"> </span>mesh<span class="op">$</span><span class="kw">parameterization</span>(<span class="dt">method =</span> <span class="st">&quot;ARAP&quot;</span>, <span class="dt">lambda =</span> <span class="dv">1000</span>)</span></code></pre></div>
+<p>No luck, the UV-space is a circle:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="kw">plot</span>(UV, <span class="dt">asp =</span> <span class="dv">1</span>, <span class="dt">pch =</span> <span class="st">&quot;.&quot;</span>, <span class="dt">xlab =</span> <span class="st">&quot;u&quot;</span>, <span class="dt">ylab =</span> <span class="st">&quot;v&quot;</span>, <span class="dt">axes =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="kw">axis</span>(<span class="dv">1</span>, <span class="dt">at =</span> <span class="kw">seq</span>(<span class="op">-</span><span class="fl">3.5</span>, <span class="fl">1.5</span>, <span class="dt">by =</span> <span class="fl">0.5</span>))</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="kw">axis</span>(<span class="dv">2</span>, <span class="dt">at =</span> <span class="kw">seq</span>(<span class="op">-</span><span class="fl">1.5</span>, <span class="fl">2.5</span>, <span class="dt">by =</span> <span class="fl">0.5</span>))</span></code></pre></div>
+<p><img src="./figures/EnneperARAP_UVspace.png" /></p>
+<p>If we draw a checkerboard on this circle with horizontal and vertical lines, then, the checkerboard mapped on the Enneper surface will not be “aligned”. So we need to draw a rotated checkerboard.</p>
+<p>We take the two vertices at the “top” of the Ennerper surface: the ones having the highest value of the <span class="math inline">\(z\)</span> coordinate.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a>vs &lt;-<span class="st"> </span>mesh<span class="op">$</span><span class="kw">getVertices</span>()</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>vsz &lt;-<span class="st"> </span>vs[, 3L]</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a>odec &lt;-<span class="st"> </span><span class="kw">order</span>(vsz, <span class="dt">decreasing =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a>vz1 &lt;-<span class="st"> </span>odec[1L]; vz2 &lt;-<span class="st"> </span>odec[2L]</span></code></pre></div>
+<p>These two vertices are on the border of the mesh, therefore their corresponding uv-points are on the border of the UV-space, and they are diametrically opposite on the circle:</p>
+<p><img src="./figures/EnneperARAP_UVspaceWithTheTwoExtremeZPoints.png" /></p>
+<p>We rotate the circle in order to bring these two points to the north and south poles:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a>uv1 &lt;-<span class="st"> </span>UV[vz1, ]</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a>uv2 &lt;-<span class="st"> </span>UV[vz2, ]</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true"></a>alpha &lt;-<span class="st"> </span><span class="kw">atan2</span>(uv2[1L]<span class="op">-</span>uv1[1L], uv2[2L]<span class="op">-</span>uv1[2L])</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true"></a><span class="co">#</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true"></a>rotation &lt;-<span class="st"> </span><span class="cf">function</span>(alpha, uv) {</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true"></a>  <span class="kw">t</span>(<span class="kw">rbind</span>(</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true"></a>    <span class="kw">c</span>(<span class="kw">cos</span>(alpha), <span class="op">-</span><span class="kw">sin</span>(alpha)),</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true"></a>    <span class="kw">c</span>(<span class="kw">sin</span>(alpha),  <span class="kw">cos</span>(alpha))</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true"></a>  ) <span class="op">%*%</span><span class="st"> </span><span class="kw">t</span>(uv))</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true"></a>}</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true"></a><span class="co">#</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true"></a>UVrot &lt;-<span class="st"> </span><span class="kw">rotation</span>(alpha, UV)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true"></a>Urot &lt;-<span class="st"> </span>UVrot[, 1L]</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true"></a>Vrot &lt;-<span class="st"> </span>UVrot[, 2L]</span></code></pre></div>
+<p>Now we can do the rotated checkerboard:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a>Un &lt;-<span class="st"> </span>(Urot <span class="op">-</span><span class="st"> </span><span class="kw">min</span>(Urot)) <span class="op">/</span><span class="st"> </span>(<span class="kw">max</span>(Urot) <span class="op">-</span><span class="st"> </span><span class="kw">min</span>(Urot))</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a>Vn &lt;-<span class="st"> </span>(Vrot <span class="op">-</span><span class="st"> </span><span class="kw">min</span>(Vrot)) <span class="op">/</span><span class="st"> </span>(<span class="kw">max</span>(Vrot) <span class="op">-</span><span class="st"> </span><span class="kw">min</span>(Vrot))</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true"></a>checkerboard &lt;-<span class="st"> </span><span class="kw">ifelse</span>( </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true"></a>  (<span class="kw">floor</span>(<span class="dv">5</span> <span class="op">*</span><span class="st"> </span>Un) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span>) <span class="op">==</span><span class="st"> </span>(<span class="kw">floor</span>(<span class="dv">5</span> <span class="op">*</span><span class="st"> </span>Vn) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span>), </span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true"></a>  <span class="st">&quot;yellow&quot;</span>, <span class="st">&quot;navy&quot;</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true"></a>)</span></code></pre></div>
+<p>Here is the rotated checkerboard:</p>
+<p><img src="./figures/Enneper_UVcheckerboard_ARAP.png" /></p>
+<p>So now it remains to do the plot of the mesh with the mapped checkerboard:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a>rmesh[[<span class="st">&quot;material&quot;</span>]] &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="st">&quot;color&quot;</span> =<span class="st"> </span>checkerboard)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">512</span>, <span class="dv">512</span>), <span class="dt">zoom =</span> <span class="fl">0.8</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true"></a><span class="kw">bg3d</span>(<span class="st">&quot;#363940&quot;</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true"></a><span class="kw">shade3d</span>(rmesh, <span class="dt">meshColor =</span> <span class="st">&quot;vertices&quot;</span>, <span class="dt">polygon_offset =</span> <span class="dv">1</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true"></a><span class="kw">shade3d</span>(bndry, <span class="dt">lwd =</span> <span class="dv">4</span>)</span></code></pre></div>
+<p><img src="./figures/EnneperCheckerboard_ARAP.gif" /></p>
+<p>Perfectly “aligned” and symmetric.</p>
+<p>It’s not easy to decide which one is better on this example, the DCP with the four fixed corners or the ARAP?</p>
+<p>I applied the same steps for the two halves of the <a href="https://laustep.github.io/stlahblog/posts/TennisBall.html">tennis ball</a>, and the decision was clear for this example: ARAP is better, because it minimizes the distortion the squares whereas DCP distorts them into elongated rectangles.</p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
