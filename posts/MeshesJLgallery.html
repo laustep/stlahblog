@@ -1,0 +1,190 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - My 'Meshes.jl' gallery</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>My 'Meshes.jl' gallery</h1> 
+          <div class="info">
+    Posted on October 12, 2023
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'julia'." href="../tags/julia.html">julia</a>, <a title="All pages tagged 'graphics'." href="../tags/graphics.html">graphics</a>
+    
+</div>
+
+<p>I really like the Julia package <strong>Meshes.jl</strong>. In this post, I show some pictures and animations I did with this package.</p>
+<h3 id="hopf-torus">Hopf torus</h3>
+<p>If you know my blog, then you know my fascination for Hopf tori. Here is one.</p>
+<p><img src="./figures/jl_HopfTorus.gif" /></p>
+<p><a href="https://gist.github.com/stla/2e00dbb08079bc41b7eb26544c2608f6">Code</a></p>
+<h3 id="hopf-torus-circle-by-circle">Hopf torus circle by circle</h3>
+<p>The same one, but plotted circle by circle.</p>
+<p><img src="./figures/jl_HopfTorus_CbyC.png" /></p>
+<p><a href="https://gist.github.com/stla/50e904e3a974a801659d495efa565adf">Code</a></p>
+<h3 id="nested-steiner-chain">Nested Steiner chain</h3>
+<p>I already showed on this blog how to draw a nested Steiner chain with different programming languages. Here is the Julia way.</p>
+<p><img src="./figures/jl_SteinerChain_4-3.gif" /></p>
+<p><a href="https://gist.github.com/stla/6d97e31721cec447b3c401bcc2529660">Code</a></p>
+<h3 id="barth-sextic">Barth sextic</h3>
+<p>One of my favorite isosurfaces. It is done with the help of the <strong>MarchingCubes.jl</strong> package.</p>
+<p><img src="./figures/jl_BarthSextic.gif" /></p>
+<p><a href="https://gist.github.com/stla/706af2eaae5419f66765343e3fde06e8">Code</a></p>
+<h3 id="linked-cyclides">Linked cyclides</h3>
+<p>Now we switch to the 4D world. Here are three linked cyclides.</p>
+<p><img src="./figures/jl_LinkedCyclides.png" /></p>
+<p><a href="https://gist.github.com/stla/a8f307695118cd9fbea08a8cca7ba49a">Code</a></p>
+<h3 id="duoprism-330">Duoprism 3,30</h3>
+<p>I already showed on this blog how to draw a duoprism with different programming languages. Here is the Julia way.</p>
+<p><img src="./figures/jl_Duoprism_3-30.gif" /></p>
+<p><a href="https://gist.github.com/stla/fa76ff2022b780db881c12f73e40a354#file-duoprism3-jl">Code</a></p>
+<h3 id="duoprism-3030">Duoprism 30,30</h3>
+<p>And here is the (30,30)-duoprism.</p>
+<p><img src="./figures/jl_Duoprism_30-30.gif" /></p>
+<p><a href="https://gist.github.com/stla/fa76ff2022b780db881c12f73e40a354#file-duoprism3-jl">Code</a></p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
