@@ -14,8 +14,6 @@
     <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
    
   
-    <link href="../libraries/highlighters/prettify/css/minimal.css" rel="stylesheet"> 
-  
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
@@ -78,7 +76,7 @@
 
       <div class="main col-sm-10">
         <div id="header">
-          <div id="logo" style="position:absolute;">
+          <div id="logo">
             <a href="../">
               <img src="../images/stla.jpg" alt="stla" width="100px" />
             </a>
@@ -101,11 +99,11 @@
 </div>
 <div class="info">
     
-    Tags: <a href="../tags/R.html">R</a>, <a href="../tags/graphics.html">graphics</a>, <a href="../tags/rgl.html">rgl</a>, <a href="../tags/geometry.html">geometry</a>, <a href="../tags/maths.html">maths</a>
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'graphics'." href="../tags/graphics.html">graphics</a>, <a title="All pages tagged 'rgl'." href="../tags/rgl.html">rgl</a>, <a title="All pages tagged 'geometry'." href="../tags/geometry.html">geometry</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>, <a title="All pages tagged 'povray'." href="../tags/povray.html">povray</a>
     
 </div>
 
-<p>In this post, I will show how to construct some linked <a href="https://en.wikipedia.org/wiki/Dupin_cyclide">cyclides</a> and draw them in R with <code>rgl</code>. The construction is based on the <a href="https://www.youtube.com/watch?v=UlZ7KDm3iCc">Hopf</a> <a href="https://www.youtube.com/watch?v=L3w_0y8VYAE">fibration</a>. To draw a cyclide, the method is the following one: for a given <span class="math inline">\(\phi \in [-\pi/2, \pi/2)\)</span> and for every <span class="math inline">\(\theta \in [0, 2\pi)\)</span>,</p>
+<p>In this post, I will show how to construct some linked <a href="https://en.wikipedia.org/wiki/Dupin_cyclide">cyclides</a> and draw them in R with <strong>rgl</strong>. The construction is based on the <a href="https://www.youtube.com/watch?v=UlZ7KDm3iCc">Hopf</a> <a href="https://www.youtube.com/watch?v=L3w_0y8VYAE">fibration</a>. To draw a cyclide, the method is the following one: for a given <span class="math inline">\(\phi \in [-\pi/2, \pi/2)\)</span> and for every <span class="math inline">\(\theta \in [0, 2\pi)\)</span>,</p>
 <ul>
 <li><p>take the Hopf fiber corresponding to the point on the two-dimensional sphere <span class="math inline">\(S^2\)</span> with spherical coordinates <span class="math inline">\((\theta, \phi)\)</span>, which is a great circle of the three-dimensional sphere <span class="math inline">\(S^3\)</span>;</p></li>
 <li><p>rotate it in the four-dimensional space;</p></li>
@@ -113,73 +111,75 @@
 </ul>
 <p>This gives a circle in the three-dimensional space, and the union of the circles over <span class="math inline">\(\theta \in [0, 2\pi)\)</span> forms a cyclide.</p>
 <p>Now, if you repeat the construction with another rotation, the two cyclides you get are linked (see the pictures below).</p>
-<p>To draw a circle with <code>rgl</code>, we will actually draw the torus whose equator is this circle, with a small minor radius. To do so, we will use the functions <code>createTorusMesh</code> and <code>transfoMatrix</code> that I introduced in <a href="https://laustep.github.io/stlahblog/posts/rglTorus.html">a previous post</a>. The code is also available in <a href="https://gist.github.com/stla/c9ad4e9e5518a5a60c06c840ce85531d">this gist</a>.</p>
+<p>To draw a circle with <strong>rgl</strong>, we will actually draw the torus whose centerline is this circle, with a small minor radius. To do so, we will use the functions <code>createTorusMesh</code> and <code>transfoMatrix</code> that I introduced in <a href="https://laustep.github.io/stlahblog/posts/rglTorus.html">a previous post</a>. The code is also available in <a href="https://gist.github.com/stla/c9ad4e9e5518a5a60c06c840ce85531d">this gist</a>.</p>
 <p>Now, here is the promised code.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="co"># load the functions createTorusMesh and transfoMatrix</span></a>
-<a class="sourceLine" id="cb1-2" title="2"><span class="kw">source</span>(<span class="st">&quot;TorusPassingByThreePoints.R&quot;</span>)</a>
-<a class="sourceLine" id="cb1-3" title="3"></a>
-<a class="sourceLine" id="cb1-4" title="4"><span class="co"># &quot;inverse&quot; Hopf map</span></a>
-<a class="sourceLine" id="cb1-5" title="5">hopfinverse &lt;-<span class="st"> </span><span class="cf">function</span>(q, t){ </a>
-<a class="sourceLine" id="cb1-6" title="6">  <span class="dv">1</span><span class="op">/</span><span class="kw">sqrt</span>(<span class="dv">2</span><span class="op">*</span>(<span class="dv">1</span><span class="op">+</span>q[<span class="dv">3</span>])) <span class="op">*</span><span class="st"> </span><span class="kw">c</span>(q[<span class="dv">1</span>]<span class="op">*</span><span class="kw">cos</span>(t)<span class="op">+</span>q[<span class="dv">2</span>]<span class="op">*</span><span class="kw">sin</span>(t),</a>
-<a class="sourceLine" id="cb1-7" title="7">                         <span class="kw">sin</span>(t)<span class="op">*</span>(<span class="dv">1</span><span class="op">+</span>q[<span class="dv">3</span>]),</a>
-<a class="sourceLine" id="cb1-8" title="8">                         <span class="kw">cos</span>(t)<span class="op">*</span>(<span class="dv">1</span><span class="op">+</span>q[<span class="dv">3</span>]),</a>
-<a class="sourceLine" id="cb1-9" title="9">                         q[<span class="dv">1</span>]<span class="op">*</span><span class="kw">sin</span>(t)<span class="op">-</span>q[<span class="dv">2</span>]<span class="op">*</span><span class="kw">cos</span>(t)) </a>
-<a class="sourceLine" id="cb1-10" title="10">}</a>
-<a class="sourceLine" id="cb1-11" title="11"><span class="co"># stereographic projection</span></a>
-<a class="sourceLine" id="cb1-12" title="12">stereog &lt;-<span class="st"> </span><span class="cf">function</span>(x){</a>
-<a class="sourceLine" id="cb1-13" title="13">  <span class="kw">c</span>(x[<span class="dv">1</span>], x[<span class="dv">2</span>], x[<span class="dv">3</span>])<span class="op">/</span>(<span class="dv">1</span><span class="op">-</span>x[<span class="dv">4</span>])</a>
-<a class="sourceLine" id="cb1-14" title="14">}</a>
-<a class="sourceLine" id="cb1-15" title="15"><span class="co"># rotation in 4D space (right-isoclinic)</span></a>
-<a class="sourceLine" id="cb1-16" title="16">rotate4d &lt;-<span class="st"> </span><span class="cf">function</span>(alpha, beta, xi, vec){</a>
-<a class="sourceLine" id="cb1-17" title="17">  a =<span class="st"> </span><span class="kw">cos</span>(xi)</a>
-<a class="sourceLine" id="cb1-18" title="18">  b =<span class="st"> </span><span class="kw">sin</span>(alpha)<span class="op">*</span><span class="kw">cos</span>(beta)<span class="op">*</span><span class="kw">sin</span>(xi)</a>
-<a class="sourceLine" id="cb1-19" title="19">  c =<span class="st"> </span><span class="kw">sin</span>(alpha)<span class="op">*</span><span class="kw">sin</span>(beta)<span class="op">*</span><span class="kw">sin</span>(xi)</a>
-<a class="sourceLine" id="cb1-20" title="20">  d =<span class="st"> </span><span class="kw">cos</span>(alpha)<span class="op">*</span><span class="kw">sin</span>(xi)</a>
-<a class="sourceLine" id="cb1-21" title="21">  p =<span class="st"> </span>vec[<span class="dv">1</span>]; q =<span class="st"> </span>vec[<span class="dv">2</span>]; r =<span class="st"> </span>vec[<span class="dv">3</span>]; s =<span class="st"> </span>vec[<span class="dv">4</span>]</a>
-<a class="sourceLine" id="cb1-22" title="22">  <span class="kw">c</span>(a<span class="op">*</span>p <span class="op">-</span><span class="st"> </span>b<span class="op">*</span>q <span class="op">-</span><span class="st"> </span>c<span class="op">*</span>r <span class="op">-</span><span class="st"> </span>d<span class="op">*</span>s,</a>
-<a class="sourceLine" id="cb1-23" title="23">    a<span class="op">*</span>q <span class="op">+</span><span class="st"> </span>b<span class="op">*</span>p <span class="op">+</span><span class="st"> </span>c<span class="op">*</span>s <span class="op">-</span><span class="st"> </span>d<span class="op">*</span>r,</a>
-<a class="sourceLine" id="cb1-24" title="24">    a<span class="op">*</span>r <span class="op">-</span><span class="st"> </span>b<span class="op">*</span>s <span class="op">+</span><span class="st"> </span>c<span class="op">*</span>p <span class="op">+</span><span class="st"> </span>d<span class="op">*</span>q,</a>
-<a class="sourceLine" id="cb1-25" title="25">    a<span class="op">*</span>s <span class="op">+</span><span class="st"> </span>b<span class="op">*</span>r <span class="op">-</span><span class="st"> </span>c<span class="op">*</span>q <span class="op">+</span><span class="st"> </span>d<span class="op">*</span>p)</a>
-<a class="sourceLine" id="cb1-26" title="26">}</a>
-<a class="sourceLine" id="cb1-27" title="27"></a>
-<a class="sourceLine" id="cb1-28" title="28">nCirclesByCyclide &lt;-<span class="st"> </span><span class="dv">100</span></a>
-<a class="sourceLine" id="cb1-29" title="29">theta_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">len=</span>nCirclesByCyclide<span class="op">+</span><span class="dv">1</span>)[<span class="op">-</span><span class="dv">1</span>]</a>
-<a class="sourceLine" id="cb1-30" title="30">nCyclides &lt;-<span class="st"> </span><span class="dv">3</span></a>
-<a class="sourceLine" id="cb1-31" title="31">beta0_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">2</span><span class="op">*</span>pi,<span class="dt">length.out=</span>nCyclides<span class="op">+</span><span class="dv">1</span>)[<span class="op">-</span><span class="dv">1</span>]</a>
-<a class="sourceLine" id="cb1-32" title="32">colors &lt;-<span class="st"> </span><span class="kw">rainbow</span>(nCyclides)</a>
-<a class="sourceLine" id="cb1-33" title="33">phi &lt;-<span class="st"> </span><span class="dv">1</span> <span class="co"># -pi/2 &lt; phi &lt; pi/2; close to pi/2 &lt;=&gt; big hole</span></a>
-<a class="sourceLine" id="cb1-34" title="34"></a>
-<a class="sourceLine" id="cb1-35" title="35"><span class="kw">library</span>(rgl)</a>
-<a class="sourceLine" id="cb1-36" title="36"><span class="kw">open3d</span>(<span class="dt">windowRect=</span><span class="kw">c</span>(<span class="dv">50</span>,<span class="dv">50</span>,<span class="dv">450</span>,<span class="dv">450</span>))</a>
-<a class="sourceLine" id="cb1-37" title="37"><span class="kw">view3d</span>(<span class="dv">90</span>,<span class="dv">0</span>)</a>
-<a class="sourceLine" id="cb1-38" title="38"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>nCyclides){</a>
-<a class="sourceLine" id="cb1-39" title="39">  beta0 &lt;-<span class="st"> </span>beta0_[i]</a>
-<a class="sourceLine" id="cb1-40" title="40">  <span class="cf">for</span>(theta <span class="cf">in</span> theta_){</a>
-<a class="sourceLine" id="cb1-41" title="41">    <span class="co"># take 3 points on the Hopf fiber of the point with </span></a>
-<a class="sourceLine" id="cb1-42" title="42">    <span class="co"># spherical coordinates (theta,phi), and rotate them</span></a>
-<a class="sourceLine" id="cb1-43" title="43">    circle4d3pts &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">4</span>), <span class="cf">function</span>(t){</a>
-<a class="sourceLine" id="cb1-44" title="44">      <span class="kw">rotate4d</span>(pi<span class="op">/</span><span class="dv">2</span>, beta0, <span class="dv">1</span>, </a>
-<a class="sourceLine" id="cb1-45" title="45">               <span class="kw">hopfinverse</span>(<span class="kw">c</span>(<span class="kw">cos</span>(theta)<span class="op">*</span><span class="kw">cos</span>(phi), </a>
-<a class="sourceLine" id="cb1-46" title="46">                             <span class="kw">sin</span>(theta)<span class="op">*</span><span class="kw">cos</span>(phi), </a>
-<a class="sourceLine" id="cb1-47" title="47">                             <span class="kw">sin</span>(phi)), t))</a>
-<a class="sourceLine" id="cb1-48" title="48">    })</a>
-<a class="sourceLine" id="cb1-49" title="49">    <span class="co"># apply the stereographic projection</span></a>
-<a class="sourceLine" id="cb1-50" title="50">    <span class="co"># this gives 3 points on a circle in the 3D space</span></a>
-<a class="sourceLine" id="cb1-51" title="51">    circle3d3pts &lt;-<span class="st"> </span><span class="kw">apply</span>(circle4d3pts, <span class="dv">2</span>, stereog)</a>
-<a class="sourceLine" id="cb1-52" title="52">    <span class="co"># draw the torus passing by these three points</span></a>
-<a class="sourceLine" id="cb1-53" title="53">    mr &lt;-<span class="st"> </span><span class="kw">transfoMatrix</span>(circle3d3pts[,<span class="dv">1</span>], circle3d3pts[,<span class="dv">2</span>], circle3d3pts[,<span class="dv">3</span>])</a>
-<a class="sourceLine" id="cb1-54" title="54">    tmesh &lt;-<span class="st"> </span><span class="kw">transform3d</span>(<span class="kw">createTorusMesh</span>(<span class="dt">R=</span>mr<span class="op">$</span>radius, <span class="dt">r=</span><span class="fl">0.2</span>), mr<span class="op">$</span>matrix)</a>
-<a class="sourceLine" id="cb1-55" title="55">    <span class="kw">shade3d</span>(tmesh, <span class="dt">color=</span>colors[i])</a>
-<a class="sourceLine" id="cb1-56" title="56">  }</a>
-<a class="sourceLine" id="cb1-57" title="57">}</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># load the functions createTorusMesh and transfoMatrix</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="kw">source</span>(<span class="st">&quot;TorusPassingByThreePoints.R&quot;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3"></a></span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="co"># Hopf fiber map</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a>HopfFiber &lt;-<span class="st"> </span><span class="cf">function</span>(q, t) { </span>
+<span id="cb1-6"><a href="#cb1-6"></a>  <span class="dv">1</span><span class="op">/</span><span class="kw">sqrt</span>(<span class="dv">2</span><span class="op">*</span>(<span class="dv">1</span><span class="op">+</span>q[<span class="dv">3</span>])) <span class="op">*</span><span class="st"> </span><span class="kw">c</span>(q[<span class="dv">1</span>]<span class="op">*</span><span class="kw">cos</span>(t) <span class="op">+</span><span class="st"> </span>q[<span class="dv">2</span>]<span class="op">*</span><span class="kw">sin</span>(t),</span>
+<span id="cb1-7"><a href="#cb1-7"></a>                         <span class="kw">sin</span>(t)<span class="op">*</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>q[<span class="dv">3</span>]),</span>
+<span id="cb1-8"><a href="#cb1-8"></a>                         <span class="kw">cos</span>(t)<span class="op">*</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>q[<span class="dv">3</span>]),</span>
+<span id="cb1-9"><a href="#cb1-9"></a>                         q[<span class="dv">1</span>]<span class="op">*</span><span class="kw">sin</span>(t) <span class="op">-</span><span class="st"> </span>q[<span class="dv">2</span>]<span class="op">*</span><span class="kw">cos</span>(t)) </span>
+<span id="cb1-10"><a href="#cb1-10"></a>}</span>
+<span id="cb1-11"><a href="#cb1-11"></a><span class="co"># stereographic projection</span></span>
+<span id="cb1-12"><a href="#cb1-12"></a>stereog &lt;-<span class="st"> </span><span class="cf">function</span>(x) {</span>
+<span id="cb1-13"><a href="#cb1-13"></a>  <span class="kw">c</span>(x[<span class="dv">1</span>], x[<span class="dv">2</span>], x[<span class="dv">3</span>]) <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span><span class="op">-</span>x[<span class="dv">4</span>])</span>
+<span id="cb1-14"><a href="#cb1-14"></a>}</span>
+<span id="cb1-15"><a href="#cb1-15"></a><span class="co"># rotation in 4D space (right-isoclinic)</span></span>
+<span id="cb1-16"><a href="#cb1-16"></a>rotate4d &lt;-<span class="st"> </span><span class="cf">function</span>(alpha, beta, xi, vec) {</span>
+<span id="cb1-17"><a href="#cb1-17"></a>  a &lt;-<span class="st"> </span><span class="kw">cos</span>(xi)</span>
+<span id="cb1-18"><a href="#cb1-18"></a>  b &lt;-<span class="st"> </span><span class="kw">sin</span>(alpha)<span class="op">*</span><span class="kw">cos</span>(beta)<span class="op">*</span><span class="kw">sin</span>(xi)</span>
+<span id="cb1-19"><a href="#cb1-19"></a>  c &lt;-<span class="st"> </span><span class="kw">sin</span>(alpha)<span class="op">*</span><span class="kw">sin</span>(beta)<span class="op">*</span><span class="kw">sin</span>(xi)</span>
+<span id="cb1-20"><a href="#cb1-20"></a>  d &lt;-<span class="st"> </span><span class="kw">cos</span>(alpha)<span class="op">*</span><span class="kw">sin</span>(xi)</span>
+<span id="cb1-21"><a href="#cb1-21"></a>  p &lt;-<span class="st"> </span>vec[<span class="dv">1</span>]; q &lt;-<span class="st"> </span>vec[<span class="dv">2</span>]; r &lt;-<span class="st"> </span>vec[<span class="dv">3</span>]; s &lt;-<span class="st"> </span>vec[<span class="dv">4</span>]</span>
+<span id="cb1-22"><a href="#cb1-22"></a>  <span class="kw">c</span>(a<span class="op">*</span>p <span class="op">-</span><span class="st"> </span>b<span class="op">*</span>q <span class="op">-</span><span class="st"> </span>c<span class="op">*</span>r <span class="op">-</span><span class="st"> </span>d<span class="op">*</span>s,</span>
+<span id="cb1-23"><a href="#cb1-23"></a>    a<span class="op">*</span>q <span class="op">+</span><span class="st"> </span>b<span class="op">*</span>p <span class="op">+</span><span class="st"> </span>c<span class="op">*</span>s <span class="op">-</span><span class="st"> </span>d<span class="op">*</span>r,</span>
+<span id="cb1-24"><a href="#cb1-24"></a>    a<span class="op">*</span>r <span class="op">-</span><span class="st"> </span>b<span class="op">*</span>s <span class="op">+</span><span class="st"> </span>c<span class="op">*</span>p <span class="op">+</span><span class="st"> </span>d<span class="op">*</span>q,</span>
+<span id="cb1-25"><a href="#cb1-25"></a>    a<span class="op">*</span>s <span class="op">+</span><span class="st"> </span>b<span class="op">*</span>r <span class="op">-</span><span class="st"> </span>c<span class="op">*</span>q <span class="op">+</span><span class="st"> </span>d<span class="op">*</span>p)</span>
+<span id="cb1-26"><a href="#cb1-26"></a>}</span>
+<span id="cb1-27"><a href="#cb1-27"></a></span>
+<span id="cb1-28"><a href="#cb1-28"></a>nCirclesByCyclide &lt;-<span class="st"> </span><span class="dv">100</span></span>
+<span id="cb1-29"><a href="#cb1-29"></a>theta_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> nCirclesByCyclide<span class="op">+</span><span class="dv">1</span>)[<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb1-30"><a href="#cb1-30"></a>nCyclides &lt;-<span class="st"> </span><span class="dv">3</span></span>
+<span id="cb1-31"><a href="#cb1-31"></a>beta0_ &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span><span class="op">*</span>pi, <span class="dt">length.out =</span> nCyclides<span class="op">+</span><span class="dv">1</span>)[<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb1-32"><a href="#cb1-32"></a>colors &lt;-<span class="st"> </span><span class="kw">rainbow</span>(nCyclides)</span>
+<span id="cb1-33"><a href="#cb1-33"></a>phi &lt;-<span class="st"> </span><span class="dv">1</span> <span class="co"># -pi/2 &lt; phi &lt; pi/2; close to pi/2 &lt;=&gt; big hole</span></span>
+<span id="cb1-34"><a href="#cb1-34"></a></span>
+<span id="cb1-35"><a href="#cb1-35"></a><span class="kw">library</span>(rgl)</span>
+<span id="cb1-36"><a href="#cb1-36"></a><span class="kw">open3d</span>(<span class="dt">windowRect=</span><span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">450</span>, <span class="dv">450</span>))</span>
+<span id="cb1-37"><a href="#cb1-37"></a><span class="kw">view3d</span>(<span class="dv">90</span>, <span class="dv">0</span>)</span>
+<span id="cb1-38"><a href="#cb1-38"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>nCyclides) {</span>
+<span id="cb1-39"><a href="#cb1-39"></a>  beta0 &lt;-<span class="st"> </span>beta0_[i]</span>
+<span id="cb1-40"><a href="#cb1-40"></a>  <span class="cf">for</span>(theta <span class="cf">in</span> theta_) {</span>
+<span id="cb1-41"><a href="#cb1-41"></a>    <span class="co"># take 3 points on the Hopf fiber of the point with </span></span>
+<span id="cb1-42"><a href="#cb1-42"></a>    <span class="co"># spherical coordinates (theta,phi), and rotate them</span></span>
+<span id="cb1-43"><a href="#cb1-43"></a>    circle4d3pts &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">4</span>), <span class="cf">function</span>(t){</span>
+<span id="cb1-44"><a href="#cb1-44"></a>      <span class="kw">rotate4d</span>(pi<span class="op">/</span><span class="dv">2</span>, beta0, <span class="dv">1</span>, </span>
+<span id="cb1-45"><a href="#cb1-45"></a>               <span class="kw">HopfFiber</span>(<span class="kw">c</span>(</span>
+<span id="cb1-46"><a href="#cb1-46"></a>                 <span class="kw">cos</span>(theta)<span class="op">*</span><span class="kw">cos</span>(phi), </span>
+<span id="cb1-47"><a href="#cb1-47"></a>                 <span class="kw">sin</span>(theta)<span class="op">*</span><span class="kw">cos</span>(phi), </span>
+<span id="cb1-48"><a href="#cb1-48"></a>                 <span class="kw">sin</span>(phi)</span>
+<span id="cb1-49"><a href="#cb1-49"></a>               ), t))</span>
+<span id="cb1-50"><a href="#cb1-50"></a>    })</span>
+<span id="cb1-51"><a href="#cb1-51"></a>    <span class="co"># apply the stereographic projection</span></span>
+<span id="cb1-52"><a href="#cb1-52"></a>    <span class="co"># this gives 3 points on a circle in the 3D space</span></span>
+<span id="cb1-53"><a href="#cb1-53"></a>    circle3d3pts &lt;-<span class="st"> </span><span class="kw">apply</span>(circle4d3pts, <span class="dv">2</span>, stereog)</span>
+<span id="cb1-54"><a href="#cb1-54"></a>    <span class="co"># draw the torus passing by these three points</span></span>
+<span id="cb1-55"><a href="#cb1-55"></a>    mr &lt;-<span class="st"> </span><span class="kw">transfoMatrix</span>(circle3d3pts[,<span class="dv">1</span>], circle3d3pts[,<span class="dv">2</span>], circle3d3pts[,<span class="dv">3</span>])</span>
+<span id="cb1-56"><a href="#cb1-56"></a>    tmesh &lt;-<span class="st"> </span><span class="kw">transform3d</span>(<span class="kw">createTorusMesh</span>(<span class="dt">R =</span> mr<span class="op">$</span>radius, <span class="dt">r =</span> <span class="fl">0.2</span>), mr<span class="op">$</span>matrix)</span>
+<span id="cb1-57"><a href="#cb1-57"></a>    <span class="kw">shade3d</span>(tmesh, <span class="dt">color =</span> colors[i])</span>
+<span id="cb1-58"><a href="#cb1-58"></a>  }</span>
+<span id="cb1-59"><a href="#cb1-59"></a>}</span></code></pre></div>
 <p>This code generates the following picture:</p>
-<p><img src="figures/linkedCyclides1.png" /></p>
+<p><img src="./figures/linkedCyclides1.png" /></p>
 <p>If you increase <span class="math inline">\(\phi\)</span>, this gives cyclides with a biggest hole, with a shape closer to the one of an ordinary torus. For example, here is the result for <span class="math inline">\(\phi=1.4\)</span>:</p>
-<p><img src="figures/linkedCyclides2.png" /></p>
+<p><img src="./figures/linkedCyclides2.png" /></p>
 <p>I used the same technique to do these animations with POV-Ray:</p>
-<p><img src="https://thumbs.gfycat.com/BreakableRectangularHarlequinbug-size_restricted.gif" /></p>
-<p><img src="https://thumbs.gfycat.com/EcstaticMintyHarrierhawk-size_restricted.gif" /></p>
-<p><img src="https://thumbs.gfycat.com/ElaborateMedicalGroundbeetle-size_restricted.gif" /></p>
+<p><img src="./figures/povray_linkedCyclides_3.gif" /></p>
+<p><img src="./figures/povray_linkedCyclides_5.gif" /></p>
+<p><img src="./figures/povray_cyclidesFlower.gif" /></p>
 
         </div>
 
@@ -233,20 +233,6 @@
 <!-- <script>
   window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
 </script> -->
-
-  <!-- Google Prettify -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script> -->
-  <script src="../libraries/highlighters/prettify/js/lang-r.js"></script>
-  <script>
-    var pres = document.getElementsByTagName("pre");
-    for (var i = 0; i < pres.length; ++i) {
-      
-        pres[i].className = pres[i].className + " prettyprint linenums";
-      
-    }
-    prettyPrint();
-  </script> 
 
 
 </html>
