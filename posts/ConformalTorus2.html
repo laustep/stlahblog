@@ -1,0 +1,299 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Conformal parameterization of the torus</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Conformal parameterization of the torus</h1> 
+          <div class="info">
+    Posted on October 14, 2023
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>, <a title="All pages tagged 'geometry'." href="../tags/geometry.html">geometry</a>, <a title="All pages tagged 'graphics'." href="../tags/graphics.html">graphics</a>, <a title="All pages tagged 'rgl'." href="../tags/rgl.html">rgl</a>
+    
+</div>
+
+<p>You can forget my post <a href="https://laustep.github.io/stlahblog/posts/ConformalTorus.html">Mapping a picture on a donut or a Hopf torus</a>. Almost everything I wrote in this post is wrong. I have even been unable to define what is the conformality property of a parameterization. Well, I don’t delete it because nevertheless it contains nice pictures.</p>
+<p>So let’s restart. Consider a torus with major radius <span class="math inline">\(R\)</span> and minor radius <span class="math inline">\(r\)</span>. Define <span class="math inline">\(s = \sqrt{\frac{R^2}{r^2}-1}\)</span>, the so-called <em>aspect ratio</em> of the torus. Then a conformal parameterization of this torus is given by <span class="math display">\[
+f(u, v) = \begin{pmatrix}
+\dfrac{s \cos\frac{2\pi u}{s}}{\sqrt{s^2+1} - \cos 2\pi v} \\
+\dfrac{s \sin\frac{2\pi u}{s}}{\sqrt{s^2+1} - \cos 2\pi v} \\
+\dfrac{\sin 2\pi v}{\sqrt{s^2+1} - \cos 2\pi v}
+\end{pmatrix}, \qquad 0 \leqslant u &lt; s,\, 0 \leqslant v &lt; 1.
+\]</span> Well, not really: only up to a scaling. This parameterization does not necessarily yield a torus with major radius <span class="math inline">\(R\)</span> and minor radius <span class="math inline">\(r\)</span>, but the torus it yields has the same shape: the ratio of the major radius over the minor radius is <span class="math inline">\(R/r\)</span>.</p>
+<h3 id="the-square-torus">The square torus</h3>
+<p>When <span class="math inline">\(s = 1\)</span>, the torus is said to be <em>square</em>. Let’s consider this case first. We take <span class="math inline">\(R = \sqrt{2}\)</span> and <span class="math inline">\(r = 1\)</span>.</p>
+<p>The torus is square, and the parameterization is conformal. That means that a square pattern fits well on the torus, in particular the angles that can be found in the pattern are preserved when one maps this pattern to the torus with the help of this parameterization.</p>
+<p>Let’s see. We need a square pattern. I’m going to do one with the help of a Weierstrass <span class="math inline">\(\wp\)</span>-function. It is implemented in my package <strong>jacobi</strong>. I compute its (complex) values on a square grid, and with the help of my package <strong>RcppColors</strong>, I map each value to a color.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">library</span>(jacobi)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="kw">library</span>(RcppColors)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="co"># generate the values of wp on a grid</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>x &lt;-<span class="st"> </span>y &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">4</span>, <span class="dv">0</span>, <span class="dt">length.out =</span> 1024L)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>f &lt;-<span class="st"> </span><span class="cf">function</span>(x, y) {</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>  z &lt;-<span class="st"> </span><span class="kw">complex</span>(<span class="dt">real =</span> x, <span class="dt">imaginary =</span> y)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>  <span class="kw">wp</span>(z, <span class="dt">omega =</span> <span class="kw">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span> <span class="op">+</span><span class="st"> </span><span class="fl">0.5</span>i))</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>}</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>Z &lt;-<span class="st"> </span><span class="kw">outer</span>(x, y, f)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a><span class="co"># map them to colors</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>img &lt;-<span class="st"> </span><span class="kw">colorMap5</span>(Z)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a><span class="co"># plot</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>opar &lt;-<span class="st"> </span><span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>))</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a><span class="kw">plot</span>(</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a>  <span class="kw">c</span>(<span class="op">-</span><span class="dv">100</span>, <span class="dv">100</span>), <span class="kw">c</span>(<span class="op">-</span><span class="dv">100</span>, <span class="dv">100</span>), <span class="dt">type =</span> <span class="st">&quot;n&quot;</span>, <span class="dt">xaxs =</span><span class="st">&quot;i&quot;</span>, <span class="dt">yaxs =</span> <span class="st">&quot;i&quot;</span>,</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>  <span class="dt">xlab =</span> <span class="ot">NA</span>, <span class="dt">ylab =</span> <span class="ot">NA</span>, <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">asp =</span> <span class="dv">1</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a><span class="kw">rasterImage</span>(img, <span class="dv">-100</span>, <span class="dv">-100</span>, <span class="dv">100</span>, <span class="dv">100</span>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a><span class="kw">par</span>(opar)</span></code></pre></div>
+<p><img src="./figures/wp4x4_cm5.png" /></p>
+<p>There are some squares and some kind of “diagonals” on this image. The diagonals always meet at right angles. The conformal parameterization is implemented in my package <strong>cgalMeshes</strong> (in the <strong>github</strong> branch of the <a href="https://github.com/stla/cgalMeshes">Github repository</a>). Let’s make two torus meshes: the first one with the usual parameterization and the second one with the conformal parameterization, and let’s map the image on each of them:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">library</span>(rgl)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="kw">library</span>(cgalMeshes)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>mesh1 &lt;-<span class="st"> </span><span class="kw">torusMesh</span>(</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>  <span class="dt">R =</span> <span class="kw">sqrt</span>(<span class="dv">2</span>), <span class="dt">r =</span> <span class="dv">1</span>, <span class="dt">nu =</span> 1024L, <span class="dt">nv =</span> 1024L, <span class="dt">conformal =</span> <span class="ot">FALSE</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>mesh2 &lt;-<span class="st"> </span><span class="kw">torusMesh</span>(</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>  <span class="dt">R =</span> <span class="kw">sqrt</span>(<span class="dv">2</span>), <span class="dt">r =</span> <span class="dv">1</span>, <span class="dt">nu =</span> 1024L, <span class="dt">nv =</span> 1024L, <span class="dt">conformal =</span> <span class="ot">TRUE</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>clrs &lt;-<span class="st"> </span><span class="kw">c</span>(img)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>mesh1[[<span class="st">&quot;material&quot;</span>]] &lt;-<span class="st"> </span>mesh2[[<span class="st">&quot;material&quot;</span>]] &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="st">&quot;color&quot;</span> =<span class="st"> </span>clrs)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a><span class="co"># plot</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">640</span>, <span class="dv">320</span>))</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a><span class="kw">clear3d</span>(<span class="dt">type =</span> <span class="st">&quot;lights&quot;</span>) <span class="co"># destroy current lights</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a><span class="kw">light3d</span>(<span class="dt">x =</span> <span class="dv">-50</span>, <span class="dt">y =</span> <span class="dv">100</span>, <span class="dt">z =</span> <span class="dv">100</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a><span class="kw">bg3d</span>(<span class="st">&quot;#363940&quot;</span>)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a><span class="kw">mfrow3d</span>(<span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a><span class="kw">view3d</span>(<span class="op">-</span><span class="dv">25</span>, <span class="dv">-25</span>, <span class="dt">zoom =</span> <span class="fl">0.75</span>)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true"></a><span class="kw">shade3d</span>(mesh1, <span class="dt">specular =</span> <span class="st">&quot;gold&quot;</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true"></a><span class="kw">next3d</span>()</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true"></a><span class="kw">view3d</span>(<span class="op">-</span><span class="dv">25</span>, <span class="dv">-25</span>, <span class="dt">zoom =</span> <span class="fl">0.75</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true"></a><span class="kw">shade3d</span>(mesh2, <span class="dt">specular =</span> <span class="st">&quot;gold&quot;</span>)</span></code></pre></div>
+<p><img src="./figures/tori_square_wp.png" /></p>
+<p>The “diagonals” meet at right angles on the conformal torus, but not on the other one. This is what we expected.</p>
+<p>Let’s try with another pattern. Thanks to the <strong>imager</strong> package, I will transform the previous image with the <a href="https://en.wikipedia.org/wiki/Sobel_operator"><em>Sobel operator</em></a>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">library</span>(imager)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="co"># transform the raster to an 'imager' image</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>im1 &lt;-<span class="st"> </span><span class="kw">as.cimg</span>(</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>  <span class="kw">aperm</span>(</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>    <span class="kw">array</span>(</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>      <span class="kw">col2rgb</span>(img) <span class="op">/</span><span class="st"> </span><span class="dv">255</span>, </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>      <span class="dt">dim =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">1024</span>, <span class="dv">1024</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>    ), <span class="kw">c</span>(2L, 3L, 1L)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a>  )</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a><span class="co"># Sobel transformation</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a>Sobel &lt;-<span class="st"> </span><span class="cf">function</span>(im) {</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a>  M &lt;-<span class="st"> </span><span class="kw">rbind</span>(</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a>    <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">-2</span>, <span class="dv">-1</span>),</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a>    <span class="kw">c</span>( <span class="dv">0</span>,  <span class="dv">0</span>,  <span class="dv">0</span>),</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a>    <span class="kw">c</span>( <span class="dv">1</span>,  <span class="dv">2</span>,  <span class="dv">1</span>)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a>  )</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a>  imX &lt;-<span class="st"> </span><span class="kw">convolve</span>(im, <span class="kw">as.cimg</span>(M))</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true"></a>  imY &lt;-<span class="st"> </span><span class="kw">convolve</span>(im, <span class="kw">as.cimg</span>(<span class="kw">t</span>(M)))</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true"></a>  imXY &lt;-<span class="st"> </span><span class="kw">enorm</span>(<span class="kw">list</span>(imX, imY))</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true"></a>  <span class="kw">pmax</span>(<span class="kw">pmin</span>(imXY, <span class="dv">1</span>), <span class="dv">0</span>)</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true"></a>}</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true"></a><span class="co"># apply Sobel transformation and get the colors as hex codes</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true"></a>im2 &lt;-<span class="st"> </span><span class="kw">Sobel</span>(im1)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true"></a>r &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">squeeze</span>(<span class="kw">R</span>(im2)))</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true"></a>g &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">squeeze</span>(<span class="kw">G</span>(im2)))</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true"></a>b &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">squeeze</span>(<span class="kw">B</span>(im2)))</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true"></a>clrs &lt;-<span class="st"> </span><span class="kw">rgb</span>(r, g, b)</span></code></pre></div>
+<p>Here is the result:</p>
+<p><img src="./figures/wp4x4_cm5_Sobel.png" /></p>
+<p>We map this image as before on the tori. Here is the result:</p>
+<p><img src="./figures/tori_square_wp_Sobel.png" /></p>
+<h3 id="non-square-torus">Non-square torus</h3>
+<p>Now we take <span class="math inline">\(R = \sqrt{5}\)</span> and <span class="math inline">\(r = 1\)</span>, so that the aspect ratio is <span class="math inline">\(s = 2\)</span>. Thus, to see the conformality property, we will have to map a rectangular image to the torus, with the same aspect ratio. Let’s do such an image. We just concatenate the previous image to itself.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">library</span>(jacobi)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="kw">library</span>(RcppColors)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="co"># generate the values of wp on a grid</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>x &lt;-<span class="st"> </span>y &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">4</span>, <span class="dv">0</span>, <span class="dt">length.out =</span> 512L)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>f &lt;-<span class="st"> </span><span class="cf">function</span>(x, y) {</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>  z &lt;-<span class="st"> </span><span class="kw">complex</span>(<span class="dt">real =</span> x, <span class="dt">imaginary =</span> y)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>  <span class="kw">wp</span>(z, <span class="dt">omega =</span> <span class="kw">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span> <span class="op">+</span><span class="st"> </span><span class="fl">0.5</span>i))</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>}</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>Z &lt;-<span class="st"> </span><span class="kw">outer</span>(x, y, f)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a><span class="co"># map them to colors</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a>img &lt;-<span class="st"> </span><span class="kw">colorMap5</span>(Z)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a><span class="co"># plot</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a>opar &lt;-<span class="st"> </span><span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>))</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a><span class="kw">plot</span>(</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a>  <span class="kw">c</span>(<span class="op">-</span><span class="dv">200</span>, <span class="dv">200</span>), <span class="kw">c</span>(<span class="op">-</span><span class="dv">100</span>, <span class="dv">100</span>), <span class="dt">type =</span> <span class="st">&quot;n&quot;</span>, <span class="dt">xaxs =</span><span class="st">&quot;i&quot;</span>, <span class="dt">yaxs =</span> <span class="st">&quot;i&quot;</span>,</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true"></a>  <span class="dt">xlab =</span> <span class="ot">NA</span>, <span class="dt">ylab =</span> <span class="ot">NA</span>, <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">asp =</span> <span class="dv">1</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true"></a>)</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true"></a><span class="kw">rasterImage</span>(img, <span class="dv">-200</span>, <span class="dv">-100</span>, <span class="dv">200</span>, <span class="dv">100</span>)</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true"></a><span class="kw">par</span>(opar)</span></code></pre></div>
+<p><img src="./figures/wp8x4_cm5.png" /></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="kw">library</span>(rgl)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="kw">library</span>(cgalMeshes)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>mesh1 &lt;-<span class="st"> </span><span class="kw">torusMesh</span>(</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>  <span class="dt">R =</span> <span class="kw">sqrt</span>(<span class="dv">5</span>), <span class="dt">r =</span> <span class="dv">1</span>, <span class="dt">nu =</span> 1024L, <span class="dt">nv =</span> 512L, <span class="dt">conformal =</span> <span class="ot">FALSE</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>mesh2 &lt;-<span class="st"> </span><span class="kw">torusMesh</span>(</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a>  <span class="dt">R =</span> <span class="kw">sqrt</span>(<span class="dv">5</span>), <span class="dt">r =</span> <span class="dv">1</span>, <span class="dt">nu =</span> 1024L, <span class="dt">nv =</span> 512L, <span class="dt">conformal =</span> <span class="ot">TRUE</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a>clrs &lt;-<span class="st"> </span><span class="kw">c</span>(img)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a>mesh1[[<span class="st">&quot;material&quot;</span>]] &lt;-<span class="st"> </span>mesh2[[<span class="st">&quot;material&quot;</span>]] &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="st">&quot;color&quot;</span> =<span class="st"> </span>clrs)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true"></a><span class="co"># plot</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true"></a><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="dv">50</span> <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">640</span>, <span class="dv">320</span>))</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true"></a><span class="kw">clear3d</span>(<span class="dt">type =</span> <span class="st">&quot;lights&quot;</span>) <span class="co"># destroy current lights</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true"></a><span class="kw">light3d</span>(<span class="dt">x =</span> <span class="dv">-50</span>, <span class="dt">y =</span> <span class="dv">100</span>, <span class="dt">z =</span> <span class="dv">100</span>)</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true"></a><span class="kw">bg3d</span>(<span class="st">&quot;#363940&quot;</span>)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true"></a><span class="kw">mfrow3d</span>(<span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true"></a><span class="kw">view3d</span>(<span class="op">-</span><span class="dv">25</span>, <span class="dv">-25</span>, <span class="dt">zoom =</span> <span class="fl">0.75</span>)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true"></a><span class="kw">shade3d</span>(mesh1, <span class="dt">specular =</span> <span class="st">&quot;gold&quot;</span>)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true"></a><span class="kw">next3d</span>()</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true"></a><span class="kw">view3d</span>(<span class="op">-</span><span class="dv">25</span>, <span class="dv">-25</span>, <span class="dt">zoom =</span> <span class="fl">0.75</span>)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true"></a><span class="kw">shade3d</span>(mesh2, <span class="dt">specular =</span> <span class="st">&quot;gold&quot;</span>)</span></code></pre></div>
+<p><img src="./figures/tori_nonsquare_wp.png" /></p>
+<p>Now let’s try with the Sobel-transformed image. Here it is:</p>
+<p><img src="./figures/wp8x4_cm5_Sobel.png" /></p>
+<p>I don’t understand why it is different from the square one (it is more brightly). Anyway it looks nice. Here are the tori now:</p>
+<p><img src="./figures/tori_nonsquare_wp_Sobel.png" /></p>
+<p>It’s not very easy to see. Observe carefully the red “diagonals”. Do they meet at right angles on the torus at right? Theoretically yes.</p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
