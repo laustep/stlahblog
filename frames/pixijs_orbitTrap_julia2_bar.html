@@ -1,0 +1,188 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <script src="../libraries/hamster.min.js"></script>
+  <title>Orbit trap</title>
+  <style>
+    html, body { 
+      margin: 0; 
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<script src="../libraries/pixi.min.js"></script>
+
+<body>
+
+  <script type="text/javascript">
+    let type = "WebGL";
+    if (!PIXI.utils.isWebGLSupported()) {
+      type = "canvas";
+    }
+    PIXI.utils.sayHello(type);
+  </script>
+
+  <div id="container"></div>
+
+  <script id="fragmentShader" type="x-shader/x-fragment">
+    precision highp float;
+    uniform vec2 iResolution;
+    uniform vec2 mouse;
+    uniform float iGlobalTime;
+    uniform float x0;
+    uniform float y0;
+    uniform float sx;
+    uniform float sy;
+
+    // map function: map(x, a, b, c, d) sends (a,b) to (b,c)
+    float lerp(float t, float a, float b){
+      return a + t*(b-a);
+    }
+    float norm(float t, float a, float b){
+      return (t-a)/(b-a);
+    }
+    float map(float t, float e1, float s1, float e2, float s2){
+      return lerp(norm(t, e1, s1), e2, s2);
+    }
+
+    // color mapping
+    vec3 hsv2rgb(vec3 c){
+      vec4 K = vec4(1.0, 2.0/3.0, 1.0/3.0, 3.0);
+      vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+      return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+    }
+    float pi = 3.1415926535897932384626433832795;
+
+    // complex product
+    vec2 product(vec2 a, vec2 b){
+      return vec2(a.x*b.x - a.y*b.y, a.x*b.y + a.y*b.x);
+    }
+    vec2 conjuguate(vec2 z) {
+      return vec2(z.x, -z.y);
+    }
+
+    // 
+    float f(vec2 z, float tx, float ty, float alpha) {
+      z = product(vec2(cos(alpha), sin(alpha)), z);
+      return min(abs(z.x - tx), abs(z.y - ty)) / 0.03;
+    }
+    vec2 orbitTrap(vec2 z, float tx, float ty, float alpha) {
+      for(int i = 0; i < 100; i += 1) {
+        z = conjuguate(product(z, z)) + vec2(0.087, -0.299015);
+        if((length(z) > 100.0) || (i >= 2 && f(conjuguate(z), tx, ty, alpha) < 1.0)) {
+          return z;
+        }
+      }
+      return z;
+    }
+
+    vec2 g(vec2 z, float tx, float ty, float alpha) {
+      return orbitTrap(z, tx, ty, alpha);
+    }
+
+    vec3 pair2hsv(vec2 z, float tx, float ty, float alpha){
+      float h = (atan(z.y, z.x) + pi) / 2.0 / pi;
+      float fz = 2.0*f(z, tx, ty, alpha);
+      float s = min(1.0, fz);
+      float v = max(0.0, min(1.0, 2.0 - fz));
+      return vec3(h, s, v);
+    }
+
+    //
+    void main(void){
+      float alpha = (1.0 + cos(iGlobalTime/10.0)) * pi;
+      float mx = map(mouse.x, 0.0, iResolution.x, -2.0, 2.0); 
+      float my = map(mouse.y, 0.0, iResolution.y, -1.5, 1.5);
+      float r = iResolution.x / iResolution.y * 3.0 / 4.0;
+//      float x = map(gl_FragCoord.x, 0.0, iResolution.x, -2.0*r, 2.0*r); 
+//      float y = map(gl_FragCoord.y, 0.0, iResolution.y, -1.5, 1.5);
+      float x = r * (sx*(gl_FragCoord.x - iResolution.x/2.0) + x0);
+      float y = sy*(gl_FragCoord.y - iResolution.y/2.0) + y0;
+      vec2 z = g(vec2(x, y), mx, my, alpha);
+      gl_FragColor = vec4(hsv2rgb(pair2hsv(z, mx, my, alpha)), 1.0);
+    }
+  </script>
+
+  <script>
+    var app = new PIXI.Application({ width: window.innerWidth, height: window.innerHeight });
+    app.resizeTo = window;
+
+    let fragmentShader = document.getElementById('fragmentShader').textContent;
+
+    let xmin = -2, xmax = 2, ymin = -1.5, ymax = 1.5;
+
+    let filter = new PIXI.Filter(null, fragmentShader);
+    filter.uniforms.iResolution = {x: app.screen.width, y: app.screen.height};
+    filter.uniforms.mouse = {x: app.screen.width/2, y: app.screen.height/2}; 
+    filter.uniforms.iGlobalTime = 0.0;
+    filter.uniforms.x0 = (xmin + xmax) / 2;
+    filter.uniforms.y0 = (ymin + ymax) / 2;
+    filter.uniforms.sx = (xmax - xmin) / app.screen.width;
+    filter.uniforms.sy = (ymax - ymin) / app.screen.height;
+
+    document.onmousemove = function(evt){
+      filter.uniforms.mouse = {x: evt.clientX, y: evt.clientY};
+    };
+
+    let X = filter.uniforms.iResolution.x / 2;
+    let Y = filter.uniforms.iResolution.y / 2;
+    document.onclick = function(evt){
+      X = evt.clientX;
+      Y = evt.clientY;
+      let offsetx = evt.clientX - filter.uniforms.iResolution.x / 2;
+      let offsety = filter.uniforms.iResolution.y / 2 - evt.clientY;
+      let ox = offsetx * filter.uniforms.sx; 
+      let oy = offsety * filter.uniforms.sy; 
+      filter.uniforms.sx /= 1.1;
+      filter.uniforms.sy /= 1.1;
+      let scrx = ox / filter.uniforms.sx;
+      let scry = oy / filter.uniforms.sy;
+      filter.uniforms.x0 += (scrx - offsetx) * filter.uniforms.sx;
+      filter.uniforms.y0 += (scry - offsety) * filter.uniforms.sy;
+    }
+
+    let factor0 = 1.001;
+    let hamster = Hamster(document.body);
+    hamster.wheel(function (evt, delta, deltaX, deltaY) {
+      let offsetx = X - filter.uniforms.iResolution.x / 2;
+      let offsety = filter.uniforms.iResolution.y / 2 - Y;
+      let ox = offsetx * filter.uniforms.sx; 
+      let oy = offsety * filter.uniforms.sy; 
+      let factor = Math.max(0.1, Math.pow(factor0, deltaY));
+      filter.uniforms.sx /= factor;
+      filter.uniforms.sy /= factor;
+      let scrx = ox / filter.uniforms.sx;
+      let scry = oy / filter.uniforms.sy;
+      filter.uniforms.x0 += (scrx - offsetx) * filter.uniforms.sx;
+      filter.uniforms.y0 += (scry - offsety) * filter.uniforms.sy;
+    });
+
+    let container = new PIXI.Container();
+    container.filterArea = app.screen;
+    container.filters = [filter];
+
+    app.stage.addChild(container);
+    document.getElementById('container').appendChild(app.view);
+
+    function onresize(event){
+      if(app.resize)
+        app.resize();
+      container.filterArea = app.screen;
+      filter.uniforms.iResolution = {x: app.screen.width, y: app.screen.height};
+    }
+    window.addEventListener('resize', onresize, false);
+
+    startTime = Date.now();
+    app.ticker.add(function(delta){
+      var currentTime = Date.now();
+      filter.uniforms.iGlobalTime = (currentTime - startTime) * 0.0005;
+    });
+
+  </script>
+</body>
+
+</html>

@@ -5,7 +5,134 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Sat, 14 Oct 2023 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Mon, 20 Nov 2023 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>Why is this hyperbolic background invariant?</title>
+      <link>https://laustep.github.io/stlahblog/posts/modularLambda.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        I have a mathematical question for you, because it is a mystery for me.
+      </p>
+      <p>Look at this animation:</p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/lambdaOnSquare.gif"
+        />
+      </p>
+      <p>
+        I get it as follows. Each frame corresponds to a value of
+        <span class="math inline">\(t \in [0,3[\)</span> (I take
+        <span class="math inline">\(160\)</span> values of
+        <span class="math inline">\(t\)</span> subdivising
+        <span class="math inline">\([0,3[\)</span>). Here is how I get the frame
+        corresponding to one value of <span class="math inline">\(t\)</span>:
+      </p>
+      <ul>
+        <li>
+          <p>
+            for each point in the unit square
+            <span class="math inline">\(S = {[0,1]}^2\)</span>, I take its
+            complex affix <span class="math inline">\(z\)</span>, and I send
+            <span class="math inline">\(z\)</span> to the open upper half-plane
+            <span class="math inline"
+              >\(\mathbb{H} = \bigl\{z | \Im(z) &gt; 0\bigr\}\)</span
+            >
+            with a conformal map <span class="math inline">\(\psi\)</span> from
+            <span class="math inline">\(S\)</span> to
+            <span class="math inline">\(\mathbb{H}\)</span>;
+          </p>
+        </li>
+        <li>
+          <p>
+            I attribute a color to
+            <span class="math inline"
+              >\(R^t\Bigl(\lambda\bigl(\psi(z)\bigr)\Bigr)\)</span
+            >
+            where <span class="math inline">\(R\)</span> is the Möbius
+            transformation of order
+            <span class="math inline">\(3\)</span> defined by
+            <span class="math inline">\(R(z) = -\dfrac{1}{z+1}\)</span> and
+            <span class="math inline">\(\lambda\)</span> is the modular lambda
+            function.
+          </p>
+        </li>
+      </ul>
+      <p>
+        The modular lambda function and the conformal map
+        <span class="math inline">\(\psi\)</span> are implemented in my R
+        package <strong>jacobi</strong>.
+      </p>
+      <p>
+        My question is: why does the hyperbolic tessellation that we can see as
+        the “background” of the animation not move? Why is it invariant?
+      </p>
+      <p>
+        I observed the same phenomenon for other modular functions, for example
+        the Klein j-invariant function.
+      </p>
+      <p>
+        The color mapping <span class="math inline">\(\mathcal{C}\)</span> is
+        defined with the help of the HSI color space. The color
+        <span class="math inline">\(\mathcal{C}(z)\)</span> depends on the phase
+        of <span class="math inline">\(z\)</span> only. Precisely,
+        <span class="math inline">\(\mathcal{C}(z)\)</span> is the HSI color
+        with:
+      </p>
+      <ul>
+        <li>
+          <p>
+            <em>hue</em> <span class="math inline">\(\in [0, 360[\)</span> given
+            by the phase
+            <span class="math inline">\(\varphi(z) \in [0, 2\pi[\)</span> of
+            <span class="math inline">\(z\)</span> converted to degrees;
+          </p>
+        </li>
+        <li>
+          <p>
+            <em>saturation</em> given by
+            <span class="math inline"
+              >\(\sqrt{\bigl(1 + \sin(w)\bigr) / 2}\)</span
+            >
+            where
+            <span class="math inline"
+              >\(w = 2\pi\log\bigl(1+\varphi(z)\bigr)\)</span
+            >;
+          </p>
+        </li>
+        <li>
+          <p>
+            <em>intensity</em> given by
+            <span class="math inline">\(\bigl(1 + \cos(w)\bigr) / 2\)</span>
+            with <span class="math inline">\(w\)</span> as above.
+          </p>
+        </li>
+      </ul>
+      <p>Why do we get such a result? I really don’t know.</p>
+      <p>
+        Before leaving you, let me show you a 3D version of this animation that
+        I made with the
+        <a href="https://github.com/cj-holmes/isocuboids"
+          ><strong>isocuboids</strong></a
+        >
+        R package:
+      </p>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/isocuboids_lambdaOnSquare-gray.gif"
+        />
+      </p>
+      <p>I hope you like it.</p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Mon, 20 Nov 2023 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/modularLambda.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>Conformal parameterization of the torus</title>
       <link>https://laustep.github.io/stlahblog/posts/ConformalTorus2.html</link>
@@ -12950,202 +13077,6 @@ PKG_CXXFLAGS = -I$(BH_PATH)</code></pre>
 ]]></description>
       <pubDate>Mon, 28 Feb 2022 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/HyperbolicGircope.html</guid>
-      <dc:creator>Stéphane Laurent</dc:creator>
-      <category>R</category>
-    </item>
-    <item>
-      <title>Volume under surface from points</title>
-      <link>https://laustep.github.io/stlahblog/posts/volumeUnderSurface.html</link>
-      <description><![CDATA[<div class="container-fluid">
-  <div class="main col-sm-12">
-    <div class="content">
-      <h2 id="the-problem">The problem</h2>
-      <p>
-        Suppose you want to get the volume under a surface but you only have
-        some points on this surface. For the illustration, I will take the
-        surface defined by
-        <span class="math inline">\(z = \exp\bigl(-(x^2 + y^2)\bigr)\)</span> on
-        the square <span class="math inline">\([-5, 5] \times [-5, 5]\)</span>.
-        Then the volume we’re looking for is close to
-        <span class="math inline">\(\pi\)</span> (the integral on
-        <span class="math inline"
-          >\([-\infty, +\infty] \times [-\infty, +\infty]\)</span
-        >
-        is exactly <span class="math inline">\(\pi\)</span>).
-      </p>
-      <div class="sourceCode" id="cb1">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb1-1">f &lt;-<span class="st"> </span><span class="cf">function</span>(x, y){</span>
-<span id="cb1-2">  <span class="kw">exp</span>(<span class="op">-</span>(x<span class="op">*</span>x <span class="op">+</span><span class="st"> </span>y<span class="op">*</span>y))</span>
-<span id="cb1-3">}</span></code></pre>
-      </div>
-      <p>
-        Now let’s define a grid on
-        <span class="math inline">\([-5, 5] \times [-5, 5]\)</span> and the
-        value of <span class="math inline">\(z\)</span> for each point on this
-        grid:
-      </p>
-      <div class="sourceCode" id="cb2">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb2-1">x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">5</span>, <span class="dv">5</span>, <span class="dt">length.out =</span> <span class="dv">100</span>)</span>
-<span id="cb2-2">y &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">5</span>, <span class="dv">5</span>, <span class="dt">length.out =</span> <span class="dv">100</span>)</span>
-<span id="cb2-3">grd &lt;-<span class="st"> </span><span class="kw">transform</span>( <span class="co"># data (x_i, y_i, z_i)</span></span>
-<span id="cb2-4">  <span class="kw">expand.grid</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y), <span class="dt">z =</span> <span class="kw">f</span>(x, y)</span>
-<span id="cb2-5">) </span></code></pre>
-      </div>
-      <h2 id="elevated-delaunay-tessellation---using-deldir">
-        Elevated Delaunay tessellation - using ‘deldir’
-      </h2>
-      <p>
-        A solution consists in constructing a Delaunay tessellation of the
-        surface and then to sum the volumes under the Delaunay triangles. The
-        <strong>deldir</strong> package allows to construct such a Delaunay
-        tessellation (which I call an <em>elevated Delaunay tessellation</em>).
-      </p>
-      <div class="sourceCode" id="cb3">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb3-1"><span class="kw">library</span>(deldir)</span>
-<span id="cb3-2">del &lt;-<span class="st"> </span><span class="kw">deldir</span>( <span class="co"># Delaunay</span></span>
-<span id="cb3-3">  <span class="dt">x =</span> grd[[<span class="st">"x"</span>]], <span class="dt">y =</span> grd[[<span class="st">"y"</span>]], <span class="dt">z =</span> grd[[<span class="st">"z"</span>]],</span>
-<span id="cb3-4">  <span class="dt">rw =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">-5</span>, <span class="dv">5</span>), <span class="dt">round =</span> <span class="ot">FALSE</span></span>
-<span id="cb3-5">) </span>
-<span id="cb3-6">trgls &lt;-<span class="st"> </span><span class="kw">triang.list</span>(del) <span class="co"># extracts all triangles</span></span></code></pre>
-      </div>
-      <p>The function below calculates the volume under a triangle:</p>
-      <div class="sourceCode" id="cb4">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb4-1">volume_under_triangle &lt;-<span class="st"> </span><span class="cf">function</span>(trgl){</span>
-<span id="cb4-2">  <span class="kw">with</span>(</span>
-<span id="cb4-3">    trgl, </span>
-<span id="cb4-4">    <span class="kw">sum</span>(z) <span class="op">*</span><span class="st"> </span></span>
-<span id="cb4-5"><span class="st">      </span>(x[1L]<span class="op">*</span>y[2L] <span class="op">-</span><span class="st"> </span>x[2L]<span class="op">*</span>y[1L] <span class="op">+</span><span class="st"> </span>x[2L]<span class="op">*</span>y[3L] <span class="op">-</span></span>
-<span id="cb4-6"><span class="st">         </span>x[3L]<span class="op">*</span>y[2L] <span class="op">+</span><span class="st"> </span>x[3L]<span class="op">*</span>y[1L] <span class="op">-</span><span class="st"> </span>x[1L]<span class="op">*</span>y[3L]) <span class="op">/</span><span class="st"> </span><span class="dv">6</span></span>
-<span id="cb4-7">  )</span>
-<span id="cb4-8">}</span></code></pre>
-      </div>
-      <p>So here is our approximation of the volume:</p>
-      <div class="sourceCode" id="cb5">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb5-1">volumes &lt;-<span class="st"> </span><span class="kw">vapply</span>(trgls, volume_under_triangle, <span class="kw">numeric</span>(1L))</span>
-<span id="cb5-2"><span class="kw">sum</span>(volumes)</span>
-<span id="cb5-3"><span class="co">## [1] 3.141592</span></span></code></pre>
-      </div>
-      <h2 id="using-rcgal">Using ‘RCGAL’</h2>
-      <p>
-        If you ran the above code, you noticed that the
-        <code>deldir</code> function as well as the
-        <code>triang.list</code> function are a bit slow. My package
-        <a
-          href="https://laustep.github.io/stlahblog/posts/SurfaceReconstruction.html"
-          >RCGAL</a
-        >
-        (not on CRAN) can construct an elevated Delaunay tessellation, and it is
-        faster.
-      </p>
-      <div class="sourceCode" id="cb6">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb6-1"><span class="kw">library</span>(RCGAL)</span>
-<span id="cb6-2">points &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(grd)</span>
-<span id="cb6-3">del &lt;-<span class="st"> </span><span class="kw">delaunay</span>(points, <span class="dt">elevation =</span> <span class="ot">TRUE</span>)</span></code></pre>
-      </div>
-      <p>You can directly get the volume:</p>
-      <div class="sourceCode" id="cb7">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb7-1">del[[<span class="st">"volume"</span>]]</span>
-<span id="cb7-2"><span class="co">## [1] 3.141593</span></span></code></pre>
-      </div>
-      <p>
-        And you can easily plot the elevated Delaunay tessellation with the help
-        of the <strong>rgl</strong> package:
-      </p>
-      <div class="sourceCode" id="cb8">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb8-1">mesh &lt;-<span class="st"> </span>del[[<span class="st">"mesh"</span>]]</span>
-<span id="cb8-2"><span class="kw">library</span>(rgl)</span>
-<span id="cb8-3"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">306</span>), <span class="dt">zoom =</span> <span class="fl">0.5</span>)</span>
-<span id="cb8-4"><span class="kw">aspect3d</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">3</span>)</span>
-<span id="cb8-5"><span class="kw">shade3d</span>(mesh, <span class="dt">color =</span> <span class="st">"limegreen"</span>)</span>
-<span id="cb8-6"><span class="kw">wire3d</span>(mesh)</span></code></pre>
-      </div>
-      <p>
-        <img
-          src="https://laustep.github.io/stlahblog/posts/figures/rgl_elevated_delaunay.png"
-        />
-      </p>
-      <h2 id="update-2022-03-02-using-tessellation">
-        Update 2022-03-02: using ‘tessellation’
-      </h2>
-      <p>
-        The elevated Delaunay tessellation is now available in my package
-        <a href="https://github.com/stla/tessellation">tessellation</a>. The
-        command to get it is the same as the ‘RCGAL’ command and the output is
-        similar.
-      </p>
-      <div class="sourceCode" id="cb9">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb9-1">del &lt;-<span class="st"> </span>tessellation<span class="op">::</span><span class="kw">delaunay</span>(points, <span class="dt">elevation =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb9-2">del[[<span class="st">"volume"</span>]]</span>
-<span id="cb9-3"><span class="co">## [1] 3.141593</span></span></code></pre>
-      </div>
-      <h2 id="update-2022-03-10-using-rcdt">Update 2022-03-10: using ‘RCDT’</h2>
-      <p>
-        The elevated Delaunay triangulation is now available in my package
-        <a href="https://github.com/stla/RCDT">RCDT</a>.
-      </p>
-      <div class="sourceCode" id="cb10">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb10-1">del &lt;-<span class="st"> </span>RCDT<span class="op">::</span><span class="kw">delaunay</span>(points, <span class="dt">elevation =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb10-2">del[[<span class="st">"volume"</span>]]</span>
-<span id="cb10-3"><span class="co">## [1] 3.141593</span></span></code></pre>
-      </div>
-      <h2 id="interactive-plot-with-deldir">Interactive plot with ‘deldir’</h2>
-      <p>
-        The <strong>deldir</strong> also allows to get an interactive graphic
-        from the elevated Delaunay tessellation. This requires the
-        <strong>rgl</strong> package. I do it below with a less fine grid,
-        otherwise the visualization is not nice (too dense):
-      </p>
-      <div class="sourceCode" id="cb11">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb11-1">x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dt">length.out =</span> <span class="dv">20</span>)</span>
-<span id="cb11-2">y &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dt">length.out =</span> <span class="dv">20</span>)</span>
-<span id="cb11-3">grd &lt;-<span class="st"> </span><span class="kw">transform</span>(</span>
-<span id="cb11-4">  <span class="kw">expand.grid</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y), <span class="dt">z =</span> <span class="kw">f</span>(x, y)</span>
-<span id="cb11-5">) </span>
-<span id="cb11-6">del &lt;-<span class="st"> </span><span class="kw">deldir</span>(</span>
-<span id="cb11-7">  <span class="dt">x =</span> grd[[<span class="st">"x"</span>]], <span class="dt">y =</span> grd[[<span class="st">"y"</span>]], <span class="dt">z =</span> grd[[<span class="st">"z"</span>]],</span>
-<span id="cb11-8">  <span class="dt">rw =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">-3</span>, <span class="dv">3</span>), <span class="dt">round =</span> <span class="ot">FALSE</span></span>
-<span id="cb11-9">) </span></code></pre>
-      </div>
-      <div class="sourceCode" id="cb12">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb12-1"><span class="kw">library</span>(rgl)</span>
-<span id="cb12-2"><span class="kw">persp3d</span>(del, <span class="dt">front =</span> <span class="st">"lines"</span>, <span class="dt">back =</span> <span class="st">"lines"</span>, <span class="dt">col =</span> <span class="st">"blue"</span>)</span>
-<span id="cb12-3"><span class="kw">aspect3d</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">1</span>)</span></code></pre>
-      </div>
-      <p>
-        <img
-          src="https://laustep.github.io/stlahblog/posts/figures/deldir_elevated_delaunay.gif"
-        />
-      </p>
-    </div>
-  </div>
-</div>
-]]></description>
-      <pubDate>Sat, 26 Feb 2022 00:00:00 UT</pubDate>
-      <guid>https://laustep.github.io/stlahblog/posts/volumeUnderSurface.html</guid>
       <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>

@@ -1,0 +1,182 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Why is this hyperbolic background invariant?</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Why is this hyperbolic background invariant?</h1> 
+          <div class="info">
+    Posted on November 20, 2023
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'graphics'." href="../tags/graphics.html">graphics</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>, <a title="All pages tagged 'special-functions'." href="../tags/special-functions.html">special-functions</a>
+    
+</div>
+
+<p>I have a mathematical question for you, because it is a mystery for me.</p>
+<p>Look at this animation:</p>
+<p><img src="./figures/lambdaOnSquare.gif" /></p>
+<p>I get it as follows. Each frame corresponds to a value of <span class="math inline">\(t \in [0,3[\)</span> (I take <span class="math inline">\(160\)</span> values of <span class="math inline">\(t\)</span> subdivising <span class="math inline">\([0,3[\)</span>). Here is how I get the frame corresponding to one value of <span class="math inline">\(t\)</span>:</p>
+<ul>
+<li><p>for each point in the unit square <span class="math inline">\(S = {[0,1]}^2\)</span>, I take its complex affix <span class="math inline">\(z\)</span>, and I send <span class="math inline">\(z\)</span> to the open upper half-plane <span class="math inline">\(\mathbb{H} = \bigl\{z | \Im(z) &gt; 0\bigr\}\)</span> with a conformal map <span class="math inline">\(\psi\)</span> from <span class="math inline">\(S\)</span> to <span class="math inline">\(\mathbb{H}\)</span>;</p></li>
+<li><p>I attribute a color to <span class="math inline">\(R^t\Bigl(\lambda\bigl(\psi(z)\bigr)\Bigr)\)</span> where <span class="math inline">\(R\)</span> is the Möbius transformation of order <span class="math inline">\(3\)</span> defined by <span class="math inline">\(R(z) = -\dfrac{1}{z+1}\)</span> and <span class="math inline">\(\lambda\)</span> is the modular lambda function.</p></li>
+</ul>
+<p>The modular lambda function and the conformal map <span class="math inline">\(\psi\)</span> are implemented in my R package <strong>jacobi</strong>.</p>
+<p>My question is: why does the hyperbolic tessellation that we can see as the “background” of the animation not move? Why is it invariant?</p>
+<p>I observed the same phenomenon for other modular functions, for example the Klein j-invariant function.</p>
+<p>The color mapping <span class="math inline">\(\mathcal{C}\)</span> is defined with the help of the HSI color space. The color <span class="math inline">\(\mathcal{C}(z)\)</span> depends on the phase of <span class="math inline">\(z\)</span> only. Precisely, <span class="math inline">\(\mathcal{C}(z)\)</span> is the HSI color with:</p>
+<ul>
+<li><p><em>hue</em> <span class="math inline">\(\in [0, 360[\)</span> given by the phase <span class="math inline">\(\varphi(z) \in [0, 2\pi[\)</span> of <span class="math inline">\(z\)</span> converted to degrees;</p></li>
+<li><p><em>saturation</em> given by <span class="math inline">\(\sqrt{\bigl(1 + \sin(w)\bigr) / 2}\)</span> where <span class="math inline">\(w = 2\pi\log\bigl(1+\varphi(z)\bigr)\)</span>;</p></li>
+<li><p><em>intensity</em> given by <span class="math inline">\(\bigl(1 + \cos(w)\bigr) / 2\)</span> with <span class="math inline">\(w\)</span> as above.</p></li>
+</ul>
+<p>Why do we get such a result? I really don’t know.</p>
+<p>Before leaving you, let me show you a 3D version of this animation that I made with the <a href="https://github.com/cj-holmes/isocuboids"><strong>isocuboids</strong></a> R package:</p>
+<p><img src="./figures/isocuboids_lambdaOnSquare-gray.gif" /></p>
+<p>I hope you like it.</p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
