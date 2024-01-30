@@ -5,7 +5,118 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Mon, 29 Jan 2024 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Tue, 30 Jan 2024 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>Using the 'RowReorder' extension in a Shiny app</title>
+      <link>https://laustep.github.io/stlahblog/posts/shinyRowReorder.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        The ‘RowReorder’ extension of <strong>datatables</strong> is available
+        in the <strong>DT</strong> package. This extension allows to reorder the
+        rows of a <strong>DT</strong> table by dragging and dropping. However,
+        if you enable this extension in a Shiny app for a table using the
+        server-side processing (option <code>server=TRUE</code> in
+        <code>renderDT</code>), that won’t work: each time the rows are
+        reordered, they will jump back to their original locations.
+      </p>
+      <p>
+        So, if you want to use the server-side processing, you have to get the
+        new order of the rows whenever they are reordered and then you have to
+        replace the data by applying this new order to it. It is possible to get
+        the new order in JavaScript by listening to the
+        <strong>datatables</strong> event <code>row-reorder</code>. Then it
+        suffices to send this new order to the Shiny server with the help of
+        <code>Shiny.setInputValue</code>. Here is the JavaScript code which does
+        this job, where <code>n</code> is the number of rows of the data:
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1">js &lt;-<span class="st"> </span><span class="kw">c</span>(</span>
+<span id="cb1-2">  <span class="st">"table.on('row-reorder', function(e, details, edit) {"</span>,</span>
+<span id="cb1-3">  <span class="kw">sprintf</span>(<span class="st">"  var order = [%s];"</span>, <span class="kw">toString</span>(<span class="dv">0</span><span class="op">:</span>(n<span class="dv">-1</span>))),</span>
+<span id="cb1-4">  <span class="st">"  for(entry of details) {"</span>,</span>
+<span id="cb1-5">  <span class="st">"    order[entry.newPosition] = entry.oldPosition;"</span>,</span>
+<span id="cb1-6">  <span class="st">"  }"</span>,</span>
+<span id="cb1-7">  <span class="st">"  Shiny.setInputValue('newOrder', order);"</span>,</span>
+<span id="cb1-8">  <span class="st">"});"</span></span>
+<span id="cb1-9">)</span></code></pre>
+      </div>
+      <p>
+        With this code, whenever the rows are reordered, the Shiny server
+        receives the new order in <code>input$newOrder</code>. So one can use a
+        Shiny observer of this value, in which we can replace the data with the
+        help of the <strong>DT</strong> function <code>replaceData</code>. One
+        has to keep track of the transformed data for the subsequent
+        reorderings, and we can use a reactive dataframe to do so. Here is the
+        full code of the implementation of this method in a Shiny app:
+      </p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1"><span class="kw">library</span>(shiny)</span>
+<span id="cb2-2"><span class="kw">library</span>(DT)</span>
+<span id="cb2-3"></span>
+<span id="cb2-4">dat &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
+<span id="cb2-5">  <span class="dt">Type  =</span> <span class="kw">c</span>(<span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"C"</span>, <span class="st">"D"</span>),</span>
+<span id="cb2-6">  <span class="dt">Value =</span> <span class="kw">c</span>(<span class="dv">100</span>, <span class="dv">90</span>, <span class="dv">80</span>, <span class="dv">70</span>)</span>
+<span id="cb2-7">)</span>
+<span id="cb2-8"></span>
+<span id="cb2-9">js &lt;-<span class="st"> </span><span class="kw">c</span>(</span>
+<span id="cb2-10">  <span class="st">"table.on('row-reorder', function(e, details, edit) {"</span>,</span>
+<span id="cb2-11">  <span class="kw">sprintf</span>(<span class="st">"  var order = [%s];"</span>, <span class="kw">toString</span>(<span class="dv">0</span><span class="op">:</span>(<span class="kw">nrow</span>(dat)<span class="op">-</span><span class="dv">1</span>))),</span>
+<span id="cb2-12">  <span class="st">"  for(entry of details) {"</span>,</span>
+<span id="cb2-13">  <span class="st">"    order[entry.newPosition] = entry.oldPosition;"</span>,</span>
+<span id="cb2-14">  <span class="st">"  }"</span>,</span>
+<span id="cb2-15">  <span class="st">"  Shiny.setInputValue('newOrder', order);"</span>,</span>
+<span id="cb2-16">  <span class="st">"});"</span></span>
+<span id="cb2-17">)</span>
+<span id="cb2-18"></span>
+<span id="cb2-19">showRowNames &lt;-<span class="st"> </span><span class="ot">TRUE</span></span>
+<span id="cb2-20"></span>
+<span id="cb2-21">ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb2-22">  <span class="kw">br</span>(),</span>
+<span id="cb2-23">  <span class="kw">DTOutput</span>(<span class="st">"table"</span>)</span>
+<span id="cb2-24">)</span>
+<span id="cb2-25"></span>
+<span id="cb2-26">server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb2-27">  </span>
+<span id="cb2-28">  output<span class="op">$</span>table &lt;-<span class="st"> </span><span class="kw">renderDT</span>({</span>
+<span id="cb2-29">    <span class="kw">datatable</span>(</span>
+<span id="cb2-30">      dat,</span>
+<span id="cb2-31">      <span class="dt">rownames =</span> showRowNames,</span>
+<span id="cb2-32">      <span class="dt">extensions =</span> <span class="st">"RowReorder"</span>,</span>
+<span id="cb2-33">      <span class="dt">callback =</span> <span class="kw">JS</span>(js),</span>
+<span id="cb2-34">      <span class="dt">options =</span> <span class="kw">list</span>(<span class="dt">rowReorder =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb2-35">    )</span>
+<span id="cb2-36">  }, <span class="dt">server =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb2-37">  </span>
+<span id="cb2-38">  proxy &lt;-<span class="st"> </span><span class="kw">dataTableProxy</span>(<span class="st">"table"</span>)</span>
+<span id="cb2-39">  </span>
+<span id="cb2-40">  Dat &lt;-<span class="st"> </span><span class="kw">reactiveVal</span>(dat)</span>
+<span id="cb2-41">  </span>
+<span id="cb2-42">  <span class="kw">observeEvent</span>(input<span class="op">$</span>newOrder, {</span>
+<span id="cb2-43">    dat0 &lt;-<span class="st"> </span><span class="kw">Dat</span>()</span>
+<span id="cb2-44">    dat1 &lt;-<span class="st"> </span>dat0[input<span class="op">$</span>newOrder <span class="op">+</span><span class="st"> </span><span class="dv">1</span>, ]</span>
+<span id="cb2-45">    <span class="kw">replaceData</span>(proxy, dat1, <span class="dt">resetPaging =</span> <span class="ot">FALSE</span>, <span class="dt">rownames =</span> showRowNames)</span>
+<span id="cb2-46">    <span class="kw">Dat</span>(dat1)</span>
+<span id="cb2-47">  })</span>
+<span id="cb2-48">  </span>
+<span id="cb2-49">}</span>
+<span id="cb2-50"></span>
+<span id="cb2-51"><span class="kw">shinyApp</span>(ui, server)</span></code></pre>
+      </div>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Tue, 30 Jan 2024 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/shinyRowReorder.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>Avoiding reactivity in a Shiny app</title>
       <link>https://laustep.github.io/stlahblog/posts/shinyRespondsEnter.html</link>
@@ -12454,134 +12565,6 @@ PKG_CXXFLAGS = -I$(BH_PATH)</code></pre>
 ]]></description>
       <pubDate>Sun, 15 May 2022 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/rAmCharts4.html</guid>
-      <dc:creator>Stéphane Laurent</dc:creator>
-      <category>R</category>
-    </item>
-    <item>
-      <title>Boolean operations on meshes with R(CGAL)</title>
-      <link>https://laustep.github.io/stlahblog/posts/BooleanOpsOnMeshes.html</link>
-      <description><![CDATA[<div class="container-fluid">
-  <div class="main col-sm-12">
-    <div class="content">
-      <p>
-        I’m still working on my package <strong>RCGAL</strong>, that I already
-        present in <a href="./SurfaceReconstruction.html">a previous post</a>.
-      </p>
-      <p>
-        This previous post was about the reconstruction of surfaces. Now I
-        implemented the <em>Boolean operations on meshes</em>. Here are some
-        simple examples.
-      </p>
-      <h4 id="union-of-two-cubes">Union of two cubes:</h4>
-      <p>
-        <img
-          src="https://laustep.github.io/stlahblog/posts/figures/cubesUnion.png"
-        />
-      </p>
-      <h4 id="intersection-of-two-cubes-one-rotated">
-        Intersection of two cubes (one rotated):
-      </h4>
-      <p>
-        <img
-          src="https://laustep.github.io/stlahblog/posts/figures/interCubeRotatedCube.gif"
-        />
-      </p>
-      <h4 id="difference-of-two-cubes">Difference of two cubes:</h4>
-      <p>
-        <img
-          src="https://laustep.github.io/stlahblog/posts/figures/cubesDifference.png"
-        />
-      </p>
-      <h4 id="intersection-of-a-cube-and-a-truncated-icosahedron">
-        Intersection of a cube and a truncated icosahedron:
-      </h4>
-      <p>
-        <img
-          src="https://laustep.github.io/stlahblog/posts/figures/cubesIntersection.png"
-        />
-      </p>
-      <p>The code generating these plots is given in the RCGAL examples.</p>
-      <p>Now let’s turn to a more interesting example.</p>
-      <h2 id="the-compound-of-five-tetrahedra">
-        The compound of five tetrahedra
-      </h2>
-      <p>
-        The compound of five tetrahedra is provided by <strong>RCGAL</strong>.
-        These are five tetrahedra in a pretty configuration, each centered at
-        the origin. You can get their meshes by typing
-        <code>tetrahedraCompound</code>. This is a list with two components: a
-        field <code>meshes</code> providing for each tetrahderon its vertices
-        and its faces, and a field <code>rglmeshes</code>, similar to
-        <code>meshes</code> but these meshes are ready for plotting with the
-        <strong>rgl</strong> package. Here it is:
-      </p>
-      <div class="sourceCode" id="cb1">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb1-1"><span class="kw">library</span>(RCGAL)</span>
-<span id="cb1-2"><span class="kw">library</span>(rgl)</span>
-<span id="cb1-3">rglmeshes &lt;-<span class="st"> </span>tetrahedraCompound[[<span class="st">"rglmeshes"</span>]]</span>
-<span id="cb1-4"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>), <span class="dt">zoom =</span> <span class="fl">0.75</span>)</span>
-<span id="cb1-5"><span class="kw">bg3d</span>(<span class="st">"#363940"</span>)</span>
-<span id="cb1-6">colors &lt;-<span class="st"> </span><span class="kw">hcl.colors</span>(<span class="dv">5</span>, <span class="dt">palette =</span> <span class="st">"Spectral"</span>)</span>
-<span id="cb1-7"><span class="kw">invisible</span>(<span class="kw">lapply</span>(</span>
-<span id="cb1-8">  <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="cf">function</span>(i) <span class="kw">shade3d</span>(rglmeshes[[i]], <span class="dt">color =</span> colors[i])</span>
-<span id="cb1-9">))</span></code></pre>
-      </div>
-      <p>
-        <img
-          src="https://laustep.github.io/stlahblog/posts/figures/tetrahedraCompound.gif"
-        />
-      </p>
-      <p>
-        I wondered for a long time what is the intersection of these five
-        tetrahedra. But I didn’t have any tool to compute it. Now I have. Let’s
-        see.
-      </p>
-      <div class="sourceCode" id="cb2">
-        <pre
-          class="sourceCode r"
-        ><code class="sourceCode r"><span id="cb2-1"><span class="co"># compute the intersection ####</span></span>
-<span id="cb2-2">inter &lt;-<span class="st"> </span><span class="kw">MeshesIntersection</span>(</span>
-<span id="cb2-3">  tetrahedraCompound[[<span class="st">"meshes"</span>]], <span class="dt">numbersType =</span> <span class="st">"lazyExact"</span>, <span class="dt">clean =</span> <span class="ot">TRUE</span></span>
-<span id="cb2-4">)</span>
-<span id="cb2-5"><span class="co"># plot ####</span></span>
-<span id="cb2-6"><span class="kw">open3d</span>(<span class="dt">windowRect =</span> <span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">562</span>, <span class="dv">562</span>), <span class="dt">zoom =</span> <span class="fl">0.75</span>)</span>
-<span id="cb2-7"><span class="kw">bg3d</span>(<span class="st">"#363940"</span>)</span>
-<span id="cb2-8"><span class="co"># first the five tetrahedra with transparency ####</span></span>
-<span id="cb2-9"><span class="kw">invisible</span>(<span class="kw">lapply</span>(</span>
-<span id="cb2-10">  rglmeshes, shade3d, <span class="dt">color =</span> <span class="st">"yellow"</span>, <span class="dt">alpha =</span> <span class="fl">0.1</span></span>
-<span id="cb2-11">))</span>
-<span id="cb2-12"><span class="co"># now the intersection ####</span></span>
-<span id="cb2-13">rglinter &lt;-<span class="st"> </span><span class="kw">tmesh3d</span>(</span>
-<span id="cb2-14">  <span class="st">"vertices"</span>    =<span class="st"> </span><span class="kw">t</span>(inter[[<span class="st">"vertices"</span>]]),</span>
-<span id="cb2-15">  <span class="st">"indices"</span>     =<span class="st"> </span><span class="kw">t</span>(inter[[<span class="st">"faces"</span>]]),</span>
-<span id="cb2-16">  <span class="st">"homogeneous"</span> =<span class="st"> </span><span class="ot">FALSE</span></span>
-<span id="cb2-17">)</span>
-<span id="cb2-18"><span class="kw">shade3d</span>(rglinter, <span class="dt">color =</span> <span class="st">"gainsboro"</span>)</span>
-<span id="cb2-19"><span class="co"># and finally the edges ####</span></span>
-<span id="cb2-20"><span class="kw">plotEdges</span>(</span>
-<span id="cb2-21">  inter[[<span class="st">"vertices"</span>]], inter[[<span class="st">"exteriorEdges"</span>]],</span>
-<span id="cb2-22">  <span class="dt">only =</span> inter[[<span class="st">"exteriorVertices"</span>]], <span class="dt">color =</span> <span class="st">"darkmagenta"</span></span>
-<span id="cb2-23">)</span></code></pre>
-      </div>
-      <p>Here is the result:</p>
-      <p>
-        <img
-          src="https://laustep.github.io/stlahblog/posts/figures/tetrahedraCompoundIntersection.gif"
-        />
-      </p>
-      <p>This is an icosahedron, I think.</p>
-      <p>
-        Unfortunately, R CMD CHECK still throws some warnings which prevent me
-        to publish this package on CRAN. I hope this issue will be solved.
-      </p>
-    </div>
-  </div>
-</div>
-]]></description>
-      <pubDate>Sat, 14 May 2022 00:00:00 UT</pubDate>
-      <guid>https://laustep.github.io/stlahblog/posts/BooleanOpsOnMeshes.html</guid>
       <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>

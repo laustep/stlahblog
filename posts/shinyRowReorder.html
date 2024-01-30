@@ -1,0 +1,224 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - Using the 'RowReorder' extension in a Shiny app</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>Using the 'RowReorder' extension in a Shiny app</h1> 
+          <div class="info">
+    Posted on January 30, 2024
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'shiny'." href="../tags/shiny.html">shiny</a>, <a title="All pages tagged 'datatables'." href="../tags/datatables.html">datatables</a>
+    
+</div>
+
+<p>The ‘RowReorder’ extension of <strong>datatables</strong> is available in the <strong>DT</strong> package. This extension allows to reorder the rows of a <strong>DT</strong> table by dragging and dropping. However, if you enable this extension in a Shiny app for a table using the server-side processing (option <code>server=TRUE</code> in <code>renderDT</code>), that won’t work: each time the rows are reordered, they will jump back to their original locations.</p>
+<p>So, if you want to use the server-side processing, you have to get the new order of the rows whenever they are reordered and then you have to replace the data by applying this new order to it. It is possible to get the new order in JavaScript by listening to the <strong>datatables</strong> event <code>row-reorder</code>. Then it suffices to send this new order to the Shiny server with the help of <code>Shiny.setInputValue</code>. Here is the JavaScript code which does this job, where <code>n</code> is the number of rows of the data:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>js &lt;-<span class="st"> </span><span class="kw">c</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>  <span class="st">&quot;table.on('row-reorder', function(e, details, edit) {&quot;</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>  <span class="kw">sprintf</span>(<span class="st">&quot;  var order = [%s];&quot;</span>, <span class="kw">toString</span>(<span class="dv">0</span><span class="op">:</span>(n<span class="dv">-1</span>))),</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>  <span class="st">&quot;  for(entry of details) {&quot;</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>  <span class="st">&quot;    order[entry.newPosition] = entry.oldPosition;&quot;</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>  <span class="st">&quot;  }&quot;</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>  <span class="st">&quot;  Shiny.setInputValue('newOrder', order);&quot;</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>  <span class="st">&quot;});&quot;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>)</span></code></pre></div>
+<p>With this code, whenever the rows are reordered, the Shiny server receives the new order in <code>input$newOrder</code>. So one can use a Shiny observer of this value, in which we can replace the data with the help of the <strong>DT</strong> function <code>replaceData</code>. One has to keep track of the transformed data for the subsequent reorderings, and we can use a reactive dataframe to do so. Here is the full code of the implementation of this method in a Shiny app:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="kw">library</span>(DT)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>dat &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>  <span class="dt">Type  =</span> <span class="kw">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;D&quot;</span>),</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>  <span class="dt">Value =</span> <span class="kw">c</span>(<span class="dv">100</span>, <span class="dv">90</span>, <span class="dv">80</span>, <span class="dv">70</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>js &lt;-<span class="st"> </span><span class="kw">c</span>(</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>  <span class="st">&quot;table.on('row-reorder', function(e, details, edit) {&quot;</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>  <span class="kw">sprintf</span>(<span class="st">&quot;  var order = [%s];&quot;</span>, <span class="kw">toString</span>(<span class="dv">0</span><span class="op">:</span>(<span class="kw">nrow</span>(dat)<span class="op">-</span><span class="dv">1</span>))),</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>  <span class="st">&quot;  for(entry of details) {&quot;</span>,</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a>  <span class="st">&quot;    order[entry.newPosition] = entry.oldPosition;&quot;</span>,</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a>  <span class="st">&quot;  }&quot;</span>,</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a>  <span class="st">&quot;  Shiny.setInputValue('newOrder', order);&quot;</span>,</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a>  <span class="st">&quot;});&quot;</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a>)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true"></a>showRowNames &lt;-<span class="st"> </span><span class="ot">TRUE</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true"></a>  <span class="kw">br</span>(),</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true"></a>  <span class="kw">DTOutput</span>(<span class="st">&quot;table&quot;</span>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true"></a>)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true"></a></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true"></a>  </span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true"></a>  output<span class="op">$</span>table &lt;-<span class="st"> </span><span class="kw">renderDT</span>({</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true"></a>    <span class="kw">datatable</span>(</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true"></a>      dat,</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true"></a>      <span class="dt">rownames =</span> showRowNames,</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true"></a>      <span class="dt">extensions =</span> <span class="st">&quot;RowReorder&quot;</span>,</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true"></a>      <span class="dt">callback =</span> <span class="kw">JS</span>(js),</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true"></a>      <span class="dt">options =</span> <span class="kw">list</span>(<span class="dt">rowReorder =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true"></a>    )</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true"></a>  }, <span class="dt">server =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true"></a>  </span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true"></a>  proxy &lt;-<span class="st"> </span><span class="kw">dataTableProxy</span>(<span class="st">&quot;table&quot;</span>)</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true"></a>  </span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true"></a>  Dat &lt;-<span class="st"> </span><span class="kw">reactiveVal</span>(dat)</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true"></a>  </span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>newOrder, {</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true"></a>    dat0 &lt;-<span class="st"> </span><span class="kw">Dat</span>()</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true"></a>    dat1 &lt;-<span class="st"> </span>dat0[input<span class="op">$</span>newOrder <span class="op">+</span><span class="st"> </span><span class="dv">1</span>, ]</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true"></a>    <span class="kw">replaceData</span>(proxy, dat1, <span class="dt">resetPaging =</span> <span class="ot">FALSE</span>, <span class="dt">rownames =</span> showRowNames)</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true"></a>    <span class="kw">Dat</span>(dat1)</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true"></a>  })</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true"></a>  </span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true"></a>}</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true"></a></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
