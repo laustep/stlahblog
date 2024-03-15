@@ -5,7 +5,192 @@
     <link>https://laustep.github.io/stlahblog</link>
     <description><![CDATA[A blog about R and more.]]></description>
     <atom:link href="https://laustep.github.io/stlahblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Tue, 30 Jan 2024 00:00:00 UT</lastBuildDate>
+    <lastBuildDate>Fri, 15 Mar 2024 00:00:00 UT</lastBuildDate>
+    <item>
+      <title>The torus and the elliptic cyclide</title>
+      <link>https://laustep.github.io/stlahblog/posts/resultant-algebraicCurves.html</link>
+      <description><![CDATA[<div class="container-fluid">
+  <div class="main col-sm-12">
+    <div class="content">
+      <p>
+        I will soon release an update of <strong>qspray</strong> on CRAN as well
+        as a new package: <strong>resultant</strong>. This post shows an
+        application of these two packages.
+      </p>
+      <p>
+        Consider the two algebraic curves
+        <span class="math inline">\(f(x,y)=0\)</span> and
+        <span class="math inline">\(g(x,y)=0\)</span> where
+        <span class="math display"
+          >\[ f(x, y) = y^4 - y^3 + y^2 - 2x^2y + x^4 \quad \text{ and } \quad
+          g(x, y) = y - 2x^2. \]</span
+        >
+        We will derive their intersection points. First of all, let’s plot them.
+      </p>
+      <div class="sourceCode" id="cb1">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb1-1">f &lt;-<span class="st"> </span><span class="cf">function</span>(x, y) {</span>
+<span id="cb1-2">  y<span class="op">^</span><span class="dv">4</span> <span class="op">-</span><span class="st"> </span>y<span class="op">^</span><span class="dv">3</span> <span class="op">+</span><span class="st"> </span>y<span class="op">^</span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>x<span class="op">^</span><span class="dv">2</span><span class="op">*</span>y <span class="op">+</span><span class="st"> </span>x<span class="op">^</span><span class="dv">4</span></span>
+<span id="cb1-3">}</span>
+<span id="cb1-4"></span>
+<span id="cb1-5">g &lt;-<span class="st"> </span><span class="cf">function</span>(x, y) {</span>
+<span id="cb1-6">  y <span class="op">-</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>x<span class="op">^</span><span class="dv">2</span></span>
+<span id="cb1-7">}</span>
+<span id="cb1-8"></span>
+<span id="cb1-9"><span class="co"># contour line for f(x,y)=0</span></span>
+<span id="cb1-10">x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="fl">1.2</span>, <span class="fl">1.2</span>, <span class="dt">len =</span> <span class="dv">2000</span>)</span>
+<span id="cb1-11">y &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">len =</span> <span class="dv">2000</span>)</span>
+<span id="cb1-12">z &lt;-<span class="st"> </span><span class="kw">outer</span>(x, y, f)</span>
+<span id="cb1-13">crf &lt;-<span class="st"> </span><span class="kw">contourLines</span>(x, y, z, <span class="dt">levels =</span> <span class="dv">0</span>)</span>
+<span id="cb1-14"><span class="co"># contour line for g(x,y)=0</span></span>
+<span id="cb1-15">x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="dt">len =</span> <span class="dv">2000</span>)</span>
+<span id="cb1-16">y &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="fl">1.5</span>, <span class="dt">len =</span> <span class="dv">2000</span>)</span>
+<span id="cb1-17">z &lt;-<span class="st"> </span><span class="kw">outer</span>(x, y, g)</span>
+<span id="cb1-18">crg &lt;-<span class="st"> </span><span class="kw">contourLines</span>(x, y, z, <span class="dt">levels =</span> <span class="dv">0</span>)</span></code></pre>
+      </div>
+      <p>
+        Theoretically there is only one contour line for both. But for some
+        technical reasons, <code>crf</code> is split into several pieces:
+      </p>
+      <div class="sourceCode" id="cb2">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb2-1"><span class="kw">length</span>(crf)</span>
+<span id="cb2-2"><span class="co">## [1] 16</span></span></code></pre>
+      </div>
+      <p>
+        So we need a helper function to construct the dataframe that we will
+        pass to <code>ggplot2::geom_path</code>:
+      </p>
+      <div class="sourceCode" id="cb3">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb3-1">intercalateNA &lt;-<span class="st"> </span><span class="cf">function</span>(xs) {</span>
+<span id="cb3-2">  <span class="cf">if</span>(<span class="kw">length</span>(xs) <span class="op">==</span><span class="st"> </span>1L) {</span>
+<span id="cb3-3">    xs[[1L]]</span>
+<span id="cb3-4">  } <span class="cf">else</span> {</span>
+<span id="cb3-5">    <span class="kw">c</span>(xs[[1L]], <span class="ot">NA</span>, <span class="kw">intercalateNA</span>(xs[<span class="op">-</span>1L]))</span>
+<span id="cb3-6">  }</span>
+<span id="cb3-7">}</span>
+<span id="cb3-8">contourData &lt;-<span class="st"> </span><span class="cf">function</span>(cr) {</span>
+<span id="cb3-9">  xs &lt;-<span class="st"> </span><span class="kw">lapply</span>(cr, <span class="st">`</span><span class="dt">[[</span><span class="st">`</span>, <span class="st">"x"</span>)</span>
+<span id="cb3-10">  ys &lt;-<span class="st"> </span><span class="kw">lapply</span>(cr, <span class="st">`</span><span class="dt">[[</span><span class="st">`</span>, <span class="st">"y"</span>)</span>
+<span id="cb3-11">  <span class="kw">data.frame</span>(<span class="st">"x"</span> =<span class="st"> </span><span class="kw">intercalateNA</span>(xs), <span class="st">"y"</span> =<span class="st"> </span><span class="kw">intercalateNA</span>(ys))</span>
+<span id="cb3-12">}</span>
+<span id="cb3-13"></span>
+<span id="cb3-14">datf &lt;-<span class="st"> </span><span class="kw">contourData</span>(crf)</span>
+<span id="cb3-15">datg &lt;-<span class="st"> </span><span class="kw">contourData</span>(crg)</span></code></pre>
+      </div>
+      <p>I also plot the intersection points that we will derive later:</p>
+      <div class="sourceCode" id="cb4">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb4-1">datPoints &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="st">"x"</span> =<span class="st"> </span><span class="kw">c</span>(<span class="op">-</span><span class="fl">0.5</span>, <span class="dv">0</span>, <span class="fl">0.5</span>), <span class="st">"y"</span> =<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.5</span>, <span class="dv">0</span>, <span class="fl">0.5</span>))</span>
+<span id="cb4-2"></span>
+<span id="cb4-3"><span class="kw">library</span>(ggplot2)</span>
+<span id="cb4-4"><span class="kw">ggplot</span>() <span class="op">+</span></span>
+<span id="cb4-5"><span class="st">  </span><span class="kw">geom_path</span>(<span class="kw">aes</span>(x, y), <span class="dt">data =</span> datf, <span class="dt">linewidth =</span> <span class="dv">1</span>, <span class="dt">color =</span> <span class="st">"blue"</span>) <span class="op">+</span></span>
+<span id="cb4-6"><span class="st">  </span><span class="kw">geom_path</span>(<span class="kw">aes</span>(x, y), <span class="dt">data =</span> datg, <span class="dt">linewidth =</span> <span class="dv">1</span>, <span class="dt">color =</span> <span class="st">"green"</span>) <span class="op">+</span></span>
+<span id="cb4-7"><span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(x, y), <span class="dt">data =</span> datPoints, <span class="dt">size =</span> <span class="dv">2</span>)</span></code></pre>
+      </div>
+      <p>
+        <img
+          src="https://laustep.github.io/stlahblog/posts/figures/resultant-algebraicCurves-ggplot-1.png"
+          style="display: block; margin: auto"
+        />
+      </p>
+      <p>
+        Now we compute the <em>resultant</em> of the two polynomials with
+        respect to <span class="math inline">\(x\)</span>:
+      </p>
+      <div class="sourceCode" id="cb5">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb5-1"><span class="co"># define the two polynomials</span></span>
+<span id="cb5-2"><span class="kw">library</span>(qspray)</span>
+<span id="cb5-3">x &lt;-<span class="st"> </span><span class="kw">qlone</span>(<span class="dv">1</span>)</span>
+<span id="cb5-4">y &lt;-<span class="st"> </span><span class="kw">qlone</span>(<span class="dv">2</span>)</span>
+<span id="cb5-5">P &lt;-<span class="st"> </span><span class="kw">f</span>(x, y)</span>
+<span id="cb5-6">Q &lt;-<span class="st"> </span><span class="kw">g</span>(x, y)</span>
+<span id="cb5-7"><span class="co"># compute their resultant with respect to x</span></span>
+<span id="cb5-8">Rx &lt;-<span class="st"> </span>resultant<span class="op">::</span><span class="kw">resultant</span>(P, Q, <span class="dt">var =</span> <span class="dv">1</span>) <span class="co"># var=1 &lt;=&gt; var="x"</span></span>
+<span id="cb5-9"><span class="kw">prettyQspray</span>(Rx, <span class="dt">vars =</span> <span class="st">"x"</span>)</span>
+<span id="cb5-10"><span class="co">## [1] "16*x^8 - 32*x^7 + 24*x^6 - 8*x^5 + x^4"</span></span></code></pre>
+      </div>
+      <p>
+        We need the roots of the resultant
+        <span class="math inline">\(R_x\)</span>. I use
+        <strong>giacR</strong> to get them:
+      </p>
+      <div class="sourceCode" id="cb6">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb6-1"><span class="kw">library</span>(giacR)</span>
+<span id="cb6-2">giac &lt;-<span class="st"> </span>Giac<span class="op">$</span><span class="kw">new</span>()</span>
+<span id="cb6-3">command &lt;-<span class="st"> </span><span class="kw">sprintf</span>(<span class="st">"roots(%s)"</span>, <span class="kw">prettyQspray</span>(Rx, <span class="dt">vars =</span> <span class="st">"x"</span>))</span>
+<span id="cb6-4">giac<span class="op">$</span><span class="kw">execute</span>(command)</span>
+<span id="cb6-5"><span class="co">## [1] "[[0,4],[1/2,4]]"</span></span>
+<span id="cb6-6">giac<span class="op">$</span><span class="kw">close</span>()</span>
+<span id="cb6-7"><span class="co">## NULL</span></span></code></pre>
+      </div>
+      <p>
+        Thus there are two roots: <span class="math inline">\(0\)</span> and
+        <span class="math inline">\(1/2\)</span> (the output of
+        <strong>GIAC</strong> also provides their multiplicities). Luckily, they
+        are rational, so we can use <code>substituteQspray</code> to replace
+        <span class="math inline">\(y\)</span> with each of these roots in
+        <span class="math inline">\(P\)</span> and
+        <span class="math inline">\(Q\)</span>. We firstly do the substitution
+        <span class="math inline">\(y=0\)</span>:
+      </p>
+      <div class="sourceCode" id="cb7">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb7-1">Px &lt;-<span class="st"> </span><span class="kw">substituteQspray</span>(P, <span class="kw">c</span>(<span class="ot">NA</span>, <span class="st">"0"</span>))</span>
+<span id="cb7-2">Qx &lt;-<span class="st"> </span><span class="kw">substituteQspray</span>(Q, <span class="kw">c</span>(<span class="ot">NA</span>, <span class="st">"0"</span>))</span>
+<span id="cb7-3"><span class="kw">prettyQspray</span>(Px, <span class="st">"x"</span>)</span>
+<span id="cb7-4"><span class="co">## [1] "x^4"</span></span>
+<span id="cb7-5"><span class="kw">prettyQspray</span>(Qx, <span class="st">"x"</span>)</span>
+<span id="cb7-6"><span class="co">## [1] "(-2)*x^2"</span></span></code></pre>
+      </div>
+      <p>
+        Clearly, <span class="math inline">\(0\)</span> is the unique common
+        root of these two polynomials. One can conclude that
+        <span class="math inline">\((0,0)\)</span> is an intersection point.
+      </p>
+      <p>
+        Now we do the substitution <span class="math inline">\(y=1/2\)</span>:
+      </p>
+      <div class="sourceCode" id="cb8">
+        <pre
+          class="sourceCode r"
+        ><code class="sourceCode r"><span id="cb8-1">Px &lt;-<span class="st"> </span><span class="kw">substituteQspray</span>(P, <span class="kw">c</span>(<span class="ot">NA</span>, <span class="st">"1/2"</span>))</span>
+<span id="cb8-2">Qx &lt;-<span class="st"> </span><span class="kw">substituteQspray</span>(Q, <span class="kw">c</span>(<span class="ot">NA</span>, <span class="st">"1/2"</span>))</span>
+<span id="cb8-3"><span class="kw">prettyQspray</span>(Px, <span class="st">"x"</span>)</span>
+<span id="cb8-4"><span class="co">## [1] "x^4 - x^2 + 3/16"</span></span>
+<span id="cb8-5"><span class="kw">prettyQspray</span>(Qx, <span class="st">"x"</span>)</span>
+<span id="cb8-6"><span class="co">## [1] "1/2 - 2*x^2"</span></span></code></pre>
+      </div>
+      <p>
+        It is easy to see that
+        <span class="math inline">\(x= \pm 1/2\)</span> are the roots of the
+        second polynomial. And one can check that they are also some roots of
+        the first one. One can conclude that
+        <span class="math inline">\((-1/2, 1/2)\)</span> and
+        <span class="math inline">\((1/2, 1/2)\)</span> are some intersection
+        points.
+      </p>
+      <p>And we’re done.</p>
+    </div>
+  </div>
+</div>
+]]></description>
+      <pubDate>Fri, 15 Mar 2024 00:00:00 UT</pubDate>
+      <guid>https://laustep.github.io/stlahblog/posts/resultant-algebraicCurves.html</guid>
+      <dc:creator>Stéphane Laurent</dc:creator>
+      <category>R</category>
+    </item>
     <item>
       <title>Using the 'RowReorder' extension in a Shiny app</title>
       <link>https://laustep.github.io/stlahblog/posts/shinyRowReorder.html</link>
@@ -12539,32 +12724,6 @@ PKG_CXXFLAGS = -I$(BH_PATH)</code></pre>
 ]]></description>
       <pubDate>Fri, 20 May 2022 00:00:00 UT</pubDate>
       <guid>https://laustep.github.io/stlahblog/posts/HierarchicalDataViz.html</guid>
-      <dc:creator>Stéphane Laurent</dc:creator>
-      <category>R</category>
-    </item>
-    <item>
-      <title>The 'rAmCharts4' package</title>
-      <link>https://laustep.github.io/stlahblog/posts/rAmCharts4.html</link>
-      <description><![CDATA[<div class="container-fluid">
-  <div class="main col-sm-12">
-    <div class="content">
-      <p>
-        My package
-        <a href="https://github.com/stla/rAmCharts4">rAmCharts4</a> has a
-        moderate success on Github (twenty stars). So I decided to present it
-        here.
-      </p>
-      <p>
-        <img
-          src="https://laustep.github.io/stlahblog/posts/figures/rAmCharts4.gif"
-        />
-      </p>
-    </div>
-  </div>
-</div>
-]]></description>
-      <pubDate>Sun, 15 May 2022 00:00:00 UT</pubDate>
-      <guid>https://laustep.github.io/stlahblog/posts/rAmCharts4.html</guid>
       <dc:creator>Stéphane Laurent</dc:creator>
       <category>R</category>
     </item>

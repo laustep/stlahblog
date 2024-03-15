@@ -1,0 +1,249 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saturn Elephant - The torus and the elliptic cyclide</title>
+  <link href="../libraries/bootstrap/bootstrap-grid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/default2.css" />
+  <link rel="stylesheet" href="../css/post.css" />
+  <link rel="stylesheet" href="../css/misc.css" /> 
+  
+    <link rel="stylesheet" href="../css/pandoc-solarized.css" /> 
+   
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,200,800" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
+  <script src="../libraries/jquery.min.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar. -->
+      <div class="sidebar col-sm-2">
+        <div class="row">
+          <div class="col-sm-12" style="float:right;clear:both;margin-right:50px;margin-top:50px;">
+            <a href="https://www.r-bloggers.com/">
+              <img src="../images/Rbloggers.png" alt="Rbloggers" width="100%" />
+            </a>
+            <br />
+            <a href="http://t-redactyl.io/">
+              <span style="color:black;font-weight:bold;font-family:sans-serif;font-size:25px;">Standard error</span>
+            </a>
+            <a href="http://timelyportfolio.blogspot.be/">
+              <span style="color:grey;font-weight:bold;font-family:sans-serif;font-size:24px;">Timely portfolio</span>
+            </a>
+            <br />
+            <a href="https://antoineguillot.wordpress.com/blog/">
+              <span style="color:white;background-color:darkblue;font-weight:bold;font-family:sans-serif;font-size:21px;border:5px solid;border-color:darkblue">ENHANCE DATA</span>
+            </a>
+            <br />
+            <a href="https://fronkonstin.com/">
+              <span style="color:black;background-color:gold;font-weight:bold;font-size:29px;border:3px solid;border-color:gold;">Fronkonstin</span>
+            </a>
+          </div>
+        </div>
+        <div id="logos">
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/AsymptoteLogo.svg" style="width: 150%; transform: rotateZ(-35deg)" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/Rlogo.svg" style="width: 110%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/shiny-hex.png" style="width: 90%;" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <img src="../images/Povray_logo_sphere.png" style="width: 105%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/javascript.svg" style="width: 90%;" />
+            </div>
+            <div class="col-sm-4">
+              <img src="../images/haskell.svg" style="width: 110%;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main col-sm-10">
+        <div id="header">
+          <div id="logo">
+            <a href="../">
+              <img src="../images/stla.jpg" alt="stla" width="100px" />
+            </a>
+          </div>
+          <div id="navigation" style="margin-top:50px;">
+            <a href="../">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../archive.html">Archive</a>
+          </div>
+        </div>
+
+        <div class="content">
+          <h1>The torus and the elliptic cyclide</h1> 
+          <div class="info">
+    Posted on March 15, 2024
+    
+        by Stéphane Laurent
+    
+</div>
+<div class="info">
+    
+    Tags: <a title="All pages tagged 'R'." href="../tags/R.html">R</a>, <a title="All pages tagged 'maths'." href="../tags/maths.html">maths</a>
+    
+</div>
+
+<p>I will soon release an update of <strong>qspray</strong> on CRAN as well as a new package: <strong>resultant</strong>. This post shows an application of these two packages.</p>
+<p>Consider the two algebraic curves <span class="math inline">\(f(x,y)=0\)</span> and <span class="math inline">\(g(x,y)=0\)</span> where <span class="math display">\[
+f(x, y) = y^4 - y^3 + y^2 - 2x^2y + x^4 
+\quad \text{ and } \quad
+g(x, y) = y - 2x^2.
+\]</span> We will derive their intersection points. First of all, let’s plot them.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>f &lt;-<span class="st"> </span><span class="cf">function</span>(x, y) {</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>  y<span class="op">^</span><span class="dv">4</span> <span class="op">-</span><span class="st"> </span>y<span class="op">^</span><span class="dv">3</span> <span class="op">+</span><span class="st"> </span>y<span class="op">^</span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>x<span class="op">^</span><span class="dv">2</span><span class="op">*</span>y <span class="op">+</span><span class="st"> </span>x<span class="op">^</span><span class="dv">4</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>}</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>g &lt;-<span class="st"> </span><span class="cf">function</span>(x, y) {</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>  y <span class="op">-</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>x<span class="op">^</span><span class="dv">2</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>}</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="co"># contour line for f(x,y)=0</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="fl">1.2</span>, <span class="fl">1.2</span>, <span class="dt">len =</span> <span class="dv">2000</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>y &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">len =</span> <span class="dv">2000</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>z &lt;-<span class="st"> </span><span class="kw">outer</span>(x, y, f)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>crf &lt;-<span class="st"> </span><span class="kw">contourLines</span>(x, y, z, <span class="dt">levels =</span> <span class="dv">0</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a><span class="co"># contour line for g(x,y)=0</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="dt">len =</span> <span class="dv">2000</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>y &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="fl">1.5</span>, <span class="dt">len =</span> <span class="dv">2000</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a>z &lt;-<span class="st"> </span><span class="kw">outer</span>(x, y, g)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a>crg &lt;-<span class="st"> </span><span class="kw">contourLines</span>(x, y, z, <span class="dt">levels =</span> <span class="dv">0</span>)</span></code></pre></div>
+<p>Theoretically there is only one contour line for both. But for some technical reasons, <code>crf</code> is split into several pieces:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">length</span>(crf)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="co">## [1] 16</span></span></code></pre></div>
+<p>So we need a helper function to construct the dataframe that we will pass to <code>ggplot2::geom_path</code>:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>intercalateNA &lt;-<span class="st"> </span><span class="cf">function</span>(xs) {</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>  <span class="cf">if</span>(<span class="kw">length</span>(xs) <span class="op">==</span><span class="st"> </span>1L) {</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>    xs[[1L]]</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>  } <span class="cf">else</span> {</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>    <span class="kw">c</span>(xs[[1L]], <span class="ot">NA</span>, <span class="kw">intercalateNA</span>(xs[<span class="op">-</span>1L]))</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>  }</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>}</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>contourData &lt;-<span class="st"> </span><span class="cf">function</span>(cr) {</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a>  xs &lt;-<span class="st"> </span><span class="kw">lapply</span>(cr, <span class="st">`</span><span class="dt">[[</span><span class="st">`</span>, <span class="st">&quot;x&quot;</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a>  ys &lt;-<span class="st"> </span><span class="kw">lapply</span>(cr, <span class="st">`</span><span class="dt">[[</span><span class="st">`</span>, <span class="st">&quot;y&quot;</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a>  <span class="kw">data.frame</span>(<span class="st">&quot;x&quot;</span> =<span class="st"> </span><span class="kw">intercalateNA</span>(xs), <span class="st">&quot;y&quot;</span> =<span class="st"> </span><span class="kw">intercalateNA</span>(ys))</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a>}</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a>datf &lt;-<span class="st"> </span><span class="kw">contourData</span>(crf)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a>datg &lt;-<span class="st"> </span><span class="kw">contourData</span>(crg)</span></code></pre></div>
+<p>I also plot the intersection points that we will derive later:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>datPoints &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="st">&quot;x&quot;</span> =<span class="st"> </span><span class="kw">c</span>(<span class="op">-</span><span class="fl">0.5</span>, <span class="dv">0</span>, <span class="fl">0.5</span>), <span class="st">&quot;y&quot;</span> =<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.5</span>, <span class="dv">0</span>, <span class="fl">0.5</span>))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="kw">library</span>(ggplot2)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a><span class="kw">ggplot</span>() <span class="op">+</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a><span class="st">  </span><span class="kw">geom_path</span>(<span class="kw">aes</span>(x, y), <span class="dt">data =</span> datf, <span class="dt">linewidth =</span> <span class="dv">1</span>, <span class="dt">color =</span> <span class="st">&quot;blue&quot;</span>) <span class="op">+</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a><span class="st">  </span><span class="kw">geom_path</span>(<span class="kw">aes</span>(x, y), <span class="dt">data =</span> datg, <span class="dt">linewidth =</span> <span class="dv">1</span>, <span class="dt">color =</span> <span class="st">&quot;green&quot;</span>) <span class="op">+</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a><span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(x, y), <span class="dt">data =</span> datPoints, <span class="dt">size =</span> <span class="dv">2</span>)</span></code></pre></div>
+<p><img src="./figures/resultant-algebraicCurves-ggplot-1.png" style="display: block; margin: auto;" /></p>
+<p>Now we compute the <em>resultant</em> of the two polynomials with respect to <span class="math inline">\(x\)</span>:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="co"># define the two polynomials</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="kw">library</span>(qspray)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="kw">qlone</span>(<span class="dv">1</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>y &lt;-<span class="st"> </span><span class="kw">qlone</span>(<span class="dv">2</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>P &lt;-<span class="st"> </span><span class="kw">f</span>(x, y)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>Q &lt;-<span class="st"> </span><span class="kw">g</span>(x, y)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a><span class="co"># compute their resultant with respect to x</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a>Rx &lt;-<span class="st"> </span>resultant<span class="op">::</span><span class="kw">resultant</span>(P, Q, <span class="dt">var =</span> <span class="dv">1</span>) <span class="co"># var=1 &lt;=&gt; var=&quot;x&quot;</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a><span class="kw">prettyQspray</span>(Rx, <span class="dt">vars =</span> <span class="st">&quot;x&quot;</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a><span class="co">## [1] &quot;16*x^8 - 32*x^7 + 24*x^6 - 8*x^5 + x^4&quot;</span></span></code></pre></div>
+<p>We need the roots of the resultant <span class="math inline">\(R_x\)</span>. I use <strong>giacR</strong> to get them:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">library</span>(giacR)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>giac &lt;-<span class="st"> </span>Giac<span class="op">$</span><span class="kw">new</span>()</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>command &lt;-<span class="st"> </span><span class="kw">sprintf</span>(<span class="st">&quot;roots(%s)&quot;</span>, <span class="kw">prettyQspray</span>(Rx, <span class="dt">vars =</span> <span class="st">&quot;x&quot;</span>))</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>giac<span class="op">$</span><span class="kw">execute</span>(command)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a><span class="co">## [1] &quot;[[0,4],[1/2,4]]&quot;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>giac<span class="op">$</span><span class="kw">close</span>()</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a><span class="co">## NULL</span></span></code></pre></div>
+<p>Thus there are two roots: <span class="math inline">\(0\)</span> and <span class="math inline">\(1/2\)</span> (the output of <strong>GIAC</strong> also provides their multiplicities). Luckily, they are rational, so we can use <code>substituteQspray</code> to replace <span class="math inline">\(y\)</span> with each of these roots in <span class="math inline">\(P\)</span> and <span class="math inline">\(Q\)</span>. We firstly do the substitution <span class="math inline">\(y=0\)</span>:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>Px &lt;-<span class="st"> </span><span class="kw">substituteQspray</span>(P, <span class="kw">c</span>(<span class="ot">NA</span>, <span class="st">&quot;0&quot;</span>))</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>Qx &lt;-<span class="st"> </span><span class="kw">substituteQspray</span>(Q, <span class="kw">c</span>(<span class="ot">NA</span>, <span class="st">&quot;0&quot;</span>))</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a><span class="kw">prettyQspray</span>(Px, <span class="st">&quot;x&quot;</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a><span class="co">## [1] &quot;x^4&quot;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a><span class="kw">prettyQspray</span>(Qx, <span class="st">&quot;x&quot;</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a><span class="co">## [1] &quot;(-2)*x^2&quot;</span></span></code></pre></div>
+<p>Clearly, <span class="math inline">\(0\)</span> is the unique common root of these two polynomials. One can conclude that <span class="math inline">\((0,0)\)</span> is an intersection point.</p>
+<p>Now we do the substitution <span class="math inline">\(y=1/2\)</span>:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>Px &lt;-<span class="st"> </span><span class="kw">substituteQspray</span>(P, <span class="kw">c</span>(<span class="ot">NA</span>, <span class="st">&quot;1/2&quot;</span>))</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a>Qx &lt;-<span class="st"> </span><span class="kw">substituteQspray</span>(Q, <span class="kw">c</span>(<span class="ot">NA</span>, <span class="st">&quot;1/2&quot;</span>))</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a><span class="kw">prettyQspray</span>(Px, <span class="st">&quot;x&quot;</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a><span class="co">## [1] &quot;x^4 - x^2 + 3/16&quot;</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a><span class="kw">prettyQspray</span>(Qx, <span class="st">&quot;x&quot;</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true"></a><span class="co">## [1] &quot;1/2 - 2*x^2&quot;</span></span></code></pre></div>
+<p>It is easy to see that <span class="math inline">\(x= \pm 1/2\)</span> are the roots of the second polynomial. And one can check that they are also some roots of the first one. One can conclude that <span class="math inline">\((-1/2, 1/2)\)</span> and <span class="math inline">\((1/2, 1/2)\)</span> are some intersection points.</p>
+<p>And we’re done.</p>
+
+        </div>
+
+
+        <div id="footer">
+          Site proudly generated by
+          <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="disqus_thread"></div>
+        <div class="pagination">
+          <ul>
+            <li>
+              <a href="http://laustep.github.io/stlahblog/">« Back Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+
+<script src="../libraries/bootstrap/bootstrap.min.js"></script>
+<script>
+  var disqus_developer = 1;
+  var disqus_shortname = 'stlapblog';
+  // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] ||
+      document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+<script type="text/x-mathjax-config" src="../libraries/mathjax/config/TeX-MML-AM_CHTML.js"></script>
+<!-- <script>
+  window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="../libraries/mathjax/MathJax.js"><\/script>');
+</script> -->
+
+
+</html>
